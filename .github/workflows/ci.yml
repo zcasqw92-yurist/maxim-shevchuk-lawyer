@@ -1,0 +1,31 @@
+name: Проверка сайта
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Запустить полную проверку
+        run: npm run check

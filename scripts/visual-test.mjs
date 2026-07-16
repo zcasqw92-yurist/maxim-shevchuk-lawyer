@@ -38,12 +38,8 @@ const extractTarBrotli = async (archive) => {
   ]);
 };
 
-if (!(await access(join(browserDir, "libGLESv2.so")).then(() => true).catch(() => false))) {
-  await extractTarBrotli("swiftshader.tar.br");
-}
-if (!(await access(join(browserDir, "fonts.conf")).then(() => true).catch(() => false))) {
-  await extractTarBrotli("fonts.tar.br");
-}
+if (!(await access(join(browserDir, "libGLESv2.so")).then(() => true).catch(() => false))) await extractTarBrotli("swiftshader.tar.br");
+if (!(await access(join(browserDir, "fonts.conf")).then(() => true).catch(() => false))) await extractTarBrotli("fonts.tar.br");
 
 await mkdir(join(browserDir, "cache"), { recursive: true });
 await mkdir(join(browserDir, "home"), { recursive: true });
@@ -78,17 +74,13 @@ const checks = [
 const errors = [];
 let browser;
 
+const messageText = (href) => {
+  try { return new URL(href).searchParams.get("text") || ""; } catch { return ""; }
+};
+
 try {
   browser = await chromium.launch({
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--disable-background-networking",
-      "--disable-extensions",
-      "--font-render-hinting=none",
-    ],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-background-networking", "--disable-extensions", "--font-render-hinting=none"],
     executablePath: browserPath,
     headless: true,
   });
@@ -143,14 +135,18 @@ try {
   const whatsappHref = await interactionPage.locator("#contact-dialog [data-whatsapp-link]").getAttribute("href");
   const telegramHref = await interactionPage.locator("#contact-dialog [data-track='telegram']").getAttribute("href");
   if (!whatsappHref?.startsWith("https://api.whatsapp.com/send?phone=79065297970&text=")) errors.push("interaction: WhatsApp link is missing prepared message");
-  if (telegramHref !== "https://t.me/lawrazbor") errors.push("interaction: Telegram link is invalid");
+  if (!telegramHref?.startsWith("https://t.me/lawrazbor?text=")) errors.push("interaction: Telegram link is missing prepared message");
+  if (!messageText(telegramHref).includes("Хочу получить первичную оценку ситуации")) errors.push("interaction: Telegram generic message is incomplete");
   await interactionPage.locator("[data-dialog-close]").click();
   await interactionPage.locator(".hero__quick-choices [data-topic='возврат денежных средств']").click();
   const selectedTopic = await interactionPage.locator("#contact-dialog [data-dialog-topic]").textContent();
   const selectedWhatsappHref = await interactionPage.locator("#contact-dialog [data-whatsapp-link]").getAttribute("href");
-  const selectedWhatsappText = selectedWhatsappHref ? new URL(selectedWhatsappHref).searchParams.get("text") : "";
+  const selectedTelegramHref = await interactionPage.locator("#contact-dialog [data-track='telegram']").getAttribute("href");
+  const selectedWhatsappText = messageText(selectedWhatsappHref);
+  const selectedTelegramText = messageText(selectedTelegramHref);
   if (selectedTopic !== "Вы выбрали: возврат денежных средств") errors.push("interaction: selected topic is not shown in dialog");
-  if (!selectedWhatsappText?.includes("по вопросу: возврат денежных средств")) errors.push("interaction: WhatsApp message does not include selected topic");
+  if (!selectedWhatsappText.includes("по вопросу: возврат денежных средств")) errors.push("interaction: WhatsApp message does not include selected topic");
+  if (!selectedTelegramText.includes("Обращаюсь по вопросу: возврат денежных средств")) errors.push("interaction: Telegram message does not include selected topic");
   await interactionPage.locator("[data-dialog-close]").click();
   await interactionPage.locator(".header__online").click();
   if (!await dialog.evaluate((element) => element.open)) errors.push("interaction: online status did not open contact dialog");
@@ -163,13 +159,15 @@ try {
   if (!await quizDialog.evaluate((element) => element.open)) errors.push("interaction: price quiz did not open");
   if (await quizDialog.locator("[data-price-quiz-step]").count() !== 3) errors.push("interaction: price quiz must contain exactly three steps");
   const quizChoices = ["Не возвращают деньги", "Договор", "В ближайшие дни"];
-  for (const choice of quizChoices) {
-    await quizDialog.getByRole("button", { name: choice, exact: true }).click();
-  }
+  for (const choice of quizChoices) await quizDialog.getByRole("button", { name: choice, exact: true }).click();
   if (await quizPage.locator("[data-price-quiz-result]").isHidden()) errors.push("interaction: price quiz result did not open");
   const quizWhatsappHref = await quizPage.locator("[data-price-quiz-whatsapp]").getAttribute("href");
-  const quizWhatsappText = quizWhatsappHref ? new URL(quizWhatsappHref).searchParams.get("text") : "";
-  if (!quizWhatsappText?.includes("Ситуация: Не возвращают деньги") || !quizWhatsappText.includes("Материалы: Договор") || !quizWhatsappText.includes("Срок: В ближайшие дни")) errors.push("interaction: price quiz WhatsApp summary is incomplete");
+  const quizTelegramHref = await quizPage.locator("[data-price-quiz-telegram]").getAttribute("href");
+  const quizWhatsappText = messageText(quizWhatsappHref);
+  const quizTelegramText = messageText(quizTelegramHref);
+  const completeQuiz = (text) => text.includes("Ситуация: Не возвращают деньги") && text.includes("Материалы: Договор") && text.includes("Срок: В ближайшие дни");
+  if (!completeQuiz(quizWhatsappText)) errors.push("interaction: price quiz WhatsApp summary is incomplete");
+  if (!completeQuiz(quizTelegramText)) errors.push("interaction: price quiz Telegram summary is incomplete");
   await quizPage.close();
 
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -188,4 +186,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialogs, price quiz, menu`);
+console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialogs, messenger drafts, price quiz, menu`);

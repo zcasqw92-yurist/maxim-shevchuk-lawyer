@@ -5,6 +5,7 @@ import { site } from "../site.config.mjs";
 import { services } from "../src/data.mjs";
 import { composeRenderedPage } from "../src/page-composer.mjs";
 import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
+import { injectCaseStudies } from "../src/case-studies.mjs";
 import {
   renderAbout,
   renderContacts,
@@ -58,7 +59,8 @@ const writePage = async (pathname, options, context = {}) => {
   const output = pathname === "/" ? join(dist, "index.html") : join(dist, pathname, "index.html");
   const rendered = renderShell({ ...options, pathname });
   const composed = composeRenderedPage(rendered, { pathname, ...context });
-  const html = injectProcessGuarantees(composed, pathname);
+  const withGuarantees = injectProcessGuarantees(composed, pathname);
+  const html = injectCaseStudies(withGuarantees, pathname);
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };

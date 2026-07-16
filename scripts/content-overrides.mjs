@@ -104,9 +104,51 @@ const replacements = [
   ],
 ];
 
-const replaceAllChecked = (html, from, to, page) => {
+const replaceAllChecked = (html, from, to) => {
   if (!html.includes(from)) return html;
   return html.replaceAll(from, to);
+};
+
+const replaceRequired = (content, from, to, label) => {
+  if (!content.includes(from)) throw new Error(`Не найден обязательный фрагмент: ${label}`);
+  return content.replace(from, to);
+};
+
+const simplifyPriceQuiz = (html) => {
+  let result = html;
+  result = replaceRequired(result, "Шаг 1 из 5", "Шаг 1 из 3", "счётчик шагов квиза");
+  result = replaceRequired(result, '<h2 id="price-quiz-title">С чем связан вопрос?</h2>', '<h2 id="price-quiz-title">Что произошло?</h2>', "заголовок первого шага квиза");
+  result = replaceRequired(result, '<p>Выберите наиболее близкую ситуацию — это поможет понять объём работы.</p>', '<p>Выберите наиболее близкую ситуацию. Подробности можно будет дописать в мессенджере.</p>', "пояснение первого шага квиза");
+  result = replaceRequired(result, '<h2>Что уже есть?</h2>', '<h2>Какие материалы есть?</h2>', "заголовок шага материалов");
+  result = replaceRequired(result, '<h2>Есть ли срок?</h2>', '<h2>Насколько срочно?</h2>', "заголовок шага срочности");
+  result = replaceRequired(result, '<p>Ответы собраны в краткую сводку. Максим Юрьевич уточнит детали и назовёт стоимость до начала работы.</p>', '<p>Ответы собраны в краткую сводку. Максим Юрьевич первично ознакомится с ситуацией бесплатно, уточнит детали и назовёт стоимость до начала работы.</p>', "пояснение результата квиза");
+
+  const removableSteps = ["goal", "other-side"];
+  for (const step of removableSteps) {
+    const pattern = new RegExp(`\\n\\s*<section class="price-quiz__step" data-price-quiz-step="${step}" hidden>[\\s\\S]*?<\\/section>\\n`, "m");
+    if (!pattern.test(result)) throw new Error(`Не найден удаляемый шаг квиза: ${step}`);
+    result = result.replace(pattern, "\n");
+  }
+  return result;
+};
+
+const updateQuizScript = async (dist) => {
+  const file = join(dist, "assets", "app.js");
+  let script = await readFile(file, "utf8");
+  const oldFields = `const priceQuizFields = [
+  ["issue", "Вопрос"],
+  ["goal", "Задача"],
+  ["other-side", "Вторая сторона"],
+  ["materials", "Материалы"],
+  ["timing", "Срок"],
+];`;
+  const newFields = `const priceQuizFields = [
+  ["issue", "Ситуация"],
+  ["materials", "Материалы"],
+  ["timing", "Срок"],
+];`;
+  script = replaceRequired(script, oldFields, newFields, "поля итоговой сводки квиза");
+  await writeFile(file, script, "utf8");
 };
 
 const walkPages = async (dist, paths) => {
@@ -118,7 +160,8 @@ const walkPages = async (dist, paths) => {
     } catch {
       continue;
     }
-    for (const [from, to] of replacements) html = replaceAllChecked(html, from, to, path || "/");
+    for (const [from, to] of replacements) html = replaceAllChecked(html, from, to);
+    html = simplifyPriceQuiz(html);
     await writeFile(file, html, "utf8");
   }
 };
@@ -132,4 +175,5 @@ export const applyContentOverrides = async ({ dist, services }) => {
     "kontakty",
   ];
   await walkPages(dist, paths);
+  await updateQuizScript(dist);
 };

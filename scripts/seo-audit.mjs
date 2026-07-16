@@ -174,8 +174,7 @@ for (const page of pages) {
 
 if (/example\.(ru|com)$/i.test(new URL(site.siteUrl).hostname)) blockers.push("Заменить тестовый домен siteUrl");
 if (!site.phoneHref) blockers.push("Указать реальный телефон");
-if (!site.email || site.email.endsWith("@example.ru")) blockers.push("Указать реальный email");
-if (!site.formEndpoint) blockers.push("Подключить защищённый обработчик формы");
+if (!site.whatsapp || !site.telegram) blockers.push("Указать WhatsApp и Telegram для обращений");
 if (!site.webmasterVerification?.google) blockers.push("Подтвердить сайт в Google Search Console");
 if (!site.webmasterVerification?.yandex) blockers.push("Подтвердить сайт в Яндекс Вебмастере");
 if (!site.publicOffice?.enabled) warnings.push("Публичный офис не указан: локальная разметка LegalService и адресная карточка отключены");

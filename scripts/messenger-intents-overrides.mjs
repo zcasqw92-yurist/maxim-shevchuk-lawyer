@@ -10,11 +10,6 @@ const telegramDraftUrl = (message) => {
   return url.toString();
 };
 
-const replaceRequired = (content, from, to, label) => {
-  if (!content.includes(from)) throw new Error(`Не найден обязательный фрагмент для мессенджеров: ${label}`);
-  return content.replaceAll(from, to);
-};
-
 const messengerIntentJs = `
 
 // Every messenger control carries the intent that the visitor selected.
@@ -30,8 +25,20 @@ const messengerIntentJs = `
     return url.toString();
   };
 
+  const cleanWhatsappBase = (href) => {
+    const url = new URL(href || "https://api.whatsapp.com/send?phone=79065297970", location.href);
+    url.searchParams.delete("text");
+    return url.toString();
+  };
+
   const telegramDraftUrl = (baseHref, message) => {
     const url = new URL(cleanTelegramBase(baseHref));
+    url.searchParams.set("text", message);
+    return url.toString();
+  };
+
+  const whatsappDraftUrl = (baseHref, message) => {
+    const url = new URL(cleanWhatsappBase(baseHref));
     url.searchParams.set("text", message);
     return url.toString();
   };
@@ -40,18 +47,39 @@ const messengerIntentJs = `
     ? "Здравствуйте, Максим Юрьевич. Обращаюсь по вопросу: " + topic + ". Кратко опишу ситуацию и приложу имеющиеся материалы:"
     : genericMessage;
 
-  const rememberBase = (link) => {
+  const messageForControl = (control) => {
+    const explicit = String(control?.dataset?.message || "").trim();
+    if (explicit) return explicit;
+    const topic = String(control?.dataset?.topic || "").trim();
+    return topicMessage(topic);
+  };
+
+  const rememberTelegramBase = (link) => {
     if (!link) return "https://t.me/lawrazbor";
     if (!link.dataset.telegramBase) link.dataset.telegramBase = cleanTelegramBase(link.href);
     return link.dataset.telegramBase;
   };
 
-  const updateContactTelegram = () => {
+  const rememberWhatsappBase = (link) => {
+    if (!link) return "https://api.whatsapp.com/send?phone=79065297970";
+    if (!link.dataset.whatsappBase) link.dataset.whatsappBase = cleanWhatsappBase(link.href);
+    return link.dataset.whatsappBase;
+  };
+
+  const updateContactLinks = (control = null) => {
     const dialog = document.querySelector("#contact-dialog");
-    const link = dialog?.querySelector("a[data-track='telegram']");
-    if (!dialog || !link) return;
-    const topic = dialog.dataset.topic && dialog.dataset.topic !== "general" ? dialog.dataset.topic : "";
-    link.href = telegramDraftUrl(rememberBase(link), topicMessage(topic));
+    const telegram = dialog?.querySelector("a[data-track='telegram']");
+    const whatsapp = dialog?.querySelector("[data-whatsapp-link]");
+    if (!dialog || !telegram || !whatsapp) return;
+
+    let message = control ? messageForControl(control) : String(dialog.dataset.intentMessage || "").trim();
+    if (!message) {
+      const topic = dialog.dataset.topic && dialog.dataset.topic !== "general" ? dialog.dataset.topic : "";
+      message = topicMessage(topic);
+    }
+    dialog.dataset.intentMessage = message;
+    telegram.href = telegramDraftUrl(rememberTelegramBase(telegram), message);
+    whatsapp.href = whatsappDraftUrl(rememberWhatsappBase(whatsapp), message);
   };
 
   const quizSummary = () => [
@@ -68,7 +96,7 @@ const messengerIntentJs = `
   const updateQuizTelegram = () => {
     const link = document.querySelector("#price-quiz-dialog [data-price-quiz-telegram]");
     if (!link) return;
-    link.href = telegramDraftUrl(rememberBase(link), quizMessage());
+    link.href = telegramDraftUrl(rememberTelegramBase(link), quizMessage());
     const note = document.querySelector("#price-quiz-dialog [data-price-quiz-telegram-note]");
     if (note) note.textContent = quizNoteText;
   };
@@ -88,7 +116,7 @@ const messengerIntentJs = `
   };
 
   document.querySelectorAll("[data-dialog-open]").forEach((control) => {
-    control.addEventListener("click", updateContactTelegram);
+    control.addEventListener("click", () => updateContactLinks(control));
   });
 
   document.querySelectorAll("[data-price-quiz-open]").forEach((control) => {
@@ -134,10 +162,10 @@ const messengerIntentJs = `
     }
 
     const telegramLink = event.target.closest?.("a[data-track='telegram']");
-    if (telegramLink && telegramLink.closest("#contact-dialog")) updateContactTelegram();
+    if (telegramLink && telegramLink.closest("#contact-dialog")) updateContactLinks();
   }, true);
 
-  updateContactTelegram();
+  updateContactLinks();
 })();
 `;
 

@@ -14,6 +14,7 @@ import {
 } from "../src/render.mjs";
 import { applyContentOverrides } from "./content-overrides.mjs";
 import { applyQuickChoicesOverrides } from "./quick-choices-overrides.mjs";
+import { applyServicePageOverrides } from "./service-pages-render.mjs";
 import { applyCallbackOverrides } from "./callback-overrides.mjs";
 import { applyMessengerIntentOverrides } from "./messenger-intents-overrides.mjs";
 
@@ -105,6 +106,7 @@ for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})
 
 await applyContentOverrides({ dist, services });
 await applyQuickChoicesOverrides({ dist });
+await applyServicePageOverrides({ dist, services });
 await applyCallbackOverrides({ dist, services });
 await applyMessengerIntentOverrides({ dist, services });
 

@@ -12,7 +12,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Получить код
@@ -27,5 +27,47 @@ jobs:
       - name: Установить зависимости
         run: npm ci
 
-      - name: Запустить полную проверку
-        run: npm run check
+      - name: Собрать сайт
+        shell: bash
+        run: |
+          set +e
+          npm run build > build.log 2>&1
+          code=$?
+          cat build.log
+          exit $code
+
+      - name: Сохранить журнал ошибки сборки
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-error-log
+          path: build.log
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Проверить HTML
+        run: npm run validate
+
+      - name: Проверить SEO
+        run: npm run audit:seo
+
+      - name: Проверить быстрые ситуации
+        run: npm run test:quick-choices
+
+      - name: Проверить форму связи позже
+        run: npm run test:callback
+
+      - name: Проверить форму связи в браузере
+        run: npm run test:callback-interaction
+
+      - name: Проверить сообщения мессенджеров
+        run: npm run test:messenger-intents
+
+      - name: Проверить содержание страниц услуг
+        run: npm run test:service-pages
+
+      - name: Проверить типографику и сообщения услуг
+        run: npm run test:service-pages-interaction
+
+      - name: Проверить вёрстку и взаимодействия
+        run: npm run test:visual

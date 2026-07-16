@@ -1,0 +1,11 @@
+node_modules/
+dist/
+src/assets/source/
+.browser-bin/
+.browser-tmp/
+reports/screenshots/
+reports/lighthouse-mobile.json
+.DS_Store
+npm-debug.log*
+.gh-config/
+gh-auth-background.log

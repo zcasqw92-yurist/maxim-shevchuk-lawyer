@@ -3,6 +3,26 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 // Контент остаётся видимым без ожидания JavaScript: это важно для медленных
 // мобильных соединений и встроенных браузеров мессенджеров.
+const heroRotator = $("[data-hero-rotator]");
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (heroRotator && !reducedMotion) {
+  const phrases = [
+    "с точных фактов",
+    "с проверки документов",
+    "с убедительных доказательств",
+    "с верной квалификации",
+    "с понятного плана действий",
+  ];
+  let phraseIndex = 0;
+  setInterval(() => {
+    heroRotator.classList.add("is-changing");
+    setTimeout(() => {
+      phraseIndex = (phraseIndex + 1) % phrases.length;
+      heroRotator.textContent = phrases[phraseIndex];
+      heroRotator.classList.remove("is-changing");
+    }, 170);
+  }, 4200);
+}
 
 const analyticsEnabled = document.body.dataset.analyticsEnabled === "true";
 const analyticsRequiresConsent = document.body.dataset.analyticsRequiresConsent === "true";

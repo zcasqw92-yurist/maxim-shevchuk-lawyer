@@ -93,11 +93,10 @@ const header = (pathname) => `
   <a class="skip-link" href="#main">Перейти к содержанию</a>
   <header class="site-header" data-header>
     <div class="wrap header__inner">
-      <a class="brand" href="/" aria-label="Максим Шевчук — главная">
-        <span class="brand__mark"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></span>
-        <span class="brand__text"><strong>Максим Шевчук</strong><small>юридическая практика</small></span>
-      </a>
-      <span class="header__online" aria-label="Юрист онлайн"><i></i><span>Юрист онлайн</span></span>
+      <div class="brand">
+        <a class="brand__mark" href="/" aria-label="Максим Шевчук — главная"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></a>
+        <span class="brand__text"><a class="brand__home" href="/">Максим Шевчук</a><button class="header__online" type="button" data-dialog-open aria-label="Юрист онлайн — задать вопрос"><i></i><span>Юрист онлайн</span></button></span>
+      </div>
       <nav class="desktop-nav" aria-label="Основная навигация">
         ${navItems.map(([label, href]) => `<a href="${href}"${isCurrentNavItem(pathname, href) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
       </nav>
@@ -587,7 +586,7 @@ export const renderHome = () => ({
           <p class="hero__lead">Разбираю документы, нахожу юридическое основание и выстраиваю последовательность действий — от досудебного требования до искового заявления.</p>
           <div class="hero__actions">
             <button class="button button--primary" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button>
-            ${button("Посмотреть услуги", "/uslugi/", "secondary")}
+            <button class="button button--secondary" type="button" data-price-quiz-open>Узнать стоимость${icon("arrow", "button__icon")}</button>
           </div>
           <span class="hero__mobile-assurance">${icon("lock")}Конфиденциально</span>
           <div class="hero__quick-choices" aria-label="Выберите типовую ситуацию">

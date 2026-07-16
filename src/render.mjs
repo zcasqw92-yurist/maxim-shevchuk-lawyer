@@ -79,10 +79,15 @@ const breadcrumbs = (items) => `
   </nav>`;
 
 const navItems = [
+  ["Главная", "/"],
   ["Услуги", "/uslugi/"],
   ["О юристе", "/o-yuriste/"],
   ["Контакты", "/kontakty/"],
 ];
+
+const isCurrentNavItem = (pathname, href) => href === "/"
+  ? pathname === "/"
+  : pathname.startsWith(href.slice(0, -1));
 
 const header = (pathname) => `
   <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -92,8 +97,9 @@ const header = (pathname) => `
         <span class="brand__mark"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></span>
         <span class="brand__text"><strong>Максим Шевчук</strong><small>юридическая практика</small></span>
       </a>
+      <span class="header__online" aria-label="Юрист онлайн"><i></i><span>Юрист онлайн</span></span>
       <nav class="desktop-nav" aria-label="Основная навигация">
-        ${navItems.map(([label, href]) => `<a href="${href}"${pathname.startsWith(href.slice(0, -1)) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
+        ${navItems.map(([label, href]) => `<a href="${href}"${isCurrentNavItem(pathname, href) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
       </nav>
       <div class="header__actions">
         <span class="header__city">${icon("pin")}Москва</span>
@@ -489,7 +495,6 @@ export const renderHome = () => ({
     <section class="hero">
       <div class="wrap hero__grid">
         <div class="hero__content">
-          <div class="hero__kicker"><span class="status-dot"></span>Юридическая помощь в Москве</div>
           <h1>Сильная правовая позиция начинается <em>с точных фактов</em></h1>
           <p class="hero__lead">Разбираю документы, нахожу юридическое основание и выстраиваю последовательность действий — от досудебного требования до искового заявления.</p>
           <div class="hero__actions">

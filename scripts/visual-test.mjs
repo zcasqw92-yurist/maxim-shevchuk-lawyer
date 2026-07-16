@@ -182,7 +182,12 @@ try {
     window.scrollTo(0, 720);
     window.dispatchEvent(new Event("scroll"));
   });
-  await mobilePage.waitForFunction(() => document.querySelector("[data-mobile-contact]")?.classList.contains("is-visible"), null, { timeout: 2000 });
+  await mobilePage.waitForFunction(() => {
+    const panel = document.querySelector("[data-mobile-contact]");
+    if (!panel?.classList.contains("is-visible")) return false;
+    const style = getComputedStyle(panel);
+    return Number(style.opacity) > .9 && panel.getBoundingClientRect().bottom <= innerHeight + 1;
+  }, null, { timeout: 2500 });
   const mobilePanel = mobilePage.locator("[data-mobile-contact]");
   if (await mobilePanel.locator("button").count() !== 2) errors.push("interaction: mobile panel must contain exactly two buttons");
   const mobileLayout = await mobilePanel.evaluate((element) => {

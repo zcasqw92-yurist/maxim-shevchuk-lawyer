@@ -217,7 +217,7 @@ const renderPriceQuiz = () => {
 const resetPriceQuiz = () => {
   priceQuizStep = 0;
   priceQuizAnswers = {};
-  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = "Перед переходом в Telegram сводка скопируется — останется только вставить её в чат.";
+  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = "Нажмите кнопку: Telegram откроется, а текст с ответами уже скопируется. Вставьте его в чат с Максимом Юрьевичем.";
   renderPriceQuiz();
 };
 
@@ -283,8 +283,8 @@ priceQuizTelegram?.addEventListener("click", (event) => {
   void copyText(`Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости.\n\n${quizSummaryText()}\n\nКратко опишу ситуацию:`)
     .then((copied) => {
       if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = copied
-        ? "Сводка скопирована. Вставьте её в чат с Максимом Юрьевичем."
-        : "Сводку можно скопировать из этого окна и вставить в чат с Максимом Юрьевичем.";
+        ? "Текст с ответами скопирован. В Telegram вставьте его в поле сообщения и отправьте Максиму Юрьевичу."
+        : "Telegram уже открыт. Скопируйте текст с ответами и вставьте его в поле сообщения.";
     });
 });
 

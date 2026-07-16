@@ -49,8 +49,7 @@ if (site.production) {
   }
   if (/^example\./i.test(hostname)) launchErrors.push("замените тестовый siteUrl");
   if (!site.phoneHref) launchErrors.push("укажите phoneHref");
-  if (!site.email || site.email.endsWith("@example.ru")) launchErrors.push("укажите реальный email");
-  if (!site.formEndpoint) launchErrors.push("подключите formEndpoint");
+  if (!site.whatsapp || !site.telegram) launchErrors.push("укажите WhatsApp и Telegram для обращений");
   if (site.publicOffice?.enabled && !site.publicOffice.streetAddress) launchErrors.push("заполните адрес включённого publicOffice");
   if (site.analytics?.enabled && !/^G-[A-Z0-9]+$/i.test(site.analytics.googleMeasurementId || "") && !/^\d+$/.test(site.analytics.yandexMetricaId || "")) {
     launchErrors.push("укажите хотя бы один корректный идентификатор аналитики либо отключите analytics.enabled");

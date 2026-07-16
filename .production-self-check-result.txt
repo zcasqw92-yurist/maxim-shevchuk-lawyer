@@ -1,10 +1,10 @@
-tested_sha=98f49573db6b5ed9f46648e8a2ee58f2770a1677
-exit_code=1
+tested_sha=11ebd9fd03577ed180b6f2d429a44b80d4ddbecd
+exit_code=0
 preview_code=0
-production_build_code=1
-production_validate_code=1
-production_seo_code=1
-run_id=29541524805
+production_build_code=0
+production_validate_code=0
+production_seo_code=0
+run_id=29541730379
 --- log tail ---
 
 > maxim-shevchuk-legal-site@1.1.0 check
@@ -94,15 +94,21 @@ Visual and interaction smoke test passed: 7 viewports, dialogs, messenger drafts
 > maxim-shevchuk-legal-site@1.1.0 build
 > node scripts/build.mjs
 
-file:///home/runner/work/maxim-shevchuk-lawyer/maxim-shevchuk-lawyer/scripts/build.mjs:56
-    throw new Error(`Публикация остановлена:\n- ${launchErrors.join("\n- ")}`);
-          ^
+Built 14 HTML pages in /home/runner/work/maxim-shevchuk-lawyer/maxim-shevchuk-lawyer/dist
 
-Error: Публикация остановлена:
-- замените черновик политики конфиденциальности
-    at file:///home/runner/work/maxim-shevchuk-lawyer/maxim-shevchuk-lawyer/scripts/build.mjs:56:11
-    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)
-    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+> maxim-shevchuk-legal-site@1.1.0 validate
+> node scripts/validate.mjs
 
-Node.js v22.17.0
+Validated 14 HTML pages: no structural errors
+
+> maxim-shevchuk-legal-site@1.1.0 audit:seo
+> node scripts/seo-audit.mjs
+
+SEO audit: 14 HTML-страниц, 11 URL в карте сайта
+Ошибки: 0; предупреждения: 0; блокеры запуска: 2
+
+Блокеры запуска:
+- Подтвердить сайт в Google Search Console
+- Подтвердить сайт в Яндекс Вебмастере
+
+Критических технических SEO-ошибок не найдено.

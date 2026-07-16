@@ -27,29 +27,6 @@ const updateOnlineStatus = () => {
 updateOnlineStatus();
 setInterval(updateOnlineStatus, 60_000);
 
-// Контент остаётся видимым без ожидания JavaScript: это важно для медленных
-// мобильных соединений и встроенных браузеров мессенджеров.
-const heroRotator = $("[data-hero-rotator]");
-const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-if (heroRotator && !reducedMotion) {
-  const phrases = [
-    "с точных фактов",
-    "с проверки документов",
-    "с убедительных доказательств",
-    "с верной квалификации",
-    "с понятного плана действий",
-  ];
-  let phraseIndex = 0;
-  setInterval(() => {
-    heroRotator.classList.add("is-changing");
-    setTimeout(() => {
-      phraseIndex = (phraseIndex + 1) % phrases.length;
-      heroRotator.textContent = phrases[phraseIndex];
-      heroRotator.classList.remove("is-changing");
-    }, 170);
-  }, 4200);
-}
-
 const analyticsEnabled = document.body.dataset.analyticsEnabled === "true";
 const analyticsRequiresConsent = document.body.dataset.analyticsRequiresConsent === "true";
 const googleAnalyticsId = document.body.dataset.googleAnalyticsId || "";
@@ -161,44 +138,88 @@ menuToggle?.addEventListener("click", () => {
   mobileMenu.hidden = open;
 });
 
+const genericMessage = "Здравствуйте, Максим Юрьевич. Хочу получить первичную оценку ситуации. Кратко опишу, что произошло, и приложу имеющиеся документы:";
+const defaultDialogCopy = "Напишите, что произошло, и приложите имеющиеся материалы. Максим Юрьевич лично ознакомится с ними, ответит на основные вопросы и объяснит, с чего разумнее начать.";
+const quizNoteText = "Telegram откроется с заполненным черновиком. Проверьте ответы и отправьте сообщение Максиму Юрьевичу.";
+
+const cleanTelegramBase = (href) => {
+  const url = new URL(href || "https://t.me/lawrazbor", location.href);
+  url.searchParams.delete("text");
+  return url.toString();
+};
+
+const cleanWhatsappBase = (href) => {
+  const url = new URL(href || "https://api.whatsapp.com/send?phone=79065297970", location.href);
+  url.searchParams.delete("text");
+  return url.toString();
+};
+
+const telegramDraftUrl = (baseHref, message) => {
+  const url = new URL(cleanTelegramBase(baseHref));
+  url.searchParams.set("text", message);
+  return url.toString();
+};
+
+const whatsappDraftUrl = (baseHref, message) => {
+  const url = new URL(cleanWhatsappBase(baseHref));
+  url.searchParams.set("text", message);
+  return url.toString();
+};
+
+const topicMessage = (topic = "") => topic
+  ? `Здравствуйте, Максим Юрьевич. Обращаюсь по вопросу: ${topic}. Кратко опишу ситуацию и приложу имеющиеся материалы:`
+  : genericMessage;
+
+const messageForControl = (control) => {
+  const explicit = String(control?.dataset?.message || "").trim();
+  if (explicit) return explicit;
+  return topicMessage(String(control?.dataset?.topic || "").trim());
+};
+
 const dialog = $("#contact-dialog");
-const defaultDialogCopy = "Напишите в удобный мессенджер, что произошло. Максим Юрьевич лично уточнит важные детали и подскажет, с чего начать.";
-const openDialog = (topic = "") => {
+const contactTelegram = dialog?.querySelector("a[data-track='telegram']");
+const contactWhatsapp = dialog?.querySelector("[data-whatsapp-link]");
+const contactTelegramBase = cleanTelegramBase(contactTelegram?.href);
+const contactWhatsappBase = cleanWhatsappBase(contactWhatsapp?.href);
+
+const updateContactLinks = (control = null) => {
+  if (!dialog || !contactTelegram || !contactWhatsapp) return;
+  const message = control ? messageForControl(control) : genericMessage;
+  const topic = String(control?.dataset?.topic || "").trim();
+  dialog.dataset.topic = topic || "general";
+  dialog.dataset.intentMessage = message;
+  contactTelegram.href = telegramDraftUrl(contactTelegramBase, message);
+  contactWhatsapp.href = whatsappDraftUrl(contactWhatsappBase, message);
+};
+
+const openDialog = (control) => {
   if (!dialog) return;
-  const normalizedTopic = topic.trim();
-  const whatsapp = $("[data-whatsapp-link]", dialog);
-  if (whatsapp) {
-    const message = `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${normalizedTopic ? ` по вопросу: ${normalizedTopic}` : ""}. Кратко опишу ситуацию:`;
-    const whatsappUrl = new URL(whatsapp.href);
-    whatsappUrl.searchParams.set("text", message);
-    whatsapp.href = whatsappUrl.toString();
-  }
+  const topic = String(control?.dataset?.topic || "").trim();
+  updateContactLinks(control);
   const topicLabel = $("[data-dialog-topic]", dialog);
   const dialogCopy = $("[data-dialog-copy]", dialog);
-  dialog.dataset.topic = normalizedTopic || "general";
   if (topicLabel) {
-    topicLabel.hidden = !normalizedTopic;
-    topicLabel.textContent = normalizedTopic ? `Вы выбрали: ${normalizedTopic}` : "";
+    topicLabel.hidden = !topic;
+    topicLabel.textContent = topic ? `Вы выбрали: ${topic}` : "";
   }
-  if (dialogCopy) {
-    dialogCopy.textContent = normalizedTopic
-      ? "Опишите, что произошло, и приложите важные детали. Максим Юрьевич лично уточнит недостающее и подскажет, с чего начать."
-      : defaultDialogCopy;
-  }
+  if (dialogCopy) dialogCopy.textContent = topic
+    ? "Опишите, что произошло, и приложите важные детали. Максим Юрьевич лично уточнит недостающее и подскажет, с чего начать."
+    : defaultDialogCopy;
   dialog.showModal();
-  track("messenger_dialog_open", { topic: normalizedTopic || "general", page_path: location.pathname });
+  track("messenger_dialog_open", { topic: topic || "general", page_path: location.pathname });
 };
 
 $$('[data-dialog-open]').forEach((control) => {
   control.addEventListener("click", (event) => {
     if (control.tagName === "A") event.preventDefault();
-    openDialog(control.dataset.topic || "");
+    openDialog(control);
   });
 });
 $("[data-dialog-close]")?.addEventListener("click", () => dialog?.close());
 dialog?.addEventListener("click", (event) => {
   if (event.target === dialog) dialog.close();
 });
+updateContactLinks();
 
 const priceQuizDialog = $("#price-quiz-dialog");
 const priceQuizSteps = $$('[data-price-quiz-step]', priceQuizDialog);
@@ -211,18 +232,20 @@ const priceQuizWhatsapp = $('[data-price-quiz-whatsapp]', priceQuizDialog);
 const priceQuizTelegram = $('[data-price-quiz-telegram]', priceQuizDialog);
 const priceQuizTelegramNote = $('[data-price-quiz-telegram-note]', priceQuizDialog);
 const priceQuizFields = [
-  ["issue", "Вопрос"],
-  ["goal", "Задача"],
-  ["other-side", "Вторая сторона"],
+  ["issue", "Ситуация"],
   ["materials", "Материалы"],
   ["timing", "Срок"],
 ];
+const priceQuizWhatsappBase = cleanWhatsappBase(priceQuizWhatsapp?.href);
+const priceQuizTelegramBase = cleanTelegramBase(priceQuizTelegram?.href);
 let priceQuizStep = 0;
 let priceQuizAnswers = {};
 
 const quizSummaryText = () => priceQuizFields
-  .map(([key, label]) => `${label}: ${priceQuizAnswers[key]}`)
+  .map(([key, label]) => `${label}: ${priceQuizAnswers[key] || "Не указано"}`)
   .join("\n");
+
+const priceQuizMessage = () => `Здравствуйте, Максим Юрьевич. Я прошёл(а) короткий опрос на сайте и хочу уточнить ориентир стоимости.\n\n${quizSummaryText()}\n\nКратко дополню обстоятельства:`;
 
 const renderPriceQuiz = () => {
   if (!priceQuizDialog) return;
@@ -234,27 +257,22 @@ const renderPriceQuiz = () => {
   if (priceQuizProgressBar) priceQuizProgressBar.style.width = `${finished ? 100 : ((priceQuizStep + 1) / priceQuizSteps.length) * 100}%`;
   if (priceQuizBack) priceQuizBack.hidden = priceQuizStep === 0 || finished;
   $$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
-    const answer = priceQuizAnswers[option.dataset.quizKey];
-    const selected = answer === option.dataset.quizValue;
-    option.setAttribute("aria-pressed", String(selected));
+    option.setAttribute("aria-pressed", String(priceQuizAnswers[option.dataset.quizKey] === option.dataset.quizValue));
   });
 };
 
 const resetPriceQuiz = () => {
   priceQuizStep = 0;
   priceQuizAnswers = {};
-  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = "Нажмите кнопку: Telegram откроется, а текст с ответами уже скопируется. Вставьте его в чат с Максимом Юрьевичем.";
+  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = quizNoteText;
   renderPriceQuiz();
 };
 
 const showPriceQuizResult = () => {
   priceQuizStep = priceQuizSteps.length;
-  const summary = quizSummaryText();
-  if (priceQuizWhatsapp) {
-    const url = new URL(priceQuizWhatsapp.href);
-    url.searchParams.set("text", `Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости.\n\n${summary}\n\nКратко опишу ситуацию:`);
-    priceQuizWhatsapp.href = url.toString();
-  }
+  const message = priceQuizMessage();
+  if (priceQuizWhatsapp) priceQuizWhatsapp.href = whatsappDraftUrl(priceQuizWhatsappBase, message);
+  if (priceQuizTelegram) priceQuizTelegram.href = telegramDraftUrl(priceQuizTelegramBase, message);
   renderPriceQuiz();
   track("price_quiz_complete", { page_path: location.pathname });
 };
@@ -285,38 +303,83 @@ priceQuizBack?.addEventListener("click", () => {
   renderPriceQuiz();
 });
 
-const copyText = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    const field = document.createElement("textarea");
-    field.value = text;
-    field.setAttribute("readonly", "");
-    field.style.position = "fixed";
-    field.style.opacity = "0";
-    document.body.append(field);
-    field.select();
-    const copied = document.execCommand("copy");
-    field.remove();
-    return copied;
-  }
-};
-
 priceQuizTelegram?.addEventListener("click", (event) => {
   event.preventDefault();
+  priceQuizTelegram.href = telegramDraftUrl(priceQuizTelegramBase, priceQuizMessage());
   window.open(priceQuizTelegram.href, "_blank", "noopener");
-  void copyText(`Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости.\n\n${quizSummaryText()}\n\nКратко опишу ситуацию:`)
-    .then((copied) => {
-      if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = copied
-        ? "Текст с ответами скопирован. В Telegram вставьте его в поле сообщения и отправьте Максиму Юрьевичу."
-        : "Telegram уже открыт. Скопируйте текст с ответами и вставьте его в поле сообщения.";
-    });
+  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = quizNoteText;
+  track("contact_click", { channel: "telegram", source: "price_quiz", page_path: location.pathname });
 });
 
 $$('[data-price-quiz-close]').forEach((control) => control.addEventListener("click", () => priceQuizDialog?.close()));
 priceQuizDialog?.addEventListener("click", (event) => {
   if (event.target === priceQuizDialog) priceQuizDialog.close();
+});
+
+const callbackDialog = $("#callback-dialog");
+const callbackForm = callbackDialog?.querySelector("[data-callback-form]");
+const callbackNote = callbackDialog?.querySelector("[data-callback-note]");
+const callbackCopy = callbackDialog?.querySelector("[data-callback-copy]");
+const callbackWhatsapp = callbackDialog?.querySelector("[data-callback-whatsapp]");
+const callbackTelegram = callbackDialog?.querySelector("[data-callback-telegram]");
+
+const callbackMessage = () => {
+  const data = new FormData(callbackForm);
+  return [
+    "Здравствуйте, Максим Юрьевич. Прошу связаться со мной позже.",
+    "",
+    `Имя: ${String(data.get("name") || "").trim()}`,
+    `Контакт: ${String(data.get("contact") || "").trim()}`,
+    `Удобный день: ${String(data.get("day") || "").trim()}`,
+    `Удобное время: ${String(data.get("period") || "").trim()}`,
+    `Кратко о ситуации: ${String(data.get("summary") || "").trim()}`,
+    `Страница сайта: ${String(data.get("source") || location.pathname).trim()}`,
+  ].join("\n");
+};
+
+const validateCallbackForm = () => {
+  const valid = Boolean(callbackForm?.reportValidity());
+  if (!valid && callbackNote) callbackNote.textContent = "Заполните обязательные поля и подтвердите согласие на обработку данных.";
+  return valid;
+};
+
+$$('[data-callback-open]').forEach((control) => {
+  control.addEventListener("click", (event) => {
+    event.preventDefault();
+    const parentDialog = control.closest("dialog");
+    if (parentDialog?.open) parentDialog.close();
+    const source = callbackForm?.elements.namedItem("source");
+    if (source) source.value = location.pathname;
+    if (callbackNote) callbackNote.textContent = "Первичное знакомство с ситуацией бесплатно. Данные не сохраняются на сайте и передаются только через выбранный вами мессенджер.";
+    if (callbackCopy) callbackCopy.hidden = true;
+    callbackDialog?.showModal();
+    callbackForm?.elements.namedItem("name")?.focus();
+    track("callback_open", { page_path: location.pathname });
+  });
+});
+
+callbackForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!validateCallbackForm() || !callbackWhatsapp) return;
+  const url = whatsappDraftUrl(callbackWhatsapp.dataset.baseHref, callbackMessage());
+  window.open(url, "_blank", "noopener");
+  if (callbackNote) callbackNote.textContent = "WhatsApp открыт с готовым сообщением. Проверьте текст и нажмите отправить.";
+  track("callback_request_whatsapp", { page_path: location.pathname });
+});
+
+callbackTelegram?.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (!validateCallbackForm()) return;
+  const url = telegramDraftUrl(callbackTelegram.dataset.telegramHref, callbackMessage());
+  if (callbackCopy) callbackCopy.hidden = true;
+  if (callbackNote) callbackNote.textContent = "Telegram открыт с заполненным обращением. Проверьте текст и нажмите отправить.";
+  window.open(url, "_blank", "noopener");
+  track("callback_request_telegram", { page_path: location.pathname });
+});
+
+callbackDialog?.querySelector("[data-callback-close]")?.addEventListener("click", () => callbackDialog.close());
+callbackDialog?.addEventListener("click", (event) => {
+  if (event.target === callbackDialog) callbackDialog.close();
 });
 
 $$('[data-track]').forEach((link) => {

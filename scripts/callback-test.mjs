@@ -40,14 +40,15 @@ for (const marker of [
   "callback_request_whatsapp",
   "callback_request_telegram",
   "callback_open",
-  "callbackForm.reportValidity()",
+  "callbackForm?.reportValidity()",
   "new FormData(callbackForm)",
-  "data is persisted in browser storage",
+  "validateCallbackForm",
 ]) {
   if (!app.includes(marker)) errors.push(`app.js: missing callback marker ${marker}`);
 }
 
-const callbackSection = app.split("// Callback-later flow:")[1] || "";
+const callbackSection = app.split('const callbackDialog = $("#callback-dialog");')[1] || "";
+if (!callbackSection) errors.push("app.js: callback source section was not found");
 if (/localStorage|sessionStorage/.test(callbackSection)) errors.push("app.js: callback flow must not use browser storage");
 if (!styles.includes(".callback-form__fields")) errors.push("styles.css: callback form styles are missing");
 if (!styles.includes(".callback-consent")) errors.push("styles.css: callback consent styles are missing");

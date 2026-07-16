@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
 import { services } from "../src/data.mjs";
+import { composeRenderedPage } from "../src/page-composer.mjs";
 import {
   renderAbout,
   renderContacts,
@@ -12,11 +13,6 @@ import {
   renderServices,
   renderShell,
 } from "../src/render.mjs";
-import { applyContentOverrides } from "./content-overrides.mjs";
-import { applyQuickChoicesOverrides } from "./quick-choices-overrides.mjs";
-import { applyServicePageOverrides } from "./service-pages-render.mjs";
-import { applyCallbackOverrides } from "./callback-overrides.mjs";
-import { applyMessengerIntentOverrides } from "./messenger-intents-overrides.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -57,10 +53,12 @@ if (site.production) {
   }
 }
 
-const writePage = async (pathname, options) => {
+const writePage = async (pathname, options, context = {}) => {
   const output = pathname === "/" ? join(dist, "index.html") : join(dist, pathname, "index.html");
+  const rendered = renderShell({ ...options, pathname });
+  const html = composeRenderedPage(rendered, { pathname, ...context });
   await mkdir(dirname(output), { recursive: true });
-  await writeFile(output, renderShell({ ...options, pathname }), "utf8");
+  await writeFile(output, html, "utf8");
 };
 
 const writeRedirect = async (pathname, destination) => {
@@ -88,14 +86,18 @@ const writeRedirect = async (pathname, destination) => {
 await rm(dist, { recursive: true, force: true });
 await mkdir(join(dist, "assets", "images"), { recursive: true });
 await cp(join(root, "src", "assets", "images"), join(dist, "assets", "images"), { recursive: true });
-await cp(join(root, "src", "styles.css"), join(dist, "assets", "styles.css"));
+const styles = [
+  await readFile(join(root, "src", "styles.css"), "utf8"),
+  await readFile(join(root, "src", "site-enhancements.css"), "utf8"),
+].join("\n");
+await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
 await cp(join(root, "public"), dist, { recursive: true });
 
 await writePage("/", renderHome());
 await writePage("/uslugi", renderServices());
 for (const service of services) {
-  await writePage(`/uslugi/${service.slug}`, renderService(service));
+  await writePage(`/uslugi/${service.slug}`, renderService(service), { service });
 }
 await writePage("/o-yuriste", renderAbout());
 await writePage("/kontakty", renderContacts());
@@ -103,12 +105,6 @@ await writePage("/politika-konfidencialnosti", renderPrivacy());
 for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})) {
   await writeRedirect(pathname, destination);
 }
-
-await applyContentOverrides({ dist, services });
-await applyQuickChoicesOverrides({ dist });
-await applyServicePageOverrides({ dist, services });
-await applyCallbackOverrides({ dist, services });
-await applyMessengerIntentOverrides({ dist, services });
 
 const indexablePages = [
   { path: "/", image: "/assets/images/maxim-hero.webp" },

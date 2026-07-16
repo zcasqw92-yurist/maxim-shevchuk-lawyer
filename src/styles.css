@@ -605,16 +605,19 @@
 
   @media (max-width: 680px) {
     :root { --wrap: calc(100% - 30px); }
-    body { padding-bottom: 64px; font-size: 15px; }
+    body { padding-bottom: 72px; font-size: 16px; line-height: 1.7; }
     h1 { font-size: clamp(2.8rem, 13vw, 4.6rem); }
     h2 { font-size: clamp(2.25rem, 10vw, 3.6rem); }
     .section { padding: 82px 0; }
     .brand__text small { display: none; }
     .brand__mark { width: 41px; }
     .hero h1 { font-size: clamp(3rem, 13.5vw, 4.8rem); }
-    .hero__lead { font-size: 16px; }
+    .hero__lead { font-size: 18px; line-height: 1.62; }
     .hero__actions { display: grid; }
+    .button { min-height: 56px; padding-inline: 24px; font-size: 15px; }
+    .button__icon { width: 18px; height: 18px; }
     .hero__actions .button { width: 100%; }
+    .eyebrow { gap: 13px; font-size: 11px; letter-spacing: .15em; }
     .hero__assurance { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .hero__image-wrap img { aspect-ratio: 4/5; object-position: 58% center; }
     .identity-card { right: 8px; bottom: 12px; width: 62%; padding: 17px; }
@@ -642,6 +645,9 @@
     .inner-hero h1, .service-hero h1, .about-hero h1, .district-detail-hero h1, .contact-page__intro h1 { font-size: clamp(3rem, 13vw, 4.7rem); }
     .inner-hero__aside { padding-left: 20px; }
     .process-line, .process-cards { grid-template-columns: 1fr; }
+    .number-list li { grid-template-columns: 50px 1fr; gap: 16px; padding: 26px 0; }
+    .number-list span { font-size: 18px; }
+    .number-list p { font-size: 17px; line-height: 1.55; }
     .process-line li { min-height: 210px; }
     .process-line span { margin-bottom: 38px; }
     .about-hero__facts { grid-template-columns: 1fr; }
@@ -659,10 +665,10 @@
     .dialog__intro { display: none; }
     .dialog__form { padding: 58px 22px 28px; }
     .contact-dialog { max-height: calc(100dvh - 18px); }
-    .mobile-contact { position: fixed; z-index: 90; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: 1fr; min-height: 64px; padding: 8px max(12px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); opacity: 0; pointer-events: none; background: rgba(9,28,44,.96); backdrop-filter: blur(12px); transform: translateY(110%); transition: opacity .25s ease, transform .25s ease; }
+    .mobile-contact { position: fixed; z-index: 90; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: 1fr; min-height: 72px; padding: 9px max(12px, env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); opacity: 0; pointer-events: none; background: rgba(9,28,44,.96); backdrop-filter: blur(12px); transform: translateY(110%); transition: opacity .25s ease, transform .25s ease; }
     .mobile-contact.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
     .mobile-contact:has(a) { grid-template-columns: .8fr 1.2fr; }
-    .mobile-contact a, .mobile-contact button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; color: var(--white); border: 0; background: transparent; font-size: 12px; font-weight: 750; }
+    .mobile-contact a, .mobile-contact button { display: flex; min-height: 54px; align-items: center; justify-content: center; gap: 9px; color: var(--white); border: 0; background: transparent; font-size: 15px; font-weight: 750; }
     .mobile-contact button { color: var(--ink); background: var(--gold-bright); border-radius: 99px; }
     .mobile-contact svg { width: 18px; }
     .site-footer { padding-top: 65px; }

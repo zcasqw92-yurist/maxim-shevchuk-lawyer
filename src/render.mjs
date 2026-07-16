@@ -40,6 +40,8 @@ const icon = (name, className = "icon") => {
     lock: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
     pin: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
     phone: '<path d="M7 3 4 5c-1 8 7 16 15 15l2-3-5-3-2 2c-3-1-5-3-6-6l2-2-3-5Z"/>',
+    whatsapp: '<path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8.5c.2 2 2 4.2 4.2 4.5l1.1-1.1 1.7.8c-.6 1.3-1.8 1.8-3 1.4-2.8-.9-4.9-3.1-5.6-5.8-.3-1.2.3-2.4 1.5-2.9l.8 1.8Z"/>',
+    telegram: '<path d="m21 4-7.1 16-3.6-6-6.3-2.7L21 4Z"/><path d="m10.3 14 2.2-2.1"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',
     education: '<path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v5c3 2 7 2 10 0v-5M21 9v7"/>',
@@ -148,46 +150,31 @@ const footer = () => `
     </div>
   </footer>`;
 
-const contactForm = (id = "contact-form") => `
-  <form class="contact-form" id="${id}" action="${esc(site.formEndpoint || "")}" method="post" data-contact-form novalidate>
-    <input type="hidden" name="source_page" value="">
-    <input type="hidden" name="utm_source" value="">
-    <input type="hidden" name="utm_medium" value="">
-    <input type="hidden" name="utm_campaign" value="">
-    <input type="hidden" name="utm_content" value="">
-    <input type="hidden" name="utm_term" value="">
-    <div class="form__row">
-      <label><span>Ваше имя</span><input name="name" autocomplete="name" required placeholder="Как к вам обращаться"></label>
-      <label><span>Телефон или мессенджер</span><input name="contact" autocomplete="tel" required placeholder="+7 или @username"></label>
-    </div>
-    <label><span>Что произошло</span><textarea name="message" rows="4" required placeholder="Коротко опишите ситуацию и укажите, какие документы сохранились"></textarea></label>
-    <label class="consent"><input type="checkbox" name="consent" required><span>Согласен на обработку данных для ответа на обращение</span></label>
-    <button class="button button--primary button--wide" type="submit">Передать ситуацию${icon("arrow", "button__icon")}</button>
-    <p class="form__note">Документы и подробности можно будет передать после первого контакта.</p>
-    <p class="form__status" role="status" aria-live="polite" data-form-status></p>
-  </form>`;
+const whatsappMessage = (topic = "") => `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${topic ? ` по вопросу: ${topic}` : ""}. Кратко опишу ситуацию:`;
+const whatsappLink = (topic = "") => `${site.whatsapp}?text=${encodeURIComponent(whatsappMessage(topic))}`;
+
+const messengerChoices = (className = "") => `
+  <div class="messenger-choices ${className}">
+    <a class="messenger-choice messenger-choice--whatsapp" href="${esc(whatsappLink())}" target="_blank" rel="noopener" data-whatsapp-link data-track="whatsapp">${icon("whatsapp")}<span>Написать в WhatsApp</span></a>
+    <a class="messenger-choice messenger-choice--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-track="telegram">${icon("telegram")}<span>Написать в Telegram</span></a>
+  </div>`;
 
 const dialog = () => `
   <dialog class="contact-dialog" id="contact-dialog" aria-labelledby="dialog-title">
     <button class="dialog__close" type="button" data-dialog-close aria-label="Закрыть">${icon("close")}</button>
-    <div class="dialog__layout">
-      <div class="dialog__intro">
-        <span class="eyebrow eyebrow--light">Первый шаг</span>
-        <h2 id="dialog-title">Опишите ситуацию своими словами</h2>
-        <p>Не нужно подбирать юридические термины. Достаточно коротко изложить хронологию и сообщить, какие документы сохранились.</p>
-        <ul class="plain-checks plain-checks--light">
-          <li>${icon("lock")}Конфиденциально</li>
-          <li>${icon("document")}Без шаблонного ответа</li>
-          <li>${icon("dialog")}Понятный следующий шаг</li>
-        </ul>
-      </div>
-      <div class="dialog__form">${contactForm("dialog-form")}</div>
+    <div class="messenger-dialog__content">
+      <span class="messenger-dialog__status"><i></i>На связи в мессенджерах</span>
+      <img class="messenger-dialog__portrait" src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Юрьевич Шевчук">
+      <h2 id="dialog-title">Готов разобрать ситуацию</h2>
+      <p>Напишите в удобный мессенджер, что произошло. Максим Юрьевич лично уточнит важные детали и подскажет, с чего начать.</p>
+      ${messengerChoices("messenger-choices--dialog")}
+      <p class="messenger-dialog__note">Первичное сообщение ни к чему вас не обязывает.</p>
+      <p class="messenger-dialog__privacy">${icon("lock")}Конфиденциально. Общение напрямую с юристом — без операторов и ботов.</p>
     </div>
   </dialog>`;
 
 const stickyContact = () => `
   <div class="mobile-contact" aria-label="Быстрые действия" data-mobile-contact>
-    ${site.phoneHref ? `<a href="tel:${site.phoneHref}">${icon("phone")}Позвонить</a>` : ""}
     <button type="button" data-dialog-open>${icon("dialog")}Описать ситуацию</button>
   </div>`;
 
@@ -718,7 +705,7 @@ export const renderContacts = () => {
     mainEntityId: entityUrl(site.personId),
     content: `
       ${breadcrumbs(crumbs)}
-      <section class="contact-page"><div class="wrap contact-page__grid"><div class="contact-page__intro"><span class="eyebrow">Связаться</span><h1>Опишите ситуацию — без юридических формулировок</h1><p class="lead">Укажите, что произошло, когда и какие документы сохранились. Этого достаточно для первого предметного ответа.</p><div class="contact-list"><div>${icon("phone")}<span>Телефон</span><strong>${esc(site.phoneDisplay)}</strong></div><div>${icon("mail")}<span>Электронная почта</span><strong>${esc(site.email)}</strong></div><div>${icon("pin")}<span>${office ? "Адрес приёма" : "География"}</span><strong>${esc(locationValue)}</strong></div></div><div class="contact-page__photo"><img src="/assets/images/maxim-consultation.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Консультация юриста Максима Шевчука"></div></div><div class="contact-page__form"><span class="eyebrow">Форма обращения</span><h2>Передать краткую информацию</h2>${contactForm("contact-page-form")}</div></div></section>
+      <section class="contact-page"><div class="wrap contact-page__grid"><div class="contact-page__intro"><span class="eyebrow">Связаться</span><h1>Опишите ситуацию — без юридических формулировок</h1><p class="lead">Напишите в WhatsApp или Telegram, что произошло и какие документы сохранились. Этого достаточно для первого предметного ответа.</p><div class="contact-list"><div>${icon("whatsapp")}<span>WhatsApp</span><strong><a href="${esc(whatsappLink())}" target="_blank" rel="noopener" data-track="whatsapp">${esc(site.phoneDisplay)}</a></strong></div><div>${icon("telegram")}<span>Telegram</span><strong><a href="${esc(site.telegram)}" target="_blank" rel="noopener" data-track="telegram">@lawrazbor</a></strong></div><div>${icon("pin")}<span>${office ? "Адрес приёма" : "География"}</span><strong>${esc(locationValue)}</strong></div></div><div class="contact-page__photo"><img src="/assets/images/maxim-consultation.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Консультация юриста Максима Шевчука"></div></div><div class="contact-page__form contact-page__messengers"><span class="eyebrow">Первый шаг</span><h2>Выберите удобный мессенджер</h2><p>Сообщение уже подготовлено — останется добавить несколько строк о вашей ситуации.</p>${messengerChoices()}</div></div></section>
       <section class="section section--faq"><div class="wrap faq-grid"><div class="faq-intro"><span class="eyebrow">Перед обращением</span><h2>Что можно приложить</h2><p>На первом этапе не обязательно отправлять всё. Сообщите, что у вас есть, и получите перечень действительно нужных материалов.</p></div>${faqBlock(faqs.slice(0, 2))}</div></section>
     `,
   };

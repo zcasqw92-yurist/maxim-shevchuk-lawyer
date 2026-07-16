@@ -1,9 +1,8 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-// Контент виден без JavaScript; класс включает только необязательные анимации.
-document.documentElement.classList.add("motion-ready");
-setTimeout(() => $$(".reveal").forEach((item) => item.classList.add("is-visible")), 1800);
+// Контент остаётся видимым без ожидания JavaScript: это важно для медленных
+// мобильных соединений и встроенных браузеров мессенджеров.
 
 const analyticsEnabled = document.body.dataset.analyticsEnabled === "true";
 const analyticsRequiresConsent = document.body.dataset.analyticsRequiresConsent === "true";
@@ -158,17 +157,3 @@ $$('[data-track]').forEach((link) => {
     });
   });
 });
-
-if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.08, rootMargin: "0px 0px -40px" });
-  $$(".reveal").forEach((item) => observer.observe(item));
-} else {
-  $$(".reveal").forEach((item) => item.classList.add("is-visible"));
-}

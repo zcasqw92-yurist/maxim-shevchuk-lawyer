@@ -1,19 +1,20 @@
 /**
  * Единственная точка настройки перед публикацией.
- * Пока production=false, поисковики получают запрет на индексацию,
- * а контактные каналы остаются в безопасном тестовом окружении.
+ * Локальная сборка по умолчанию закрыта от индексации; публичный workflow
+ * явно включает production-режим после успешных проверок.
  */
 const normalizeSiteUrl = (value) => String(value || "https://example.ru").replace(/\/+$/, "");
 const normalizeBasePath = (value) => {
   const path = String(value || "").trim().replace(/^\/+|\/+$/g, "");
   return path ? `/${path}` : "";
 };
+const env = (name) => String(process.env[name] || "").trim();
 
 export const site = {
   production: process.env.SITE_PRODUCTION === "true",
   siteUrl: normalizeSiteUrl(process.env.SITE_URL),
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
-  contentLastModified: "2026-07-16",
+  contentLastModified: "2026-07-17",
   name: "Максим Юрьевич Шевчук",
   shortName: "Максим Шевчук",
   businessName: "Юридическая консультация Шевчука М. Ю.",
@@ -30,8 +31,8 @@ export const site = {
     "https://yandex.ru/maps/org/yuridicheskaya_konsultatsiya_shevchuka_m_yu_/118077889231/",
   ],
   webmasterVerification: {
-    google: "",
-    yandex: "",
+    google: env("GOOGLE_SITE_VERIFICATION"),
+    yandex: env("YANDEX_SITE_VERIFICATION"),
   },
   analytics: {
     enabled: false,
@@ -39,7 +40,7 @@ export const site = {
     googleMeasurementId: "",
     yandexMetricaId: "",
   },
-  indexNowKey: "",
+  indexNowKey: env("INDEXNOW_KEY"),
   legacyRedirects: {
     "/dosudebnaya-pretenziya/": "/uslugi/dosudebnoe-uregulirovanie/",
     "/политика-конфиденциальности/": "/politika-konfidencialnosti/",
@@ -59,7 +60,7 @@ export const site = {
   },
   organizationId: "#legal-practice",
   personId: "#maxim-shevchuk",
-  defaultTitle: "Юрист в Москве — претензии, жалобы, иски | Максим Шевчук",
+  defaultTitle: "Юрист по гражданским делам в Москве | Максим Шевчук",
   defaultDescription:
-    "Юридическая помощь в Москве: досудебные претензии, жалобы, исковые заявления, возврат денежных средств и споры бизнеса.",
+    "Юрист по гражданским делам в Москве и Химках: досудебные претензии, возврат денег, жалобы, исковые заявления и договорные споры. Дистанционно по России.",
 };

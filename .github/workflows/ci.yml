@@ -75,6 +75,9 @@ jobs:
       - name: Проверить примеры работы
         run: npm run test:case-studies
 
+      - name: Проверить экспертный поисковый контент
+        run: npm run test:search-visibility
+
       - name: Проверить мобильную панель
         run: npm run test:mobile-actions
 

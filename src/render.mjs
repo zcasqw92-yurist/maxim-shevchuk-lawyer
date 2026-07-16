@@ -151,7 +151,7 @@ const footer = () => `
   </footer>`;
 
 const whatsappMessage = (topic = "") => `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${topic ? ` по вопросу: ${topic}` : ""}. Кратко опишу ситуацию:`;
-const whatsappLink = (topic = "") => `${site.whatsapp}?text=${encodeURIComponent(whatsappMessage(topic))}`;
+const whatsappLink = (topic = "") => `${site.whatsapp}&text=${encodeURIComponent(whatsappMessage(topic))}`;
 
 const messengerChoices = (className = "") => `
   <div class="messenger-choices ${className}">

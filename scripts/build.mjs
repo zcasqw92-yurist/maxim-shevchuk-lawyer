@@ -79,7 +79,7 @@ const writeRedirect = async (pathname, destination) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="${site.production ? "index,follow" : "noindex,follow"}">
+  <meta name="robots" content="noindex,follow">
   <meta http-equiv="refresh" content="0;url=${localDestination}">
   <link rel="canonical" href="${canonical}">
   <title>Страница перемещена | Максим Шевчук</title>

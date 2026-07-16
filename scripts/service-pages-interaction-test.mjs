@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createBrotliDecompress } from "node:zlib";
 import { pipeline } from "node:stream/promises";
-import { servicePageContent } from "./service-pages-overrides.mjs";
+import { servicePageContent } from "../src/service-content.mjs";
 
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");

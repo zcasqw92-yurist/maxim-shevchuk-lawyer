@@ -163,7 +163,6 @@ try {
   const quizChoices = ["Не возвращают деньги", "Подготовить документ", "Компания или ИП", "Договор", "В ближайшие дни"];
   for (const choice of quizChoices) {
     await quizDialog.getByRole("button", { name: choice, exact: true }).click();
-    await quizDialog.locator("[data-price-quiz-next]").click();
   }
   if (await quizPage.locator("[data-price-quiz-result]").isHidden()) errors.push("interaction: price quiz result did not open");
   const quizWhatsappHref = await quizPage.locator("[data-price-quiz-whatsapp]").getAttribute("href");

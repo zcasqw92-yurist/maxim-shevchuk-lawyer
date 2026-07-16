@@ -150,11 +150,14 @@ try {
   const selectedWhatsappText = selectedWhatsappHref ? new URL(selectedWhatsappHref).searchParams.get("text") : "";
   if (selectedTopic !== "Вы выбрали: возврат денежных средств") errors.push("interaction: selected topic is not shown in dialog");
   if (!selectedWhatsappText?.includes("по вопросу: возврат денежных средств")) errors.push("interaction: WhatsApp message does not include selected topic");
+  await interactionPage.locator("[data-dialog-close]").click();
+  await interactionPage.locator(".header__online").click();
+  if (!await dialog.evaluate((element) => element.open)) errors.push("interaction: online status did not open contact dialog");
   await interactionPage.close();
 
   const quizPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await quizPage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
-  await quizPage.locator("[data-price-quiz-open]").first().click();
+  await quizPage.locator(".hero__actions [data-price-quiz-open]").click();
   const quizDialog = quizPage.locator("#price-quiz-dialog");
   if (!await quizDialog.evaluate((element) => element.open)) errors.push("interaction: price quiz did not open");
   const quizChoices = ["Не возвращают деньги", "Подготовить документ", "Компания или ИП", "Договор", "В ближайшие дни"];

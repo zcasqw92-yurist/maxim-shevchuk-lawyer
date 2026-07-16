@@ -688,6 +688,9 @@
     .mobile-contact button { color: var(--ink); background: var(--gold-bright); border-radius: 99px; }
     .mobile-contact svg { width: 18px; }
     .site-footer { padding-top: 65px; }
+    .footer__title { font-size: 10px; line-height: 1.35; letter-spacing: .12em; }
+    .footer__links { font-size: 14px; }
+    .footer__links li, .footer__contact p { overflow-wrap: anywhere; }
     .footer__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px 24px; }
     .footer__identity, .footer__contact { grid-column: 1 / -1; }
     .footer__grid > *, .footer__identity, .brand--footer { min-width: 0; }

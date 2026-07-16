@@ -26,7 +26,7 @@ export const site = {
   email: "mail@example.ru",
   telegram: "https://t.me/lawrazbor",
   whatsapp: "https://api.whatsapp.com/send?phone=79065297970",
-  sameAs: [],
+  sameAs: ["https://yandex.ru/maps/?ol=biz&oid=118077889231"],
   webmasterVerification: {
     google: "",
     yandex: "",

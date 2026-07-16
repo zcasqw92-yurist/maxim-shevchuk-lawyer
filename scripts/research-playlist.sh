@@ -16,6 +16,7 @@ yt-dlp \
   2>> "$OUT/diagnostics.log"
 
 python scripts/research-youtube-pages.py >> "$OUT/diagnostics.log" 2>&1
+python scripts/research-selected-transcripts.py >> "$OUT/diagnostics.log" 2>&1
 
 python - <<'PY'
 import json
@@ -25,12 +26,15 @@ out = Path('research-output')
 data = json.loads((out / 'playlist.json').read_text(encoding='utf-8'))
 entries = data.get('entries') or []
 summary = json.loads((out / 'page-summary.json').read_text(encoding='utf-8'))
+transcript_summary_path = out / 'selected-transcripts-summary.json'
+transcript_summary = json.loads(transcript_summary_path.read_text(encoding='utf-8')) if transcript_summary_path.exists() else []
 lines = [
     f"Плейлист: {data.get('title') or 'Без названия'}",
     f"Автор: {data.get('uploader') or data.get('channel') or 'Не определён'}",
     f"Количество видео: {len(entries)}",
     f"Получены описания: {sum(bool(item.get('description_chars')) for item in summary)}",
-    f"Получены субтитры: {sum(bool(item.get('subtitle_file')) for item in summary)}",
+    f"Получены субтитры с YouTube: {sum(bool(item.get('subtitle_file')) for item in summary)}",
+    f"Получены расшифровки ключевых роликов: {sum(bool(item.get('file')) for item in transcript_summary)} из {len(transcript_summary)}",
     '',
 ]
 for index, item in enumerate(entries, 1):

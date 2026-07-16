@@ -321,6 +321,8 @@
   .hero__kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 10px; font-weight: 780; letter-spacing: .14em; text-transform: uppercase; }
   .hero h1 { max-width: 750px; }
   .hero h1 em { color: #9e7848; font-weight: inherit; }
+  .hero h1 [data-hero-rotator] { display: inline-block; transition: opacity .17s ease; }
+  .hero h1 [data-hero-rotator].is-changing { opacity: 0; }
   .hero__lead { max-width: 650px; margin-top: 32px; color: var(--ink-soft); font-size: clamp(17px, 1.7vw, 21px); line-height: 1.65; }
   .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 38px; }
   .hero__quick-choices { margin-top: 22px; }

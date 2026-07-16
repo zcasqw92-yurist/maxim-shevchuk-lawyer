@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { services } from "../src/data.mjs";
-import { servicePageContent } from "./service-pages-overrides.mjs";
+import { servicePageContent } from "../src/service-content.mjs";
 
 const root = new URL("../", import.meta.url).pathname;
 const dist = join(root, "dist");

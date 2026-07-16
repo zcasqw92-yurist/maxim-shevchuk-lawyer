@@ -410,6 +410,44 @@ const faqBlock = (items = faqs) => `
       </details>`).join("")}
   </div>`;
 
+const valueBlock = () => `
+  <section class="section section--value">
+    <div class="wrap">
+      <div class="section-head section-head--split reveal">
+        <div><span class="eyebrow">Результат работы</span><h2>Что вы получите после разбора</h2></div>
+        <p>Не абстрактную консультацию, а понятную опору для следующего действия — в переписке, претензии, жалобе или суде.</p>
+      </div>
+      <div class="value-grid">
+        ${[
+          ["01", "Позицию по вашей ситуации", "Какие факты имеют значение, чем они подтверждаются и на чём можно строить требования."],
+          ["02", "Понятный состав работы", "Что именно нужно подготовить: претензию, жалобу, иск или несколько связанных документов."],
+          ["03", "Следующий практический шаг", "Кому и в какой последовательности направлять документы, как действовать при ответе или молчании."],
+        ].map(([number, title, text]) => `<article class="value-card reveal"><span>${number}</span><h3>${title}</h3><p>${text}</p></article>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+const priceBlock = () => `
+  <section class="section section--prices" id="stoimost">
+    <div class="wrap">
+      <div class="section-head section-head--split reveal">
+        <div><span class="eyebrow">Ориентиры по стоимости</span><h2>Понятно, с чего начинается работа</h2></div>
+        <p>Это стартовые ориентиры за подготовку документов. Итоговая стоимость зависит от материалов, объёма требований и состава задачи.</p>
+      </div>
+      <div class="price-grid">
+        ${[
+          ["Досудебная претензия", "Требования, срок исполнения и правовое обоснование", "от 3 000 ₽"],
+          ["Жалоба или обращение", "Подготовка обращения в компетентный орган", "от 2 800 ₽"],
+          ["Исковое заявление", "Позиция, требования, расчёт и приложения", "от 5 000 ₽"],
+          ["Заявление или жалоба в полицию", "Фиксация обстоятельств и процессуальные требования", "от 3 200 ₽"],
+          ["Жалоба в ФССП", "Обжалование действий или бездействия пристава", "от 3 500 ₽"],
+          ["Подготовка договора", "Документ под конкретную сделку или задачу", "от 5 000 ₽"],
+        ].map(([title, text, price]) => `<article class="price-card reveal"><h3>${title}</h3><p>${text}</p><strong>${price}</strong></article>`).join("")}
+      </div>
+      <div class="price-note reveal"><p>Если для защиты нужно несколько взаимосвязанных документов, состав работы и стоимость согласуются до начала подготовки.</p><button class="text-link" type="button" data-dialog-open>Уточнить стоимость по ситуации ${icon("arrow")}</button></div>
+    </div>
+  </section>`;
+
 const cta = (title = "Разберём, на чём можно построить позицию", text = "Опишите ситуацию и перечислите документы. Этого достаточно, чтобы определить первый предметный шаг.") => `
   <section class="section section--cta">
     <div class="wrap cta-panel reveal">
@@ -515,6 +553,9 @@ export const renderHome = () => ({
       </div>
     </section>
 
+    ${valueBlock()}
+    ${priceBlock()}
+
     <section class="section section--consultation">
       <div class="wrap consultation-grid">
         <div class="consultation-photo reveal"><img src="/assets/images/maxim-consultation.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Максим Шевчук объясняет клиенту юридическую позицию"></div>
@@ -581,6 +622,7 @@ export const renderServices = () => {
       ${breadcrumbs(crumbs)}
       <section class="inner-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">Направления практики</span><h1>Юридическая помощь, собранная под вашу ситуацию</h1><p>Выберите направление, чтобы увидеть логику работы, необходимые материалы и возможный результат подготовки.</p></div><div class="inner-hero__aside"><span>Важно</span><p>Окончательная услуга и состав требований определяются после проверки документов, а не по одному названию проблемы.</p></div></div></section>
       <section class="section section--services"><div class="wrap">${serviceCards()}</div></section>
+      ${priceBlock()}
       <section class="section section--dark compact-dark"><div class="wrap compact-dark__grid"><div><span class="eyebrow eyebrow--light">Не нашли точного совпадения?</span><h2>Описать факты полезнее, чем самостоятельно выбирать документ</h2></div><div><p>Иногда вместо претензии нужна жалоба, вместо заявления в полицию — гражданский иск, а до документа необходим анализ доказательств.</p><button class="button button--gold" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button></div></div></section>
       ${cta("Начнём с правильной квалификации", "Коротко изложите хронологию и сообщите, что подтверждается документами, платежами или перепиской.")}
     `,
@@ -617,7 +659,7 @@ export const renderService = (service) => {
       <section class="service-hero">
         <div class="wrap service-hero__grid">
           <div><span class="eyebrow">${esc(service.eyebrow)}</span><h1>${esc(service.title)}</h1><p>${esc(service.lead)}</p><div class="hero__actions"><button class="button button--primary" type="button" data-dialog-open data-topic="${esc(service.name)}">Обсудить ситуацию${icon("arrow", "button__icon")}</button>${button("Все услуги", "/uslugi/", "secondary")}</div></div>
-          <aside class="service-hero__card"><span class="service-hero__icon">${icon(service.icon)}</span><strong>С чего начинается работа</strong><p>С проверки документов, хронологии, платежей, переписки и уже полученных ответов.</p><ul><li>${icon("check")}Факты</li><li>${icon("check")}Доказательства</li><li>${icon("check")}Правовое основание</li></ul></aside>
+          <aside class="service-hero__card"><span class="service-hero__icon">${icon(service.icon)}</span><strong>С чего начинается работа</strong><p>С проверки документов, хронологии, платежей, переписки и уже полученных ответов.</p>${service.priceFrom ? `<div class="service-hero__price"><small>Подготовка документа</small><b>${esc(service.priceFrom)}</b></div>` : ""}<ul><li>${icon("check")}Факты</li><li>${icon("check")}Доказательства</li><li>${icon("check")}Правовое основание</li></ul></aside>
         </div>
       </section>
       <section class="section"><div class="wrap two-lists">

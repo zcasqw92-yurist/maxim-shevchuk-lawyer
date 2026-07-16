@@ -139,24 +139,6 @@ $$('[data-track]').forEach((link) => {
   }));
 });
 
-const districtSearch = $("[data-district-search]");
-if (districtSearch) {
-  const cards = $$("[data-search]");
-  const counter = $("[data-search-count]");
-  const empty = $("[data-empty-state]");
-  districtSearch.addEventListener("input", () => {
-    const query = districtSearch.value.trim().toLocaleLowerCase("ru");
-    let visible = 0;
-    cards.forEach((card) => {
-      const match = !query || card.dataset.search.includes(query);
-      card.hidden = !match;
-      if (match) visible += 1;
-    });
-    if (counter) counter.textContent = query ? `Найдено: ${visible}` : "Показаны все округа";
-    if (empty) empty.hidden = visible !== 0;
-  });
-}
-
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {

@@ -152,6 +152,22 @@ try {
   if (!selectedWhatsappText?.includes("по вопросу: возврат денежных средств")) errors.push("interaction: WhatsApp message does not include selected topic");
   await interactionPage.close();
 
+  const quizPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await quizPage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
+  await quizPage.locator("[data-price-quiz-open]").first().click();
+  const quizDialog = quizPage.locator("#price-quiz-dialog");
+  if (!await quizDialog.evaluate((element) => element.open)) errors.push("interaction: price quiz did not open");
+  const quizChoices = ["Не возвращают деньги", "Подготовить документ", "Компания или ИП", "Договор", "В ближайшие дни"];
+  for (const choice of quizChoices) {
+    await quizDialog.getByRole("button", { name: choice, exact: true }).click();
+    await quizDialog.locator("[data-price-quiz-next]").click();
+  }
+  if (await quizPage.locator("[data-price-quiz-result]").isHidden()) errors.push("interaction: price quiz result did not open");
+  const quizWhatsappHref = await quizPage.locator("[data-price-quiz-whatsapp]").getAttribute("href");
+  const quizWhatsappText = quizWhatsappHref ? new URL(quizWhatsappHref).searchParams.get("text") : "";
+  if (!quizWhatsappText?.includes("Вопрос: Не возвращают деньги") || !quizWhatsappText.includes("Срок: В ближайшие дни")) errors.push("interaction: price quiz WhatsApp summary is incomplete");
+  await quizPage.close();
+
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await mobilePage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
   const menuButton = mobilePage.locator("[data-menu-toggle]");
@@ -168,4 +184,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialog, menu`);
+console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialogs, price quiz, menu`);

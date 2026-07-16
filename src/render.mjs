@@ -257,7 +257,7 @@ const priceQuizDialog = () => `
           <a class="messenger-choice messenger-choice--whatsapp" href="${esc(site.whatsapp)}" target="_blank" rel="noopener" data-price-quiz-whatsapp data-track="whatsapp">${icon("whatsapp")}<span>Отправить в WhatsApp</span></a>
           <a class="messenger-choice messenger-choice--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-price-quiz-telegram data-track="telegram">${icon("telegram")}<span>Продолжить в Telegram</span></a>
         </div>
-        <p class="price-quiz__telegram-note" data-price-quiz-telegram-note>Перед переходом в Telegram сводка скопируется — останется только вставить её в чат.</p>
+        <p class="price-quiz__telegram-note" data-price-quiz-telegram-note>Нажмите кнопку: Telegram откроется, а текст с ответами уже скопируется. Вставьте его в чат с Максимом Юрьевичем.</p>
         <p class="price-quiz__privacy">${icon("lock")}Ответы отправятся только после вашего выбора мессенджера.</p>
       </section>
 

@@ -179,10 +179,8 @@ const priceQuizSteps = $$('[data-price-quiz-step]', priceQuizDialog);
 const priceQuizResult = $('[data-price-quiz-result]', priceQuizDialog);
 const priceQuizProgress = $('[data-price-quiz-progress]', priceQuizDialog);
 const priceQuizProgressBar = $('[data-price-quiz-progress-bar]', priceQuizDialog);
-const priceQuizNext = $('[data-price-quiz-next]', priceQuizDialog);
 const priceQuizBack = $('[data-price-quiz-back]', priceQuizDialog);
 const priceQuizControls = $('[data-price-quiz-controls]', priceQuizDialog);
-const priceQuizSummary = $('[data-price-quiz-summary]', priceQuizDialog);
 const priceQuizWhatsapp = $('[data-price-quiz-whatsapp]', priceQuizDialog);
 const priceQuizTelegram = $('[data-price-quiz-telegram]', priceQuizDialog);
 const priceQuizTelegramNote = $('[data-price-quiz-telegram-note]', priceQuizDialog);
@@ -196,13 +194,8 @@ const priceQuizFields = [
 let priceQuizStep = 0;
 let priceQuizAnswers = {};
 
-const quizHasAnswer = (key) => {
-  const answer = priceQuizAnswers[key];
-  return Array.isArray(answer) ? answer.length > 0 : Boolean(answer);
-};
-
 const quizSummaryText = () => priceQuizFields
-  .map(([key, label]) => `${label}: ${Array.isArray(priceQuizAnswers[key]) ? priceQuizAnswers[key].join(", ") : priceQuizAnswers[key]}`)
+  .map(([key, label]) => `${label}: ${priceQuizAnswers[key]}`)
   .join("\n");
 
 const renderPriceQuiz = () => {
@@ -210,17 +203,13 @@ const renderPriceQuiz = () => {
   const finished = priceQuizStep >= priceQuizSteps.length;
   priceQuizSteps.forEach((step, index) => { step.hidden = finished || index !== priceQuizStep; });
   if (priceQuizResult) priceQuizResult.hidden = !finished;
-  if (priceQuizControls) priceQuizControls.hidden = finished;
+  if (priceQuizControls) priceQuizControls.hidden = finished || priceQuizStep === 0;
   if (priceQuizProgress) priceQuizProgress.textContent = finished ? "Готово" : `Шаг ${priceQuizStep + 1} из ${priceQuizSteps.length}`;
   if (priceQuizProgressBar) priceQuizProgressBar.style.width = `${finished ? 100 : ((priceQuizStep + 1) / priceQuizSteps.length) * 100}%`;
   if (priceQuizBack) priceQuizBack.hidden = priceQuizStep === 0 || finished;
-  if (priceQuizNext) {
-    priceQuizNext.disabled = !quizHasAnswer(priceQuizFields[priceQuizStep]?.[0]);
-    priceQuizNext.textContent = priceQuizStep === priceQuizSteps.length - 1 ? "Показать сводку →" : "Далее →";
-  }
   $$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
     const answer = priceQuizAnswers[option.dataset.quizKey];
-    const selected = Array.isArray(answer) ? answer.includes(option.dataset.quizValue) : answer === option.dataset.quizValue;
+    const selected = answer === option.dataset.quizValue;
     option.setAttribute("aria-pressed", String(selected));
   });
 };
@@ -235,9 +224,6 @@ const resetPriceQuiz = () => {
 const showPriceQuizResult = () => {
   priceQuizStep = priceQuizSteps.length;
   const summary = quizSummaryText();
-  if (priceQuizSummary) {
-    priceQuizSummary.innerHTML = priceQuizFields.map(([key, label]) => `<div><dt>${label}</dt><dd>${Array.isArray(priceQuizAnswers[key]) ? priceQuizAnswers[key].join(", ") : priceQuizAnswers[key]}</dd></div>`).join("");
-  }
   if (priceQuizWhatsapp) {
     const url = new URL(priceQuizWhatsapp.href);
     url.searchParams.set("text", `Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости.\n\n${summary}\n\nКратко опишу ситуацию:`);
@@ -259,26 +245,13 @@ $$('[data-price-quiz-open]').forEach((control) => {
 $$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
   option.addEventListener("click", () => {
     const { quizKey: key, quizValue: value } = option.dataset;
-    if (option.hasAttribute("data-quiz-multiple")) {
-      const selected = new Set(priceQuizAnswers[key] || []);
-      if (value === "Пока ничего") selected.clear();
-      else selected.delete("Пока ничего");
-      selected.has(value) ? selected.delete(value) : selected.add(value);
-      priceQuizAnswers[key] = [...selected];
-    } else {
-      priceQuizAnswers[key] = value;
+    priceQuizAnswers[key] = value;
+    if (priceQuizStep === priceQuizSteps.length - 1) showPriceQuizResult();
+    else {
+      priceQuizStep += 1;
+      renderPriceQuiz();
     }
-    renderPriceQuiz();
   });
-});
-
-priceQuizNext?.addEventListener("click", () => {
-  if (!quizHasAnswer(priceQuizFields[priceQuizStep]?.[0])) return;
-  if (priceQuizStep === priceQuizSteps.length - 1) showPriceQuizResult();
-  else {
-    priceQuizStep += 1;
-    renderPriceQuiz();
-  }
 });
 
 priceQuizBack?.addEventListener("click", () => {

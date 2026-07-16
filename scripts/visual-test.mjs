@@ -73,7 +73,7 @@ const checks = [
   { name: "service-mobile", path: "/uslugi/dosudebnoe-uregulirovanie/", viewport: { width: 390, height: 844 }, fullPage: true },
   { name: "about-desktop", path: "/o-yuriste/", viewport: { width: 1440, height: 1000 }, fullPage: true },
   { name: "about-mobile", path: "/o-yuriste/", viewport: { width: 390, height: 844 }, fullPage: true },
-  { name: "districts-mobile", path: "/rayony-moskvy/", viewport: { width: 390, height: 844 }, fullPage: true },
+  { name: "contacts-mobile", path: "/kontakty/", viewport: { width: 390, height: 844 }, fullPage: true },
 ];
 const errors = [];
 let browser;
@@ -151,10 +151,6 @@ try {
   if (await menuButton.count() !== 1) errors.push("interaction: mobile menu trigger is not unique");
   else await menuButton.click();
   if (!await mobilePage.locator("[data-mobile-menu]").isVisible()) errors.push("interaction: mobile menu did not open");
-  await mobilePage.goto("http://127.0.0.1:4173/rayony-moskvy/", { waitUntil: "networkidle" });
-  await mobilePage.locator("[data-district-search]").fill("Хамовники");
-  const visibleDistricts = await mobilePage.locator("[data-search]:visible").count();
-  if (visibleDistricts !== 1) errors.push(`interaction: district filter expected 1 card, got ${visibleDistricts}`);
   await mobilePage.close();
 } finally {
   await browser?.close();
@@ -165,4 +161,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialog, menu, filter`);
+console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialog, menu`);

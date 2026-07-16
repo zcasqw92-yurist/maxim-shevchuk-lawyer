@@ -28,7 +28,22 @@ jobs:
         run: npm ci
 
       - name: Собрать сайт
-        run: npm run build
+        shell: bash
+        run: |
+          set +e
+          npm run build > build.log 2>&1
+          code=$?
+          cat build.log
+          exit $code
+
+      - name: Сохранить журнал ошибки сборки
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-error-log
+          path: build.log
+          if-no-files-found: ignore
+          retention-days: 3
 
       - name: Проверить HTML
         run: npm run validate

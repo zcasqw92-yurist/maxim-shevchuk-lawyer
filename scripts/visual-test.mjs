@@ -143,6 +143,13 @@ try {
   const telegramHref = await interactionPage.locator("#contact-dialog [data-track='telegram']").getAttribute("href");
   if (!whatsappHref?.startsWith("https://api.whatsapp.com/send?phone=79065297970&text=")) errors.push("interaction: WhatsApp link is missing prepared message");
   if (telegramHref !== "https://t.me/lawrazbor") errors.push("interaction: Telegram link is invalid");
+  await interactionPage.locator("[data-dialog-close]").click();
+  await interactionPage.locator(".hero__quick-choices [data-topic='возврат денежных средств']").click();
+  const selectedTopic = await interactionPage.locator("#contact-dialog [data-dialog-topic]").textContent();
+  const selectedWhatsappHref = await interactionPage.locator("#contact-dialog [data-whatsapp-link]").getAttribute("href");
+  const selectedWhatsappText = selectedWhatsappHref ? new URL(selectedWhatsappHref).searchParams.get("text") : "";
+  if (selectedTopic !== "Вы выбрали: возврат денежных средств") errors.push("interaction: selected topic is not shown in dialog");
+  if (!selectedWhatsappText?.includes("по вопросу: возврат денежных средств")) errors.push("interaction: WhatsApp message does not include selected topic");
   await interactionPage.close();
 
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });

@@ -174,6 +174,152 @@ dialog?.addEventListener("click", (event) => {
   if (event.target === dialog) dialog.close();
 });
 
+const priceQuizDialog = $("#price-quiz-dialog");
+const priceQuizSteps = $$('[data-price-quiz-step]', priceQuizDialog);
+const priceQuizResult = $('[data-price-quiz-result]', priceQuizDialog);
+const priceQuizProgress = $('[data-price-quiz-progress]', priceQuizDialog);
+const priceQuizProgressBar = $('[data-price-quiz-progress-bar]', priceQuizDialog);
+const priceQuizNext = $('[data-price-quiz-next]', priceQuizDialog);
+const priceQuizBack = $('[data-price-quiz-back]', priceQuizDialog);
+const priceQuizControls = $('[data-price-quiz-controls]', priceQuizDialog);
+const priceQuizSummary = $('[data-price-quiz-summary]', priceQuizDialog);
+const priceQuizWhatsapp = $('[data-price-quiz-whatsapp]', priceQuizDialog);
+const priceQuizTelegram = $('[data-price-quiz-telegram]', priceQuizDialog);
+const priceQuizTelegramNote = $('[data-price-quiz-telegram-note]', priceQuizDialog);
+const priceQuizFields = [
+  ["issue", "Вопрос"],
+  ["goal", "Задача"],
+  ["other-side", "Вторая сторона"],
+  ["materials", "Материалы"],
+  ["timing", "Срок"],
+];
+let priceQuizStep = 0;
+let priceQuizAnswers = {};
+
+const quizHasAnswer = (key) => {
+  const answer = priceQuizAnswers[key];
+  return Array.isArray(answer) ? answer.length > 0 : Boolean(answer);
+};
+
+const quizSummaryText = () => priceQuizFields
+  .map(([key, label]) => `${label}: ${Array.isArray(priceQuizAnswers[key]) ? priceQuizAnswers[key].join(", ") : priceQuizAnswers[key]}`)
+  .join("\n");
+
+const renderPriceQuiz = () => {
+  if (!priceQuizDialog) return;
+  const finished = priceQuizStep >= priceQuizSteps.length;
+  priceQuizSteps.forEach((step, index) => { step.hidden = finished || index !== priceQuizStep; });
+  if (priceQuizResult) priceQuizResult.hidden = !finished;
+  if (priceQuizControls) priceQuizControls.hidden = finished;
+  if (priceQuizProgress) priceQuizProgress.textContent = finished ? "Готово" : `Шаг ${priceQuizStep + 1} из ${priceQuizSteps.length}`;
+  if (priceQuizProgressBar) priceQuizProgressBar.style.width = `${finished ? 100 : ((priceQuizStep + 1) / priceQuizSteps.length) * 100}%`;
+  if (priceQuizBack) priceQuizBack.hidden = priceQuizStep === 0 || finished;
+  if (priceQuizNext) {
+    priceQuizNext.disabled = !quizHasAnswer(priceQuizFields[priceQuizStep]?.[0]);
+    priceQuizNext.textContent = priceQuizStep === priceQuizSteps.length - 1 ? "Показать сводку →" : "Далее →";
+  }
+  $$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
+    const answer = priceQuizAnswers[option.dataset.quizKey];
+    const selected = Array.isArray(answer) ? answer.includes(option.dataset.quizValue) : answer === option.dataset.quizValue;
+    option.setAttribute("aria-pressed", String(selected));
+  });
+};
+
+const resetPriceQuiz = () => {
+  priceQuizStep = 0;
+  priceQuizAnswers = {};
+  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = "Перед переходом в Telegram сводка скопируется — останется только вставить её в чат.";
+  renderPriceQuiz();
+};
+
+const showPriceQuizResult = () => {
+  priceQuizStep = priceQuizSteps.length;
+  const summary = quizSummaryText();
+  if (priceQuizSummary) {
+    priceQuizSummary.innerHTML = priceQuizFields.map(([key, label]) => `<div><dt>${label}</dt><dd>${Array.isArray(priceQuizAnswers[key]) ? priceQuizAnswers[key].join(", ") : priceQuizAnswers[key]}</dd></div>`).join("");
+  }
+  if (priceQuizWhatsapp) {
+    const url = new URL(priceQuizWhatsapp.href);
+    url.searchParams.set("text", `Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости.\n\n${summary}\n\nКратко опишу ситуацию:`);
+    priceQuizWhatsapp.href = url.toString();
+  }
+  renderPriceQuiz();
+  track("price_quiz_complete", { page_path: location.pathname });
+};
+
+$$('[data-price-quiz-open]').forEach((control) => {
+  control.addEventListener("click", () => {
+    if (!priceQuizDialog) return;
+    resetPriceQuiz();
+    priceQuizDialog.showModal();
+    track("price_quiz_open", { page_path: location.pathname });
+  });
+});
+
+$$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
+  option.addEventListener("click", () => {
+    const { quizKey: key, quizValue: value } = option.dataset;
+    if (option.hasAttribute("data-quiz-multiple")) {
+      const selected = new Set(priceQuizAnswers[key] || []);
+      if (value === "Пока ничего") selected.clear();
+      else selected.delete("Пока ничего");
+      selected.has(value) ? selected.delete(value) : selected.add(value);
+      priceQuizAnswers[key] = [...selected];
+    } else {
+      priceQuizAnswers[key] = value;
+    }
+    renderPriceQuiz();
+  });
+});
+
+priceQuizNext?.addEventListener("click", () => {
+  if (!quizHasAnswer(priceQuizFields[priceQuizStep]?.[0])) return;
+  if (priceQuizStep === priceQuizSteps.length - 1) showPriceQuizResult();
+  else {
+    priceQuizStep += 1;
+    renderPriceQuiz();
+  }
+});
+
+priceQuizBack?.addEventListener("click", () => {
+  priceQuizStep = Math.max(0, priceQuizStep - 1);
+  renderPriceQuiz();
+});
+
+const copyText = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.append(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    return copied;
+  }
+};
+
+priceQuizTelegram?.addEventListener("click", (event) => {
+  event.preventDefault();
+  window.open(priceQuizTelegram.href, "_blank", "noopener");
+  void copyText(`Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости.\n\n${quizSummaryText()}\n\nКратко опишу ситуацию:`)
+    .then((copied) => {
+      if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = copied
+        ? "Сводка скопирована. Вставьте её в чат с Максимом Юрьевичем."
+        : "Сводку можно скопировать из этого окна и вставить в чат с Максимом Юрьевичем.";
+    });
+});
+
+$$('[data-price-quiz-close]').forEach((control) => control.addEventListener("click", () => priceQuizDialog?.close()));
+priceQuizDialog?.addEventListener("click", (event) => {
+  if (event.target === priceQuizDialog) priceQuizDialog.close();
+});
+
 $$('[data-track]').forEach((link) => {
   link.addEventListener("click", () => {
     const dialogTopic = link.closest("#contact-dialog")?.dataset.topic;

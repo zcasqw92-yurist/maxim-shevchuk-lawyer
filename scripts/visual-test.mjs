@@ -161,14 +161,15 @@ try {
   await quizPage.locator(".hero__actions [data-price-quiz-open]").click();
   const quizDialog = quizPage.locator("#price-quiz-dialog");
   if (!await quizDialog.evaluate((element) => element.open)) errors.push("interaction: price quiz did not open");
-  const quizChoices = ["Не возвращают деньги", "Подготовить документ", "Компания или ИП", "Договор", "В ближайшие дни"];
+  if (await quizDialog.locator("[data-price-quiz-step]").count() !== 3) errors.push("interaction: price quiz must contain exactly three steps");
+  const quizChoices = ["Не возвращают деньги", "Договор", "В ближайшие дни"];
   for (const choice of quizChoices) {
     await quizDialog.getByRole("button", { name: choice, exact: true }).click();
   }
   if (await quizPage.locator("[data-price-quiz-result]").isHidden()) errors.push("interaction: price quiz result did not open");
   const quizWhatsappHref = await quizPage.locator("[data-price-quiz-whatsapp]").getAttribute("href");
   const quizWhatsappText = quizWhatsappHref ? new URL(quizWhatsappHref).searchParams.get("text") : "";
-  if (!quizWhatsappText?.includes("Вопрос: Не возвращают деньги") || !quizWhatsappText.includes("Срок: В ближайшие дни")) errors.push("interaction: price quiz WhatsApp summary is incomplete");
+  if (!quizWhatsappText?.includes("Ситуация: Не возвращают деньги") || !quizWhatsappText.includes("Материалы: Договор") || !quizWhatsappText.includes("Срок: В ближайшие дни")) errors.push("interaction: price quiz WhatsApp summary is incomplete");
   await quizPage.close();
 
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });

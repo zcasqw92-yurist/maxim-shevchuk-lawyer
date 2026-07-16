@@ -29,28 +29,24 @@ jobs:
       - name: Проверить preview и production
         id: verify
         shell: bash
-        env:
-          SITE_URL: https://zcasqw92-yurist.github.io/maxim-shevchuk-lawyer
-          SITE_BASE_PATH: /maxim-shevchuk-lawyer
-          INDEXNOW_KEY: ci-indexnow-key
         run: |
           set +e
           npm run check > production-self-check.log 2>&1
           preview_code=$?
           if [ "$preview_code" -eq 0 ]; then
-            SITE_PRODUCTION=true npm run build >> production-self-check.log 2>&1
+            SITE_PRODUCTION=true SITE_URL=https://zcasqw92-yurist.github.io/maxim-shevchuk-lawyer SITE_BASE_PATH=/maxim-shevchuk-lawyer INDEXNOW_KEY=ci-indexnow-key npm run build >> production-self-check.log 2>&1
             build_code=$?
           else
             build_code=1
           fi
           if [ "$preview_code" -eq 0 ] && [ "$build_code" -eq 0 ]; then
-            SITE_PRODUCTION=true npm run validate >> production-self-check.log 2>&1
+            SITE_PRODUCTION=true SITE_URL=https://zcasqw92-yurist.github.io/maxim-shevchuk-lawyer SITE_BASE_PATH=/maxim-shevchuk-lawyer INDEXNOW_KEY=ci-indexnow-key npm run validate >> production-self-check.log 2>&1
             validate_code=$?
           else
             validate_code=1
           fi
           if [ "$preview_code" -eq 0 ] && [ "$build_code" -eq 0 ] && [ "$validate_code" -eq 0 ]; then
-            SITE_PRODUCTION=true npm run audit:seo >> production-self-check.log 2>&1
+            SITE_PRODUCTION=true SITE_URL=https://zcasqw92-yurist.github.io/maxim-shevchuk-lawyer SITE_BASE_PATH=/maxim-shevchuk-lawyer INDEXNOW_KEY=ci-indexnow-key npm run audit:seo >> production-self-check.log 2>&1
             seo_code=$?
           else
             seo_code=1

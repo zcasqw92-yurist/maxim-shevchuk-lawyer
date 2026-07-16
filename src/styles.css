@@ -261,7 +261,7 @@
   .contact-dialog::backdrop { background: rgba(5,18,29,.72); backdrop-filter: blur(8px); }
   .contact-dialog[open] { animation: dialog-in .28s ease both; }
   .dialog__close { position: absolute; z-index: 3; top: 15px; right: 15px; display: grid; width: 30px; aspect-ratio: 1; place-items: center; padding: 0; color: rgba(9,28,44,.5); outline: 0; border: 0; box-shadow: none; background: transparent; border-radius: 0; -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; cursor: pointer; transition: color .2s ease, opacity .2s ease; }
-  .dialog__close:focus, .dialog__close:focus-visible { outline: 0; box-shadow: none; }
+  .dialog__close:focus, .dialog__close:focus-visible { outline: 0 !important; border: 0 !important; box-shadow: none !important; background: transparent !important; }
   .dialog__close:hover { color: var(--ink); opacity: .85; }
   .dialog__close svg { width: 17px; }
   .messenger-dialog__content { padding: 48px clamp(25px, 6vw, 52px) 34px; text-align: center; }
@@ -285,7 +285,8 @@
   .price-quiz-dialog[open] { animation: dialog-in .28s ease both; }
   .price-quiz { padding: 47px clamp(25px, 6vw, 52px) 34px; }
   .price-quiz__head { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-bottom: 31px; }
-  .price-quiz__head .eyebrow { margin: 0; }
+  .price-quiz__head .eyebrow { justify-self: start; gap: 0; margin: 0; }
+  .price-quiz__head .eyebrow::before { display: none; }
   .price-quiz__progress { color: var(--muted); font-size: 11px; font-weight: 750; white-space: nowrap; }
   .price-quiz__progress-line { grid-column: 1 / -1; height: 3px; overflow: hidden; background: #e5dfd2; border-radius: 99px; }
   .price-quiz__progress-line i { display: block; width: 20%; height: 100%; background: var(--gold); border-radius: inherit; transition: width .25s ease; }
@@ -650,7 +651,7 @@
     .button { min-height: 56px; padding-inline: 24px; font-size: 15px; }
     .button__icon { width: 18px; height: 18px; }
     .hero__actions .button { width: 100%; }
-    .hero__mobile-assurance { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
+    .hero__mobile-assurance { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; color: var(--ink-soft); font-size: 12px; font-weight: 700; text-align: center; }
     .hero__mobile-assurance svg { width: 18px; color: var(--ink); }
     .hero__quick-choices { margin-top: 20px; }
     .hero__quick-choices > div { display: grid; grid-template-columns: 1fr 1fr; }

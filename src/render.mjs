@@ -496,6 +496,7 @@ export const renderHome = () => ({
             <button class="button button--primary" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button>
             ${button("Посмотреть услуги", "/uslugi/", "secondary")}
           </div>
+          <span class="hero__mobile-assurance">${icon("lock")}Конфиденциально</span>
           <div class="hero__quick-choices" aria-label="Выберите типовую ситуацию">
             <span>С чего начнём?</span>
             <div>

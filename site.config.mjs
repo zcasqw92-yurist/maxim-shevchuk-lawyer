@@ -11,8 +11,6 @@ const normalizeBasePath = (value) => {
 
 export const site = {
   production: process.env.SITE_PRODUCTION === "true",
-  districtPagesIndexable: false,
-  indexableDistricts: [],
   siteUrl: normalizeSiteUrl(process.env.SITE_URL),
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
   contentLastModified: "2026-07-16",

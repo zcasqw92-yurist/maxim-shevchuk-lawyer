@@ -296,6 +296,12 @@
   .footer__links a:hover, .footer__contact a:hover { color: var(--white); }
   .footer__contact p { margin-bottom: 9px; color: var(--white); font-family: var(--serif); font-size: 17px; }
   .footer__contact .text-link { margin-top: 20px; color: var(--gold-bright); }
+  .footer__office { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; color: rgba(255,255,255,.75); font-size: 12px; line-height: 1.45; }
+  .footer__office:hover { color: var(--white); }
+  .footer__office > svg { flex: 0 0 18px; width: 18px; margin-top: 3px; color: var(--gold-bright); }
+  .footer__office span { display: grid; gap: 2px; }
+  .footer__office small { color: rgba(255,255,255,.48); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+  .footer__office em { color: var(--gold-bright); font-size: 11px; font-style: normal; }
   .footer__bottom { display: flex; justify-content: space-between; gap: 24px; margin-top: 70px; padding-top: 24px; border-top: 1px solid var(--line-light); font-size: 10px; }
   .footer__settings { padding: 0; color: rgba(255,255,255,.58); border: 0; background: transparent; cursor: pointer; font: inherit; text-decoration: underline; text-underline-offset: 3px; }
   .footer__settings:hover { color: var(--white); }

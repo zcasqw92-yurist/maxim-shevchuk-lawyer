@@ -1,6 +1,6 @@
-tested_sha=7f7a8796755a3aa4afa79cd1d628fa68daa62e08
-exit_code=1
-run_id=29540400249
+tested_sha=ebcf01919b76e266d57a150833a2cff60f724bfd
+exit_code=0
+run_id=29540511940
 --- log tail ---
 
 > maxim-shevchuk-legal-site@1.1.0 check
@@ -75,5 +75,14 @@ Case-study checks passed: 5 pages, 3 anonymized matters, relevant placement and 
 > maxim-shevchuk-legal-site@1.1.0 test:search-visibility
 > node scripts/search-visibility-test.mjs
 
-Главная: избыточное повторение ключевой фразы (9)
-spory-biznesa: недостаточно полезного уникального текста (146 слов)
+Search visibility checks passed: visible expert content, internal links, authorship, production indexing and IndexNow hooks
+
+> maxim-shevchuk-legal-site@1.1.0 test:mobile-actions
+> node scripts/mobile-actions-test.mjs
+
+Mobile action panel checks passed: 11 pages, two actions and safe-area layout
+
+> maxim-shevchuk-legal-site@1.1.0 test:visual
+> node scripts/visual-test.mjs
+
+Visual and interaction smoke test passed: 7 viewports, dialogs, messenger drafts, price quiz, menu and dual mobile actions

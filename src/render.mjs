@@ -87,7 +87,7 @@ const header = (pathname) => `
   <header class="site-header" data-header>
     <div class="wrap header__inner">
       <a class="brand" href="/" aria-label="Максим Шевчук — главная">
-        <span class="brand__mark" aria-hidden="true">МШ</span>
+        <span class="brand__mark"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></span>
         <span class="brand__text"><strong>Максим Шевчук</strong><small>юридическая практика</small></span>
       </a>
       <nav class="desktop-nav" aria-label="Основная навигация">
@@ -114,7 +114,7 @@ const footer = () => `
     <div class="wrap footer__grid">
       <div class="footer__identity">
         <a class="brand brand--footer" href="/">
-          <span class="brand__mark" aria-hidden="true">МШ</span>
+          <span class="brand__mark"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></span>
           <span class="brand__text"><strong>Максим Юрьевич Шевчук</strong><small>юрист · Москва</small></span>
         </a>
         <p>Персональная юридическая практика. Досудебные претензии, жалобы, исковые заявления и защита денежных интересов.</p>

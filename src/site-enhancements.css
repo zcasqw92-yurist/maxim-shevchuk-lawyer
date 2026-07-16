@@ -1,0 +1,120 @@
+
+/* Readable editorial type scale: restrained on desktop and compact on mobile. */
+@layer base {
+  h1 { font-size: clamp(2.75rem, 5vw, 4.75rem); }
+  h2 { font-size: clamp(2rem, 3.6vw, 3.5rem); }
+  h3 { font-size: clamp(1.2rem, 1.7vw, 1.45rem); }
+}
+
+@layer components {
+  .lead { font-size: clamp(1.0625rem, 1.5vw, 1.25rem); line-height: 1.65; }
+  .section-head--split p { font-size: clamp(1rem, 1.35vw, 1.0625rem); line-height: 1.65; }
+  .messenger-dialog__content h2 { font-size: clamp(2rem, 4.2vw, 2.75rem); }
+  .price-quiz__step h2, .price-quiz__result h2, .callback-form > h2 { font-size: clamp(1.95rem, 4vw, 2.7rem); }
+
+  .callback-dialog { overflow-x: hidden; }
+  .callback-open-link {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    justify-content: center;
+    justify-self: center;
+    margin: 16px auto 0;
+    text-align: center;
+  }
+  .footer__contact .callback-open-link { justify-content: center; margin: 12px auto 0; }
+  .callback-form, .callback-form__fields, .callback-field, .callback-consent > span { min-width: 0; }
+  .callback-form__head { display: block; margin-bottom: 20px; }
+  .callback-form__head .eyebrow { margin: 0; }
+  .callback-form > h2 { margin-bottom: 13px; font-size: clamp(1.95rem, 4vw, 2.7rem); }
+  .callback-form__intro { color: var(--ink-soft); font-size: 16px; line-height: 1.6; }
+  .callback-form__fields { display: grid; gap: 17px; margin-top: 26px; }
+  .callback-field { display: grid; gap: 7px; color: var(--ink); font-size: 13px; font-weight: 720; text-align: left; }
+  .callback-field input, .callback-field select, .callback-field textarea {
+    width: 100%;
+    max-width: 100%;
+    min-height: 52px;
+    padding: 12px 14px;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    background: #faf8f3;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .callback-field textarea { min-height: 112px; resize: vertical; }
+  .callback-field input:focus, .callback-field select:focus, .callback-field textarea:focus {
+    border-color: var(--gold);
+    outline: 2px solid rgba(195,154,93,.24);
+    outline-offset: 0;
+  }
+  .callback-consent {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .callback-consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--ink); }
+  .callback-consent > span, .callback-consent a { white-space: normal; overflow-wrap: anywhere; }
+  .callback-consent a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .callback-form__actions { display: grid; gap: 10px; margin-top: 24px; }
+  .callback-form__note { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.55; text-align: center; }
+  .callback-copy {
+    width: 100%;
+    max-width: 100%;
+    min-height: 150px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 7px;
+    font: inherit;
+    font-size: 12px;
+  }
+  .callback-copy[hidden] { display: none; }
+
+  .legal-page__grid, .legal-page aside, .legal-copy { min-width: 0; }
+  .legal-page aside h1, .legal-copy, .legal-copy p, .legal-copy a { overflow-wrap: anywhere; hyphens: auto; }
+}
+
+@layer sections {
+  .hero h1 { font-size: clamp(2.9rem, 5.2vw, 4.9rem); }
+  .hero__lead { font-size: clamp(1.0625rem, 1.55vw, 1.1875rem); line-height: 1.65; }
+  .inner-hero h1 { font-size: clamp(2.75rem, 4.8vw, 4.75rem); }
+  .inner-hero h1 + p { font-size: 1.125rem; line-height: 1.65; }
+  .service-hero h1 { max-width: 860px; font-size: clamp(2.75rem, 4.6vw, 4.6rem); }
+  .service-hero h1 + p { font-size: 1.125rem; line-height: 1.65; }
+  .service-hero__card strong { font-size: clamp(1.45rem, 2vw, 1.7rem); }
+  .service-hero__card > p { font-size: .875rem; line-height: 1.65; }
+  .two-lists h2 { font-size: clamp(2rem, 3.2vw, 3rem); }
+  .number-list p, .plain-checks li { font-size: 1rem; line-height: 1.6; }
+  .process-line strong { font-size: clamp(1.25rem, 1.8vw, 1.45rem); }
+  .process-line p { font-size: .9375rem; line-height: 1.6; }
+}
+
+@layer utilities {
+  @media (max-width: 680px) {
+    h1 { font-size: clamp(2.25rem, 10vw, 3rem); }
+    h2 { font-size: clamp(1.875rem, 8vw, 2.5rem); }
+    h3 { font-size: 1.25rem; }
+    .hero h1 { font-size: clamp(2.35rem, 10.5vw, 3.15rem); }
+    .hero__lead, .service-hero h1 + p, .inner-hero h1 + p, .lead { font-size: 1.0625rem; line-height: 1.65; }
+    .inner-hero h1, .service-hero h1, .about-hero h1, .contact-page__intro h1 { font-size: clamp(2.25rem, 10vw, 3rem); }
+    .two-lists h2 { font-size: clamp(1.875rem, 8vw, 2.4rem); }
+    .messenger-dialog__content h2, .price-quiz__step h2, .price-quiz__result h2, .callback-form > h2 { font-size: clamp(1.9rem, 8.5vw, 2.4rem); }
+    .button { font-size: .9375rem; }
+    .service-hero__card strong { font-size: 1.5rem; }
+    .service-hero__card > p, .process-line p, .paper-panel__note { font-size: .9375rem; }
+    .number-list p, .plain-checks li { font-size: 1rem; }
+    .callback-form__intro { font-size: 15px; }
+    .callback-form__fields { gap: 14px; margin-top: 22px; }
+    .callback-open-link { min-height: 44px; }
+    .legal-page aside h1 { font-size: clamp(2.35rem, 12vw, 4.2rem); }
+  }
+}

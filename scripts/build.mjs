@@ -93,6 +93,7 @@ await cp(join(root, "src", "assets", "images"), join(dist, "assets", "images"), 
 const styles = [
   await readFile(join(root, "src", "styles.css"), "utf8"),
   await readFile(join(root, "src", "site-enhancements.css"), "utf8"),
+  await readFile(join(root, "src", "case-studies.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));

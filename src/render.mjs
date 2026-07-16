@@ -148,6 +148,7 @@ const footer = () => `
         <button class="text-link" type="button" data-dialog-open>Описать ситуацию ${icon("arrow")}</button>
       </div>
     </div>
+    ${hasPublicOffice() ? `<section class="footer__map" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — по предварительной записи. Для согласования времени и вопроса по подсудности напишите Максиму Юрьевичу в мессенджер.</p><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><iframe src="https://yandex.ru/map-widget/v1/?z=12&amp;ol=biz&amp;oid=118077889231" width="560" height="400" frameborder="0" loading="lazy" title="Офис юридической практики Максима Шевчука на Яндекс Картах"></iframe></div></section>` : ""}
     <div class="wrap footer__bottom">
       <p>© ${new Date().getFullYear()} Максим Юрьевич Шевчук</p>
       <p>Материалы обновлены ${lastModifiedLabel}. Информация не является гарантией результата по конкретному делу.</p>

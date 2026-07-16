@@ -17,6 +17,10 @@ const siteRoot = `${site.siteUrl.replace(/\/$/, "")}/`;
 const entityUrl = (fragment) => `${siteRoot}${fragment}`;
 const hasPublicEmail = () => Boolean(site.email && !site.email.endsWith("@example.ru"));
 const hasPublicOffice = () => Boolean(site.publicOffice?.enabled && site.publicOffice.streetAddress);
+const officeAddress = () => hasPublicOffice()
+  ? `${site.publicOffice.addressLocality}, ${site.publicOffice.streetAddress}`
+  : "";
+const yandexMapsLink = () => `https://yandex.ru/maps/?text=${encodeURIComponent(officeAddress())}`;
 const lastModifiedLabel = new Intl.DateTimeFormat("ru-RU", {
   day: "numeric",
   month: "long",
@@ -140,6 +144,7 @@ const footer = () => `
         <p>${hasPublicEmail() ? `<a href="mailto:${esc(site.email)}" data-track="email">${esc(site.email)}</a>` : `<span>${esc(site.email)}</span>`}</p>
         ${site.telegram ? `<p><a href="${esc(site.telegram)}" rel="me noopener" data-track="telegram">Telegram</a></p>` : ""}
         ${site.whatsapp ? `<p><a href="${esc(site.whatsapp)}" rel="noopener" data-track="whatsapp">WhatsApp</a></p>` : ""}
+        ${hasPublicOffice() ? `<a class="footer__office" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">${icon("pin")}<span><small>Офис · по предварительной записи</small>${esc(officeAddress())}<em>Открыть в Яндекс Картах</em></span></a>` : ""}
         <button class="text-link" type="button" data-dialog-open>Описать ситуацию ${icon("arrow")}</button>
       </div>
     </div>

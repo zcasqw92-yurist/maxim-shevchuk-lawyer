@@ -1,0 +1,54 @@
+@layer utilities {
+  @media (max-width: 680px) {
+    body { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+
+    .mobile-contact--dual {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 74px;
+      padding: 8px max(10px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    }
+
+    .mobile-contact--dual .mobile-contact__action {
+      min-width: 0;
+      min-height: 52px;
+      gap: 7px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: .875rem;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .mobile-contact--dual .mobile-contact__action--now {
+      color: var(--ink);
+      border: 1px solid var(--gold-bright);
+      background: var(--gold-bright);
+    }
+
+    .mobile-contact--dual .mobile-contact__action--later {
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,.34);
+      background: rgba(255,255,255,.06);
+    }
+
+    .mobile-contact--dual .mobile-contact__action--later:hover,
+    .mobile-contact--dual .mobile-contact__action--later:focus-visible {
+      color: var(--white);
+      border-color: rgba(255,255,255,.62);
+      background: rgba(255,255,255,.12);
+    }
+
+    .mobile-contact--dual .mobile-contact__action svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 17px;
+    }
+  }
+
+  @media (max-width: 350px) {
+    .mobile-contact--dual { gap: 6px; padding-inline: 8px; }
+    .mobile-contact--dual .mobile-contact__action { gap: 5px; padding-inline: 7px; font-size: .8125rem; }
+    .mobile-contact--dual .mobile-contact__action svg { width: 16px; height: 16px; flex-basis: 16px; }
+  }
+}

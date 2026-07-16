@@ -367,6 +367,21 @@
   .position-steps p { max-width: 530px; margin-top: 10px; color: rgba(255,255,255,.57); font-size: 13px; }
 
   .section--services { background: var(--paper); }
+  .section--value { background: var(--white); }
+  .value-grid, .price-grid { display: grid; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .value-grid { grid-template-columns: repeat(3, 1fr); }
+  .value-card { min-height: 300px; padding: clamp(28px, 3.4vw, 46px); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .value-card > span { display: block; margin-bottom: 56px; color: var(--gold); font-family: var(--serif); font-size: 16px; }
+  .value-card h3 { max-width: 270px; font-family: var(--serif); font-size: clamp(24px, 2.4vw, 32px); font-weight: 500; }
+  .value-card p { max-width: 310px; margin-top: 15px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .section--prices { background: var(--paper-2); }
+  .price-grid { grid-template-columns: repeat(3, 1fr); background: rgba(255,255,255,.32); }
+  .price-card { display: flex; min-height: 230px; flex-direction: column; padding: clamp(26px, 3vw, 42px); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .price-card h3 { font-family: var(--serif); font-size: clamp(21px, 2vw, 27px); font-weight: 500; }
+  .price-card p { margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+  .price-card strong { margin-top: auto; padding-top: 28px; color: #8a673b; font-family: var(--serif); font-size: clamp(25px, 2.5vw, 34px); font-weight: 500; }
+  .price-note { display: flex; align-items: center; justify-content: space-between; gap: 35px; margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--line); }
+  .price-note p { max-width: 720px; color: var(--muted); font-size: 13px; }
   .section--consultation { background: var(--white); }
   .consultation-grid { display: grid; grid-template-columns: 1.08fr .92fr; align-items: center; gap: clamp(55px, 9vw, 130px); }
   .consultation-grid--reverse { grid-template-columns: .92fr .72fr; }
@@ -440,6 +455,9 @@
   .service-hero__icon svg { width: 25px; }
   .service-hero__card strong { display: block; color: var(--white); font-family: var(--serif); font-size: 27px; font-weight: 500; }
   .service-hero__card > p { margin: 16px 0 25px; font-size: 13px; }
+  .service-hero__price { display: grid; gap: 4px; margin: 0 0 25px; padding: 17px 0; border-block: 1px solid var(--line-light); }
+  .service-hero__price small { color: rgba(255,255,255,.52); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .service-hero__price b { color: var(--gold-bright); font-family: var(--serif); font-size: 29px; font-weight: 500; }
   .service-hero__card ul { display: flex; flex-wrap: wrap; gap: 9px 18px; list-style: none; color: var(--gold-bright); font-size: 10px; font-weight: 700; text-transform: uppercase; }
   .service-hero__card li { display: flex; align-items: center; gap: 5px; }
   .service-hero__card li svg { width: 13px; }
@@ -582,6 +600,7 @@
     .hero__grid { grid-template-columns: 1.08fr .92fr; gap: 45px; }
     .identity-card { right: -8px; }
     .service-grid, .district-grid { grid-template-columns: repeat(2, 1fr); }
+    .value-grid, .price-grid { grid-template-columns: repeat(2, 1fr); }
     .footer__grid { grid-template-columns: 1.3fr .8fr .8fr; }
     .footer__contact { grid-column: 2 / -1; }
   }
@@ -641,6 +660,14 @@
     .trust-rail { margin-top: 35px; }
     .section-head { margin-bottom: 40px; }
     .service-grid, .situation-grid, .district-grid { grid-template-columns: minmax(0, 1fr); }
+    .value-grid, .price-grid { grid-template-columns: minmax(0, 1fr); }
+    .value-card { min-height: 0; padding: 31px 26px; }
+    .value-card > span { margin-bottom: 32px; }
+    .value-card h3 { font-size: 28px; }
+    .value-card p, .price-card p, .price-note p { font-size: 15px; }
+    .price-card { min-height: 0; padding: 30px 26px; }
+    .price-card strong { margin-top: 24px; padding-top: 0; }
+    .price-note { display: grid; gap: 20px; }
     .service-card { min-height: 330px; }
     .situation-card { min-height: 210px; }
     .position-grid { gap: 60px; }

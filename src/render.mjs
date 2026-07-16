@@ -495,7 +495,7 @@ export const renderHome = () => ({
     <section class="hero">
       <div class="wrap hero__grid">
         <div class="hero__content">
-          <h1>Сильная правовая позиция начинается <em>с точных фактов</em></h1>
+          <h1>Сильная правовая позиция начинается <em data-hero-rotator>с точных фактов</em></h1>
           <p class="hero__lead">Разбираю документы, нахожу юридическое основание и выстраиваю последовательность действий — от досудебного требования до искового заявления.</p>
           <div class="hero__actions">
             <button class="button button--primary" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button>

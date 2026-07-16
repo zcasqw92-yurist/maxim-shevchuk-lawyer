@@ -88,6 +88,11 @@ const updateScroll = () => {
   header?.classList.toggle("is-scrolled", y > 12);
   const scrollingDown = y > previousScrollY + 8;
   const scrollingUp = y < previousScrollY - 8;
+  const mobileViewport = matchMedia("(max-width: 680px)").matches;
+  if (header) {
+    if (!mobileViewport || y <= 80 || scrollingUp) header.classList.remove("is-header-hidden");
+    else if (scrollingDown) header.classList.add("is-header-hidden");
+  }
   if (mobileContact && y <= 420) mobileContact.classList.remove("is-visible");
   else if (scrollingDown) mobileContact?.classList.add("is-visible");
   else if (scrollingUp) mobileContact?.classList.remove("is-visible");
@@ -99,11 +104,13 @@ const updateScroll = () => {
 };
 updateScroll();
 addEventListener("scroll", updateScroll, { passive: true });
+addEventListener("resize", updateScroll, { passive: true });
 
 const menuToggle = $("[data-menu-toggle]");
 const mobileMenu = $("[data-mobile-menu]");
 menuToggle?.addEventListener("click", () => {
   const open = menuToggle.getAttribute("aria-expanded") === "true";
+  header?.classList.remove("is-header-hidden");
   menuToggle.setAttribute("aria-expanded", String(!open));
   mobileMenu.hidden = open;
 });

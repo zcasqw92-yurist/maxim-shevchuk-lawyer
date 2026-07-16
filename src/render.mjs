@@ -183,6 +183,93 @@ const dialog = () => `
     </div>
   </dialog>`;
 
+const priceQuizDialog = () => `
+  <dialog class="price-quiz-dialog" id="price-quiz-dialog" aria-labelledby="price-quiz-title">
+    <button class="dialog__close" type="button" data-price-quiz-close aria-label="Закрыть">${icon("close")}</button>
+    <div class="price-quiz">
+      <div class="price-quiz__head">
+        <span class="eyebrow">Ориентир стоимости</span>
+        <span class="price-quiz__progress" data-price-quiz-progress>Шаг 1 из 5</span>
+        <div class="price-quiz__progress-line" aria-hidden="true"><i data-price-quiz-progress-bar></i></div>
+      </div>
+
+      <section class="price-quiz__step" data-price-quiz-step="issue">
+        <h2 id="price-quiz-title">С чем связан вопрос?</h2>
+        <p>Выберите наиболее близкую ситуацию — это поможет понять объём работы.</p>
+        <div class="price-quiz__options">
+          <button type="button" data-price-quiz-option data-quiz-key="issue" data-quiz-value="Не возвращают деньги" aria-pressed="false">Не возвращают деньги</button>
+          <button type="button" data-price-quiz-option data-quiz-key="issue" data-quiz-value="Нужна претензия" aria-pressed="false">Нужна претензия</button>
+          <button type="button" data-price-quiz-option data-quiz-key="issue" data-quiz-value="Жалоба или обращение" aria-pressed="false">Жалоба или обращение</button>
+          <button type="button" data-price-quiz-option data-quiz-key="issue" data-quiz-value="Иск в суд" aria-pressed="false">Иск в суд</button>
+          <button type="button" data-price-quiz-option data-quiz-key="issue" data-quiz-value="Спор по договору" aria-pressed="false">Спор по договору</button>
+          <button type="button" data-price-quiz-option data-quiz-key="issue" data-quiz-value="Другое" aria-pressed="false">Другое</button>
+        </div>
+      </section>
+
+      <section class="price-quiz__step" data-price-quiz-step="goal" hidden>
+        <h2>Какой результат нужен?</h2>
+        <p>Так Максим Юрьевич поймёт, требуется ли разбор, документ или дальнейшее сопровождение.</p>
+        <div class="price-quiz__options">
+          <button type="button" data-price-quiz-option data-quiz-key="goal" data-quiz-value="Понять, что можно сделать" aria-pressed="false">Понять, что можно сделать</button>
+          <button type="button" data-price-quiz-option data-quiz-key="goal" data-quiz-value="Подготовить документ" aria-pressed="false">Подготовить документ</button>
+          <button type="button" data-price-quiz-option data-quiz-key="goal" data-quiz-value="Оценить готовый документ" aria-pressed="false">Оценить готовый документ</button>
+          <button type="button" data-price-quiz-option data-quiz-key="goal" data-quiz-value="Сопровождение дальше" aria-pressed="false">Сопровождение дальше</button>
+        </div>
+      </section>
+
+      <section class="price-quiz__step" data-price-quiz-step="other-side" hidden>
+        <h2>Кто вторая сторона?</h2>
+        <p>Правовой порядок и объём подготовки зависят от того, к кому предъявляются требования.</p>
+        <div class="price-quiz__options">
+          <button type="button" data-price-quiz-option data-quiz-key="other-side" data-quiz-value="Человек" aria-pressed="false">Человек</button>
+          <button type="button" data-price-quiz-option data-quiz-key="other-side" data-quiz-value="Компания или ИП" aria-pressed="false">Компания или ИП</button>
+          <button type="button" data-price-quiz-option data-quiz-key="other-side" data-quiz-value="Государственный орган" aria-pressed="false">Государственный орган</button>
+          <button type="button" data-price-quiz-option data-quiz-key="other-side" data-quiz-value="Пока не уверен" aria-pressed="false">Пока не уверен</button>
+        </div>
+      </section>
+
+      <section class="price-quiz__step" data-price-quiz-step="materials" hidden>
+        <h2>Что уже есть?</h2>
+        <p>Можно выбрать несколько вариантов. Документы сейчас прикладывать не нужно.</p>
+        <div class="price-quiz__options">
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Договор" data-quiz-multiple aria-pressed="false">Договор</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Переписка" data-quiz-multiple aria-pressed="false">Переписка</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Подтверждения оплаты" data-quiz-multiple aria-pressed="false">Подтверждения оплаты</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Ответ или отказ" data-quiz-multiple aria-pressed="false">Ответ или отказ</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Пока ничего" data-quiz-multiple aria-pressed="false">Пока ничего</button>
+        </div>
+      </section>
+
+      <section class="price-quiz__step" data-price-quiz-step="timing" hidden>
+        <h2>Есть ли срок?</h2>
+        <p>Срочность влияет на порядок работы, поэтому лучше отметить её сразу.</p>
+        <div class="price-quiz__options">
+          <button type="button" data-price-quiz-option data-quiz-key="timing" data-quiz-value="Срочно" aria-pressed="false">Срочно</button>
+          <button type="button" data-price-quiz-option data-quiz-key="timing" data-quiz-value="В ближайшие дни" aria-pressed="false">В ближайшие дни</button>
+          <button type="button" data-price-quiz-option data-quiz-key="timing" data-quiz-value="Срока нет" aria-pressed="false">Срока нет</button>
+        </div>
+      </section>
+
+      <section class="price-quiz__result" data-price-quiz-result hidden aria-live="polite">
+        <span class="eyebrow">Следующий шаг</span>
+        <h2>Можно уточнить стоимость по вашей ситуации</h2>
+        <p>Ответы собраны в краткую сводку. Максим Юрьевич уточнит детали и назовёт стоимость до начала работы.</p>
+        <dl class="price-quiz__summary" data-price-quiz-summary></dl>
+        <div class="messenger-choices price-quiz__choices">
+          <a class="messenger-choice messenger-choice--whatsapp" href="${esc(site.whatsapp)}" target="_blank" rel="noopener" data-price-quiz-whatsapp data-track="whatsapp">${icon("whatsapp")}<span>Отправить в WhatsApp</span></a>
+          <a class="messenger-choice messenger-choice--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-price-quiz-telegram data-track="telegram">${icon("telegram")}<span>Продолжить в Telegram</span></a>
+        </div>
+        <p class="price-quiz__telegram-note" data-price-quiz-telegram-note>Перед переходом в Telegram сводка скопируется — останется только вставить её в чат.</p>
+        <p class="price-quiz__privacy">${icon("lock")}Никакие ответы не сохраняются на сайте.</p>
+      </section>
+
+      <div class="price-quiz__controls" data-price-quiz-controls>
+        <button class="price-quiz__back" type="button" data-price-quiz-back hidden>Назад</button>
+        <button class="button button--primary" type="button" data-price-quiz-next disabled>Далее ${icon("arrow", "button__icon")}</button>
+      </div>
+    </div>
+  </dialog>`;
+
 const stickyContact = () => `
   <div class="mobile-contact" aria-label="Быстрые действия" data-mobile-contact>
     <button type="button" data-dialog-open>${icon("dialog")}Описать ситуацию</button>
@@ -377,6 +464,7 @@ export const renderShell = ({
   <main id="main">${content}</main>
   ${footer()}
   ${dialog()}
+  ${priceQuizDialog()}
   ${stickyContact()}
   ${consentBanner()}
 </body>
@@ -450,7 +538,7 @@ const priceBlock = () => `
           ["Подготовка договора", "Документ под конкретную сделку или задачу", "от 5 000 ₽"],
         ].map(([title, text, price]) => `<article class="price-card reveal"><h3>${title}</h3><p>${text}</p><strong>${price}</strong></article>`).join("")}
       </div>
-      <div class="price-note reveal"><p>Если для защиты нужно несколько взаимосвязанных документов, состав работы и стоимость согласуются до начала подготовки.</p><button class="text-link" type="button" data-dialog-open>Уточнить стоимость по ситуации ${icon("arrow")}</button></div>
+      <div class="price-note reveal"><p>Если для защиты нужно несколько взаимосвязанных документов, состав работы и стоимость согласуются до начала подготовки.</p><button class="text-link" type="button" data-price-quiz-open>Получить ориентир стоимости ${icon("arrow")}</button></div>
     </div>
   </section>`;
 

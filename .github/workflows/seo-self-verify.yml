@@ -1,0 +1,54 @@
+name: Временная самопроверка SEO-ветки
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: ${{ github.event.pull_request.number == 13 && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Получить исходную ветку
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Выполнить полную проверку и зафиксировать результат
+        shell: bash
+        run: |
+          set +e
+          npm run check > /tmp/seo-verification.log 2>&1
+          code=$?
+          set -e
+
+          mkdir -p verification
+          {
+            echo "tested_sha=${{ github.event.pull_request.head.sha }}"
+            echo "exit_code=$code"
+            echo "run_id=${{ github.run_id }}"
+            echo "--- log tail ---"
+            tail -n 240 /tmp/seo-verification.log
+          } > verification/seo-pr13.txt
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add verification/seo-pr13.txt
+          git commit -m "Зафиксировать результат полной проверки [skip ci]"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+
+          exit "$code"

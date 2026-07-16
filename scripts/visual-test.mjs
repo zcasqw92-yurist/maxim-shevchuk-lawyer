@@ -70,7 +70,9 @@ const checks = [
   { name: "home-desktop", path: "/", viewport: { width: 1440, height: 1000 }, fullPage: true },
   { name: "home-mobile", path: "/", viewport: { width: 390, height: 844 }, fullPage: true },
   { name: "services-tablet", path: "/uslugi/", viewport: { width: 820, height: 1180 }, fullPage: true },
+  { name: "service-mobile", path: "/uslugi/dosudebnoe-uregulirovanie/", viewport: { width: 390, height: 844 }, fullPage: true },
   { name: "about-desktop", path: "/o-yuriste/", viewport: { width: 1440, height: 1000 }, fullPage: true },
+  { name: "about-mobile", path: "/o-yuriste/", viewport: { width: 390, height: 844 }, fullPage: true },
   { name: "districts-mobile", path: "/rayony-moskvy/", viewport: { width: 390, height: 844 }, fullPage: true },
 ];
 const errors = [];

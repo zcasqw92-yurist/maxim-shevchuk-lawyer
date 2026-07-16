@@ -13,6 +13,7 @@ import {
   renderShell,
 } from "../src/render.mjs";
 import { applyContentOverrides } from "./content-overrides.mjs";
+import { applyQuickChoicesOverrides } from "./quick-choices-overrides.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -101,6 +102,7 @@ for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})
 }
 
 await applyContentOverrides({ dist, services });
+await applyQuickChoicesOverrides({ dist });
 
 const indexablePages = [
   { path: "/", image: "/assets/images/maxim-hero.webp" },

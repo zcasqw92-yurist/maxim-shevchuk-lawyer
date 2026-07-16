@@ -348,10 +348,16 @@
   .identity-card span, .identity-card small { color: var(--gold-bright); font-size: 9px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
   .identity-card strong { margin: 9px 0 8px; font-family: var(--serif); font-size: clamp(17px, 2vw, 24px); font-weight: 500; line-height: 1.12; }
   .identity-card small { color: rgba(255,255,255,.5); letter-spacing: .05em; text-transform: none; }
-  .trust-rail { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 64px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-  .trust-rail > div { display: flex; min-height: 100px; align-items: center; gap: 18px; padding: 20px 28px; border-right: 1px solid var(--line); }
-  .trust-rail strong { color: var(--gold); font-family: var(--serif); font-size: 23px; font-weight: 500; }
-  .trust-rail span { color: var(--muted); font-size: 11px; line-height: 1.45; }
+  .contact-path { position: relative; z-index: 1; padding: clamp(64px, 8vw, 110px) 0; background: var(--paper-2); border-block: 1px solid var(--line); }
+  .contact-path__grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: clamp(50px, 8vw, 120px); align-items: start; }
+  .contact-path__intro h2 { max-width: 500px; margin-top: 18px; font-size: clamp(2.2rem, 3.5vw, 3.6rem); }
+  .contact-path__intro p { max-width: 470px; margin-top: 22px; color: var(--muted); font-size: 14px; }
+  .contact-path__steps { display: grid; grid-template-columns: repeat(3, 1fr); list-style: none; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .contact-path__steps li { min-height: 215px; padding: 29px 25px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .contact-path__steps > li > span { display: block; margin-bottom: 48px; color: var(--gold); font-family: var(--serif); font-size: 17px; }
+  .contact-path__steps strong { display: block; font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.25; }
+  .contact-path__steps p { margin-top: 10px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+  .contact-path--service { background: var(--white); }
 
   .section--situations { padding-top: clamp(100px, 12vw, 175px); }
   .situation-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
@@ -582,15 +588,14 @@
     .header__inner { min-height: 72px; }
     .hero { padding-top: 45px; }
     .hero__grid, .about-preview, .consultation-grid, .consultation-grid--reverse,
-    .position-grid, .faq-grid, .inner-hero__grid, .service-hero__grid, .two-lists,
+    .position-grid, .faq-grid, .inner-hero__grid, .service-hero__grid, .two-lists, .contact-path__grid,
     .about-hero__grid, .story-grid, .education-grid, .contact-page__grid, .contact-location__grid,
     .legal-page__grid { grid-template-columns: 1fr; }
     .hero__content { order: 1; }
     .hero__visual { order: 2; width: min(700px, 100%); }
     .hero__image-wrap { border-radius: 240px 240px 5px 5px; }
     .hero__image-wrap img { aspect-ratio: 6/5; object-position: center 31%; }
-    .trust-rail { grid-template-columns: 1fr; }
-    .trust-rail > div { min-height: 76px; }
+    .contact-path__steps { grid-template-columns: repeat(3, 1fr); }
     .section-head--split { grid-template-columns: 1fr; gap: 25px; }
     .position-intro, .story-heading, .legal-page aside { position: static; }
     .about-preview__visual { width: min(600px, 90%); margin-inline: auto; }
@@ -628,7 +633,13 @@
     .hero__assurance { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .hero__image-wrap img { aspect-ratio: 4/5; object-position: 58% center; }
     .identity-card { right: 8px; bottom: 12px; width: 62%; padding: 17px; }
-    .trust-rail { margin-top: 35px; }
+    .contact-path { padding: 70px 0; }
+    .contact-path__grid { gap: 38px; }
+    .contact-path__steps { grid-template-columns: 1fr; }
+    .contact-path__steps li { display: grid; grid-template-columns: 45px 1fr; gap: 14px; min-height: 0; padding: 23px 0; border-right: 0; }
+    .contact-path__steps > li > span { margin: 0; font-size: 18px; }
+    .contact-path__steps strong { font-size: 22px; }
+    .contact-path__steps p { font-size: 15px; }
     .section-head { margin-bottom: 40px; }
     .service-grid, .situation-grid { grid-template-columns: minmax(0, 1fr); }
     .value-grid, .price-grid { grid-template-columns: minmax(0, 1fr); }

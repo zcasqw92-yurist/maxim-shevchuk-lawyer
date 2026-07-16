@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { createReadStream, createWriteStream } from "node:fs";
-import { access, chmod, mkdir } from "node:fs/promises";
+import { access, chmod, mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -117,7 +117,7 @@ try {
 
   const openedAfterWhatsapp = await page.evaluate(() => [...window.__callbackOpenedUrls]);
   const whatsappUrl = openedAfterWhatsapp.at(-1) || "";
-  if (!whatsappUrl.startsWith("https://api.whatsapp.com/send?phone=79065297970")) errors.push("WhatsApp callback URL is invalid");
+  if (!whatsappUrl.startsWith("https://api.whatsapp.com/send?phone=79065297970")) errors.push(`WhatsApp callback URL is invalid: ${whatsappUrl}`);
   const whatsappText = whatsappUrl ? new URL(whatsappUrl).searchParams.get("text") || "" : "";
   for (const part of [
     "Прошу связаться со мной позже",
@@ -132,10 +132,11 @@ try {
   }
 
   await callbackDialog.locator("[data-callback-telegram]").click();
+  await page.waitForFunction(() => document.querySelector("[data-callback-note]")?.textContent?.includes("Telegram открыт"), null, { timeout: 3000 }).catch(() => {});
   const openedAfterTelegram = await page.evaluate(() => [...window.__callbackOpenedUrls]);
-  if (openedAfterTelegram.at(-1) !== "https://t.me/lawrazbor") errors.push("Telegram callback URL is invalid");
+  if (openedAfterTelegram.at(-1) !== "https://t.me/lawrazbor") errors.push(`Telegram callback URL is invalid: ${openedAfterTelegram.at(-1) || "empty"}`);
   const note = await callbackDialog.locator("[data-callback-note]").textContent();
-  if (!note?.includes("Telegram открыт")) errors.push("Telegram instruction was not shown");
+  if (!note?.includes("Telegram открыт")) errors.push(`Telegram instruction was not shown: ${note || "empty"}`);
   const storedKeys = await page.evaluate(() => Object.keys(localStorage).filter((key) => /callback/i.test(key)));
   if (storedKeys.length) errors.push(`callback data was persisted: ${storedKeys.join(", ")}`);
 
@@ -146,6 +147,9 @@ try {
 }
 
 if (errors.length) {
+  const reportDir = join(root, "reports");
+  await mkdir(reportDir, { recursive: true });
+  await writeFile(join(reportDir, "callback-errors.txt"), [...new Set(errors)].join("\n"), "utf8");
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }

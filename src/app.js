@@ -78,11 +78,17 @@ const track = (event, params = {}) => {
 const header = $("[data-header]");
 const progress = $("[data-scroll-progress]");
 const mobileContact = $("[data-mobile-contact]");
+let previousScrollY = window.scrollY;
 
 const updateScroll = () => {
   const y = window.scrollY;
   header?.classList.toggle("is-scrolled", y > 12);
-  mobileContact?.classList.toggle("is-visible", y > 420);
+  const scrollingDown = y > previousScrollY + 8;
+  const scrollingUp = y < previousScrollY - 8;
+  if (mobileContact && y <= 420) mobileContact.classList.remove("is-visible");
+  else if (scrollingDown) mobileContact?.classList.add("is-visible");
+  else if (scrollingUp) mobileContact?.classList.remove("is-visible");
+  previousScrollY = y;
   if (progress) {
     const max = Math.max(document.documentElement.scrollHeight - innerHeight, 1);
     progress.style.transform = `scaleX(${Math.min(y / max, 1)})`;

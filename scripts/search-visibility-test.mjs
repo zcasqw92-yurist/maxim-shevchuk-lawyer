@@ -62,7 +62,7 @@ const config = await readFile(join(root, "site.config.mjs"), "utf8");
 for (const marker of [
   'google: env("GOOGLE_SITE_VERIFICATION")',
   'yandex: env("YANDEX_SITE_VERIFICATION")',
-  'indexNowKey: env("INDEXNOW_KEY")',
+  'indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158"',
   'defaultTitle: "Юрист по гражданским делам в Москве | Максим Шевчук"',
 ]) {
   if (!config.includes(marker)) errors.push(`site.config.mjs: отсутствует настройка ${marker}`);
@@ -70,18 +70,19 @@ for (const marker of [
 
 const workflow = await readFile(join(root, ".github", "workflows", "pages.yml"), "utf8");
 for (const marker of [
-  "SITE_PRODUCTION: ${{ vars.SITE_PRODUCTION || 'true' }}",
+  "SITE_PRODUCTION: 'true'",
   "GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}",
   "YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}",
-  "INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}",
+  "INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}",
   "npm run submit:indexnow",
 ]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует настройка ${marker}`);
 }
+if (/if:\s*\$\{\{\s*env\.INDEXNOW_KEY/.test(workflow)) errors.push("pages.yml: IndexNow не должен зависеть от необязательного секрета");
 
 if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: visible expert content, internal links, authorship, responsive styles and indexing hooks");
+console.log("Search visibility checks passed: visible expert content, internal links, authorship, production indexing and IndexNow hooks");

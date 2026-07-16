@@ -2,12 +2,10 @@ import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
-import { districts, services } from "../src/data.mjs";
+import { services } from "../src/data.mjs";
 import {
   renderAbout,
   renderContacts,
-  renderDistrict,
-  renderDistricts,
   renderHome,
   renderPrivacy,
   renderService,
@@ -24,12 +22,6 @@ const xml = (value) => String(value)
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&apos;");
 
-const knownDistricts = new Set(districts.map((district) => district.slug));
-const requestedDistricts = site.districtPagesIndexable
-  ? districts.map((district) => district.slug)
-  : (site.indexableDistricts || []);
-const unknownDistricts = requestedDistricts.filter((slug) => !knownDistricts.has(slug));
-if (unknownDistricts.length) throw new Error(`Неизвестные коды округов: ${unknownDistricts.join(", ")}`);
 if (!/^\d{4}-\d{2}-\d{2}$/.test(site.contentLastModified)) {
   throw new Error("contentLastModified должен быть датой YYYY-MM-DD");
 }
@@ -55,12 +47,6 @@ if (site.production) {
     launchErrors.push("укажите хотя бы один корректный идентификатор аналитики либо отключите analytics.enabled");
   }
   if (/заглушк|\[Указать/i.test(renderPrivacy().content)) launchErrors.push("замените черновик политики конфиденциальности");
-  for (const slug of requestedDistricts) {
-    const district = districts.find((item) => item.slug === slug);
-    if (/подготовлена к наполнению|общая структура/i.test(renderDistrict(district).content)) {
-      launchErrors.push(`наполните локальную страницу ${district.short} перед индексацией`);
-    }
-  }
   if (launchErrors.length) {
     throw new Error(`Публикация остановлена:\n- ${launchErrors.join("\n- ")}`);
   }
@@ -107,10 +93,6 @@ for (const service of services) {
   await writePage(`/uslugi/${service.slug}`, renderService(service));
 }
 await writePage("/o-yuriste", renderAbout());
-await writePage("/rayony-moskvy", renderDistricts());
-for (const district of districts) {
-  await writePage(`/rayony-moskvy/${district.slug}`, renderDistrict(district));
-}
 await writePage("/kontakty", renderContacts());
 await writePage("/politika-konfidencialnosti", renderPrivacy());
 for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})) {
@@ -122,12 +104,8 @@ const indexablePages = [
   { path: "/uslugi/", image: "/assets/images/maxim-documents.webp" },
   ...services.map((service) => ({ path: `/uslugi/${service.slug}/`, image: "/assets/images/maxim-documents.webp" })),
   { path: "/o-yuriste/", image: "/assets/images/maxim-documents.webp" },
-  { path: "/rayony-moskvy/" },
   { path: "/kontakty/", image: "/assets/images/maxim-consultation.webp" },
   { path: "/politika-konfidencialnosti/" },
-  ...districts
-    .filter((district) => site.districtPagesIndexable || site.indexableDistricts?.includes(district.slug))
-    .map((district) => ({ path: `/rayony-moskvy/${district.slug}/` })),
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -173,4 +151,4 @@ const renderedNotFound = notFound
   .replace(/(\b(?:href|src)=["'])\/(?!\/)/g, `$1${site.basePath || ""}/`);
 await writeFile(join(dist, "404.html"), renderedNotFound, "utf8");
 
-console.log(`Built ${7 + services.length + districts.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist}`);
+console.log(`Built ${6 + services.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist}`);

@@ -260,8 +260,9 @@
   }
   .contact-dialog::backdrop { background: rgba(5,18,29,.72); backdrop-filter: blur(8px); }
   .contact-dialog[open] { animation: dialog-in .28s ease both; }
-  .dialog__close { position: absolute; z-index: 3; top: 16px; right: 16px; display: grid; width: 42px; aspect-ratio: 1; place-items: center; color: var(--ink); border: 1px solid var(--line); background: rgba(255,255,255,.9); border-radius: 50%; cursor: pointer; }
-  .dialog__close svg { width: 20px; }
+  .dialog__close { position: absolute; z-index: 3; top: 15px; right: 15px; display: grid; width: 30px; aspect-ratio: 1; place-items: center; padding: 0; color: rgba(9,28,44,.5); border: 0; background: transparent; border-radius: 0; cursor: pointer; transition: color .2s ease, opacity .2s ease; }
+  .dialog__close:hover { color: var(--ink); opacity: .85; }
+  .dialog__close svg { width: 17px; }
   .messenger-dialog__content { padding: 48px clamp(25px, 6vw, 52px) 34px; text-align: center; }
   .messenger-dialog__status { display: inline-flex; align-items: center; gap: 9px; padding: 10px 14px; color: #416550; background: #e5f5ea; border-radius: 99px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
   .messenger-dialog__status i { width: 9px; aspect-ratio: 1; background: #41b86b; border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); }

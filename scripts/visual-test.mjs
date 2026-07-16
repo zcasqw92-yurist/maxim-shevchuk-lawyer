@@ -176,6 +176,42 @@ try {
   if (await menuButton.count() !== 1) errors.push("interaction: mobile menu trigger is not unique");
   else await menuButton.click();
   if (!await mobilePage.locator("[data-mobile-menu]").isVisible()) errors.push("interaction: mobile menu did not open");
+  await menuButton.click();
+
+  await mobilePage.evaluate(() => {
+    window.scrollTo(0, 720);
+    window.dispatchEvent(new Event("scroll"));
+  });
+  await mobilePage.waitForFunction(() => {
+    const panel = document.querySelector("[data-mobile-contact]");
+    if (!panel?.classList.contains("is-visible")) return false;
+    const style = getComputedStyle(panel);
+    return Number(style.opacity) > .9 && panel.getBoundingClientRect().bottom <= innerHeight + 1;
+  }, null, { timeout: 2500 });
+  const mobilePanel = mobilePage.locator("[data-mobile-contact]");
+  if (await mobilePanel.locator("button").count() !== 2) errors.push("interaction: mobile panel must contain exactly two buttons");
+  const mobileLayout = await mobilePanel.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    const buttons = [...element.querySelectorAll("button")].map((button) => {
+      const buttonRect = button.getBoundingClientRect();
+      return { width: buttonRect.width, height: buttonRect.height, left: buttonRect.left, right: buttonRect.right };
+    });
+    return { display: style.display, opacity: style.opacity, rect: { left: rect.left, right: rect.right, bottom: rect.bottom }, buttons, viewport: innerWidth };
+  });
+  if (mobileLayout.display !== "grid" || Number(mobileLayout.opacity) < .9 || mobileLayout.buttons.some((button) => button.height < 44 || button.width < 120)) errors.push(`interaction: mobile panel sizing is invalid ${JSON.stringify(mobileLayout)}`);
+  if (mobileLayout.rect.left < -1 || mobileLayout.rect.right > mobileLayout.viewport + 1 || mobileLayout.buttons.some((button) => button.left < -1 || button.right > mobileLayout.viewport + 1)) errors.push(`interaction: mobile panel overflows viewport ${JSON.stringify(mobileLayout)}`);
+
+  await mobilePage.locator("[data-mobile-contact-now]").click();
+  const mobileDialog = mobilePage.locator("#contact-dialog");
+  if (!await mobileDialog.evaluate((element) => element.open)) errors.push("interaction: 'Написать сейчас' did not open messenger dialog");
+  const mobileTelegram = await mobileDialog.locator("[data-track='telegram']").getAttribute("href");
+  if (!messageText(mobileTelegram).includes("Хочу получить первичную оценку ситуации")) errors.push("interaction: immediate mobile action has incomplete starter message");
+  await mobileDialog.locator("[data-dialog-close]").click();
+
+  await mobilePage.locator("[data-mobile-contact-later]").click();
+  const callbackDialog = mobilePage.locator("#callback-dialog");
+  if (!await callbackDialog.evaluate((element) => element.open)) errors.push("interaction: 'Связаться позже' did not open callback form");
   await mobilePage.close();
 } finally {
   await browser?.close();
@@ -186,4 +222,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialogs, messenger drafts, price quiz, menu`);
+console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialogs, messenger drafts, price quiz, menu and dual mobile actions`);

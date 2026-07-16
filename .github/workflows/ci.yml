@@ -75,5 +75,23 @@ jobs:
       - name: Проверить примеры работы
         run: npm run test:case-studies
 
+      - name: Проверить мобильную панель
+        run: npm run test:mobile-actions
+
       - name: Проверить вёрстку и взаимодействия
-        run: npm run test:visual
+        shell: bash
+        run: |
+          set +e
+          npm run test:visual > visual-test.log 2>&1
+          code=$?
+          cat visual-test.log
+          exit $code
+
+      - name: Сохранить журнал визуальной проверки
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-test-log
+          path: visual-test.log
+          if-no-files-found: ignore
+          retention-days: 3

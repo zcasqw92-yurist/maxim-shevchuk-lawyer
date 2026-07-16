@@ -17,12 +17,12 @@ concurrency:
 jobs:
   build-and-deploy:
     env:
-      SITE_PRODUCTION: ${{ vars.SITE_PRODUCTION || 'true' }}
+      SITE_PRODUCTION: 'true'
       SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
       SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || format('/{0}', github.event.repository.name) }}
       GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
       YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
-      INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+      INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -61,6 +61,5 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Notify Yandex and IndexNow partners
-        if: ${{ env.INDEXNOW_KEY != '' }}
         continue-on-error: true
         run: npm run submit:indexnow

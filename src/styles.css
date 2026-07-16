@@ -564,6 +564,16 @@
   .contact-page__guide li span { color: var(--gold-bright); font-family: var(--serif); }
   .contact-page__guide > p { display: flex; gap: 9px; margin-top: 31px; padding-top: 22px; border-top: 1px solid var(--line-light); color: rgba(255,255,255,.54); font-size: 12px; }
   .contact-page__guide > p svg { flex: 0 0 16px; width: 16px; color: var(--gold-bright); }
+  .contact-location__grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(55px, 9vw, 130px); }
+  .contact-location__grid > div > p { max-width: 620px; margin-top: 25px; color: var(--muted); }
+  .contact-location address { display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: clamp(28px, 4vw, 46px); border: 1px solid var(--line); background: var(--white); font-style: normal; }
+  .contact-location address > span { display: grid; width: 46px; aspect-ratio: 1; place-items: center; color: var(--ink); background: var(--gold-bright); border-radius: 50%; }
+  .contact-location address > span svg { width: 22px; }
+  .contact-location address > div { display: grid; gap: 7px; }
+  .contact-location address small { margin-top: 14px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .contact-location address small:first-child { margin-top: 0; }
+  .contact-location address strong { font-family: var(--serif); font-size: 20px; font-weight: 500; line-height: 1.35; }
+  .contact-location address .text-link { justify-self: start; margin-top: 20px; }
 
   .legal-page { padding: clamp(70px, 9vw, 130px) 0; }
   .legal-page__grid { display: grid; grid-template-columns: .6fr 1.4fr; gap: clamp(60px, 10vw, 150px); }
@@ -578,8 +588,9 @@
 }
 
 @layer utilities {
-  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease var(--delay, 0ms), transform .7s cubic-bezier(.2,.65,.2,1) var(--delay, 0ms); }
-  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  .reveal { opacity: 1; transform: none; }
+  .motion-ready .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease var(--delay, 0ms), transform .7s cubic-bezier(.2,.65,.2,1) var(--delay, 0ms); }
+  .motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
   @keyframes dialog-in { from { opacity: 0; transform: translateY(15px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -613,7 +624,7 @@
     .hero__grid, .about-preview, .district-preview, .consultation-grid, .consultation-grid--reverse,
     .position-grid, .faq-grid, .inner-hero__grid, .service-hero__grid, .two-lists,
     .about-hero__grid, .story-grid, .education-grid, .local-seo-note, .district-context,
-    .district-detail-hero__grid, .contact-page__grid, .legal-page__grid { grid-template-columns: 1fr; }
+    .district-detail-hero__grid, .contact-page__grid, .contact-location__grid, .legal-page__grid { grid-template-columns: 1fr; }
     .hero__content { order: 1; }
     .hero__visual { order: 2; width: min(700px, 100%); }
     .hero__image-wrap { border-radius: 240px 240px 5px 5px; }

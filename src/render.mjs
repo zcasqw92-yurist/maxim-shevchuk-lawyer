@@ -95,7 +95,7 @@ const header = (pathname) => `
     <div class="wrap header__inner">
       <div class="brand">
         <a class="brand__mark" href="/" aria-label="Максим Шевчук — главная"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></a>
-        <span class="brand__text"><a class="brand__home" href="/">Максим Шевчук</a><button class="header__online" type="button" data-dialog-open aria-label="Юрист онлайн — задать вопрос"><i></i><span>Юрист онлайн</span></button></span>
+        <span class="brand__text"><a class="brand__home" href="/">Максим Шевчук</a><button class="header__online" type="button" data-dialog-open data-online-status aria-label="Юрист онлайн — задать вопрос"><i></i><span data-online-label>Юрист онлайн</span></button></span>
       </div>
       <nav class="desktop-nav" aria-label="Основная навигация">
         ${navItems.map(([label, href]) => `<a href="${href}"${isCurrentNavItem(pathname, href) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
@@ -171,7 +171,7 @@ const dialog = () => `
   <dialog class="contact-dialog" id="contact-dialog" aria-labelledby="dialog-title">
     <button class="dialog__close" type="button" data-dialog-close aria-label="Закрыть">${icon("close")}</button>
     <div class="messenger-dialog__content">
-      <span class="messenger-dialog__status"><i></i>На связи в мессенджерах</span>
+      <span class="messenger-dialog__status" data-online-status><i></i><span data-online-label>На связи в мессенджерах</span></span>
       <img class="messenger-dialog__portrait" src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Юрьевич Шевчук">
       <h2 id="dialog-title">Готов разобрать ситуацию</h2>
       <p class="messenger-dialog__topic" data-dialog-topic hidden></p>

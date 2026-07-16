@@ -6,6 +6,7 @@ import { services } from "../src/data.mjs";
 import { composeRenderedPage } from "../src/page-composer.mjs";
 import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
 import { injectCaseStudies } from "../src/case-studies.mjs";
+import { injectSearchVisibility } from "../src/search-visibility.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
 import {
   renderAbout,
@@ -62,7 +63,8 @@ const writePage = async (pathname, options, context = {}) => {
   const composed = composeRenderedPage(rendered, { pathname, ...context });
   const withGuarantees = injectProcessGuarantees(composed, pathname);
   const withCases = injectCaseStudies(withGuarantees, pathname);
-  const html = injectMobileActions(withCases, pathname);
+  const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
+  const html = injectMobileActions(withSearchVisibility, pathname);
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };
@@ -96,6 +98,7 @@ const styles = [
   await readFile(join(root, "src", "styles.css"), "utf8"),
   await readFile(join(root, "src", "site-enhancements.css"), "utf8"),
   await readFile(join(root, "src", "case-studies.css"), "utf8"),
+  await readFile(join(root, "src", "search-visibility.css"), "utf8"),
   await readFile(join(root, "src", "mobile-actions.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");

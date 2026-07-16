@@ -1,6 +1,32 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+const moscowHour = () => {
+  try {
+    const hour = new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow", hour: "2-digit", hourCycle: "h23" })
+      .formatToParts(new Date())
+      .find((part) => part.type === "hour")?.value;
+    return Number(hour);
+  } catch {
+    return new Date().getHours();
+  }
+};
+
+const updateOnlineStatus = () => {
+  const online = moscowHour() >= 7 && moscowHour() < 23;
+  $$('[data-online-status]').forEach((status) => {
+    status.classList.toggle("is-offline", !online);
+    const label = $('[data-online-label]', status);
+    if (label) label.textContent = status.classList.contains("header__online")
+      ? (online ? "Юрист онлайн" : "Юрист офлайн")
+      : (online ? "На связи в мессенджерах" : "Сейчас офлайн · отвечу после 07:00 МСК");
+    if (status.classList.contains("header__online")) status.setAttribute("aria-label", `${online ? "Юрист онлайн" : "Юрист офлайн"} — задать вопрос`);
+  });
+};
+
+updateOnlineStatus();
+setInterval(updateOnlineStatus, 60_000);
+
 // Контент остаётся видимым без ожидания JavaScript: это важно для медленных
 // мобильных соединений и встроенных браузеров мессенджеров.
 const heroRotator = $("[data-hero-rotator]");

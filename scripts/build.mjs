@@ -72,6 +72,28 @@ const writePage = async (pathname, options) => {
   await writeFile(output, renderShell({ ...options, pathname }), "utf8");
 };
 
+const writeRedirect = async (pathname, destination) => {
+  const output = join(dist, pathname, "index.html");
+  const canonical = `${site.siteUrl}${destination}`;
+  const localDestination = `${site.basePath || ""}${destination}`;
+  await mkdir(dirname(output), { recursive: true });
+  await writeFile(output, `<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="${site.production ? "index,follow" : "noindex,follow"}">
+  <meta http-equiv="refresh" content="0;url=${localDestination}">
+  <link rel="canonical" href="${canonical}">
+  <title>Страница перемещена | Максим Шевчук</title>
+  <meta name="description" content="Материал перемещён на актуальную страницу сайта юридической практики Максима Шевчука.">
+</head>
+<body>
+  <main id="main"><h1>Страница перемещена</h1><p><a href="${localDestination}">Перейти к актуальному материалу</a></p></main>
+</body>
+</html>`, "utf8");
+};
+
 await rm(dist, { recursive: true, force: true });
 await mkdir(join(dist, "assets", "images"), { recursive: true });
 await cp(join(root, "src", "assets", "images"), join(dist, "assets", "images"), { recursive: true });
@@ -91,6 +113,9 @@ for (const district of districts) {
 }
 await writePage("/kontakty", renderContacts());
 await writePage("/politika-konfidencialnosti", renderPrivacy());
+for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})) {
+  await writeRedirect(pathname, destination);
+}
 
 const indexablePages = [
   { path: "/", image: "/assets/images/maxim-hero.webp" },
@@ -148,4 +173,4 @@ const renderedNotFound = notFound
   .replace(/(\b(?:href|src)=["'])\/(?!\/)/g, `$1${site.basePath || ""}/`);
 await writeFile(join(dist, "404.html"), renderedNotFound, "utf8");
 
-console.log(`Built ${7 + services.length + districts.length} HTML pages in ${dist}`);
+console.log(`Built ${7 + services.length + districts.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist}`);

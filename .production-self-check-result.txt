@@ -1,0 +1,85 @@
+tested_sha=714dac36131abd8ce7db24d6ccc5de0cf78115c8
+exit_code=1
+preview_code=1
+production_build_code=1
+production_validate_code=1
+production_seo_code=1
+run_id=29541451075
+--- log tail ---
+
+> maxim-shevchuk-legal-site@1.1.0 check
+> npm run build && npm run validate && npm run audit:seo && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual
+
+
+> maxim-shevchuk-legal-site@1.1.0 build
+> node scripts/build.mjs
+
+Built 14 HTML pages in /home/runner/work/maxim-shevchuk-lawyer/maxim-shevchuk-lawyer/dist
+
+> maxim-shevchuk-legal-site@1.1.0 validate
+> node scripts/validate.mjs
+
+Validated 14 HTML pages: no structural errors
+
+> maxim-shevchuk-legal-site@1.1.0 audit:seo
+> node scripts/seo-audit.mjs
+
+SEO audit: 14 HTML-страниц, 11 URL в карте сайта
+Ошибки: 0; предупреждения: 0; блокеры запуска: 3
+
+Блокеры запуска:
+- Подтвердить сайт в Google Search Console
+- Подтвердить сайт в Яндекс Вебмастере
+- После заполнения данных переключить production: true
+
+Критических технических SEO-ошибок не найдено.
+
+> maxim-shevchuk-legal-site@1.1.0 test:quick-choices
+> node scripts/quick-choices-test.mjs
+
+Quick situations test passed: 6 topics and labels
+
+> maxim-shevchuk-legal-site@1.1.0 test:callback
+> node scripts/callback-test.mjs
+
+Callback-later checks passed: 11 pages, fields, links, privacy and no-storage rules
+
+> maxim-shevchuk-legal-site@1.1.0 test:callback-interaction
+> node scripts/callback-interaction-test.mjs
+
+Callback interaction test passed: centered links, direct Telegram drafts, privacy layout and messenger URLs
+
+> maxim-shevchuk-legal-site@1.1.0 test:messenger-intents
+> node scripts/messenger-intents-interaction-test.mjs
+
+Messenger intent test passed: generic, topic, case-study CTA, quiz and callback flows on desktop and mobile
+
+> maxim-shevchuk-legal-site@1.1.0 test:service-pages
+> node scripts/service-pages-test.mjs
+
+Service page checks passed: 6 individual pages and responsive type scale
+
+> maxim-shevchuk-legal-site@1.1.0 test:service-pages-interaction
+> node scripts/service-pages-interaction-test.mjs
+
+Service page interaction test passed: individual messages and readable typography on desktop and mobile
+
+> maxim-shevchuk-legal-site@1.1.0 test:process-guarantees
+> node scripts/process-guarantees-test.mjs
+
+Process guarantees checks passed: 8 pages, four items and responsive layout
+
+> maxim-shevchuk-legal-site@1.1.0 test:case-studies
+> node scripts/case-studies-test.mjs
+
+Case-study checks passed: 5 pages, 3 anonymized matters, relevant placement and responsive layout
+
+> maxim-shevchuk-legal-site@1.1.0 test:search-visibility
+> node scripts/search-visibility-test.mjs
+
+Главная: отсутствует внутренняя ссылка на dosudebnoe-uregulirovanie
+Главная: отсутствует внутренняя ссылка на vozvrat-deneg
+Главная: отсутствует внутренняя ссылка на zhaloby-i-obrashcheniya
+Главная: отсутствует внутренняя ссылка на iskovoe-zayavlenie
+Главная: отсутствует внутренняя ссылка на spory-biznesa
+Главная: отсутствует внутренняя ссылка на marketpleysy

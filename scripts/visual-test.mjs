@@ -139,13 +139,10 @@ try {
   else await dialogButton.click();
   const dialog = interactionPage.locator("#contact-dialog");
   if (!await dialog.evaluate((element) => element.open)) errors.push("interaction: contact dialog did not open");
-  await interactionPage.locator("#dialog-form input[name='name']").fill("Тест");
-  await interactionPage.locator("#dialog-form input[name='contact']").fill("@test");
-  await interactionPage.locator("#dialog-form textarea[name='message']").fill("Проверка формы");
-  await interactionPage.locator("#dialog-form input[name='consent']").setChecked(true);
-  await interactionPage.locator("#dialog-form button[type='submit']").click();
-  const formStatus = await interactionPage.locator("#dialog-form [data-form-status]").innerText();
-  if (!formStatus.includes("Демонстрационный режим")) errors.push("interaction: demo form status is missing");
+  const whatsappHref = await interactionPage.locator("#contact-dialog [data-whatsapp-link]").getAttribute("href");
+  const telegramHref = await interactionPage.locator("#contact-dialog [data-track='telegram']").getAttribute("href");
+  if (!whatsappHref?.startsWith("https://wa.me/79065297970?text=")) errors.push("interaction: WhatsApp link is missing prepared message");
+  if (telegramHref !== "https://t.me/lawrazbor") errors.push("interaction: Telegram link is invalid");
   await interactionPage.close();
 
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });

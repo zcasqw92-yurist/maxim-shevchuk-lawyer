@@ -68,6 +68,22 @@ await new Promise((resolve, reject) => {
 const errors = [];
 let browser;
 
+const profiles = [
+  { name: "desktop", viewport: { width: 1280, height: 900 }, isMobile: false, hasTouch: false },
+  { name: "mobile", viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
+];
+
+const checkCentered = async (locator, parentLocator, label) => {
+  const box = await locator.boundingBox();
+  const parentBox = await parentLocator.boundingBox();
+  if (!box || !parentBox) {
+    errors.push(`${label}: missing geometry`);
+    return;
+  }
+  const delta = Math.abs((box.x + box.width / 2) - (parentBox.x + parentBox.width / 2));
+  if (delta > 2) errors.push(`${label}: link is not centered, delta=${delta.toFixed(2)}px`);
+};
+
 try {
   browser = await chromium.launch({
     args: [
@@ -81,66 +97,107 @@ try {
     executablePath: browserPath,
     headless: true,
   });
-  const context = await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] });
-  const page = await context.newPage();
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => { if (message.type() === "error") errors.push(`console: ${message.text()}`); });
-  await page.addInitScript(() => {
-    window.__callbackOpenedUrls = [];
-    window.open = (url) => {
-      window.__callbackOpenedUrls.push(String(url));
-      return null;
-    };
-  });
-  await page.goto("http://127.0.0.1:4174/", { waitUntil: "networkidle" });
 
-  await page.locator(".header__actions [data-dialog-open]").click();
-  const contactDialog = page.locator("#contact-dialog");
-  if (!await contactDialog.evaluate((element) => element.open)) errors.push("contact dialog did not open");
-  await contactDialog.locator("[data-callback-open]").click();
+  for (const profile of profiles) {
+    const context = await browser.newContext({
+      viewport: profile.viewport,
+      isMobile: profile.isMobile,
+      hasTouch: profile.hasTouch,
+      permissions: ["clipboard-read", "clipboard-write"],
+    });
+    const page = await context.newPage();
+    page.on("pageerror", (error) => errors.push(`${profile.name} pageerror: ${error.message}`));
+    page.on("console", (message) => { if (message.type() === "error") errors.push(`${profile.name} console: ${message.text()}`); });
+    await page.addInitScript(() => {
+      window.__callbackOpenedUrls = [];
+      window.open = (url) => {
+        window.__callbackOpenedUrls.push(String(url));
+        return null;
+      };
+    });
 
-  const callbackDialog = page.locator("#callback-dialog");
-  if (!await callbackDialog.evaluate((element) => element.open)) errors.push("callback dialog did not open");
-  if (await contactDialog.evaluate((element) => element.open)) errors.push("contact dialog remained open under callback dialog");
+    await page.goto("http://127.0.0.1:4174/", { waitUntil: "networkidle" });
 
-  await callbackDialog.locator("[data-callback-whatsapp]").click();
-  const emptyAttempt = await page.evaluate(() => window.__callbackOpenedUrls.length);
-  if (emptyAttempt !== 0) errors.push("invalid empty form opened a messenger");
+    await page.locator(".hero__actions [data-dialog-open]").click();
+    const contactDialog = page.locator("#contact-dialog");
+    if (!await contactDialog.evaluate((element) => element.open)) errors.push(`${profile.name}: contact dialog did not open`);
+    const contactCallbackLink = contactDialog.locator("[data-callback-open]");
+    await checkCentered(contactCallbackLink, contactDialog.locator(".messenger-dialog__content"), `${profile.name} contact form`);
+    await contactCallbackLink.click();
 
-  await callbackDialog.locator('[name="name"]').fill("Тестовый клиент");
-  await callbackDialog.locator('[name="contact"]').fill("@test_client");
-  await callbackDialog.locator('[name="day"]').selectOption({ label: "Завтра" });
-  await callbackDialog.locator('[name="period"]').selectOption({ label: "День, 12:00–17:00" });
-  await callbackDialog.locator('[name="summary"]').fill("Нужно обсудить возврат денег по договору.");
-  await callbackDialog.locator('[name="consent"]').check();
-  await callbackDialog.locator("[data-callback-whatsapp]").click();
+    const callbackDialog = page.locator("#callback-dialog");
+    if (!await callbackDialog.evaluate((element) => element.open)) errors.push(`${profile.name}: callback dialog did not open`);
+    if (await contactDialog.evaluate((element) => element.open)) errors.push(`${profile.name}: contact dialog remained open under callback dialog`);
 
-  const openedAfterWhatsapp = await page.evaluate(() => [...window.__callbackOpenedUrls]);
-  const whatsappUrl = openedAfterWhatsapp.at(-1) || "";
-  if (!whatsappUrl.startsWith("https://api.whatsapp.com/send?phone=79065297970")) errors.push(`WhatsApp callback URL is invalid: ${whatsappUrl}`);
-  const whatsappText = whatsappUrl ? new URL(whatsappUrl).searchParams.get("text") || "" : "";
-  for (const part of [
-    "Прошу связаться со мной позже",
-    "Имя: Тестовый клиент",
-    "Контакт: @test_client",
-    "Удобный день: Завтра",
-    "Удобное время: День, 12:00–17:00 МСК",
-    "Кратко о ситуации: Нужно обсудить возврат денег по договору.",
-    "Страница сайта: /",
-  ]) {
-    if (!whatsappText.includes(part)) errors.push(`WhatsApp summary is missing: ${part}`);
+    await callbackDialog.locator("[data-callback-whatsapp]").click();
+    const emptyAttempt = await page.evaluate(() => window.__callbackOpenedUrls.length);
+    if (emptyAttempt !== 0) errors.push(`${profile.name}: invalid empty form opened a messenger`);
+
+    await callbackDialog.locator('[name="name"]').fill("Тестовый клиент");
+    await callbackDialog.locator('[name="contact"]').fill("@test_client");
+    await callbackDialog.locator('[name="day"]').selectOption({ label: "Завтра" });
+    await callbackDialog.locator('[name="period"]').selectOption({ label: "День, 12:00–17:00" });
+    await callbackDialog.locator('[name="summary"]').fill("Нужно обсудить возврат денег по договору.");
+    await callbackDialog.locator('[name="consent"]').check();
+
+    const callbackLayout = await callbackDialog.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      consentClientWidth: element.querySelector(".callback-consent")?.clientWidth || 0,
+      consentScrollWidth: element.querySelector(".callback-consent")?.scrollWidth || 0,
+    }));
+    if (callbackLayout.scrollWidth > callbackLayout.clientWidth + 1) errors.push(`${profile.name}: callback dialog has horizontal overflow`);
+    if (callbackLayout.consentScrollWidth > callbackLayout.consentClientWidth + 1) errors.push(`${profile.name}: privacy consent slid sideways`);
+
+    await callbackDialog.locator("[data-callback-telegram]").click();
+    await page.waitForFunction(() => document.querySelector("[data-callback-note]")?.textContent?.includes("скопирован"), null, { timeout: 3000 }).catch(() => {});
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText()).catch(() => "");
+    for (const part of [
+      "Прошу связаться со мной позже",
+      "Имя: Тестовый клиент",
+      "Контакт: @test_client",
+      "Удобный день: Завтра",
+      "Удобное время: День, 12:00–17:00 МСК",
+      "Кратко о ситуации: Нужно обсудить возврат денег по договору.",
+      "Страница сайта: /",
+    ]) {
+      if (!clipboardText.includes(part)) errors.push(`${profile.name}: Telegram clipboard is missing: ${part}`);
+    }
+    const openedAfterTelegram = await page.evaluate(() => [...window.__callbackOpenedUrls]);
+    if (openedAfterTelegram.at(-1) !== "https://t.me/lawrazbor") errors.push(`${profile.name}: Telegram callback URL is invalid`);
+
+    await callbackDialog.locator("[data-callback-whatsapp]").click();
+    const openedAfterWhatsapp = await page.evaluate(() => [...window.__callbackOpenedUrls]);
+    const whatsappUrl = openedAfterWhatsapp.at(-1) || "";
+    if (!whatsappUrl.startsWith("https://api.whatsapp.com/send?phone=79065297970")) errors.push(`${profile.name}: WhatsApp callback URL is invalid`);
+
+    await callbackDialog.locator("[data-callback-close]").click();
+    await page.locator(".hero__actions [data-price-quiz-open]").click();
+    const quizDialog = page.locator("#price-quiz-dialog");
+    for (const choice of ["Не возвращают деньги", "Договор", "В ближайшие дни"]) {
+      await quizDialog.getByRole("button", { name: choice, exact: true }).click();
+    }
+    const quizCallbackLink = quizDialog.locator("[data-price-quiz-result] [data-callback-open]");
+    await checkCentered(quizCallbackLink, quizDialog.locator("[data-price-quiz-result]"), `${profile.name} quiz form`);
+
+    await page.goto("http://127.0.0.1:4174/politika-konfidencialnosti/", { waitUntil: "networkidle" });
+    const privacyLayout = await page.evaluate(() => {
+      const heading = document.querySelector(".legal-page aside h1")?.getBoundingClientRect();
+      const viewport = document.documentElement.clientWidth;
+      return {
+        viewport,
+        scrollWidth: document.documentElement.scrollWidth,
+        headingLeft: heading?.left ?? 0,
+        headingRight: heading?.right ?? 0,
+      };
+    });
+    if (privacyLayout.scrollWidth > privacyLayout.viewport + 1) errors.push(`${profile.name}: privacy page has horizontal overflow`);
+    if (privacyLayout.headingLeft < -1 || privacyLayout.headingRight > privacyLayout.viewport + 1) errors.push(`${profile.name}: privacy heading slid sideways`);
+
+    const storedKeys = await page.evaluate(() => Object.keys(localStorage).filter((key) => /callback/i.test(key)));
+    if (storedKeys.length) errors.push(`${profile.name}: callback data was persisted: ${storedKeys.join(", ")}`);
+    await context.close();
   }
-
-  await callbackDialog.locator("[data-callback-telegram]").click();
-  await page.waitForFunction(() => document.querySelector("[data-callback-note]")?.textContent?.includes("Telegram открыт"), null, { timeout: 3000 }).catch(() => {});
-  const openedAfterTelegram = await page.evaluate(() => [...window.__callbackOpenedUrls]);
-  if (openedAfterTelegram.at(-1) !== "https://t.me/lawrazbor") errors.push(`Telegram callback URL is invalid: ${openedAfterTelegram.at(-1) || "empty"}`);
-  const note = await callbackDialog.locator("[data-callback-note]").textContent();
-  if (!note?.includes("Telegram открыт")) errors.push(`Telegram instruction was not shown: ${note || "empty"}`);
-  const storedKeys = await page.evaluate(() => Object.keys(localStorage).filter((key) => /callback/i.test(key)));
-  if (storedKeys.length) errors.push(`callback data was persisted: ${storedKeys.join(", ")}`);
-
-  await context.close();
 } finally {
   await browser?.close();
   server.kill("SIGTERM");
@@ -154,4 +211,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Callback interaction test passed: validation, WhatsApp, Telegram and no-storage behavior");
+console.log("Callback interaction test passed: centered links, desktop/mobile clipboard, privacy layout and messenger URLs");

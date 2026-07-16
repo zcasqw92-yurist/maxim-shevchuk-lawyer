@@ -165,4 +165,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialog, form, menu, filter`);
+console.log(`Visual and interaction smoke test passed: ${checks.length} viewports, dialog, menu, filter`);

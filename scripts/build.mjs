@@ -14,7 +14,7 @@ import {
 } from "../src/render.mjs";
 import { applyContentOverrides } from "./content-overrides.mjs";
 import { applyQuickChoicesOverrides } from "./quick-choices-overrides.mjs";
-import { applyServicePageOverrides } from "./service-pages-overrides.mjs";
+import { applyServicePageOverrides } from "./service-pages-render.mjs";
 import { applyCallbackOverrides } from "./callback-overrides.mjs";
 import { applyMessengerIntentOverrides } from "./messenger-intents-overrides.mjs";
 

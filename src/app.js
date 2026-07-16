@@ -100,15 +100,15 @@ menuToggle?.addEventListener("click", () => {
 });
 
 const dialog = $("#contact-dialog");
-const messageField = dialog?.querySelector("textarea[name='message']");
 const openDialog = (topic = "") => {
   if (!dialog) return;
-  if (topic && messageField && !messageField.value) {
-    messageField.value = `Интересует направление: ${topic}.\n\nСитуация: `;
+  const whatsapp = $("[data-whatsapp-link]", dialog);
+  if (whatsapp) {
+    const message = `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${topic ? ` по вопросу: ${topic}` : ""}. Кратко опишу ситуацию:`;
+    whatsapp.href = `https://wa.me/79065297970?text=${encodeURIComponent(message)}`;
   }
   dialog.showModal();
-  track("lead_form_open", { topic: topic || "general", page_path: location.pathname });
-  requestAnimationFrame(() => dialog.querySelector("input")?.focus());
+  track("messenger_dialog_open", { topic: topic || "general", page_path: location.pathname });
 };
 
 $$('[data-dialog-open]').forEach((control) => {
@@ -120,54 +120,6 @@ $$('[data-dialog-open]').forEach((control) => {
 $("[data-dialog-close]")?.addEventListener("click", () => dialog?.close());
 dialog?.addEventListener("click", (event) => {
   if (event.target === dialog) dialog.close();
-});
-
-const validateForm = (form) => {
-  let firstInvalid = null;
-  $$('[required]', form).forEach((field) => {
-    const valid = field.type === "checkbox" ? field.checked : field.value.trim().length > 0;
-    field.toggleAttribute("aria-invalid", !valid);
-    if (!valid && !firstInvalid) firstInvalid = field;
-  });
-  firstInvalid?.focus();
-  return !firstInvalid;
-};
-
-$$('[data-contact-form]').forEach((form) => {
-  const query = new URLSearchParams(location.search);
-  const campaignFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
-  const sourcePage = $("input[name='source_page']", form);
-  if (sourcePage) sourcePage.value = `${location.pathname}${location.search}`;
-  campaignFields.forEach((name) => {
-    const field = $(`input[name='${name}']`, form);
-    if (!field) return;
-    const current = query.get(name);
-    try {
-      if (current) sessionStorage.setItem(name, current);
-      field.value = current || sessionStorage.getItem(name) || "";
-    } catch {
-      field.value = current || "";
-    }
-  });
-  form.addEventListener("input", (event) => event.target.removeAttribute?.("aria-invalid"));
-  form.addEventListener("submit", (event) => {
-    if (!validateForm(form)) {
-      event.preventDefault();
-      const status = $("[data-form-status]", form);
-      if (status) status.textContent = "Заполните обязательные поля.";
-      track("lead_form_error", { form_id: form.id, page_path: location.pathname });
-      return;
-    }
-    const preview = document.body.dataset.preview === "true" || !form.action;
-    if (preview) {
-      event.preventDefault();
-      const status = $("[data-form-status]", form);
-      if (status) status.textContent = "Демонстрационный режим: форма готова, но канал отправки ещё не подключён.";
-      track("lead_form_demo_submit", { form_id: form.id, page_path: location.pathname });
-    } else {
-      track("lead_form_submit", { form_id: form.id, page_path: location.pathname });
-    }
-  });
 });
 
 $$('[data-track]').forEach((link) => {

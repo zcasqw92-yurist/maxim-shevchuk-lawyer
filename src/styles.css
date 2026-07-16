@@ -2,7 +2,7 @@
 
 @layer reset {
   *, *::before, *::after { box-sizing: border-box; }
-  html { overflow-x: clip; scroll-behavior: smooth; }
+  html { overflow-x: clip; scroll-behavior: smooth; scroll-padding-top: 100px; }
   body, h1, h2, h3, p, figure, blockquote, dl, dd { margin: 0; }
   ul, ol { margin: 0; padding: 0; }
   img { display: block; max-width: 100%; }
@@ -602,7 +602,7 @@
   @media (max-width: 680px) {
     :root { --wrap: calc(100% - 30px); }
     body { padding-bottom: 72px; font-size: 16px; line-height: 1.7; }
-    .site-header { background: var(--paper); }
+    .site-header { position: relative; background: var(--paper); }
     h1 { font-size: clamp(2.8rem, 13vw, 4.6rem); }
     h2 { font-size: clamp(2.25rem, 10vw, 3.6rem); }
     .section { padding: 82px 0; }
@@ -621,13 +621,13 @@
     .hero__assurance { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .hero__image-wrap img { aspect-ratio: 4/5; object-position: 58% center; }
     .identity-card { right: 8px; bottom: 12px; width: 62%; padding: 17px; }
-    .contact-path { padding: 70px 0; }
-    .contact-path__grid { gap: 38px; }
+    .contact-path { padding: 52px 0 46px; }
+    .contact-path__grid { gap: 28px; }
     .contact-path__steps { grid-template-columns: 1fr; }
-    .contact-path__steps li { display: grid; grid-template-columns: 45px 1fr; gap: 14px; min-height: 0; padding: 23px 0; border-right: 0; }
-    .contact-path__steps > li > span { margin: 0; font-size: 18px; }
-    .contact-path__steps strong { font-size: 22px; }
-    .contact-path__steps p { font-size: 15px; }
+    .contact-path__steps li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; min-height: 0; padding: 20px 0; border-right: 0; }
+    .contact-path__steps > li > span { margin: 0; font-size: 17px; }
+    .contact-path__steps strong { font-size: 21px; }
+    .contact-path__steps p { margin-top: 7px; font-size: 15px; }
     .section-head { margin-bottom: 40px; }
     .service-grid, .situation-grid { grid-template-columns: minmax(0, 1fr); }
     .value-grid, .price-grid { grid-template-columns: minmax(0, 1fr); }

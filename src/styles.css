@@ -606,6 +606,7 @@
   @media (max-width: 680px) {
     :root { --wrap: calc(100% - 30px); }
     body { padding-bottom: 72px; font-size: 16px; line-height: 1.7; }
+    .site-header { background: var(--paper); }
     h1 { font-size: clamp(2.8rem, 13vw, 4.6rem); }
     h2 { font-size: clamp(2.25rem, 10vw, 3.6rem); }
     .section { padding: 82px 0; }
@@ -629,7 +630,11 @@
     .position-grid { gap: 60px; }
     .position-steps li { grid-template-columns: 45px 1fr; }
     .consultation-grid { gap: 50px; }
-    .consultation-photo img { aspect-ratio: 4/5; object-position: 55% center; }
+    .consultation-photo img { aspect-ratio: 4/3; object-position: 55% center; }
+    /* Portraits stay recognisable without taking over the entire mobile screen. */
+    .consultation-grid--reverse .consultation-photo img,
+    .about-hero__photo img { aspect-ratio: 4/3; max-height: none; object-fit: cover; object-position: center 42%; }
+    .about-preview__visual img { aspect-ratio: 4/3; max-height: none; object-fit: cover; object-position: center 42%; }
     .about-preview__lead { font-size: 17px; }
     .about-preview blockquote { font-size: 20px; }
     .about-preview__visual { width: 88%; }
@@ -648,6 +653,20 @@
     .number-list li { grid-template-columns: 50px 1fr; gap: 16px; padding: 26px 0; }
     .number-list span { font-size: 18px; }
     .number-list p { font-size: 17px; line-height: 1.55; }
+    .section-head--split p,
+    .service-card p,
+    .feature-list span,
+    .position-steps p,
+    .inner-hero__aside p,
+    .service-hero__card > p,
+    .paper-panel__note,
+    .process-line p,
+    .about-hero__facts span,
+    .education-copy dd,
+    .district-card p,
+    .contact-list strong,
+    .legal-copy p { font-size: 16px; line-height: 1.6; }
+    .contact-form input, .contact-form textarea { font-size: 16px; }
     .process-line li { min-height: 210px; }
     .process-line span { margin-bottom: 38px; }
     .about-hero__facts { grid-template-columns: 1fr; }
@@ -655,7 +674,8 @@
     .about-hero__photo { width: 94%; }
     .education-copy dl > div { grid-template-columns: 1fr; gap: 5px; }
     .diploma-card { padding: 10px; }
-    .district-monogram { width: min(330px, 82vw); }
+    .diploma-card img { height: auto; aspect-ratio: 1170 / 765; object-fit: contain; }
+    .district-monogram { width: min(270px, 72vw); padding: 30px; }
     .contact-list { grid-template-columns: 1fr; }
     .contact-list div { min-height: 100px; }
     .contact-page__photo img { aspect-ratio: 4/3; }

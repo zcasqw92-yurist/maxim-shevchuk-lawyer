@@ -121,10 +121,12 @@
     border-radius: 50%;
   }
   .brand__mark img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
-  .brand__text { display: flex; flex-direction: column; line-height: 1.15; }
-  .brand__text strong { font-family: var(--serif); font-size: 17px; font-weight: 600; }
+  .brand__text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+  .brand__home, .brand__text strong { color: inherit; font-family: var(--serif); font-size: 17px; font-weight: 600; }
+  .brand__home:hover { color: inherit; }
   .brand__text small { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
-  .header__online { display: inline-flex; align-items: center; gap: 8px; color: #416550; font-size: 10px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .header__online { display: inline-flex; align-items: center; gap: 8px; margin-top: 5px; padding: 0; color: #416550; border: 0; background: transparent; cursor: pointer; font: inherit; font-size: 10px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .header__online:hover span { text-decoration: underline; text-underline-offset: 3px; }
   .header__online i { width: 8px; aspect-ratio: 1; flex: 0 0 auto; background: #41b86b; border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); animation: online-pulse 1.8s ease-out infinite; }
   .desktop-nav { display: flex; align-items: center; gap: 28px; margin-left: auto; }
   .desktop-nav a { position: relative; padding: 30px 0 26px; font-size: 14px; font-weight: 560; }
@@ -638,13 +640,12 @@
     .site-header { position: fixed; top: 0; right: 0; left: 0; background: var(--paper); transform: translateY(0); transition: transform .24s ease, box-shadow .25s ease, border-color .25s ease; }
     .site-header.is-header-hidden { transform: translateY(calc(-100% - 2px)); }
     .header__inner { gap: 10px; }
-    .header__online { gap: 6px; font-size: 9px; letter-spacing: .04em; }
+    .header__online { gap: 6px; margin-top: 4px; font-size: 8px; letter-spacing: .04em; }
     .header__online i { width: 7px; }
     body { padding-top: 72px; }
     h1 { font-size: clamp(2.8rem, 13vw, 4.6rem); }
     h2 { font-size: clamp(2.25rem, 10vw, 3.6rem); }
     .section { padding: 82px 0; }
-    .brand__text small { display: none; }
     .brand__mark { width: 41px; }
     .hero h1 { font-size: clamp(3rem, 13.5vw, 4.8rem); }
     .hero__lead { font-size: 18px; line-height: 1.62; }
@@ -652,8 +653,8 @@
     .button { min-height: 56px; padding-inline: 24px; font-size: 15px; }
     .button__icon { width: 18px; height: 18px; }
     .hero__actions .button { width: 100%; }
-    .hero__mobile-assurance { display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; color: var(--muted); font-size: 12px; font-weight: 700; }
-    .hero__mobile-assurance svg { width: 18px; color: var(--gold); }
+    .hero__mobile-assurance { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
+    .hero__mobile-assurance svg { width: 18px; color: var(--ink); }
     .hero__quick-choices { margin-top: 20px; }
     .hero__quick-choices > div { display: grid; grid-template-columns: 1fr 1fr; }
     .hero__quick-choices button { min-height: 44px; padding-inline: 10px; font-size: 12px; }

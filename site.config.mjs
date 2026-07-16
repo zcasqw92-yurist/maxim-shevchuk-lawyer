@@ -25,7 +25,7 @@ export const site = {
   phoneHref: "+79065297970",
   email: "mail@example.ru",
   telegram: "https://t.me/lawrazbor",
-  whatsapp: "https://wa.me/79065297970",
+  whatsapp: "https://api.whatsapp.com/send?phone=79065297970",
   sameAs: [],
   webmasterVerification: {
     google: "",

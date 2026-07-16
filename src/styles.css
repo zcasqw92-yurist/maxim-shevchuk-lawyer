@@ -410,22 +410,6 @@
   .about-preview__seal span { font-family: var(--serif); font-size: 24px; }
   .about-preview__seal small { color: var(--gold-bright); font-size: 9px; letter-spacing: .08em; }
 
-  .section--districts { overflow: hidden; color: rgba(255,255,255,.7); background: var(--ink-deep); }
-  .district-preview { display: grid; grid-template-columns: .95fr 1.05fr; align-items: center; gap: 70px; }
-  .district-preview h2 { color: var(--white); }
-  .district-preview p { max-width: 600px; margin: 28px 0 36px; }
-  .district-preview__map { position: relative; min-height: 510px; }
-  .map-ring { position: absolute; top: 50%; left: 50%; aspect-ratio: 1; border: 1px solid rgba(221,185,121,.25); border-radius: 48% 52% 42% 58%; transform: translate(-50%,-50%) rotate(12deg); }
-  .map-ring--1 { width: 180px; }
-  .map-ring--2 { width: 330px; transform: translate(-50%,-50%) rotate(-18deg); }
-  .map-ring--3 { width: 480px; transform: translate(-50%,-50%) rotate(28deg); }
-  .map-dot { position: absolute; top: 50%; left: 50%; width: 15px; aspect-ratio: 1; background: var(--gold-bright); border-radius: 50%; box-shadow: 0 0 0 12px rgba(221,185,121,.08); transform: translate(-50%,-50%); }
-  .map-label { position: absolute; color: rgba(255,255,255,.7); font-family: var(--serif); font-size: 15px; }
-  .map-label--1 { top: 44%; left: 46%; }
-  .map-label--2 { top: 17%; left: 48%; }
-  .map-label--3 { top: 48%; left: 16%; }
-  .map-label--4 { right: 37%; bottom: 16%; }
-
   .faq-grid { display: grid; grid-template-columns: .68fr 1.32fr; gap: clamp(55px, 9vw, 130px); }
   .faq-intro { align-self: start; }
   .faq-intro p { max-width: 390px; margin: 25px 0 30px; color: var(--muted); }
@@ -510,36 +494,6 @@
   .process-cards h3 { margin: 60px 0 14px; font-family: var(--serif); font-size: 25px; font-weight: 500; }
   .process-cards p { color: rgba(255,255,255,.52); font-size: 12px; }
 
-  .district-search label { display: block; margin-bottom: 13px; color: var(--ink); font-size: 11px; font-weight: 750; }
-  .search-field { display: flex; min-height: 58px; align-items: center; gap: 12px; padding: 0 17px; border: 1px solid var(--line); background: var(--white); }
-  .search-field svg { width: 20px; color: var(--gold); }
-  .search-field input { width: 100%; border: 0; outline: 0; background: transparent; }
-  .district-search small { display: block; margin-top: 10px; color: var(--muted); }
-  .district-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-  .district-card { position: relative; display: flex; min-height: 320px; flex-direction: column; padding: 34px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(255,255,255,.16); }
-  .district-card[hidden] { display: none; }
-  .district-card__top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 42px; }
-  .district-card__top strong { color: var(--gold); font-family: var(--serif); font-size: 28px; font-weight: 500; }
-  .district-card__top span { display: grid; width: 38px; aspect-ratio: 1; place-items: center; border: 1px solid var(--line); border-radius: 50%; }
-  .district-card__top svg { width: 17px; }
-  .district-card h2 { font-family: var(--serif); font-size: 24px; font-weight: 500; }
-  .district-card h2 a { overflow-wrap: anywhere; }
-  .district-card p { margin-top: 13px; color: var(--muted); font-size: 11px; }
-  .district-card .card-link { align-self: flex-start; margin-top: auto; padding-top: 24px; }
-  .empty-state { padding: 50px; text-align: center; }
-  .local-seo-note, .district-context { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(60px, 10vw, 140px); }
-  .local-seo-note > div:last-child > p { margin-bottom: 30px; color: var(--muted); }
-  .district-detail-hero { padding: clamp(75px, 9vw, 135px) 0; }
-  .district-detail-hero__grid { display: grid; grid-template-columns: 1.25fr .75fr; align-items: center; gap: 100px; }
-  .district-detail-hero h1 { margin-top: 10px; font-size: clamp(3.4rem, 6vw, 6.1rem); }
-  .district-detail-hero h1 + p { max-width: 720px; margin-top: 28px; color: var(--ink-soft); font-size: 19px; }
-  .draft-label { display: block; margin-bottom: 18px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-  .district-monogram { display: grid; aspect-ratio: 1; place-content: center; padding: 45px; color: var(--white); background: var(--ink); border-radius: 50%; text-align: center; box-shadow: var(--shadow); }
-  .district-monogram span { font-family: var(--serif); font-size: clamp(3rem, 7vw, 7rem); }
-  .district-monogram small { color: rgba(255,255,255,.5); font-size: 10px; }
-  .district-context > div:first-child p { margin-top: 25px; color: var(--muted); }
-  .district-context .paper-panel h3 { margin-bottom: 25px; font-family: var(--serif); font-size: 30px; font-weight: 500; }
-
   .contact-page { padding: clamp(70px, 9vw, 130px) 0; }
   .contact-page__grid { display: grid; grid-template-columns: 1.12fr .88fr; align-items: start; gap: clamp(55px, 9vw, 130px); }
   .contact-page__intro h1 { font-size: clamp(3.3rem, 6vw, 5.8rem); }
@@ -610,7 +564,7 @@
     .header__city { display: none; }
     .hero__grid { grid-template-columns: 1.08fr .92fr; gap: 45px; }
     .identity-card { right: -8px; }
-    .service-grid, .district-grid { grid-template-columns: repeat(2, 1fr); }
+    .service-grid { grid-template-columns: repeat(2, 1fr); }
     .value-grid, .price-grid { grid-template-columns: repeat(2, 1fr); }
     .footer__grid { grid-template-columns: 1.3fr .8fr .8fr; }
     .footer__contact { grid-column: 2 / -1; }
@@ -621,10 +575,10 @@
     .menu-toggle { display: grid; margin-left: auto; place-items: center; }
     .header__inner { min-height: 72px; }
     .hero { padding-top: 45px; }
-    .hero__grid, .about-preview, .district-preview, .consultation-grid, .consultation-grid--reverse,
+    .hero__grid, .about-preview, .consultation-grid, .consultation-grid--reverse,
     .position-grid, .faq-grid, .inner-hero__grid, .service-hero__grid, .two-lists,
-    .about-hero__grid, .story-grid, .education-grid, .local-seo-note, .district-context,
-    .district-detail-hero__grid, .contact-page__grid, .contact-location__grid, .legal-page__grid { grid-template-columns: 1fr; }
+    .about-hero__grid, .story-grid, .education-grid, .contact-page__grid, .contact-location__grid,
+    .legal-page__grid { grid-template-columns: 1fr; }
     .hero__content { order: 1; }
     .hero__visual { order: 2; width: min(700px, 100%); }
     .hero__image-wrap { border-radius: 240px 240px 5px 5px; }
@@ -633,7 +587,6 @@
     .trust-rail > div { min-height: 76px; }
     .section-head--split { grid-template-columns: 1fr; gap: 25px; }
     .position-intro, .story-heading, .legal-page aside { position: static; }
-    .district-preview__map { min-height: 430px; }
     .about-preview__visual { width: min(600px, 90%); margin-inline: auto; }
     .about-preview__visual img { max-height: 680px; }
     .about-preview__seal { right: -25px; }
@@ -642,8 +595,6 @@
     .service-hero__card { max-width: 560px; }
     .about-hero__photo { width: min(530px, 90%); }
     .education-grid { gap: 55px; }
-    .district-detail-hero__grid { gap: 60px; }
-    .district-monogram { width: min(400px, 80vw); margin-inline: auto; }
     .footer__grid { grid-template-columns: 1fr 1fr; }
     .footer__identity { grid-column: 1 / -1; }
     .footer__contact { grid-column: auto; }
@@ -670,7 +621,7 @@
     .identity-card { right: 8px; bottom: 12px; width: 62%; padding: 17px; }
     .trust-rail { margin-top: 35px; }
     .section-head { margin-bottom: 40px; }
-    .service-grid, .situation-grid, .district-grid { grid-template-columns: minmax(0, 1fr); }
+    .service-grid, .situation-grid { grid-template-columns: minmax(0, 1fr); }
     .value-grid, .price-grid { grid-template-columns: minmax(0, 1fr); }
     .value-card { min-height: 0; padding: 31px 26px; }
     .value-card > span { margin-bottom: 32px; }
@@ -693,15 +644,12 @@
     .about-preview blockquote { font-size: 20px; }
     .about-preview__visual { width: 88%; }
     .about-preview__seal { right: -30px; width: 115px; }
-    .district-preview { gap: 30px; }
-    .district-preview__map { min-height: 330px; transform: scale(.8); }
-    .map-ring--3 { width: 420px; }
     .faq-grid { gap: 40px; }
     .faq-item summary { min-height: 80px; font-size: 19px; }
     .cta-panel { grid-template-columns: 1fr; padding: 38px 25px; }
     .cta-panel .button { width: 100%; }
     .inner-hero, .service-hero { padding: 60px 0 85px; }
-    .inner-hero h1, .service-hero h1, .about-hero h1, .district-detail-hero h1, .contact-page__intro h1 { font-size: clamp(3rem, 13vw, 4.7rem); }
+    .inner-hero h1, .service-hero h1, .about-hero h1, .contact-page__intro h1 { font-size: clamp(3rem, 13vw, 4.7rem); }
     .inner-hero__aside { padding-left: 20px; }
     .process-line, .process-cards { grid-template-columns: 1fr; }
     .number-list li { grid-template-columns: 50px 1fr; gap: 16px; padding: 26px 0; }
@@ -717,7 +665,6 @@
     .process-line p,
     .about-hero__facts span,
     .education-copy dd,
-    .district-card p,
     .legal-copy p { font-size: 16px; line-height: 1.6; }
     .process-line li { min-height: 210px; }
     .process-line span { margin-bottom: 38px; }
@@ -727,7 +674,6 @@
     .education-copy dl > div { grid-template-columns: 1fr; gap: 5px; }
     .diploma-card { padding: 10px; }
     .diploma-card img { height: auto; aspect-ratio: 1170 / 765; object-fit: contain; }
-    .district-monogram { width: min(270px, 72vw); padding: 30px; }
     .contact-page__guide { padding: 30px 24px; }
     .contact-dialog { max-height: calc(100dvh - 18px); }
     .mobile-contact { position: fixed; z-index: 90; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: 1fr; min-height: 72px; padding: 9px max(12px, env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); opacity: 0; pointer-events: none; background: rgba(9,28,44,.96); backdrop-filter: blur(12px); transform: translateY(110%); transition: opacity .25s ease, transform .25s ease; }

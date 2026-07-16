@@ -111,7 +111,7 @@ const openDialog = (topic = "") => {
   const whatsapp = $("[data-whatsapp-link]", dialog);
   if (whatsapp) {
     const message = `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${topic ? ` по вопросу: ${topic}` : ""}. Кратко опишу ситуацию:`;
-    whatsapp.href = `https://wa.me/79065297970?text=${encodeURIComponent(message)}`;
+    whatsapp.href = `https://api.whatsapp.com/send?phone=79065297970&text=${encodeURIComponent(message)}`;
   }
   dialog.showModal();
   track("messenger_dialog_open", { topic: topic || "general", page_path: location.pathname });

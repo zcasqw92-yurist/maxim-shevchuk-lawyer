@@ -12,6 +12,7 @@ import {
   renderServices,
   renderShell,
 } from "../src/render.mjs";
+import { applyContentOverrides } from "./content-overrides.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -98,6 +99,8 @@ await writePage("/politika-konfidencialnosti", renderPrivacy());
 for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})) {
   await writeRedirect(pathname, destination);
 }
+
+await applyContentOverrides({ dist, services });
 
 const indexablePages = [
   { path: "/", image: "/assets/images/maxim-hero.webp" },

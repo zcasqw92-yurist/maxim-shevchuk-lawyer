@@ -229,13 +229,13 @@ const priceQuizDialog = () => `
 
       <section class="price-quiz__step" data-price-quiz-step="materials" hidden>
         <h2>Что уже есть?</h2>
-        <p>Можно выбрать несколько вариантов. Документы сейчас прикладывать не нужно.</p>
+        <p>Выберите наиболее важное из того, что уже сохранилось. Документы сейчас прикладывать не нужно.</p>
         <div class="price-quiz__options">
-          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Договор" data-quiz-multiple aria-pressed="false">Договор</button>
-          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Переписка" data-quiz-multiple aria-pressed="false">Переписка</button>
-          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Подтверждения оплаты" data-quiz-multiple aria-pressed="false">Подтверждения оплаты</button>
-          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Ответ или отказ" data-quiz-multiple aria-pressed="false">Ответ или отказ</button>
-          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Пока ничего" data-quiz-multiple aria-pressed="false">Пока ничего</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Договор" aria-pressed="false">Договор</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Переписка" aria-pressed="false">Переписка</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Подтверждения оплаты" aria-pressed="false">Подтверждения оплаты</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Ответ или отказ" aria-pressed="false">Ответ или отказ</button>
+          <button type="button" data-price-quiz-option data-quiz-key="materials" data-quiz-value="Пока ничего" aria-pressed="false">Пока ничего</button>
         </div>
       </section>
 
@@ -253,18 +253,16 @@ const priceQuizDialog = () => `
         <span class="eyebrow">Следующий шаг</span>
         <h2>Можно уточнить стоимость по вашей ситуации</h2>
         <p>Ответы собраны в краткую сводку. Максим Юрьевич уточнит детали и назовёт стоимость до начала работы.</p>
-        <dl class="price-quiz__summary" data-price-quiz-summary></dl>
         <div class="messenger-choices price-quiz__choices">
           <a class="messenger-choice messenger-choice--whatsapp" href="${esc(site.whatsapp)}" target="_blank" rel="noopener" data-price-quiz-whatsapp data-track="whatsapp">${icon("whatsapp")}<span>Отправить в WhatsApp</span></a>
           <a class="messenger-choice messenger-choice--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-price-quiz-telegram data-track="telegram">${icon("telegram")}<span>Продолжить в Telegram</span></a>
         </div>
         <p class="price-quiz__telegram-note" data-price-quiz-telegram-note>Перед переходом в Telegram сводка скопируется — останется только вставить её в чат.</p>
-        <p class="price-quiz__privacy">${icon("lock")}Никакие ответы не сохраняются на сайте.</p>
+        <p class="price-quiz__privacy">${icon("lock")}Ответы отправятся только после вашего выбора мессенджера.</p>
       </section>
 
       <div class="price-quiz__controls" data-price-quiz-controls>
         <button class="price-quiz__back" type="button" data-price-quiz-back hidden>Назад</button>
-        <button class="button button--primary" type="button" data-price-quiz-next disabled>Далее ${icon("arrow", "button__icon")}</button>
       </div>
     </div>
   </dialog>`;

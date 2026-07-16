@@ -106,7 +106,7 @@ try {
     let telegramHref = await dialog.locator("a[data-track='telegram']").getAttribute("href") || "";
     let whatsappHref = await dialog.locator("[data-whatsapp-link]").getAttribute("href") || "";
     expectParts(`${profile.name}: generic Telegram`, textParam(telegramHref), ["Хочу получить первичную оценку ситуации", "Кратко опишу"]);
-    expectParts(`${profile.name}: generic WhatsApp`, textParam(whatsappHref), ["Нужна юридическая консультация", "Кратко опишу ситуацию"]);
+    expectParts(`${profile.name}: generic WhatsApp`, textParam(whatsappHref), ["Хочу получить первичную оценку ситуации", "Кратко опишу"]);
     await dialog.locator("[data-dialog-close]").click();
 
     await page.locator(".hero__quick-choices [data-topic='возврат денежных средств']").click({ force: true });

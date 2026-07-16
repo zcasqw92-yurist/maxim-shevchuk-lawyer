@@ -15,12 +15,12 @@ const withBasePath = (html) => site.basePath
 
 const siteRoot = `${site.siteUrl.replace(/\/$/, "")}/`;
 const entityUrl = (fragment) => `${siteRoot}${fragment}`;
-const hasPublicEmail = () => Boolean(site.email && !site.email.endsWith("@example.ru"));
+const hasPublicEmail = () => Boolean(site.email);
 const hasPublicOffice = () => Boolean(site.publicOffice?.enabled && site.publicOffice.streetAddress);
 const officeAddress = () => hasPublicOffice()
   ? `${site.publicOffice.addressLocality}, ${site.publicOffice.streetAddress}`
   : "";
-const yandexMapsLink = () => `https://yandex.ru/maps/?text=${encodeURIComponent(officeAddress())}`;
+const yandexMapsLink = () => site.publicOffice?.mapUrl || `https://yandex.ru/maps/?text=${encodeURIComponent(officeAddress())}`;
 const lastModifiedLabel = new Intl.DateTimeFormat("ru-RU", {
   day: "numeric",
   month: "long",
@@ -141,14 +141,14 @@ const footer = () => `
       <div class="footer__contact">
         <h2 class="footer__title">Связаться</h2>
         <p>${site.phoneHref ? `<a href="tel:${site.phoneHref}" data-track="phone">${esc(site.phoneDisplay)}</a>` : `<span>${esc(site.phoneDisplay)}</span>`}</p>
-        <p>${hasPublicEmail() ? `<a href="mailto:${esc(site.email)}" data-track="email">${esc(site.email)}</a>` : `<span>${esc(site.email)}</span>`}</p>
+        ${hasPublicEmail() ? `<p><a href="mailto:${esc(site.email)}" data-track="email">${esc(site.email)}</a></p>` : ""}
         ${site.telegram ? `<p><a href="${esc(site.telegram)}" rel="me noopener" data-track="telegram">Telegram</a></p>` : ""}
         ${site.whatsapp ? `<p><a href="${esc(site.whatsapp)}" rel="noopener" data-track="whatsapp">WhatsApp</a></p>` : ""}
-        ${hasPublicOffice() ? `<a class="footer__office" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">${icon("pin")}<span><small>Офис · по предварительной записи</small>${esc(officeAddress())}<em>Открыть в Яндекс Картах</em></span></a>` : ""}
+        ${hasPublicOffice() ? `<a class="footer__office" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">${icon("pin")}<span><small>Офис · по предварительной записи</small>${esc(officeAddress())}<small>${esc(site.publicOffice.openingHoursLabel)}</small><em>Открыть в Яндекс Картах</em></span></a>` : ""}
         <button class="text-link" type="button" data-dialog-open>Описать ситуацию ${icon("arrow")}</button>
       </div>
     </div>
-    ${hasPublicOffice() ? `<section class="footer__map" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — по предварительной записи. Для согласования времени и вопроса по подсудности напишите Максиму Юрьевичу в мессенджер.</p><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><iframe src="https://yandex.ru/map-widget/v1/?z=12&amp;ol=biz&amp;oid=118077889231" width="560" height="400" frameborder="0" loading="lazy" title="Офис юридической практики Максима Шевчука на Яндекс Картах"></iframe></div></section>` : ""}
+    ${hasPublicOffice() ? `<section class="footer__map" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${esc(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу в мессенджер.</p><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><iframe src="https://yandex.ru/map-widget/v1/?z=12&amp;ol=biz&amp;oid=118077889231" width="560" height="400" frameborder="0" loading="lazy" title="Офис юридической практики Максима Шевчука на Яндекс Картах"></iframe></div></section>` : ""}
     <div class="wrap footer__bottom">
       <p>© ${new Date().getFullYear()} Максим Юрьевич Шевчук</p>
       <p>Материалы обновлены ${lastModifiedLabel}. Информация не является гарантией результата по конкретному делу.</p>
@@ -228,7 +228,7 @@ const personSchema = () => ({
     "Споры продавцов с маркетплейсами",
   ],
   areaServed: ["Москва", "Московская область"],
-  ...(site.sameAs?.length ? { sameAs: site.sameAs } : {}),
+  ...(site.personSameAs?.length ? { sameAs: site.personSameAs } : {}),
 });
 
 const practiceSchema = () => {
@@ -236,7 +236,8 @@ const practiceSchema = () => {
   return {
     "@type": office ? "LegalService" : "Organization",
     "@id": entityUrl(site.organizationId),
-    name: "Юридическая практика Максима Юрьевича Шевчука",
+    name: site.businessName,
+    alternateName: "Юридическая практика Максима Юрьевича Шевчука",
     url: siteRoot,
     logo: `${site.siteUrl}/favicon.svg`,
     image: `${site.siteUrl}/assets/images/maxim-hero.webp`,
@@ -247,7 +248,7 @@ const practiceSchema = () => {
     ],
     ...(site.phoneHref ? { telephone: site.phoneHref } : {}),
     ...(hasPublicEmail() ? { email: site.email } : {}),
-    ...(site.sameAs?.length ? { sameAs: site.sameAs } : {}),
+    ...(site.organizationSameAs?.length ? { sameAs: site.organizationSameAs } : {}),
     ...(office ? {
       address: {
         "@type": "PostalAddress",
@@ -266,6 +267,7 @@ const practiceSchema = () => {
       } : {}),
       ...(site.publicOffice.openingHours?.length ? { openingHours: site.publicOffice.openingHours } : {}),
       ...(site.publicOffice.priceRange ? { priceRange: site.publicOffice.priceRange } : {}),
+      ...(site.publicOffice.mapUrl ? { hasMap: site.publicOffice.mapUrl } : {}),
     } : {}),
   };
 };
@@ -750,10 +752,11 @@ export const renderContacts = () => {
     imageAlt: "Юрист Максим Шевчук проводит консультацию",
     schema: [personSchema(), practiceSchema(), breadcrumbSchema(crumbs)],
     pageType: "ContactPage",
-    mainEntityId: entityUrl(site.personId),
+    mainEntityId: entityUrl(site.organizationId),
     content: `
       ${breadcrumbs(crumbs)}
       <section class="contact-page"><div class="wrap contact-page__grid"><div class="contact-page__intro"><span class="eyebrow">Связаться с юристом</span><h1>Начните с короткого сообщения</h1><p class="lead">Не нужно заполнять форму или подбирать юридические слова. Напишите, что произошло, — Максим Юрьевич лично уточнит детали и предложит следующий шаг.</p><div class="contact-page__methods"><a class="contact-method contact-method--whatsapp" href="${esc(whatsappLink())}" target="_blank" rel="noopener" data-track="whatsapp">${icon("whatsapp")}<span><small>WhatsApp</small><strong>${esc(site.phoneDisplay)}</strong></span>${icon("arrow")}</a><a class="contact-method contact-method--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-track="telegram">${icon("telegram")}<span><small>Telegram</small><strong>@lawrazbor</strong></span>${icon("arrow")}</a></div></div><aside class="contact-page__guide"><div class="contact-page__person"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Юрьевич Шевчук"><span>Максим Юрьевич Шевчук<br><small>юрист · Москва</small></span></div><h2>Что написать в первом сообщении</h2><ol><li><span>01</span>Коротко: что произошло и когда.</li><li><span>02</span>Что хотите получить в результате.</li><li><span>03</span>Какие документы, платежи или переписка сохранились.</li></ol><p>${icon("lock")}Конфиденциально. Сообщение поступает напрямую юристу.</p></aside></div></section>
+      ${office ? `<section class="section section--paper contact-location"><div class="wrap contact-location__grid"><div><span class="eyebrow">Личный приём</span><h2>Офис юридической консультации в Химках</h2><p>Встреча проходит по предварительной записи — так Максим Юрьевич заранее понимает предмет вопроса и может сообщить, какие документы взять с собой.</p></div><address><span>${icon("pin")}</span><div><small>Полный адрес</small><strong>${esc(`${site.publicOffice.postalCode}, ${site.publicOffice.addressRegion}, ${site.publicOffice.addressLocality}, ${site.publicOffice.streetAddress}`)}</strong><small>Часы связи и приёма</small><strong>${esc(site.publicOffice.openingHoursLabel)}, по записи</strong><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Открыть в Яндекс Картах ${icon("arrow")}</a></div></address></div></section>` : ""}
       <section class="section section--faq"><div class="wrap faq-grid"><div class="faq-intro"><span class="eyebrow">Перед обращением</span><h2>Что можно приложить</h2><p>На первом этапе не обязательно отправлять всё. Сообщите, что у вас есть, и получите перечень действительно нужных материалов.</p></div>${faqBlock(faqs.slice(0, 2))}</div></section>
     `,
   };

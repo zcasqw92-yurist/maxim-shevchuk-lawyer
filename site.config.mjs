@@ -1,7 +1,7 @@
 /**
  * Единственная точка настройки перед публикацией.
  * Пока production=false, поисковики получают запрет на индексацию,
- * а формы работают в безопасном демонстрационном режиме.
+ * а контактные каналы остаются в безопасном тестовом окружении.
  */
 const normalizeSiteUrl = (value) => String(value || "https://example.ru").replace(/\/+$/, "");
 const normalizeBasePath = (value) => {
@@ -15,18 +15,22 @@ export const site = {
   indexableDistricts: [],
   siteUrl: normalizeSiteUrl(process.env.SITE_URL),
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
-  contentLastModified: "2026-07-15",
+  contentLastModified: "2026-07-16",
   name: "Максим Юрьевич Шевчук",
   shortName: "Максим Шевчук",
+  businessName: "Юридическая консультация Шевчука М. Ю.",
   role: "Юрист",
   city: "Москва",
   region: "Москва и Московская область",
   phoneDisplay: "+7 (906) 529-79-70",
   phoneHref: "+79065297970",
-  email: "mail@example.ru",
+  email: "",
   telegram: "https://t.me/lawrazbor",
   whatsapp: "https://api.whatsapp.com/send?phone=79065297970",
-  sameAs: ["https://yandex.ru/maps/?ol=biz&oid=118077889231"],
+  personSameAs: [],
+  organizationSameAs: [
+    "https://yandex.ru/maps/org/yuridicheskaya_konsultatsiya_shevchuka_m_yu_/118077889231/",
+  ],
   webmasterVerification: {
     google: "",
     yandex: "",
@@ -38,16 +42,22 @@ export const site = {
     yandexMetricaId: "",
   },
   indexNowKey: "",
+  legacyRedirects: {
+    "/dosudebnaya-pretenziya/": "/uslugi/dosudebnoe-uregulirovanie/",
+    "/политика-конфиденциальности/": "/politika-konfidencialnosti/",
+  },
   publicOffice: {
     enabled: true,
     streetAddress: "улица Горшина, 2",
-    postalCode: "",
+    postalCode: "141407",
     addressLocality: "Химки",
     addressRegion: "Московская область",
-    latitude: "",
-    longitude: "",
-    openingHours: [],
-    priceRange: "",
+    latitude: "55.886899",
+    longitude: "37.429363",
+    openingHours: ["Mo-Su 08:00-22:00"],
+    openingHoursLabel: "ежедневно, 08:00–22:00",
+    priceRange: "от 2 800 ₽",
+    mapUrl: "https://yandex.ru/maps/org/yuridicheskaya_konsultatsiya_shevchuka_m_yu_/118077889231/",
   },
   organizationId: "#legal-practice",
   personId: "#maxim-shevchuk",

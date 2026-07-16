@@ -6,13 +6,14 @@
   "description": "Персональный сайт юриста Максима Юрьевича Шевчука",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:visual",
+    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:visual",
     "dev": "node scripts/server.mjs",
     "validate": "node scripts/validate.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "test:quick-choices": "node scripts/quick-choices-test.mjs",
     "test:callback": "node scripts/callback-test.mjs",
     "test:callback-interaction": "node scripts/callback-interaction-test.mjs",
+    "test:messenger-intents": "node scripts/messenger-intents-interaction-test.mjs",
     "test:visual": "node scripts/visual-test.mjs",
     "submit:indexnow": "node scripts/submit-indexnow.mjs"
   },

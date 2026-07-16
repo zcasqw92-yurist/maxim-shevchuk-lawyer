@@ -9,7 +9,6 @@ import { pipeline } from "node:stream/promises";
 
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
-const chromiumBinary = require("@sparticuz/chromium").default;
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const browserDir = join(root, ".browser-bin");
 const browserPath = join(browserDir, "chromium");
@@ -37,12 +36,8 @@ const extractTarBrotli = async (archive) => {
   ]);
 };
 
-if (!(await access(join(browserDir, "libGLESv2.so")).then(() => true).catch(() => false))) {
-  await extractTarBrotli("swiftshader.tar.br");
-}
-if (!(await access(join(browserDir, "fonts.conf")).then(() => true).catch(() => false))) {
-  await extractTarBrotli("fonts.tar.br");
-}
+if (!(await access(join(browserDir, "libGLESv2.so")).then(() => true).catch(() => false))) await extractTarBrotli("swiftshader.tar.br");
+if (!(await access(join(browserDir, "fonts.conf")).then(() => true).catch(() => false))) await extractTarBrotli("fonts.tar.br");
 
 await mkdir(join(browserDir, "cache"), { recursive: true });
 await mkdir(join(browserDir, "home"), { recursive: true });
@@ -84,27 +79,19 @@ const checkCentered = async (locator, parentLocator, label) => {
   if (delta > 2) errors.push(`${label}: link is not centered, delta=${delta.toFixed(2)}px`);
 };
 
+const textParam = (href) => {
+  try { return new URL(href).searchParams.get("text") || ""; } catch { return ""; }
+};
+
 try {
   browser = await chromium.launch({
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--disable-background-networking",
-      "--disable-extensions",
-    ],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-background-networking", "--disable-extensions"],
     executablePath: browserPath,
     headless: true,
   });
 
   for (const profile of profiles) {
-    const context = await browser.newContext({
-      viewport: profile.viewport,
-      isMobile: profile.isMobile,
-      hasTouch: profile.hasTouch,
-      permissions: ["clipboard-read", "clipboard-write"],
-    });
+    const context = await browser.newContext({ viewport: profile.viewport, isMobile: profile.isMobile, hasTouch: profile.hasTouch });
     const page = await context.newPage();
     page.on("pageerror", (error) => errors.push(`${profile.name} pageerror: ${error.message}`));
     page.on("console", (message) => { if (message.type() === "error") errors.push(`${profile.name} console: ${message.text()}`); });
@@ -150,8 +137,10 @@ try {
     if (callbackLayout.consentScrollWidth > callbackLayout.consentClientWidth + 1) errors.push(`${profile.name}: privacy consent slid sideways`);
 
     await callbackDialog.locator("[data-callback-telegram]").click();
-    await page.waitForFunction(() => document.querySelector("[data-callback-note]")?.textContent?.includes("скопирован"), null, { timeout: 3000 }).catch(() => {});
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText()).catch(() => "");
+    const openedAfterTelegram = await page.evaluate(() => [...window.__callbackOpenedUrls]);
+    const telegramUrl = openedAfterTelegram.at(-1) || "";
+    if (!telegramUrl.startsWith("https://t.me/lawrazbor?")) errors.push(`${profile.name}: Telegram callback URL is invalid: ${telegramUrl}`);
+    const telegramText = textParam(telegramUrl);
     for (const part of [
       "Прошу связаться со мной позже",
       "Имя: Тестовый клиент",
@@ -161,10 +150,10 @@ try {
       "Кратко о ситуации: Нужно обсудить возврат денег по договору.",
       "Страница сайта: /",
     ]) {
-      if (!clipboardText.includes(part)) errors.push(`${profile.name}: Telegram clipboard is missing: ${part}`);
+      if (!telegramText.includes(part)) errors.push(`${profile.name}: Telegram draft is missing: ${part}`);
     }
-    const openedAfterTelegram = await page.evaluate(() => [...window.__callbackOpenedUrls]);
-    if (openedAfterTelegram.at(-1) !== "https://t.me/lawrazbor") errors.push(`${profile.name}: Telegram callback URL is invalid`);
+    const telegramNote = await callbackDialog.locator("[data-callback-note]").textContent();
+    if (!telegramNote?.includes("заполненным обращением")) errors.push(`${profile.name}: Telegram direct-draft note is missing`);
 
     await callbackDialog.locator("[data-callback-whatsapp]").click();
     const openedAfterWhatsapp = await page.evaluate(() => [...window.__callbackOpenedUrls]);
@@ -184,12 +173,7 @@ try {
     const privacyLayout = await page.evaluate(() => {
       const heading = document.querySelector(".legal-page aside h1")?.getBoundingClientRect();
       const viewport = document.documentElement.clientWidth;
-      return {
-        viewport,
-        scrollWidth: document.documentElement.scrollWidth,
-        headingLeft: heading?.left ?? 0,
-        headingRight: heading?.right ?? 0,
-      };
+      return { viewport, scrollWidth: document.documentElement.scrollWidth, headingLeft: heading?.left ?? 0, headingRight: heading?.right ?? 0 };
     });
     if (privacyLayout.scrollWidth > privacyLayout.viewport + 1) errors.push(`${profile.name}: privacy page has horizontal overflow`);
     if (privacyLayout.headingLeft < -1 || privacyLayout.headingRight > privacyLayout.viewport + 1) errors.push(`${profile.name}: privacy heading slid sideways`);
@@ -211,4 +195,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Callback interaction test passed: centered links, desktop/mobile clipboard, privacy layout and messenger URLs");
+console.log("Callback interaction test passed: centered links, direct Telegram drafts, privacy layout and messenger URLs");

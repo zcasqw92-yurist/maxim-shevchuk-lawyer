@@ -41,8 +41,10 @@ const routeFor = (file) => {
   return `/${local}`;
 };
 const isDistrictDetail = (route) => /^\/rayony-moskvy\/[^/]+\/$/.test(route);
+const isLegacyRedirect = (route) => Boolean(site.legacyRedirects?.[route]);
 const expectedIndexable = (route) => {
   if (route === "/404.html") return false;
+  if (isLegacyRedirect(route)) return false;
   if (!isDistrictDetail(route)) return true;
   const slug = route.split("/").filter(Boolean).at(-1);
   return site.districtPagesIndexable || site.indexableDistricts?.includes(slug);
@@ -81,7 +83,9 @@ for (const file of files) {
   const canonical = link(html, "canonical");
   const shouldIndex = expectedIndexable(route);
   const isIndex = robots.split(",").map((value) => value.trim()).includes("index");
-  const expectedCanonical = `${site.siteUrl}${route}`;
+  const expectedCanonical = isLegacyRedirect(route)
+    ? `${site.siteUrl}${site.legacyRedirects[route]}`
+    : `${site.siteUrl}${route}`;
   const mainHtml = html.match(/<main[^>]*>[\s\S]*?<\/main>/i)?.[0] || html;
   const mainText = stripText(mainHtml);
   const wordCount = mainText.split(/\s+/).filter(Boolean).length;
@@ -95,33 +99,55 @@ for (const file of files) {
   if (!robots) errors.push(`${route}: отсутствует meta robots`);
   if (site.production && shouldIndex && !isIndex) errors.push(`${route}: production-страница ошибочно закрыта от индексации`);
   if (site.production && !shouldIndex && isIndex) errors.push(`${route}: служебная/черновая страница ошибочно индексируется`);
-  if (route !== "/404.html" && (!meta(html, "og:title") || !meta(html, "og:description") || !meta(html, "og:image"))) errors.push(`${route}: неполный Open Graph`);
-  if (route !== "/404.html" && (!meta(html, "og:image:width") || !meta(html, "og:image:height") || !meta(html, "og:image:alt"))) warnings.push(`${route}: неполные атрибуты изображения Open Graph`);
+  if (route !== "/404.html" && !isLegacyRedirect(route) && (!meta(html, "og:title") || !meta(html, "og:description") || !meta(html, "og:image"))) errors.push(`${route}: неполный Open Graph`);
+  if (route !== "/404.html" && !isLegacyRedirect(route) && (!meta(html, "og:image:width") || !meta(html, "og:image:height") || !meta(html, "og:image:alt"))) warnings.push(`${route}: неполные атрибуты изображения Open Graph`);
   if (/<img(?![^>]*\balt=)[^>]*>/i.test(html)) errors.push(`${route}: изображение без alt`);
   if (/<img(?![^>]*\bwidth=)[^>]*>/i.test(html) || /<img(?![^>]*\bheight=)[^>]*>/i.test(html)) errors.push(`${route}: изображение без width/height`);
 
   const jsonLdBlocks = [...html.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)];
   const graphTypes = [];
+  const graphNodes = [];
   for (const block of jsonLdBlocks) {
     try {
       const parsed = JSON.parse(block[1]);
       const graph = Array.isArray(parsed["@graph"]) ? parsed["@graph"] : [parsed];
+      graphNodes.push(...graph);
       graphTypes.push(...graph.flatMap((node) => Array.isArray(node["@type"]) ? node["@type"] : [node["@type"]]));
       const webPage = graph.find((node) => ["WebPage", "ProfilePage", "ContactPage", "CollectionPage"].includes(node["@type"]));
-      if (route !== "/404.html" && !webPage) errors.push(`${route}: нет сущности WebPage/подтипа в JSON-LD`);
+      if (route !== "/404.html" && !isLegacyRedirect(route) && !webPage) errors.push(`${route}: нет сущности WebPage/подтипа в JSON-LD`);
       if (webPage && webPage.dateModified !== site.contentLastModified) errors.push(`${route}: неверный dateModified в JSON-LD`);
     } catch (error) {
       errors.push(`${route}: JSON-LD не разбирается (${error.message})`);
     }
   }
-  if (route !== "/404.html" && !graphTypes.includes("WebSite")) errors.push(`${route}: нет WebSite в JSON-LD`);
+  if (route !== "/404.html" && !isLegacyRedirect(route) && !graphTypes.includes("WebSite")) errors.push(`${route}: нет WebSite в JSON-LD`);
+  if (/mail@example\.ru/i.test(html)) errors.push(`${route}: найден тестовый email`);
+
+  if (route === "/kontakty/" && site.publicOffice?.enabled) {
+    const organization = graphNodes.find((node) => node["@type"] === "LegalService");
+    const person = graphNodes.find((node) => node["@type"] === "Person");
+    if (!organization) errors.push(`${route}: нет LegalService для подтверждённого офиса`);
+    else {
+      if (organization.name !== site.businessName) errors.push(`${route}: название LegalService не совпадает с Яндекс Бизнес`);
+      if (organization.telephone !== site.phoneHref) errors.push(`${route}: телефон LegalService не совпадает с публичным телефоном`);
+      if (!organization.address?.streetAddress || !organization.address?.addressLocality || !organization.address?.addressRegion) errors.push(`${route}: неполный PostalAddress в LegalService`);
+      if (!organization.geo?.latitude || !organization.geo?.longitude) errors.push(`${route}: отсутствуют координаты офиса в LegalService`);
+      if (!organization.openingHours?.length) errors.push(`${route}: отсутствует график офиса в LegalService`);
+      if (site.publicOffice.mapUrl && organization.hasMap !== site.publicOffice.mapUrl) errors.push(`${route}: hasMap не совпадает с карточкой организации`);
+      if (site.publicOffice.mapUrl && !organization.sameAs?.includes(site.publicOffice.mapUrl)) errors.push(`${route}: карточка организации отсутствует в sameAs`);
+    }
+    if (site.publicOffice.mapUrl && person?.sameAs?.includes(site.publicOffice.mapUrl)) errors.push(`${route}: карточка организации ошибочно присвоена Person`);
+    for (const value of [site.publicOffice.postalCode, site.publicOffice.addressRegion, site.publicOffice.addressLocality, site.publicOffice.streetAddress]) {
+      if (value && !mainText.includes(value)) errors.push(`${route}: адресная часть «${value}» отсутствует в видимом тексте`);
+    }
+  }
 
   pages.push({ route, title, description, robots, shouldIndex, internalLinks, wordCount, mainText });
 }
 
 for (const field of ["title", "description"]) {
   const groups = new Map();
-  for (const page of pages.filter((item) => item.route !== "/404.html")) {
+  for (const page of pages.filter((item) => item.route !== "/404.html" && !isLegacyRedirect(item.route))) {
     const value = page[field];
     groups.set(value, [...(groups.get(value) || []), page.route]);
   }

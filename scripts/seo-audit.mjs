@@ -2,7 +2,6 @@ import { access, readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
-import { districts } from "../src/data.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -40,14 +39,11 @@ const routeFor = (file) => {
   if (local.endsWith("/index.html")) return `/${local.slice(0, -"index.html".length)}`;
   return `/${local}`;
 };
-const isDistrictDetail = (route) => /^\/rayony-moskvy\/[^/]+\/$/.test(route);
 const isLegacyRedirect = (route) => Boolean(site.legacyRedirects?.[route]);
 const expectedIndexable = (route) => {
   if (route === "/404.html") return false;
   if (isLegacyRedirect(route)) return false;
-  if (!isDistrictDetail(route)) return true;
-  const slug = route.split("/").filter(Boolean).at(-1);
-  return site.districtPagesIndexable || site.indexableDistricts?.includes(slug);
+  return true;
 };
 const stripText = (html) => html
   .replace(/<(script|style|svg)[^>]*>[\s\S]*?<\/\1>/gi, " ")
@@ -162,9 +158,7 @@ for (let leftIndex = 0; leftIndex < contentPages.length; leftIndex += 1) {
     const left = contentPages[leftIndex];
     const right = contentPages[rightIndex];
     const similarity = jaccard(shingles(left.mainText), shingles(right.mainText));
-    if (isDistrictDetail(left.route) && isDistrictDetail(right.route) && similarity > 0.72) {
-      errors.push(`Локальные страницы слишком похожи (${Math.round(similarity * 100)}%): ${left.route} и ${right.route}`);
-    } else if (similarity > 0.86) {
+    if (similarity > 0.86) {
       warnings.push(`Высокая схожесть основного контента (${Math.round(similarity * 100)}%): ${left.route} и ${right.route}`);
     }
   }
@@ -204,8 +198,6 @@ if (!site.whatsapp || !site.telegram) blockers.push("Указать WhatsApp и 
 if (!site.webmasterVerification?.google) blockers.push("Подтвердить сайт в Google Search Console");
 if (!site.webmasterVerification?.yandex) blockers.push("Подтвердить сайт в Яндекс Вебмастере");
 if (!site.publicOffice?.enabled) warnings.push("Публичный офис не указан: локальная разметка LegalService и адресная карточка отключены");
-const closedDistricts = districts.length - (site.districtPagesIndexable ? districts.length : (site.indexableDistricts?.length || 0));
-if (closedDistricts) warnings.push(`${closedDistricts} окружных страниц остаются noindex до появления уникального локального содержания`);
 if (!site.production) blockers.push("После заполнения данных переключить production: true");
 
 console.log(`SEO audit: ${pages.length} HTML-страниц, ${expectedUrls.length} URL в карте сайта`);

@@ -82,8 +82,18 @@ const callbackDialog = () => {
 const callbackCss = `
 
 @layer components {
-  .callback-open-link { justify-content: center; margin: 16px auto 0; }
-  .footer__contact .callback-open-link { justify-content: flex-start; margin: 12px 0 0; }
+  .callback-dialog { overflow-x: hidden; }
+  .callback-open-link {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    justify-content: center;
+    justify-self: center;
+    margin: 16px auto 0;
+    text-align: center;
+  }
+  .footer__contact .callback-open-link { justify-content: center; margin: 12px auto 0; }
+  .callback-form, .callback-form__fields, .callback-field, .callback-consent > span { min-width: 0; }
   .callback-form__head { display: block; margin-bottom: 20px; }
   .callback-form__head .eyebrow { margin: 0; }
   .callback-form > h2 { margin-bottom: 13px; font-size: clamp(2.15rem, 5vw, 3.35rem); }
@@ -92,6 +102,7 @@ const callbackCss = `
   .callback-field { display: grid; gap: 7px; color: var(--ink); font-size: 13px; font-weight: 720; text-align: left; }
   .callback-field input, .callback-field select, .callback-field textarea {
     width: 100%;
+    max-width: 100%;
     min-height: 52px;
     padding: 12px 14px;
     color: var(--ink);
@@ -105,13 +116,17 @@ const callbackCss = `
   }
   .callback-field textarea { min-height: 112px; resize: vertical; }
   .callback-field input:focus, .callback-field select:focus, .callback-field textarea:focus { border-color: var(--gold); outline: 2px solid rgba(195,154,93,.24); outline-offset: 0; }
-  .callback-consent { display: grid; grid-template-columns: 20px 1fr; align-items: start; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.5; }
+  .callback-consent { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.5; }
   .callback-consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--ink); }
+  .callback-consent > span, .callback-consent a { white-space: normal; overflow-wrap: anywhere; }
   .callback-consent a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
   .callback-form__actions { display: grid; gap: 10px; margin-top: 24px; }
   .callback-form__note { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.55; text-align: center; }
-  .callback-copy { width: 100%; min-height: 150px; margin-top: 14px; padding: 12px; border: 1px solid var(--line); background: var(--paper); border-radius: 7px; font: inherit; font-size: 12px; }
+  .callback-copy { width: 100%; max-width: 100%; min-height: 150px; margin-top: 14px; padding: 12px; border: 1px solid var(--line); background: var(--paper); border-radius: 7px; font: inherit; font-size: 12px; }
   .callback-copy[hidden] { display: none; }
+
+  .legal-page__grid, .legal-page aside, .legal-copy { min-width: 0; }
+  .legal-page aside h1, .legal-copy, .legal-copy p, .legal-copy a { overflow-wrap: anywhere; hyphens: auto; }
 }
 
 @layer utilities {
@@ -120,6 +135,7 @@ const callbackCss = `
     .callback-form__intro { font-size: 15px; }
     .callback-form__fields { gap: 14px; margin-top: 22px; }
     .callback-open-link { min-height: 44px; }
+    .legal-page aside h1 { font-size: clamp(2.35rem, 12vw, 4.2rem); }
   }
 }
 `;
@@ -157,6 +173,46 @@ const callbackJs = `
     return valid;
   };
 
+  const legacyClipboardCopy = (text) => {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.setAttribute("aria-hidden", "true");
+    field.style.position = "fixed";
+    field.style.inset = "0 auto auto -9999px";
+    field.style.width = "1px";
+    field.style.height = "1px";
+    field.style.opacity = "0";
+    document.body.append(field);
+    field.focus({ preventScroll: true });
+    field.select();
+    field.setSelectionRange(0, field.value.length);
+    let copied = false;
+    try { copied = document.execCommand("copy"); } catch { copied = false; }
+    field.remove();
+    return copied;
+  };
+
+  const beginClipboardCopy = (text) => {
+    let modernAttempt = Promise.resolve(false);
+    if (window.isSecureContext && navigator.clipboard?.writeText) {
+      modernAttempt = navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+    }
+    const legacyCopied = legacyClipboardCopy(text);
+    return modernAttempt.then((modernCopied) => modernCopied || legacyCopied);
+  };
+
+  const showManualCopy = (message) => {
+    if (callbackCopy) {
+      callbackCopy.value = message;
+      callbackCopy.hidden = false;
+      callbackCopy.focus({ preventScroll: true });
+      callbackCopy.select();
+      callbackCopy.setSelectionRange(0, callbackCopy.value.length);
+    }
+    if (callbackNote) callbackNote.textContent = "Telegram открыт. Скопируйте выделенный текст из поля ниже и отправьте его Максиму Юрьевичу.";
+  };
+
   document.querySelectorAll("[data-callback-open]").forEach((control) => {
     control.addEventListener("click", (event) => {
       event.preventDefault();
@@ -186,18 +242,19 @@ const callbackJs = `
     event.preventDefault();
     if (!validateCallbackForm()) return;
     const message = callbackMessage();
+
+    // Start both clipboard strategies while the click still has user activation,
+    // and only then open Telegram. This works more reliably on desktop and mobile.
+    const copyAttempt = beginClipboardCopy(message);
     window.open(callbackTelegram.dataset.telegramHref, "_blank", "noopener");
-    void copyText(message).then((copied) => {
+    if (callbackNote) callbackNote.textContent = "Telegram открыт. Подготавливаю текст обращения для вставки…";
+
+    void copyAttempt.then((copied) => {
       if (copied) {
+        if (callbackCopy) callbackCopy.hidden = true;
         if (callbackNote) callbackNote.textContent = "Telegram открыт, а текст обращения скопирован. Вставьте его в чат и отправьте Максиму Юрьевичу.";
       } else {
-        if (callbackCopy) {
-          callbackCopy.value = message;
-          callbackCopy.hidden = false;
-          callbackCopy.focus();
-          callbackCopy.select();
-        }
-        if (callbackNote) callbackNote.textContent = "Telegram открыт. Скопируйте текст из поля ниже и отправьте его Максиму Юрьевичу.";
+        showManualCopy(message);
       }
     });
     if (typeof track === "function") track("callback_request_telegram", { page_path: location.pathname });

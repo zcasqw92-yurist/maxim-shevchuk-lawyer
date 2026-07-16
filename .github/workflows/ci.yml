@@ -72,5 +72,8 @@ jobs:
       - name: Проверить гарантии процесса
         run: npm run test:process-guarantees
 
+      - name: Проверить примеры работы
+        run: npm run test:case-studies
+
       - name: Проверить вёрстку и взаимодействия
         run: npm run test:visual

@@ -1,6 +1,10 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+// Контент виден без JavaScript; класс включает только необязательные анимации.
+document.documentElement.classList.add("motion-ready");
+setTimeout(() => $$(".reveal").forEach((item) => item.classList.add("is-visible")), 1800);
+
 const analyticsEnabled = document.body.dataset.analyticsEnabled === "true";
 const analyticsRequiresConsent = document.body.dataset.analyticsRequiresConsent === "true";
 const googleAnalyticsId = document.body.dataset.googleAnalyticsId || "";

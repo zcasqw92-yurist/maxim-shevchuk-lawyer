@@ -1,5 +1,5 @@
 import { site } from "../site.config.mjs";
-import { districts, faqs, services } from "./data.mjs";
+import { faqs, services } from "./data.mjs";
 
 const esc = (value = "") =>
   String(value)
@@ -47,7 +47,6 @@ const icon = (name, className = "icon") => {
     whatsapp: '<path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8.5c.2 2 2 4.2 4.2 4.5l1.1-1.1 1.7.8c-.6 1.3-1.8 1.8-3 1.4-2.8-.9-4.9-3.1-5.6-5.8-.3-1.2.3-2.4 1.5-2.9l.8 1.8Z"/>',
     telegram: '<path d="m21 4-7.1 16-3.6-6-6.3-2.7L21 4Z"/><path d="m10.3 14 2.2-2.1"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
-    search: '<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',
     education: '<path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v5c3 2 7 2 10 0v-5M21 9v7"/>',
     chevron: '<path d="m8 10 4 4 4-4"/>',
     close: '<path d="m6 6 12 12M18 6 6 18"/>',
@@ -82,7 +81,6 @@ const breadcrumbs = (items) => `
 const navItems = [
   ["Услуги", "/uslugi/"],
   ["О юристе", "/o-yuriste/"],
-  ["Районы Москвы", "/rayony-moskvy/"],
   ["Контакты", "/kontakty/"],
 ];
 
@@ -133,7 +131,6 @@ const footer = () => `
         <h2 class="footer__title">Информация</h2>
         <ul class="footer__links">
           <li><a href="/o-yuriste/">О юристе</a></li>
-          <li><a href="/rayony-moskvy/">Районы Москвы</a></li>
           <li><a href="/kontakty/">Контакты</a></li>
           <li><a href="/politika-konfidencialnosti/">Конфиденциальность</a></li>
         </ul>
@@ -592,16 +589,6 @@ export const renderHome = () => ({
       </div>
     </section>
 
-    <section class="section section--districts">
-      <div class="wrap district-preview reveal">
-        <div><span class="eyebrow eyebrow--light">Москва</span><h2>Юридическая помощь по районам города</h2><p>Структура сайта учитывает территориальные запросы, но каждая районная страница будет наполнена самостоятельной полезной информацией, а не копией общего текста.</p>${button("Выбрать округ", "/rayony-moskvy/", "gold")}</div>
-        <div class="district-preview__map" aria-hidden="true">
-          <span class="map-ring map-ring--1"></span><span class="map-ring map-ring--2"></span><span class="map-ring map-ring--3"></span>
-          <span class="map-label map-label--1">ЦАО</span><span class="map-label map-label--2">САО</span><span class="map-label map-label--3">ЗАО</span><span class="map-label map-label--4">ЮАО</span><span class="map-dot"></span>
-        </div>
-      </div>
-    </section>
-
     <section class="section section--faq">
       <div class="wrap faq-grid">
         <div class="faq-intro reveal"><span class="eyebrow">Коротко о главном</span><h2>Частые вопросы перед обращением</h2><p>Если вашего вопроса нет в списке, опишите ситуацию в свободной форме.</p><button class="text-link" type="button" data-dialog-open>Спросить напрямую ${icon("arrow")}</button></div>
@@ -695,46 +682,6 @@ export const renderAbout = () => {
       <section class="section section--education"><div class="wrap education-grid"><div class="education-copy reveal"><span class="eyebrow">Образование</span><h2>Высшее юридическое образование</h2><dl><div><dt>Учебное заведение</dt><dd>Российский государственный университет правосудия, Москва</dd></div><div><dt>Направление</dt><dd>40.03.01 «Юриспруденция»</dd></div><div><dt>Квалификация</dt><dd>Бакалавр</dd></div><div><dt>Год выдачи диплома</dt><dd>2010</dd></div></dl><p class="muted">На сайте используется изображение диплома с закрытыми регистрационными данными.</p></div><figure class="diploma-card reveal"><img src="/assets/images/maxim-diploma.webp" width="1170" height="765" loading="lazy" decoding="async" alt="Диплом Максима Юрьевича Шевчука по направлению Юриспруденция"><figcaption>${icon("education")}Документ об образовании и квалификации</figcaption></figure></div></section>
       <section class="section section--dark" id="process"><div class="wrap"><div class="section-head reveal"><span class="eyebrow eyebrow--light">Работа с обращением</span><h2>Четыре понятных этапа</h2></div><ol class="process-cards"><li><span>01</span><h3>Вы описываете ситуацию</h3><p>Свободным текстом, без необходимости подбирать юридические термины.</p></li><li><span>02</span><h3>Я изучаю материалы</h3><p>Проверяю документы, хронологию, платежи и уже полученные ответы.</p></li><li><span>03</span><h3>Определяю позицию</h3><p>Объясняю возможные требования, ограничения и последовательность действий.</p></li><li><span>04</span><h3>Готовлю результат</h3><p>Документ и пояснение, как им пользоваться при дальнейшем развитии ситуации.</p></li></ol></div></section>
       ${cta("Передайте ситуацию на первичный разбор", "Краткой хронологии и перечня документов достаточно, чтобы начать предметный разговор.")}
-    `,
-  };
-};
-
-export const renderDistricts = () => {
-  const crumbs = [{ name: "Главная", path: "/" }, { name: "Районы Москвы", path: "/rayony-moskvy/" }];
-  return {
-    title: "Юридическая помощь по районам Москвы | Максим Шевчук",
-    description: "Юридическая помощь жителям и бизнесу в административных округах и районах Москвы.",
-    schema: [personSchema(), practiceSchema(), breadcrumbSchema(crumbs)],
-    pageType: "CollectionPage",
-    mainEntityId: entityUrl(site.personId),
-    content: `
-      ${breadcrumbs(crumbs)}
-      <section class="inner-hero district-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">География работы</span><h1>Юридическая помощь по районам Москвы</h1><p>Выберите административный округ. Районные страницы будут содержать самостоятельную информацию об услугах и порядке обращения, а не механически размноженный SEO-текст.</p></div><div class="inner-hero__aside district-search"><label for="district-search">Найти округ или район</label><div class="search-field">${icon("search")}<input id="district-search" type="search" placeholder="Например, Хамовники" autocomplete="off" data-district-search></div><small data-search-count>Показаны все округа</small></div></div></section>
-      <section class="section"><div class="wrap"><div class="district-grid" data-district-grid>${districts.map((district) => `<article class="district-card reveal" data-search="${esc(`${district.short} ${district.name} ${district.areas}`.toLowerCase())}"><div class="district-card__top"><strong>${esc(district.short)}</strong><span>${icon("pin")}</span></div><h2><a href="/rayony-moskvy/${district.slug}/">${esc(district.name)}</a></h2><p>${esc(district.areas)}</p><a class="card-link" href="/rayony-moskvy/${district.slug}/">Открыть страницу ${icon("arrow")}</a></article>`).join("")}</div><p class="empty-state" data-empty-state hidden>Ничего не найдено. Напишите название района иначе или опишите ситуацию через форму.</p></div></section>
-      <section class="section section--paper"><div class="wrap local-seo-note"><div><span class="eyebrow">Почему без копий</span><h2>Локальная страница должна помогать человеку</h2></div><div><p>Высокие позиции нельзя получить простым повторением названия района. Для публикации каждая страница дополняется уникальными сценариями, актуальной подсудностью, маршрутами обращения и ответами на реальные местные запросы.</p><ul class="plain-checks"><li>${icon("check")}Самостоятельное содержание</li><li>${icon("check")}Понятная перелинковка</li><li>${icon("check")}Корректные заголовки и метаданные</li></ul></div></div></section>
-      ${cta("Нужна помощь независимо от района?", "Большинство материалов можно изучить дистанционно. Укажите район и коротко опишите ситуацию.")}
-    `,
-  };
-};
-
-export const renderDistrict = (district) => {
-  const crumbs = [
-    { name: "Главная", path: "/" },
-    { name: "Районы Москвы", path: "/rayony-moskvy/" },
-    { name: district.short, path: `/rayony-moskvy/${district.slug}/` },
-  ];
-  return {
-    title: `Юрист в ${district.short} Москвы — претензии, жалобы, иски | Максим Шевчук`,
-    description: `Юридическая помощь в ${district.name}: досудебные претензии, жалобы, возврат денег и исковые заявления.`,
-    indexable: site.districtPagesIndexable || site.indexableDistricts?.includes(district.slug),
-    schema: [personSchema(), practiceSchema(), breadcrumbSchema(crumbs)],
-    mainEntityId: entityUrl(site.personId),
-    content: `
-      ${breadcrumbs(crumbs)}
-      <section class="district-detail-hero"><div class="wrap district-detail-hero__grid"><div><span class="draft-label">SEO-страница подготовлена к наполнению</span><span class="eyebrow">${esc(district.short)} · Москва</span><h1>Юридическая помощь в ${esc(district.name)}</h1><p>Досудебные претензии, жалобы, исковые заявления и помощь в денежных спорах для жителей и бизнеса округа.</p><div class="hero__actions"><button class="button button--primary" type="button" data-dialog-open data-topic="${esc(district.short)}">Описать ситуацию${icon("arrow", "button__icon")}</button>${button("Все районы", "/rayony-moskvy/", "secondary")}</div></div><div class="district-monogram"><span>${esc(district.short)}</span><small>${esc(district.areas)}</small></div></div></section>
-      <section class="section"><div class="wrap"><div class="section-head section-head--split"><div><span class="eyebrow">Направления помощи</span><h2>С какими вопросами можно обратиться</h2></div><p>Ниже — общая структура. Перед открытием страницы для индексации блок дополняется уникальной информацией по округу.</p></div>${serviceCards(4)}</div></section>
-      <section class="section section--paper"><div class="wrap district-context"><div><span class="eyebrow">Территория</span><h2>${esc(district.areas)}</h2><p>Для выбора способа обращения важно учитывать не только место проживания клиента, но и характер спора, статус сторон, условия договора и применимые правила подсудности.</p></div><div class="paper-panel"><h3>Что подготовить</h3><ul class="plain-checks"><li>${icon("check")}Краткую хронологию</li><li>${icon("check")}Договоры и переписку</li><li>${icon("check")}Подтверждения оплаты</li><li>${icon("check")}Полученные ответы и отказы</li></ul></div></div></section>
-      ${cta(`Обсудить ситуацию в ${district.short}`, "Укажите район, суть вопроса и имеющиеся документы. Формат дальнейшей работы определяется после первичного анализа.")}
     `,
   };
 };

@@ -169,7 +169,8 @@ const dialog = () => `
       <span class="messenger-dialog__status"><i></i>На связи в мессенджерах</span>
       <img class="messenger-dialog__portrait" src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Юрьевич Шевчук">
       <h2 id="dialog-title">Готов разобрать ситуацию</h2>
-      <p>Напишите в удобный мессенджер, что произошло. Максим Юрьевич лично уточнит важные детали и подскажет, с чего начать.</p>
+      <p class="messenger-dialog__topic" data-dialog-topic hidden></p>
+      <p data-dialog-copy>Напишите в удобный мессенджер, что произошло. Максим Юрьевич лично уточнит важные детали и подскажет, с чего начать.</p>
       ${messengerChoices("messenger-choices--dialog")}
       <p class="messenger-dialog__note">Первичное сообщение ни к чему вас не обязывает.</p>
       <p class="messenger-dialog__privacy">${icon("lock")}Конфиденциально. Общение напрямую с юристом — без операторов и ботов.</p>
@@ -479,6 +480,15 @@ export const renderHome = () => ({
             <button class="button button--primary" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button>
             ${button("Посмотреть услуги", "/uslugi/", "secondary")}
           </div>
+          <div class="hero__quick-choices" aria-label="Выберите типовую ситуацию">
+            <span>С чего начнём?</span>
+            <div>
+              <button type="button" data-dialog-open data-topic="возврат денежных средств">Не возвращают деньги</button>
+              <button type="button" data-dialog-open data-topic="досудебная претензия">Нужна претензия</button>
+              <button type="button" data-dialog-open data-topic="спор по договору">Спор по договору</button>
+              <button type="button" data-dialog-open data-topic="подготовка иска">Нужно в суд</button>
+            </div>
+          </div>
           <div class="hero__assurance" aria-label="Принципы работы">
             <span>${icon("eye")}Сначала документы</span>
             <span>${icon("lock")}Конфиденциально</span>
@@ -511,12 +521,12 @@ export const renderHome = () => ({
         </div>
         <div class="situation-grid">
           ${[
-            ["Не возвращают деньги", "Оплата, аванс, долг или удержание без понятного основания", "возврат"],
-            ["Не исполнили договор", "Работы, услуги, поставка или иное обязательство сорваны", "договор"],
-            ["Игнорируют претензию", "Требование получено, но ответа или исполнения нет", "тишина"],
-            ["Орган бездействует", "Проверку затягивают либо отвечают формально", "жалоба"],
-            ["Нужно обратиться в суд", "Важно определить требования, расчёт и доказательства", "иск"],
-            ["Спор с маркетплейсом", "Блокировка, штраф, удержание или спорное начисление", "бизнес"],
+            ["Не возвращают деньги", "Оплата, аванс, долг или удержание без понятного основания", "возврат денежных средств"],
+            ["Не исполнили договор", "Работы, услуги, поставка или иное обязательство сорваны", "спор по договору"],
+            ["Игнорируют претензию", "Требование получено, но ответа или исполнения нет", "досудебная претензия"],
+            ["Орган бездействует", "Проверку затягивают либо отвечают формально", "жалоба или обращение"],
+            ["Нужно обратиться в суд", "Важно определить требования, расчёт и доказательства", "подготовка иска"],
+            ["Спор с маркетплейсом", "Блокировка, штраф, удержание или спорное начисление", "спор с маркетплейсом"],
           ].map(([title, text, tag], index) => `
             <button class="situation-card reveal" type="button" data-dialog-open data-topic="${tag}" style="--delay:${index * 45}ms">
               <span class="situation-card__index">${String(index + 1).padStart(2, "0")}</span>

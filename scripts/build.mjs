@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
 import { services } from "../src/data.mjs";
 import { composeRenderedPage } from "../src/page-composer.mjs";
+import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
 import {
   renderAbout,
   renderContacts,
@@ -56,7 +57,8 @@ if (site.production) {
 const writePage = async (pathname, options, context = {}) => {
   const output = pathname === "/" ? join(dist, "index.html") : join(dist, pathname, "index.html");
   const rendered = renderShell({ ...options, pathname });
-  const html = composeRenderedPage(rendered, { pathname, ...context });
+  const composed = composeRenderedPage(rendered, { pathname, ...context });
+  const html = injectProcessGuarantees(composed, pathname);
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };

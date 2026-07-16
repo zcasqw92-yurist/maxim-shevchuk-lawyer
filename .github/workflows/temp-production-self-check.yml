@@ -1,0 +1,83 @@
+name: Временная проверка production-деплоя
+
+on:
+  push:
+    branches: [agent/fix-production-deploy]
+    paths-ignore:
+      - '.production-self-check-result.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  check-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Проверить preview и production
+        id: verify
+        shell: bash
+        env:
+          SITE_URL: https://zcasqw92-yurist.github.io/maxim-shevchuk-lawyer
+          SITE_BASE_PATH: /maxim-shevchuk-lawyer
+          INDEXNOW_KEY: ci-indexnow-key
+        run: |
+          set +e
+          npm run check > production-self-check.log 2>&1
+          preview_code=$?
+          if [ "$preview_code" -eq 0 ]; then
+            SITE_PRODUCTION=true npm run build >> production-self-check.log 2>&1
+            build_code=$?
+          else
+            build_code=1
+          fi
+          if [ "$preview_code" -eq 0 ] && [ "$build_code" -eq 0 ]; then
+            SITE_PRODUCTION=true npm run validate >> production-self-check.log 2>&1
+            validate_code=$?
+          else
+            validate_code=1
+          fi
+          if [ "$preview_code" -eq 0 ] && [ "$build_code" -eq 0 ] && [ "$validate_code" -eq 0 ]; then
+            SITE_PRODUCTION=true npm run audit:seo >> production-self-check.log 2>&1
+            seo_code=$?
+          else
+            seo_code=1
+          fi
+          if [ "$preview_code" -eq 0 ] && [ "$build_code" -eq 0 ] && [ "$validate_code" -eq 0 ] && [ "$seo_code" -eq 0 ]; then
+            final_code=0
+          else
+            final_code=1
+          fi
+          {
+            echo "tested_sha=$GITHUB_SHA"
+            echo "exit_code=$final_code"
+            echo "preview_code=$preview_code"
+            echo "production_build_code=$build_code"
+            echo "production_validate_code=$validate_code"
+            echo "production_seo_code=$seo_code"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "--- log tail ---"
+            tail -n 120 production-self-check.log
+          } > .production-self-check-result.txt
+          exit 0
+
+      - name: Записать результат в ветку
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .production-self-check-result.txt
+          git commit -m "Записать результат production-проверки"
+          git push

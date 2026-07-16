@@ -7,6 +7,7 @@ import { composeRenderedPage } from "../src/page-composer.mjs";
 import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
 import { injectCaseStudies } from "../src/case-studies.mjs";
 import { injectSearchVisibility } from "../src/search-visibility.mjs";
+import { injectPrivacyPolicy } from "../src/privacy-policy.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
 import {
   renderAbout,
@@ -51,7 +52,8 @@ if (site.production) {
   if (site.analytics?.enabled && !/^G-[A-Z0-9]+$/i.test(site.analytics.googleMeasurementId || "") && !/^\d+$/.test(site.analytics.yandexMetricaId || "")) {
     launchErrors.push("укажите хотя бы один корректный идентификатор аналитики либо отключите analytics.enabled");
   }
-  if (/заглушк|\[Указать/i.test(renderPrivacy().content)) launchErrors.push("замените черновик политики конфиденциальности");
+  const privacyContent = injectPrivacyPolicy(renderPrivacy().content, "/politika-konfidencialnosti");
+  if (/заглушк|\[Указать/i.test(privacyContent)) launchErrors.push("замените черновик политики конфиденциальности");
   if (launchErrors.length) {
     throw new Error(`Публикация остановлена:\n- ${launchErrors.join("\n- ")}`);
   }
@@ -61,7 +63,8 @@ const writePage = async (pathname, options, context = {}) => {
   const output = pathname === "/" ? join(dist, "index.html") : join(dist, pathname, "index.html");
   const rendered = renderShell({ ...options, pathname });
   const composed = composeRenderedPage(rendered, { pathname, ...context });
-  const withGuarantees = injectProcessGuarantees(composed, pathname);
+  const withPrivacyPolicy = injectPrivacyPolicy(composed, pathname);
+  const withGuarantees = injectProcessGuarantees(withPrivacyPolicy, pathname);
   const withCases = injectCaseStudies(withGuarantees, pathname);
   const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
   const html = injectMobileActions(withSearchVisibility, pathname);

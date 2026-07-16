@@ -142,5 +142,24 @@ const manifest = {
   lang: "ru",
   start_url: `${site.basePath || ""}/`,
   scope: `${site.basePath || ""}/`,
+  display: "standalone",
+  background_color: "#f3f0e9",
+  theme_color: "#10283d",
+  icons: [{ src: `${site.basePath || ""}/favicon.svg`, sizes: "any", type: "image/svg+xml" }],
 };
-await writeFile(join(dist, "manifest.webmanifest"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+await writeFile(join(dist, "site.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
+
+if (site.indexNowKey) {
+  if (!/^[A-Za-z0-9-]{8,128}$/.test(site.indexNowKey)) {
+    throw new Error("indexNowKey должен содержать 8–128 латинских букв, цифр или дефисов");
+  }
+  await writeFile(join(dist, `${site.indexNowKey}.txt`), site.indexNowKey, "utf8");
+}
+
+const notFound = await readFile(join(root, "src", "404.html"), "utf8");
+const renderedNotFound = notFound
+  .replaceAll("{{SITE_URL}}", site.siteUrl)
+  .replace(/(\b(?:href|src)=["'])\/(?!\/)/g, `$1${site.basePath || ""}/`);
+await writeFile(join(dist, "404.html"), renderedNotFound, "utf8");
+
+console.log(`Built ${6 + services.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist}`);

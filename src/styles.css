@@ -302,6 +302,12 @@
   .footer__office span { display: grid; gap: 2px; }
   .footer__office small { color: rgba(255,255,255,.48); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
   .footer__office em { color: var(--gold-bright); font-size: 11px; font-style: normal; }
+  .footer__map { margin-top: 65px; padding: 55px 0; border-top: 1px solid var(--line-light); border-bottom: 1px solid var(--line-light); }
+  .footer__map-grid { display: grid; grid-template-columns: .75fr 1.25fr; align-items: center; gap: clamp(35px, 7vw, 100px); }
+  .footer__map h2 { margin: 14px 0 20px; color: var(--white); font-size: clamp(2rem, 3vw, 3.2rem); }
+  .footer__map p { max-width: 480px; margin-bottom: 24px; color: rgba(255,255,255,.63); font-size: 14px; }
+  .footer__map .text-link { color: var(--gold-bright); }
+  .footer__map iframe { display: block; width: 100%; min-height: 320px; border: 0; filter: saturate(.76) contrast(.96); }
   .footer__bottom { display: flex; justify-content: space-between; gap: 24px; margin-top: 70px; padding-top: 24px; border-top: 1px solid var(--line-light); font-size: 10px; }
   .footer__settings { padding: 0; color: rgba(255,255,255,.58); border: 0; background: transparent; cursor: pointer; font: inherit; text-decoration: underline; text-underline-offset: 3px; }
   .footer__settings:hover { color: var(--white); }
@@ -698,6 +704,10 @@
     .footer__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px 24px; }
     .footer__identity, .footer__contact { grid-column: 1 / -1; }
     .footer__grid > *, .footer__identity, .brand--footer { min-width: 0; }
+    .footer__map { margin-top: 45px; padding: 42px 0; }
+    .footer__map-grid { grid-template-columns: 1fr; gap: 28px; }
+    .footer__map h2 { font-size: 32px; }
+    .footer__map iframe { min-height: 280px; }
     .footer__bottom { display: grid; }
     .consent-banner { right: 10px; bottom: 10px; left: 10px; grid-template-columns: 1fr; width: calc(100% - 20px); padding: 20px; }
     .consent-banner__actions { display: grid; grid-template-columns: 1fr 1fr; margin: 18px 0 0; }

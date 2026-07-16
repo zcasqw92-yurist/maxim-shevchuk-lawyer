@@ -139,6 +139,7 @@ try {
   else await dialogButton.click();
   const dialog = interactionPage.locator("#contact-dialog");
   if (!await dialog.evaluate((element) => element.open)) errors.push("interaction: contact dialog did not open");
+  if (await interactionPage.locator("[data-online-status]").count() < 2) errors.push("interaction: online status indicators are missing");
   const whatsappHref = await interactionPage.locator("#contact-dialog [data-whatsapp-link]").getAttribute("href");
   const telegramHref = await interactionPage.locator("#contact-dialog [data-track='telegram']").getAttribute("href");
   if (!whatsappHref?.startsWith("https://api.whatsapp.com/send?phone=79065297970&text=")) errors.push("interaction: WhatsApp link is missing prepared message");

@@ -40,7 +40,9 @@ export const site = {
     googleMeasurementId: "",
     yandexMetricaId: "",
   },
-  indexNowKey: env("INDEXNOW_KEY"),
+  // IndexNow проверяет ключ через опубликованный текстовый файл, поэтому ключ
+  // не является секретом. Переменная окружения может заменить его при переносе домена.
+  indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158",
   legacyRedirects: {
     "/dosudebnaya-pretenziya/": "/uslugi/dosudebnoe-uregulirovanie/",
     "/политика-конфиденциальности/": "/politika-konfidencialnosti/",

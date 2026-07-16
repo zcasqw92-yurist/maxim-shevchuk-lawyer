@@ -110,15 +110,31 @@ menuToggle?.addEventListener("click", () => {
 });
 
 const dialog = $("#contact-dialog");
+const defaultDialogCopy = "Напишите в удобный мессенджер, что произошло. Максим Юрьевич лично уточнит важные детали и подскажет, с чего начать.";
 const openDialog = (topic = "") => {
   if (!dialog) return;
+  const normalizedTopic = topic.trim();
   const whatsapp = $("[data-whatsapp-link]", dialog);
   if (whatsapp) {
-    const message = `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${topic ? ` по вопросу: ${topic}` : ""}. Кратко опишу ситуацию:`;
-    whatsapp.href = `https://api.whatsapp.com/send?phone=79065297970&text=${encodeURIComponent(message)}`;
+    const message = `Здравствуйте, Максим Юрьевич. Нужна юридическая консультация${normalizedTopic ? ` по вопросу: ${normalizedTopic}` : ""}. Кратко опишу ситуацию:`;
+    const whatsappUrl = new URL(whatsapp.href);
+    whatsappUrl.searchParams.set("text", message);
+    whatsapp.href = whatsappUrl.toString();
+  }
+  const topicLabel = $("[data-dialog-topic]", dialog);
+  const dialogCopy = $("[data-dialog-copy]", dialog);
+  dialog.dataset.topic = normalizedTopic || "general";
+  if (topicLabel) {
+    topicLabel.hidden = !normalizedTopic;
+    topicLabel.textContent = normalizedTopic ? `Вы выбрали: ${normalizedTopic}` : "";
+  }
+  if (dialogCopy) {
+    dialogCopy.textContent = normalizedTopic
+      ? "Опишите, что произошло, и приложите важные детали. Максим Юрьевич лично уточнит недостающее и подскажет, с чего начать."
+      : defaultDialogCopy;
   }
   dialog.showModal();
-  track("messenger_dialog_open", { topic: topic || "general", page_path: location.pathname });
+  track("messenger_dialog_open", { topic: normalizedTopic || "general", page_path: location.pathname });
 };
 
 $$('[data-dialog-open]').forEach((control) => {
@@ -133,10 +149,14 @@ dialog?.addEventListener("click", (event) => {
 });
 
 $$('[data-track]').forEach((link) => {
-  link.addEventListener("click", () => track("contact_click", {
-    channel: link.dataset.track,
-    page_path: location.pathname,
-  }));
+  link.addEventListener("click", () => {
+    const dialogTopic = link.closest("#contact-dialog")?.dataset.topic;
+    track("contact_click", {
+      channel: link.dataset.track,
+      page_path: location.pathname,
+      ...(dialogTopic ? { topic: dialogTopic } : {}),
+    });
+  });
 });
 
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {

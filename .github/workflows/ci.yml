@@ -112,7 +112,19 @@ jobs:
           retention-days: 3
 
       - name: Провести полный браузерный аудит
-        run: node scripts/browser-audit.mjs
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/browser-audit.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = 'args: chromiumBinary.args.concat(["--disable-background-networking", "--disable-extensions", "--font-render-hinting=none"]),'
+          new = 'args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-background-networking", "--disable-extensions", "--font-render-hinting=none"],'
+          if old not in text:
+              raise SystemExit('Не найдена строка запуска Chromium для аудита')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+          node scripts/browser-audit.mjs
 
       - name: Сохранить скриншоты браузерного аудита
         if: always()

@@ -10,6 +10,8 @@ import { injectSearchVisibility } from "../src/search-visibility.mjs";
 import { injectPrivacyPolicy } from "../src/privacy-policy.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
 import { injectVisualTrust } from "../src/visual-trust.mjs";
+import { injectOnDemandVideo } from "../src/video-ready.mjs";
+import { createVideoConfig, validateVideoAssets } from "../src/video-config.mjs";
 import {
   renderAbout,
   renderContacts,
@@ -79,6 +81,11 @@ if (site.production) {
   }
   const privacyContent = injectPrivacyPolicy(renderPrivacy().content, "/politika-konfidencialnosti");
   if (/заглушк|\[Указать/i.test(privacyContent)) launchErrors.push("замените черновик политики конфиденциальности");
+  try {
+    await validateVideoAssets(root);
+  } catch (error) {
+    launchErrors.push(error instanceof Error ? error.message : String(error));
+  }
   if (launchErrors.length) {
     throw new Error(`Публикация остановлена:\n- ${launchErrors.join("\n- ")}`);
   }
@@ -93,7 +100,8 @@ const writePage = async (pathname, options, context = {}) => {
   const withCases = injectCaseStudies(withGuarantees, pathname);
   const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
   const withVisualTrust = injectVisualTrust(withSearchVisibility, pathname);
-  const html = injectBuildMetadata(injectMobileActions(withVisualTrust, pathname));
+  const withVideo = injectOnDemandVideo(withVisualTrust, pathname);
+  const html = injectBuildMetadata(injectMobileActions(withVideo, pathname));
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };
@@ -131,6 +139,7 @@ const styles = [
   await readFile(join(root, "src", "search-visibility.css"), "utf8"),
   await readFile(join(root, "src", "mobile-actions.css"), "utf8"),
   await readFile(join(root, "src", "visual-trust.css"), "utf8"),
+  await readFile(join(root, "src", "video-ready.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
@@ -199,6 +208,7 @@ const manifest = {
 };
 await writeFile(join(dist, "site.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
 await writeFile(join(dist, "build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`, "utf8");
+await writeFile(join(dist, "video-config.json"), `${JSON.stringify(createVideoConfig(), null, 2)}\n`, "utf8");
 
 if (site.indexNowKey) {
   if (!/^[A-Za-z0-9-]{8,128}$/.test(site.indexNowKey)) {

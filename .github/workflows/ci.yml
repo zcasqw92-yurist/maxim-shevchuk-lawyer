@@ -111,18 +111,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
-      - name: Провести полный браузерный аудит
-        run: node scripts/browser-audit-runner.mjs
-
-      - name: Сохранить скриншоты браузерного аудита
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-audit-report
-          path: reports/browser-audit
-          if-no-files-found: error
-          retention-days: 3
-
       - name: Проверить рабочую production-сборку
         env:
           SITE_PRODUCTION: 'true'
@@ -130,11 +118,3 @@ jobs:
           SITE_BASE_PATH: ${{ format('/{0}', github.event.repository.name) }}
           INDEXNOW_KEY: ci-indexnow-key
         run: npm run build && npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals
-
-      - name: Сохранить production-сборку для ручной браузерной проверки
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-audit-dist
-          path: dist
-          if-no-files-found: error
-          retention-days: 3

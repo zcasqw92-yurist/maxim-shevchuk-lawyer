@@ -9,6 +9,7 @@ const escapeHtml = (value = "") => String(value)
 
 const closeIcon = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>';
 const arrowIcon = '<svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const webVitalsVersion = site.contentLastModified.replaceAll("-", "");
 
 const videoDialog = () => {
   const enabled = Boolean(site.video?.enabled);
@@ -34,6 +35,10 @@ export const injectOnDemandVideo = (html, pathname) => {
   let result = html.replace(
     /\s*<dialog class="video-placeholder-dialog"[\s\S]*?<\/dialog>/,
     videoDialog(),
+  );
+  result = result.replace(
+    "</head>",
+    `  <script type="module" src="${base}/assets/web-vitals.js?v=${webVitalsVersion}"></script>\n</head>`,
   );
 
   if (pathname !== "/") return result;

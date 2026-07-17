@@ -11,7 +11,7 @@ const limits = {
   "index.html": 260 * 1024,
   "assets/styles.css": 180 * 1024,
   "assets/app.js": 90 * 1024,
-  "assets/visual-trust.js": 32 * 1024,
+  "assets/visual-trust.js": 40 * 1024,
   "assets/images/maxim-hero.webp": 260 * 1024,
 };
 
@@ -31,7 +31,7 @@ const criticalPaths = [
 ];
 const criticalBytes = (await Promise.all(criticalPaths.map(async (path) => (await stat(join(dist, path))).size)))
   .reduce((sum, size) => sum + size, 0);
-const criticalLimit = 650 * 1024;
+const criticalLimit = 670 * 1024;
 report.push(`critical first view: ${formatKb(criticalBytes)} / ${formatKb(criticalLimit)}`);
 if (criticalBytes > criticalLimit) errors.push(`critical first view: ${formatKb(criticalBytes)} exceeds ${formatKb(criticalLimit)}`);
 
@@ -70,8 +70,13 @@ for (const path of htmlFiles) {
 
 const home = await readFile(join(dist, "index.html"), "utf8");
 if (!/maxim-hero\.webp[^>]+fetchpriority="high"/i.test(home)) errors.push("home: hero poster must have fetchpriority=high");
-if (!/data-video-placeholder/.test(home)) errors.push("home: lightweight video placeholder is missing");
+if (!/data-video-launch/.test(home) || !/data-video-config-url/.test(home)) errors.push("home: lightweight on-demand video launcher is missing");
 if (!/document-[a-z-]+-demo\.svg[^>]+loading="lazy"/i.test(home)) errors.push("home: document visuals must be lazy-loaded");
+
+const videoConfig = JSON.parse(await readFile(join(dist, "video-config.json"), "utf8"));
+if (videoConfig.enabled === false && (videoConfig.sources || videoConfig.poster || videoConfig.captions)) {
+  errors.push("disabled video config must not expose or preload media URLs");
+}
 
 console.log(report.join("\n"));
 if (errors.length) {

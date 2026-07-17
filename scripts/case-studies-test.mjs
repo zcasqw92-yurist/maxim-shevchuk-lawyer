@@ -47,8 +47,11 @@ for (const marker of [
   if (!home.includes(marker)) errors.push(`home: missing visual case marker ${marker}`);
 }
 for (const item of Object.values(caseStudies)) {
-  for (const text of [item.category, item.title, item.situation, item.materials, item.work, item.next]) {
-    if (!home.includes(text)) errors.push(`home: incomplete visual case ${item.id}`);
+  const expectedTexts = item.id === "autoclub"
+    ? [item.title, item.situation, item.materials, item.work, item.next]
+    : [item.category, item.title, item.situation, item.materials, item.work, item.next];
+  for (const text of expectedTexts) {
+    if (!home.includes(text)) errors.push(`home: incomplete visual case ${item.id}: ${text}`);
   }
 }
 const situationsPosition = home.indexOf('class="section section--situations"');

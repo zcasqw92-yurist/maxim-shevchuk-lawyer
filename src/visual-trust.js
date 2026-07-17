@@ -1,5 +1,6 @@
 const proofTrack = (event, params = {}) => {
-  if (Array.isArray(window.dataLayer)) window.dataLayer.push({ event, ...params });
+  if (document.body.dataset.analyticsEnabled !== "true") return;
+  if (typeof window.gtag === "function") window.gtag("event", event, params);
   const metricaId = Number(document.body.dataset.yandexMetricaId || 0);
   if (metricaId && typeof window.ym === "function") window.ym(metricaId, "reachGoal", event, params);
 };
@@ -51,14 +52,25 @@ document.querySelector("[data-video-placeholder]")?.addEventListener("click", ()
   videoDialog?.showModal();
   proofTrack("video_placeholder_open", { page_path: location.pathname });
 });
-document.querySelector("[data-video-placeholder-close]")?.addEventListener("click", () => videoDialog?.close());
-videoDialog?.addEventListener("click", (event) => {
-  if (event.target === videoDialog) videoDialog.close();
+document.querySelector("[data-video-placeholder-close]")?.addEventListener("click", () => {
+  videoDialog?.close();
+  proofTrack("video_placeholder_close", { page_path: location.pathname, close_method: "button" });
 });
-document.querySelector("[data-video-contact]")?.addEventListener("click", () => videoDialog?.close(), true);
+videoDialog?.addEventListener("click", (event) => {
+  if (event.target !== videoDialog) return;
+  videoDialog.close();
+  proofTrack("video_placeholder_close", { page_path: location.pathname, close_method: "backdrop" });
+});
+document.querySelector("[data-video-contact]")?.addEventListener("click", () => {
+  proofTrack("video_placeholder_contact", { page_path: location.pathname });
+  videoDialog?.close();
+}, true);
 
-const closeProofDialog = (dialog) => {
-  if (dialog?.open) dialog.close();
+const closeProofDialog = (dialog, closeMethod = "button") => {
+  if (!dialog?.open) return;
+  const sample = dialog.dataset.proofDialog || "unknown";
+  dialog.close();
+  proofTrack("document_sample_close", { sample, page_path: location.pathname, close_method: closeMethod });
 };
 
 document.querySelectorAll("[data-proof-open]").forEach((control) => {
@@ -73,9 +85,24 @@ document.querySelectorAll("[data-proof-open]").forEach((control) => {
 document.querySelectorAll("[data-proof-dialog]").forEach((dialog) => {
   dialog.querySelector("[data-proof-close]")?.addEventListener("click", () => closeProofDialog(dialog));
   dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) closeProofDialog(dialog);
+    if (event.target === dialog) closeProofDialog(dialog, "backdrop");
   });
-  dialog.querySelector("[data-dialog-open]")?.addEventListener("click", () => closeProofDialog(dialog), true);
+  dialog.querySelector("[data-dialog-open]")?.addEventListener("click", () => {
+    proofTrack("document_sample_contact", { sample: dialog.dataset.proofDialog || "unknown", page_path: location.pathname });
+    closeProofDialog(dialog, "contact");
+  }, true);
+});
+
+document.querySelectorAll(".visual-case details").forEach((details) => {
+  details.addEventListener("toggle", () => {
+    if (!details.open) return;
+    const title = details.closest(".visual-case")?.querySelector("h3")?.textContent?.trim() || "unknown";
+    proofTrack("case_details_open", { case_title: title, page_path: location.pathname });
+  });
+});
+
+document.querySelector(".about-proof")?.addEventListener("click", () => {
+  proofTrack("education_proof_open", { page_path: location.pathname });
 });
 
 document.querySelector("[data-map-load]")?.addEventListener("click", (event) => {

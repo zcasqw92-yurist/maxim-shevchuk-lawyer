@@ -54,7 +54,7 @@ jobs:
         run: npm run build
 
       - name: Validate generated site
-        run: npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready
+        run: npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

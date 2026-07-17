@@ -1,7 +1,13 @@
 /* Corrections verified in Chromium on desktop and mobile viewports. */
 @layer components {
   .hero-video { overflow: clip; }
-  .identity-card--video { right: 12px; bottom: 12px; }
+  .identity-card--video {
+    top: 112px;
+    right: auto;
+    bottom: auto;
+    left: 14px;
+    width: min(220px, 43%);
+  }
 
   .hero-video__poster img,
   .consultation-photo img,
@@ -18,6 +24,11 @@
   .cta-portrait > img { height: 94px; }
   .about-proof img { height: auto; object-fit: contain; }
   .contact-dialog { max-height: min(900px, calc(100dvh - 32px)); }
+
+  html[data-proof-motion="ready"] .section--cta-portrait .proof-reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @layer utilities {
@@ -40,6 +51,6 @@
 
     .cta-portrait > img { height: 64px; }
     .about-preview__seal { right: 10px; }
-    .identity-card--video { right: 8px; bottom: 10px; }
+    .identity-card--video { display: none; }
   }
 }

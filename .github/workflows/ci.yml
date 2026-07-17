@@ -111,6 +111,18 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
+      - name: Провести полный браузерный аудит
+        run: node scripts/browser-audit.mjs
+
+      - name: Сохранить скриншоты браузерного аудита
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-audit-report
+          path: reports/browser-audit
+          if-no-files-found: error
+          retention-days: 3
+
       - name: Проверить рабочую production-сборку
         env:
           SITE_PRODUCTION: 'true'

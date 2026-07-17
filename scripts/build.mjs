@@ -9,6 +9,7 @@ import { injectCaseStudies } from "../src/case-studies.mjs";
 import { injectSearchVisibility } from "../src/search-visibility.mjs";
 import { injectPrivacyPolicy } from "../src/privacy-policy.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
+import { injectVisualTrust } from "../src/visual-trust.mjs";
 import {
   renderAbout,
   renderContacts,
@@ -67,7 +68,8 @@ const writePage = async (pathname, options, context = {}) => {
   const withGuarantees = injectProcessGuarantees(withPrivacyPolicy, pathname);
   const withCases = injectCaseStudies(withGuarantees, pathname);
   const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
-  const html = injectMobileActions(withSearchVisibility, pathname);
+  const withVisualTrust = injectVisualTrust(withSearchVisibility, pathname);
+  const html = injectMobileActions(withVisualTrust, pathname);
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };
@@ -103,9 +105,11 @@ const styles = [
   await readFile(join(root, "src", "case-studies.css"), "utf8"),
   await readFile(join(root, "src", "search-visibility.css"), "utf8"),
   await readFile(join(root, "src", "mobile-actions.css"), "utf8"),
+  await readFile(join(root, "src", "visual-trust.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
+await cp(join(root, "src", "visual-trust.js"), join(dist, "assets", "visual-trust.js"));
 await cp(join(root, "public"), dist, { recursive: true });
 
 await writePage("/", renderHome());
@@ -121,20 +125,31 @@ for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})
 }
 
 const indexablePages = [
-  { path: "/", image: "/assets/images/maxim-hero.webp" },
-  { path: "/uslugi/", image: "/assets/images/maxim-documents.webp" },
-  ...services.map((service) => ({ path: `/uslugi/${service.slug}/`, image: "/assets/images/maxim-documents.webp" })),
-  { path: "/o-yuriste/", image: "/assets/images/maxim-documents.webp" },
-  { path: "/kontakty/", image: "/assets/images/maxim-consultation.webp" },
-  { path: "/politika-konfidencialnosti/" },
+  {
+    path: "/",
+    images: [
+      "/assets/images/maxim-hero.webp",
+      "/assets/images/document-pretenziya-demo.svg",
+      "/assets/images/document-police-demo.svg",
+      "/assets/images/document-claim-demo.svg",
+      "/assets/images/case-autoclub-demo.svg",
+      "/assets/images/case-engine-demo.svg",
+      "/assets/images/case-land-demo.svg",
+    ],
+  },
+  { path: "/uslugi/", images: ["/assets/images/maxim-documents.webp"] },
+  ...services.map((service) => ({ path: `/uslugi/${service.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
+  { path: "/o-yuriste/", images: ["/assets/images/maxim-documents.webp", "/assets/images/diploma-demo.svg"] },
+  { path: "/kontakty/", images: ["/assets/images/maxim-consultation.webp"] },
+  { path: "/politika-konfidencialnosti/", images: [] },
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${indexablePages.map(({ path, image }) => `  <url>
+${indexablePages.map(({ path, images = [] }) => `  <url>
     <loc>${xml(`${site.siteUrl}${path}`)}</loc>
-    <lastmod>${xml(site.contentLastModified)}</lastmod>${image ? `
-    <image:image><image:loc>${xml(`${site.siteUrl}${image}`)}</image:loc></image:image>` : ""}
+    <lastmod>${xml(site.contentLastModified)}</lastmod>${images.map((image) => `
+    <image:image><image:loc>${xml(`${site.siteUrl}${image}`)}</image:loc></image:image>`).join("")}
   </url>`).join("\n")}
 </urlset>\n`;
 await writeFile(join(dist, "sitemap.xml"), sitemap, "utf8");

@@ -28,6 +28,30 @@ const xml = (value) => String(value)
   .replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&apos;");
+const attr = (value) => String(value)
+  .replaceAll("&", "&amp;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;");
+
+const rawBuildSha = String(process.env.GITHUB_SHA || process.env.SITE_BUILD_SHA || "local").trim();
+const buildSha = /^[A-Za-z0-9._-]{1,64}$/.test(rawBuildSha) ? rawBuildSha : "local";
+const buildVersion = buildSha === "local" ? site.contentLastModified.replaceAll("-", "") : buildSha.slice(0, 12);
+const buildTime = String(process.env.SITE_BUILD_TIME || new Date().toISOString()).trim();
+const buildInfo = {
+  sha: buildSha,
+  version: buildVersion,
+  builtAt: buildTime,
+  contentLastModified: site.contentLastModified,
+  production: site.production,
+};
+
+const injectBuildMetadata = (html) => html
+  .replace(
+    "</head>",
+    `  <meta name="site-build-sha" content="${attr(buildSha)}">\n  <meta name="site-build-version" content="${attr(buildVersion)}">\n  <meta name="site-build-time" content="${attr(buildTime)}">\n</head>`,
+  )
+  .replace(/(\/assets\/(?:styles\.css|app\.js|visual-trust\.js))(["'])/g, `$1?v=${buildVersion}$2`);
 
 if (!/^\d{4}-\d{2}-\d{2}$/.test(site.contentLastModified)) {
   throw new Error("contentLastModified должен быть датой YYYY-MM-DD");
@@ -69,7 +93,7 @@ const writePage = async (pathname, options, context = {}) => {
   const withCases = injectCaseStudies(withGuarantees, pathname);
   const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
   const withVisualTrust = injectVisualTrust(withSearchVisibility, pathname);
-  const html = injectMobileActions(withVisualTrust, pathname);
+  const html = injectBuildMetadata(injectMobileActions(withVisualTrust, pathname));
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };
@@ -79,7 +103,7 @@ const writeRedirect = async (pathname, destination) => {
   const canonical = `${site.siteUrl}${destination}`;
   const localDestination = `${site.basePath || ""}${destination}`;
   await mkdir(dirname(output), { recursive: true });
-  await writeFile(output, `<!doctype html>
+  const html = injectBuildMetadata(`<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
@@ -93,7 +117,8 @@ const writeRedirect = async (pathname, destination) => {
 <body>
   <main id="main"><h1>Страница перемещена</h1><p><a href="${localDestination}">Перейти к актуальному материалу</a></p></main>
 </body>
-</html>`, "utf8");
+</html>`);
+  await writeFile(output, html, "utf8");
 };
 
 await rm(dist, { recursive: true, force: true });
@@ -173,6 +198,7 @@ const manifest = {
   icons: [{ src: `${site.basePath || ""}/favicon.svg`, sizes: "any", type: "image/svg+xml" }],
 };
 await writeFile(join(dist, "site.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
+await writeFile(join(dist, "build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`, "utf8");
 
 if (site.indexNowKey) {
   if (!/^[A-Za-z0-9-]{8,128}$/.test(site.indexNowKey)) {
@@ -187,4 +213,4 @@ const renderedNotFound = notFound
   .replace(/(\b(?:href|src)=["'])\/(?!\/)/g, `$1${site.basePath || ""}/`);
 await writeFile(join(dist, "404.html"), renderedNotFound, "utf8");
 
-console.log(`Built ${6 + services.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist}`);
+console.log(`Built ${6 + services.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist} · ${buildVersion}`);

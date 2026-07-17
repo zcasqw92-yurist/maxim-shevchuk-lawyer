@@ -90,6 +90,9 @@ jobs:
       - name: Проверить видео по требованию
         run: npm run test:video-ready
 
+      - name: Проверить Core Web Vitals
+        run: npm run test:core-web-vitals
+
       - name: Проверить вёрстку и взаимодействия
         shell: bash
         run: |
@@ -114,4 +117,4 @@ jobs:
           SITE_URL: ${{ format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
           SITE_BASE_PATH: ${{ format('/{0}', github.event.repository.name) }}
           INDEXNOW_KEY: ci-indexnow-key
-        run: npm run build && npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready
+        run: npm run build && npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals

@@ -22,6 +22,9 @@ jobs:
       SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || format('/{0}', github.event.repository.name) }}
       GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
       YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
+      SITE_ANALYTICS_ENABLED: ${{ vars.SITE_ANALYTICS_ENABLED || 'false' }}
+      GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
+      YANDEX_METRICA_ID: ${{ vars.YANDEX_METRICA_ID }}
       INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
     environment:
       name: github-pages
@@ -44,7 +47,7 @@ jobs:
         run: npm run build
 
       - name: Validate generated site
-        run: npm run validate && npm run audit:seo
+        run: npm run validate && npm run audit:seo && npm run test:deployment-observability
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -59,6 +62,12 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify published build
+        env:
+          SITE_PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_BUILD_SHA: ${{ github.sha }}
+        run: npm run test:live
 
       - name: Notify Yandex and IndexNow partners
         continue-on-error: true

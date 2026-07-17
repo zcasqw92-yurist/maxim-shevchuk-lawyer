@@ -33,6 +33,10 @@ source = source.replace(
   'desktop.locator("dialog[open] [data-dialog-close]").first().click()',
   'desktop.locator("[data-video-dialog] [data-video-close]").first().click()',
 );
+source = source.replace(
+  'desktop.locator("dialog[open] [data-dialog-close]").first().click()',
+  'desktop.locator("[data-proof-dialog][open] [data-proof-close]").first().click()',
+);
 
 await writeFile(runtimePath, source, "utf8");
 try {

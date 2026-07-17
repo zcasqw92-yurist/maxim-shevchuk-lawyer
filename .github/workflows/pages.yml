@@ -25,6 +25,13 @@ jobs:
       SITE_ANALYTICS_ENABLED: ${{ vars.SITE_ANALYTICS_ENABLED || 'false' }}
       GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
       YANDEX_METRICA_ID: ${{ vars.YANDEX_METRICA_ID }}
+      SITE_VIDEO_ENABLED: ${{ vars.SITE_VIDEO_ENABLED || 'false' }}
+      SITE_VIDEO_TITLE: ${{ vars.SITE_VIDEO_TITLE }}
+      SITE_VIDEO_DURATION: ${{ vars.SITE_VIDEO_DURATION }}
+      SITE_VIDEO_POSTER: ${{ vars.SITE_VIDEO_POSTER }}
+      SITE_VIDEO_WEBM: ${{ vars.SITE_VIDEO_WEBM }}
+      SITE_VIDEO_MP4: ${{ vars.SITE_VIDEO_MP4 }}
+      SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
       INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
     environment:
       name: github-pages
@@ -47,7 +54,7 @@ jobs:
         run: npm run build
 
       - name: Validate generated site
-        run: npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget
+        run: npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

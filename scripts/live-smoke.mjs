@@ -37,12 +37,18 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       `<meta name="site-build-sha" content="${expectedSha}">`,
       "section--document-samples",
       "section--featured-case",
-      "data-video-placeholder",
+      "data-video-launch",
+      "data-video-config-url",
       "data-price-quiz-step",
     ];
     for (const marker of requiredMarkers) {
       if (!html.includes(marker)) throw new Error(`home page is missing marker: ${marker}`);
     }
+
+    const videoResponse = await fetch(noCacheUrl("video-config.json"), { cache: "no-store", redirect: "follow" });
+    if (!videoResponse.ok) throw new Error(`video-config.json returned ${videoResponse.status}`);
+    const videoConfig = await videoResponse.json();
+    if (typeof videoConfig.enabled !== "boolean") throw new Error("video-config.json has no enabled boolean");
 
     console.log(`Published GitHub Pages build verified: ${expectedSha.slice(0, 12)} · ${base}`);
     process.exit(0);

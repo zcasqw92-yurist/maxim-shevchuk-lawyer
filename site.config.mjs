@@ -40,6 +40,15 @@ export const site = {
     googleMeasurementId: env("GOOGLE_ANALYTICS_ID"),
     yandexMetricaId: env("YANDEX_METRICA_ID"),
   },
+  video: {
+    enabled: env("SITE_VIDEO_ENABLED") === "true",
+    title: env("SITE_VIDEO_TITLE") || "Не знаете, с чего начать? Объясню за 45 секунд",
+    durationLabel: env("SITE_VIDEO_DURATION") || "45 секунд",
+    poster: env("SITE_VIDEO_POSTER") || "/assets/images/maxim-hero.webp",
+    webm: env("SITE_VIDEO_WEBM") || "/assets/video/intro.webm",
+    mp4: env("SITE_VIDEO_MP4") || "/assets/video/intro.mp4",
+    captions: env("SITE_VIDEO_CAPTIONS") || "/assets/video/intro-captions.vtt",
+  },
   // IndexNow проверяет ключ через опубликованный текстовый файл, поэтому ключ
   // не является секретом. Переменная окружения может заменить его при переносе домена.
   indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158",

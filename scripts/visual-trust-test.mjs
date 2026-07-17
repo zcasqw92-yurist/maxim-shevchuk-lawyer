@@ -13,7 +13,7 @@ const contacts = await read("dist/kontakty/index.html");
 const script = await read("dist/assets/visual-trust.js");
 
 for (const marker of [
-  "data-video-placeholder",
+  "data-video-launch",
   "trust-strip__grid",
   "section--document-samples",
   "section--featured-case",

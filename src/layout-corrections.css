@@ -1,0 +1,56 @@
+/* Corrections verified in Chromium on desktop and mobile viewports.
+   This file is intentionally unlayered so it overrides the layered base styles. */
+.hero-video { overflow: clip; }
+.identity-card--video { display: none; }
+
+.hero-video__poster img,
+.consultation-photo img,
+.about-preview__visual img,
+.about-hero__photo img,
+.document-sample__visual img,
+.featured-case__visual img,
+.visual-case figure img,
+.proof-dialog figure img,
+.video-ready-dialog__media > img {
+  height: auto;
+}
+
+.cta-portrait > img { height: 94px; }
+.about-proof img { height: auto; object-fit: contain; }
+.contact-dialog { max-height: min(900px, calc(100dvh - 32px)); }
+
+.section--cta-portrait {
+  display: block;
+  min-height: 220px;
+  padding: 0;
+  background: var(--ink-deep);
+}
+
+html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
+.section--cta-portrait .cta-portrait {
+  min-height: 220px;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+@media (max-width: 680px) {
+  .about-hero__copy { order: 1; }
+  .about-hero__photo { order: 2; width: 100%; }
+
+  .legal-page aside h1 {
+    font-size: clamp(2.15rem, 9vw, 2.65rem);
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+    text-wrap: wrap;
+  }
+
+  .document-samples__rail {
+    width: calc(100vw - ((100vw - var(--wrap)) / 2));
+    max-width: none;
+  }
+
+  .cta-portrait > img { height: 64px; }
+  .about-preview__seal { right: 10px; }
+}

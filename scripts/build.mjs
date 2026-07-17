@@ -140,6 +140,7 @@ const styles = [
   await readFile(join(root, "src", "mobile-actions.css"), "utf8"),
   await readFile(join(root, "src", "visual-trust.css"), "utf8"),
   await readFile(join(root, "src", "video-ready.css"), "utf8"),
+  await readFile(join(root, "src", "layout-corrections.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));

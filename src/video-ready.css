@@ -36,12 +36,6 @@
   .video-ready-dialog__copy h2 { font-size: clamp(2rem, 4vw, 3.25rem); }
   .video-ready-dialog__copy p { max-width: 680px; margin: 20px 0 27px; color: var(--muted); }
   .video-ready-dialog__copy .button { width: fit-content; }
-
-  /* Corrections found during the full desktop/mobile browser audit. */
-  .hero-video { overflow: clip; }
-  .identity-card--video { right: 12px; bottom: 12px; }
-  .about-proof img { height: auto; object-fit: contain; }
-  .contact-dialog { max-height: min(900px, calc(100dvh - 32px)); }
 }
 
 @layer utilities {
@@ -52,21 +46,5 @@
     .video-ready-dialog__player { max-height: 43dvh; aspect-ratio: 16 / 10; }
     .video-ready-dialog > .video-ready-dialog__copy { padding: 30px 22px; }
     .video-ready-dialog__copy .button { width: 100%; }
-
-    .about-hero__copy { order: 1; }
-    .about-hero__photo { order: 2; width: 100%; }
-    .legal-page aside h1 {
-      font-size: clamp(2.15rem, 9vw, 2.65rem);
-      overflow-wrap: normal;
-      word-break: normal;
-      hyphens: none;
-      text-wrap: wrap;
-    }
-    .document-samples__rail {
-      width: calc(100vw - ((100vw - var(--wrap)) / 2));
-      max-width: none;
-    }
-    .about-preview__seal { right: 10px; }
-    .identity-card--video { right: 8px; bottom: 10px; }
   }
 }

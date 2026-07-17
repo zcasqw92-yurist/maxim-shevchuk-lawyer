@@ -12,6 +12,7 @@ const limits = {
   "assets/styles.css": 180 * 1024,
   "assets/app.js": 90 * 1024,
   "assets/visual-trust.js": 40 * 1024,
+  "assets/web-vitals.js": 10 * 1024,
   "assets/images/maxim-hero.webp": 260 * 1024,
 };
 
@@ -27,11 +28,12 @@ const criticalPaths = [
   "assets/styles.css",
   "assets/app.js",
   "assets/visual-trust.js",
+  "assets/web-vitals.js",
   "assets/images/maxim-hero.webp",
 ];
 const criticalBytes = (await Promise.all(criticalPaths.map(async (path) => (await stat(join(dist, path))).size)))
   .reduce((sum, size) => sum + size, 0);
-const criticalLimit = 670 * 1024;
+const criticalLimit = 680 * 1024;
 report.push(`critical first view: ${formatKb(criticalBytes)} / ${formatKb(criticalLimit)}`);
 if (criticalBytes > criticalLimit) errors.push(`critical first view: ${formatKb(criticalBytes)} exceeds ${formatKb(criticalLimit)}`);
 

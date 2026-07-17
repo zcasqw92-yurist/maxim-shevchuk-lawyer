@@ -116,11 +116,11 @@ try {
     expectParts(`${profile.name}: topic WhatsApp`, textParam(whatsappHref), ["по вопросу: возврат денежных средств", "Кратко опишу ситуацию"]);
     await dialog.locator("[data-dialog-close]").click();
 
-    await page.locator(".section--case-studies [data-dialog-open]").click({ force: true });
+    await page.locator(".section--featured-case [data-dialog-open]").click({ force: true });
     telegramHref = await dialog.locator("a[data-track='telegram']").getAttribute("href") || "";
     whatsappHref = await dialog.locator("[data-whatsapp-link]").getAttribute("href") || "";
-    expectParts(`${profile.name}: case CTA Telegram`, textParam(telegramHref), ["похожая юридическая ситуация", "Кратко опишу ситуацию"]);
-    expectParts(`${profile.name}: case CTA WhatsApp`, textParam(whatsappHref), ["похожая юридическая ситуация", "Кратко опишу ситуацию"]);
+    expectParts(`${profile.name}: case CTA Telegram`, textParam(telegramHref), ["возврат денег по навязанной услуге", "Кратко опишу ситуацию"]);
+    expectParts(`${profile.name}: case CTA WhatsApp`, textParam(whatsappHref), ["возврат денег по навязанной услуге", "Кратко опишу ситуацию"]);
     await dialog.locator("[data-dialog-close]").click();
 
     await page.evaluate(() => document.querySelector("[data-price-quiz-open]")?.click());
@@ -189,4 +189,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Messenger intent test passed: generic, topic, case-study CTA, quiz and callback flows on desktop and mobile");
+console.log("Messenger intent test passed: generic, topic, featured-case CTA, quiz and callback flows on desktop and mobile");

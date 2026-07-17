@@ -35,10 +35,10 @@ export const site = {
     yandex: env("YANDEX_SITE_VERIFICATION"),
   },
   analytics: {
-    enabled: false,
+    enabled: env("SITE_ANALYTICS_ENABLED") === "true",
     requireConsent: true,
-    googleMeasurementId: "",
-    yandexMetricaId: "",
+    googleMeasurementId: env("GOOGLE_ANALYTICS_ID"),
+    yandexMetricaId: env("YANDEX_METRICA_ID"),
   },
   // IndexNow проверяет ключ через опубликованный текстовый файл, поэтому ключ
   // не является секретом. Переменная окружения может заменить его при переносе домена.

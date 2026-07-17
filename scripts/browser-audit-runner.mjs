@@ -22,10 +22,24 @@ const newPrepare = `    window.scrollTo(0, 0);
   const step = Math.max(420, Math.floor((viewport?.height || 844) * 0.72));
   for (let y = 0; y < pageHeight; y += step) {
     await page.evaluate((top) => window.scrollTo(0, top), y);
-    await page.waitForTimeout(45);
+    await page.waitForTimeout(60);
   }
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(160);
+  await page.evaluate(async () => {
+    const images = [...document.images];
+    await Promise.all(images.map(async (image) => {
+      if (!image.complete || image.naturalWidth === 0) {
+        await new Promise((resolve) => {
+          const timer = setTimeout(resolve, 5000);
+          const done = () => { clearTimeout(timer); resolve(); };
+          image.addEventListener("load", done, { once: true });
+          image.addEventListener("error", done, { once: true });
+        });
+      }
+      if (typeof image.decode === "function" && image.naturalWidth > 0) await image.decode().catch(() => {});
+    }));
+    window.scrollTo(0, 0);
+  });
+  await page.waitForTimeout(220);
 };`;
 if (!source.includes(oldPrepare)) throw new Error("Не найдена функция подготовки страницы");
 source = source.replace(oldPrepare, newPrepare);
@@ -36,6 +50,10 @@ source = source.replace(
 source = source.replace(
   'desktop.locator("dialog[open] [data-dialog-close]").first().click()',
   'desktop.locator("[data-proof-dialog][open] [data-proof-close]").first().click()',
+);
+source = source.replace(
+  'mobile.locator("#price-quiz-dialog [data-dialog-close]").first().click()',
+  'mobile.locator("#price-quiz-dialog [data-price-quiz-close]").first().click()',
 );
 
 await writeFile(runtimePath, source, "utf8");

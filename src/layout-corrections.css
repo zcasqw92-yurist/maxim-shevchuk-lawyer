@@ -1,13 +1,7 @@
 /* Corrections verified in Chromium on desktop and mobile viewports. */
 @layer components {
   .hero-video { overflow: clip; }
-  .identity-card--video {
-    top: 112px;
-    right: auto;
-    bottom: auto;
-    left: 14px;
-    width: min(220px, 43%);
-  }
+  .identity-card--video { display: none; }
 
   .hero-video__poster img,
   .consultation-photo img,
@@ -25,9 +19,19 @@
   .about-proof img { height: auto; object-fit: contain; }
   .contact-dialog { max-height: min(900px, calc(100dvh - 32px)); }
 
-  html[data-proof-motion="ready"] .section--cta-portrait .proof-reveal {
-    opacity: 1;
-    transform: none;
+  .section--cta-portrait {
+    display: block;
+    min-height: 220px;
+    padding: 0;
+    background: var(--ink-deep) !important;
+  }
+
+  html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
+  .section--cta-portrait .cta-portrait {
+    min-height: 220px;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
   }
 }
 
@@ -51,6 +55,5 @@
 
     .cta-portrait > img { height: 64px; }
     .about-preview__seal { right: 10px; }
-    .identity-card--video { display: none; }
   }
 }

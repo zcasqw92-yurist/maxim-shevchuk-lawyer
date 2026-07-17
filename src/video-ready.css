@@ -1,0 +1,49 @@
+/* Real video is created by JavaScript only after a deliberate click. */
+@layer components {
+  .video-ready-dialog { width: min(920px, calc(100% - 34px)); }
+  .video-ready-dialog__media {
+    position: relative;
+    display: grid;
+    min-height: min(52vw, 500px);
+    place-items: center;
+    overflow: hidden;
+    background: var(--ink-deep);
+  }
+  .video-ready-dialog__media > img,
+  .video-ready-dialog__player {
+    display: block;
+    width: 100%;
+    max-height: min(62dvh, 560px);
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center 30%;
+    background: var(--ink-deep);
+  }
+  .video-ready-dialog__player { outline: 0; }
+  .video-ready-dialog__loading {
+    position: absolute;
+    inset: auto 18px 18px;
+    width: fit-content;
+    padding: 8px 12px;
+    color: rgba(255,255,255,.82);
+    background: rgba(9,28,44,.82);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    font-size: 11px;
+  }
+  .video-ready-dialog__copy { padding: clamp(32px, 6vw, 62px); }
+  .video-ready-dialog__copy h2 { font-size: clamp(2rem, 4vw, 3.25rem); }
+  .video-ready-dialog__copy p { max-width: 680px; margin: 20px 0 27px; color: var(--muted); }
+  .video-ready-dialog__copy .button { width: fit-content; }
+}
+
+@layer utilities {
+  @media (max-width: 680px) {
+    .video-ready-dialog { width: calc(100% - 18px); max-height: calc(100dvh - 18px); }
+    .video-ready-dialog__media { min-height: 220px; }
+    .video-ready-dialog__media > img,
+    .video-ready-dialog__player { max-height: 43dvh; aspect-ratio: 16 / 10; }
+    .video-ready-dialog__copy { padding: 30px 22px; }
+    .video-ready-dialog__copy .button { width: 100%; }
+  }
+}

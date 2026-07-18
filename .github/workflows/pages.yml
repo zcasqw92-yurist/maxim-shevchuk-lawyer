@@ -56,6 +56,11 @@ jobs:
       - name: Validate generated site
         run: npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals
 
+      # Постоянная установка владельца: сайт и весь новый контент закрыты от
+      # индексации до отдельного прямого разрешения.
+      - name: Enforce site-wide indexing lock
+        run: npm run lock:indexing && npm run test:indexing-lock
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -76,6 +81,7 @@ jobs:
           EXPECTED_BUILD_SHA: ${{ github.sha }}
         run: npm run test:live
 
-      - name: Notify Yandex and IndexNow partners
-        continue-on-error: true
-        run: npm run submit:indexnow
+      - name: Verify published indexing lock
+        env:
+          SITE_PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
+        run: npm run test:live-indexing-lock

@@ -6,7 +6,7 @@
   "description": "Персональный сайт юриста Максима Юрьевича Шевчука",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual-trust && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:visual",
+    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual-trust && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:visual && npm run lock:indexing && npm run test:indexing-lock",
     "dev": "node scripts/server.mjs",
     "validate": "node scripts/validate.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
@@ -26,7 +26,10 @@
     "test:video-ready": "node scripts/video-ready-test.mjs",
     "test:core-web-vitals": "node scripts/core-web-vitals-test.mjs",
     "test:visual": "node scripts/visual-test.mjs",
+    "lock:indexing": "node scripts/lock-indexing.mjs",
+    "test:indexing-lock": "node scripts/indexing-lock-test.mjs",
     "test:live": "node scripts/live-smoke.mjs",
+    "test:live-indexing-lock": "node scripts/live-indexing-lock.mjs",
     "submit:indexnow": "node scripts/submit-indexnow.mjs"
   },
   "devDependencies": {

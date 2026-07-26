@@ -25,6 +25,8 @@
 .home .hero__content { padding-bottom: 20px; }
 .home .hero__lead { margin-top: 22px; }
 .home .hero__actions { margin-top: 26px; }
+.consent-banner__actions [data-consent-reject] { order: 1; }
+.consent-banner__actions [data-consent-accept] { order: 2; }
 
 @media (min-width: 901px) and (max-height: 820px) {
   .home .hero { padding-top: 24px; }

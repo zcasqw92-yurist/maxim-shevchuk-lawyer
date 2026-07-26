@@ -211,9 +211,14 @@
     .hero-video__copy strong { font-size: 25px; }
     .identity-card--video { right: 8px; bottom: 10px; }
 
-    .trust-strip__item { grid-template-columns: 28px minmax(0, 1fr); min-height: 116px; padding: 17px 13px; }
-    .trust-strip__item strong { font-size: 12px; }
-    .trust-strip__item small { font-size: 10px; }
+    .trust-strip__item { grid-template-columns: 28px minmax(0, 1fr); min-height: 148px; padding: 20px 14px; }
+    .trust-strip__item > span,
+    .trust-strip__item strong,
+    .trust-strip__item small { font-size: .875rem; }
+    .trust-strip__item div,
+    .trust-strip__item strong,
+    .trust-strip__item small { min-width: 0; overflow-wrap: anywhere; }
+    .trust-strip__item small { line-height: 1.5; hyphens: auto; }
 
     .document-samples__head, .visual-cases__head { grid-template-columns: 1fr; gap: 18px; margin-bottom: 32px; }
     .document-samples__rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-right: calc((100vw - var(--wrap)) / -2); padding-right: calc((100vw - var(--wrap)) / 2); }

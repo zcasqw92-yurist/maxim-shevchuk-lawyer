@@ -169,6 +169,48 @@ try {
       }
     }
     if (!keyboardFocused) errors.push(`interaction: online status is not keyboard reachable at ${width}px`);
+
+    const trustTypography = await targetPage.locator(".trust-strip").evaluate((strip) => {
+      const items = [...strip.querySelectorAll(".trust-strip__item")];
+      const sizes = items.flatMap((item) => [...item.querySelectorAll("strong, small")].map((node) => parseFloat(getComputedStyle(node).fontSize)));
+      return {
+        minSize: Math.min(...sizes),
+        clipped: items.some((item) => item.scrollHeight > item.clientHeight + 1 || item.scrollWidth > item.clientWidth + 1),
+        boxes: items.map((item) => ({
+          text: item.textContent.trim().replace(/\s+/g, " ").slice(0, 60),
+          clientWidth: item.clientWidth,
+          scrollWidth: item.scrollWidth,
+          clientHeight: item.clientHeight,
+          scrollHeight: item.scrollHeight,
+        })),
+      };
+    });
+    if (trustTypography.minSize < 14 || trustTypography.clipped) {
+      errors.push(`interaction: trust strip is unreadable at ${width}px ${JSON.stringify(trustTypography)}`);
+    }
+
+    await targetPage.addStyleTag({ content: `
+      html { font-size: 200% !important; }
+      * { line-height: 1.5 !important; letter-spacing: .12em !important; word-spacing: .16em !important; }
+    ` });
+    const enlargedTrust = await targetPage.locator(".trust-strip").evaluate((strip) => {
+      const items = [...strip.querySelectorAll(".trust-strip__item")];
+      return {
+        scrollWidth: document.documentElement.scrollWidth,
+        viewport: document.documentElement.clientWidth,
+        clipped: items.some((item) => item.scrollHeight > item.clientHeight + 1 || item.scrollWidth > item.clientWidth + 1),
+        boxes: items.map((item) => ({
+          text: item.textContent.trim().replace(/\s+/g, " ").slice(0, 60),
+          clientWidth: item.clientWidth,
+          scrollWidth: item.scrollWidth,
+          clientHeight: item.clientHeight,
+          scrollHeight: item.scrollHeight,
+        })),
+      };
+    });
+    if (enlargedTrust.clipped || enlargedTrust.scrollWidth > enlargedTrust.viewport + 1) {
+      errors.push(`interaction: trust strip fails 200% text spacing at ${width}px ${JSON.stringify(enlargedTrust)}`);
+    }
     await targetPage.close();
   }
 

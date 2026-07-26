@@ -35,14 +35,29 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const html = await pageResponse.text();
     const requiredMarkers = [
       `<meta name="site-build-sha" content="${expectedSha}">`,
-      "section--document-samples",
-      "section--featured-case",
-      "data-video-launch",
-      "data-video-config-url",
+      "trust-strip__grid",
+      "section--value-editorial",
+      "section--cta-portrait",
       "data-price-quiz-step",
     ];
     for (const marker of requiredMarkers) {
       if (!html.includes(marker)) throw new Error(`home page is missing marker: ${marker}`);
+    }
+    const forbiddenMarkers = [
+      "section--document-samples",
+      "section--featured-case",
+      "section--visual-cases",
+      "section--case-studies",
+      "data-video-launch",
+      "data-video-dialog",
+      "data-proof-dialog",
+      "Видео готовится",
+      "Демо-макет",
+      "Демо-визуал",
+      "-demo.svg",
+    ];
+    for (const marker of forbiddenMarkers) {
+      if (html.includes(marker)) throw new Error(`home page exposes unconfirmed material: ${marker}`);
     }
 
     const videoResponse = await fetch(noCacheUrl("video-config.json"), { cache: "no-store", redirect: "follow" });

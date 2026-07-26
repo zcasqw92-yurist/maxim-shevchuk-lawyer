@@ -94,15 +94,7 @@ const insertAfterRequired = (html, pattern, insertion, label) => {
 };
 
 export const injectCaseStudies = (html, pathname) => {
-  const ids = pageCaseIds[pathname];
-  if (!ids?.length) return html;
-  if (html.includes('class="section section--case-studies"')) {
-    throw new Error(`Блок примеров работы уже присутствует: ${pathname}`);
-  }
-
-  const block = caseStudiesBlock(ids, pathname);
-  if (pathname === "/") {
-    return insertAfterRequired(html, /<section class="section section--services">[\s\S]*?<\/section>/, block, "главная страница");
-  }
-  return insertAfterRequired(html, /<section class="section section--process">[\s\S]*?<\/section>/, block, `страница услуги ${pathname}`);
+  // Реальные материалы по этим примерам пока не подтверждены владельцем.
+  // Данные сохранены в исходниках для последующей проверки, но не публикуются.
+  return html;
 };

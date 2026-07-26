@@ -163,19 +163,11 @@ for (const [pathname, destination] of Object.entries(site.legacyRedirects || {})
 const indexablePages = [
   {
     path: "/",
-    images: [
-      "/assets/images/maxim-hero.webp",
-      "/assets/images/document-pretenziya-demo.svg",
-      "/assets/images/document-police-demo.svg",
-      "/assets/images/document-claim-demo.svg",
-      "/assets/images/case-autoclub-demo.svg",
-      "/assets/images/case-engine-demo.svg",
-      "/assets/images/case-land-demo.svg",
-    ],
+    images: ["/assets/images/maxim-hero.webp"],
   },
   { path: "/uslugi/", images: ["/assets/images/maxim-documents.webp"] },
   ...services.map((service) => ({ path: `/uslugi/${service.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
-  { path: "/o-yuriste/", images: ["/assets/images/maxim-documents.webp", "/assets/images/diploma-demo.svg"] },
+  { path: "/o-yuriste/", images: ["/assets/images/maxim-documents.webp", "/assets/images/maxim-diploma.webp"] },
   { path: "/kontakty/", images: ["/assets/images/maxim-consultation.webp"] },
   { path: "/politika-konfidencialnosti/", images: [] },
 ];

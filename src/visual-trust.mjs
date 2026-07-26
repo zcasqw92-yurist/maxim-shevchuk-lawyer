@@ -223,8 +223,7 @@ const interactiveOffice = () => `
     <section class="footer__map footer__map--interactive" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${escapeHtml(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу.</p><a class="text-link" href="${escapeHtml(site.publicOffice.mapUrl)}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><button class="map-poster" type="button" data-map-load aria-label="Загрузить интерактивную карту офиса">${icon("pin")}<span><small>Интерактивная карта не загружена</small><strong>Показать офис на карте</strong><em>Загрузится только после нажатия</em></span></button></div></section>`;
 
 const injectGlobalAssets = (html) => html
-  .replace('</head>', `  <script type="module" src="${base}/assets/visual-trust.js"></script>\n</head>`)
-  .replace('</body>', `${videoDialog()}\n${proofDialogs()}\n</body>`);
+  .replace('</head>', `  <script type="module" src="${base}/assets/visual-trust.js"></script>\n</head>`);
 
 const injectFooterMap = (html, pathname) => {
   if (!site.publicOffice?.enabled) return html;
@@ -235,27 +234,21 @@ const injectFooterMap = (html, pathname) => {
 
 const injectHomeArchitecture = (html) => {
   let result = html;
-  result = replaceRequired(result, /\s*<div class="hero__visual">[\s\S]*?<div class="identity-card">[\s\S]*?<\/div>\s*<\/div>/, videoHero(), "видеопостер первого экрана");
   result = insertAfterRequired(result, /<section class="hero">[\s\S]*?<\/section>/, trustStrip(), "полоса доверия");
 
   const guarantees = result.match(/\s*<section class="section section--process-guarantees"[\s\S]*?<\/section>/)?.[0] || "";
   if (!guarantees) throw new Error("Не найден блок гарантий для переноса к стоимости");
   result = result.replace(guarantees, "");
 
-  result = insertAfterRequired(result, /<section class="contact-path[^\"]*"[\s\S]*?<\/section>/, documentSamplesBlock(), "образцы документов");
-
-  const oldCases = result.match(/\s*<section class="section section--case-studies"[\s\S]*?<\/section>/)?.[0] || "";
-  if (!oldCases) throw new Error("Не найден исходный блок кейсов");
-  result = result.replace(oldCases, "");
-  result = insertAfterRequired(result, /<section class="section section--situations">[\s\S]*?<\/section>/, featuredCase(), "главный кейс");
-  result = insertAfterRequired(result, /<section class="section section--services">[\s\S]*?<\/section>/, secondaryCases(), "дополнительные кейсы");
+  // Неподтверждённые кейсы и образцы не публикуются. Этот защитный проход
+  // также удаляет устаревший блок, если он вернётся из более раннего шаблона.
+  result = result.replace(/\s*<section class="section section--case-studies"[\s\S]*?<\/section>/, "");
 
   result = replaceRequired(result, /\s*<section class="section section--value">[\s\S]*?<\/section>/, valueBlock(), "результат работы");
   result = insertAfterRequired(result, /<section class="section section--prices"[^>]*>[\s\S]*?<\/section>/, guarantees, "гарантии после стоимости");
 
   const aboutButton = `<a class="button button--secondary" href="${base}/o-yuriste/"`;
-  if (result.includes(aboutButton)) result = result.replace(aboutButton, `${diplomaProof()}\n            ${aboutButton}`);
-  else throw new Error("Не найдено место для подтверждения образования");
+  if (!result.includes(aboutButton)) throw new Error("Не найдена ссылка на сведения об образовании");
 
   result = replaceRequired(result, /\s*<section class="section section--cta">[\s\S]*?<\/section>/, finalCta(), "финальный призыв");
   return result;

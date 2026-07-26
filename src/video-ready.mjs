@@ -34,13 +34,14 @@ const videoDialog = () => {
 export const injectOnDemandVideo = (html, pathname) => {
   let result = html.replace(
     /\s*<dialog class="video-placeholder-dialog"[\s\S]*?<\/dialog>/,
-    videoDialog(),
+    site.video?.enabled ? videoDialog() : "",
   );
   result = result.replace(
     "</head>",
     `  <script type="module" src="${base}/assets/web-vitals.js?v=${webVitalsVersion}"></script>\n</head>`,
   );
 
+  if (!site.video?.enabled) return result;
   if (pathname !== "/") return result;
   const configUrl = `${base}/video-config.json`;
   result = result.replace(

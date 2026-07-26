@@ -14,10 +14,11 @@ const styles = await readFile(join(dist, "assets", "styles.css"), "utf8");
 
 if (config.enabled !== false) errors.push("video-config.json: video must remain disabled without explicit variable");
 if ("sources" in config || "poster" in config || "captions" in config) errors.push("video-config.json: disabled config must not expose media URLs");
-if (!home.includes("data-video-launch")) errors.push("home: video launcher is missing");
-if (!home.includes("data-video-config-url=")) errors.push("home: video config URL is missing");
-if (!home.includes("data-video-dialog")) errors.push("home: video dialog is missing");
-if (!home.includes("data-video-stage")) errors.push("home: dynamic video stage is missing");
+if (home.includes("data-video-launch")) errors.push("home: disabled video must not expose a launcher");
+if (home.includes("data-video-config-url=")) errors.push("home: disabled video must not expose a config URL");
+if (home.includes("data-video-dialog")) errors.push("home: disabled video must not expose a dialog");
+if (home.includes("data-video-stage")) errors.push("home: disabled video must not expose a dynamic stage");
+if (home.includes("Видео готовится") || home.includes("Здесь будет короткое")) errors.push("home: must not promise unpublished future video");
 if (/<video\b/i.test(home)) errors.push("home: video element must not exist before user action");
 if (/\.(?:mp4|webm)(?:[?\"'])/i.test(home)) errors.push("home: media URL must not exist before user action");
 
@@ -65,4 +66,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("On-demand video checks passed: disabled fallback, no eager media, accessible player factory and production asset guard");
+console.log("On-demand video checks passed: disabled UI is absent, no eager media, and production asset guard is active");

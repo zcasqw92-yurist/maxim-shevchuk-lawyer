@@ -319,9 +319,11 @@ try {
         await runAxe(page, `${profile.name} / price-quiz`);
         await page.locator("[data-price-quiz-close]").click();
 
-        await page.locator("[data-proof-open]").first().click();
-        await runAxe(page, `${profile.name} / proof-dialog`);
-        await page.locator("[data-proof-close]").first().click();
+        if (await page.locator("[data-proof-open]").count()) {
+          await page.locator("[data-proof-open]").first().click();
+          await runAxe(page, `${profile.name} / proof-dialog`);
+          await page.locator("[data-proof-close]").first().click();
+        }
 
         if (profile.isMobile) {
           await page.evaluate(() => window.scrollTo(0, 0));
@@ -356,9 +358,11 @@ try {
         await auditMobileTypography(page, `${width}px / price-quiz`, "#price-quiz-dialog");
         await page.locator("[data-price-quiz-close]").click();
 
-        await page.locator("[data-proof-open]").first().click();
-        await auditMobileTypography(page, `${width}px / proof-dialog`, ".proof-dialog[open]");
-        await page.locator("[data-proof-close]").first().click();
+        if (await page.locator("[data-proof-open]").count()) {
+          await page.locator("[data-proof-open]").first().click();
+          await auditMobileTypography(page, `${width}px / proof-dialog`, ".proof-dialog[open]");
+          await page.locator("[data-proof-close]").first().click();
+        }
       }
       await page.close();
     }

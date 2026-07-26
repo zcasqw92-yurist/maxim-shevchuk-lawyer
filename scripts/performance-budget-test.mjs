@@ -72,8 +72,8 @@ for (const path of htmlFiles) {
 
 const home = await readFile(join(dist, "index.html"), "utf8");
 if (!/maxim-hero\.webp[^>]+fetchpriority="high"/i.test(home)) errors.push("home: hero poster must have fetchpriority=high");
-if (!/data-video-launch/.test(home) || !/data-video-config-url/.test(home)) errors.push("home: lightweight on-demand video launcher is missing");
-if (!/document-[a-z-]+-demo\.svg[^>]+loading="lazy"/i.test(home)) errors.push("home: document visuals must be lazy-loaded");
+if (/data-video-launch|data-video-config-url/.test(home)) errors.push("home: disabled unpublished video UI must be absent");
+if (/(?:document|case)-[a-z-]+-demo\.svg|diploma-demo\.svg/i.test(home)) errors.push("home: unconfirmed demo visuals must be absent");
 
 const videoConfig = JSON.parse(await readFile(join(dist, "video-config.json"), "utf8"));
 if (videoConfig.enabled === false && (videoConfig.sources || videoConfig.poster || videoConfig.captions)) {

@@ -1,5 +1,6 @@
 import { site } from "../site.config.mjs";
 import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
+import { fillBuildSlot } from "./html-slots.mjs";
 
 const escapeHtml = (value = "") => String(value)
   .replaceAll("&", "&amp;")
@@ -223,12 +224,6 @@ const serviceBlock = (service) => {
   </section>`;
 };
 
-const insertBefore = (html, marker, insertion, label) => {
-  const index = html.indexOf(marker);
-  if (index < 0) throw new Error(`Не найдено место для экспертного блока: ${label}`);
-  return `${html.slice(0, index)}${insertion}\n${html.slice(index)}`;
-};
-
 export const injectSearchVisibility = (html, pathname, service = null) => {
   // На главной ссылки и краткие объяснения уже находятся в видимом каталоге
   // направлений. Подробные материалы остаются на страницах услуг.
@@ -236,10 +231,10 @@ export const injectSearchVisibility = (html, pathname, service = null) => {
 
   if (html.includes("data-search-visibility=")) throw new Error(`Экспертный поисковый блок уже добавлен: ${pathname}`);
   if (pathname === "/uslugi") {
-    return insertBefore(html, '<section class="section section--prices"', directoryBlock(), "каталог услуг");
+    return fillBuildSlot(html, "services-guide", directoryBlock());
   }
   if (service) {
-    return insertBefore(html, '<section class="section section--consultation">', serviceBlock(service), `услуга ${service.slug}`);
+    return fillBuildSlot(html, "service-guide", serviceBlock(service));
   }
   return html;
 };

@@ -6,11 +6,12 @@
   "description": "Персональный сайт юриста Максима Юрьевича Шевчука",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:online-status && npm run test:accessibility && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual-trust && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:visual && npm run lock:indexing && npm run test:indexing-lock",
+    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:composition-contract && npm run test:online-status && npm run test:accessibility && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual-trust && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:visual && npm run lock:indexing && npm run test:indexing-lock",
     "dev": "node scripts/server.mjs",
     "validate": "node scripts/validate.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "test:accessibility": "node scripts/accessibility-test.mjs",
+    "test:composition-contract": "node scripts/composition-contract-test.mjs",
     "test:content-dates": "node scripts/content-dates-test.mjs",
     "test:online-status": "node scripts/online-status-test.mjs",
     "test:quick-choices": "node scripts/quick-choices-test.mjs",

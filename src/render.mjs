@@ -1,5 +1,6 @@
 import { site } from "../site.config.mjs";
 import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
+import { buildSlot } from "./html-slots.mjs";
 import { faqs, services } from "./data.mjs";
 
 const esc = (value = "") =>
@@ -147,7 +148,7 @@ const footer = (pageLastModified) => `
         <button class="text-link" type="button" data-dialog-open>Описать ситуацию ${icon("arrow")}</button>
       </div>
     </div>
-    ${hasPublicOffice() ? `<section class="footer__map" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${esc(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу в мессенджер.</p><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><iframe src="https://yandex.ru/map-widget/v1/?z=12&amp;ol=biz&amp;oid=118077889231" width="560" height="400" frameborder="0" loading="lazy" title="Офис юридической практики Максима Шевчука на Яндекс Картах"></iframe></div></section>` : ""}
+    ${buildSlot("footer-map")}
     <div class="wrap footer__bottom">
       <p>© ${new Date().getFullYear()} Максим Юрьевич Шевчук</p>
       <p>Страница проверена <time datetime="${pageLastModified}">${formatContentDate(pageLastModified)}</time>. Информация не является гарантией результата по конкретному делу.</p>
@@ -264,10 +265,7 @@ const priceQuizDialog = () => `
     </div>
   </dialog>`;
 
-const stickyContact = () => `
-  <div class="mobile-contact" aria-label="Быстрые действия" data-mobile-contact>
-    <button type="button" data-dialog-open>${icon("dialog")}Описать ситуацию</button>
-  </div>`;
+const stickyContact = () => buildSlot("mobile-actions");
 
 const consentBanner = () => site.analytics?.enabled && site.analytics?.requireConsent ? `
   <aside class="consent-banner" data-consent-banner hidden aria-labelledby="consent-title">
@@ -452,6 +450,7 @@ export const renderShell = ({
   <link rel="stylesheet" href="/assets/styles.css">
   <script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": graph }).replaceAll("<", "\\u003c")}</script>
   <script type="module" src="/assets/app.js"></script>
+  ${buildSlot("head-assets")}
 </head>
 <body class="${bodyClass}" data-preview="${site.production ? "false" : "true"}" data-analytics-enabled="${site.analytics?.enabled ? "true" : "false"}" data-analytics-requires-consent="${site.analytics?.requireConsent ? "true" : "false"}" data-google-analytics-id="${esc(site.analytics?.googleMeasurementId || "")}" data-yandex-metrica-id="${esc(site.analytics?.yandexMetricaId || "")}">
   <div class="scroll-progress" aria-hidden="true" data-scroll-progress></div>
@@ -460,6 +459,7 @@ export const renderShell = ({
   ${footer(pageLastModified)}
   ${dialog()}
   ${priceQuizDialog()}
+  ${buildSlot("video-dialog")}
   ${stickyContact()}
   ${consentBanner()}
 </body>
@@ -612,6 +612,7 @@ export const renderHome = () => ({
         </div>
       </div>
     </section>
+    ${buildSlot("home-trust")}
 
     ${contactPath("contact-path--home")}
 
@@ -648,7 +649,7 @@ export const renderHome = () => ({
       </div>
     </section>
 
-    ${valueBlock()}
+    ${buildSlot("home-value")}
     ${priceBlock()}
 
     <section class="section section--about-preview">
@@ -674,7 +675,7 @@ export const renderHome = () => ({
         ${faqBlock()}
       </div>
     </section>
-    ${cta()}
+    ${buildSlot("home-cta")}
   `,
 });
 
@@ -689,7 +690,9 @@ export const renderServices = () => {
     content: `
       ${breadcrumbs(crumbs)}
       <section class="inner-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">Направления практики</span><h1>Юридическая помощь, собранная под вашу ситуацию</h1><p>Выберите направление, чтобы увидеть логику работы, необходимые материалы и возможный результат подготовки.</p></div><div class="inner-hero__aside"><span>Важно</span><p>Окончательная услуга и состав требований определяются после проверки документов, а не по одному названию проблемы.</p></div></div></section>
+      ${buildSlot("services-guarantees")}
       <section class="section section--services"><div class="wrap">${serviceCards()}</div></section>
+      ${buildSlot("services-guide")}
       ${priceBlock()}
       <section class="section section--dark compact-dark"><div class="wrap compact-dark__grid"><div><span class="eyebrow eyebrow--light">Не нашли точного совпадения?</span><h2>Описать факты полезнее, чем самостоятельно выбирать документ</h2></div><div><p>Иногда вместо претензии нужна жалоба, вместо заявления в полицию — гражданский иск, а до документа необходим анализ доказательств.</p><button class="button button--gold" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button></div></div></section>
       ${cta("Начнём с правильной квалификации", "Коротко изложите хронологию и сообщите, что подтверждается документами, платежами или перепиской.")}
@@ -731,11 +734,13 @@ export const renderService = (service) => {
         </div>
       </section>
       ${contactPath("contact-path--service")}
+      ${buildSlot("service-guarantees")}
       <section class="section"><div class="wrap two-lists">
         <div class="reveal"><span class="eyebrow">Когда это направление подходит</span><h2>Типовые исходные ситуации</h2><ul class="number-list">${service.problems.map((item, i) => `<li><span>0${i + 1}</span><p>${esc(item)}</p></li>`).join("")}</ul></div>
         <div class="paper-panel reveal"><span class="eyebrow">Что входит в результат</span><h2>Позиция, которой можно пользоваться</h2><ul class="plain-checks">${service.result.map((item) => `<li>${icon("check")}<span>${esc(item)}</span></li>`).join("")}</ul><p class="paper-panel__note">Точный состав документа и требований зависит от правовой квалификации конкретных обстоятельств.</p></div>
       </div></section>
       <section class="section section--process"><div class="wrap"><div class="section-head reveal"><span class="eyebrow">Последовательность</span><h2>Как строится работа</h2></div><ol class="process-line"><li><span>01</span><strong>Материалы</strong><p>Вы передаёте краткую хронологию и имеющиеся документы.</p></li><li><span>02</span><strong>Анализ</strong><p>Определяю факты, доказательства и применимые основания.</p></li><li><span>03</span><strong>Позиция</strong><p>Согласовываем требования и ожидаемый результат.</p></li><li><span>04</span><strong>Документ</strong><p>Получаете готовый текст и пояснение дальнейших шагов.</p></li></ol></div></section>
+      ${buildSlot("service-guide")}
       <section class="section section--consultation"><div class="wrap consultation-grid consultation-grid--reverse"><div class="consultation-copy reveal"><span class="eyebrow">Персональная работа</span><h2>Документ готовит Максим Юрьевич</h2><p class="lead">Формулировки связываются с вашими фактами и приложениями. После подготовки вы понимаете не только что направить, но и как реагировать на дальнейшее развитие спора.</p><div class="education-note">${icon("education")}<div><strong>Профильное образование</strong><span>Российский государственный университет правосудия</span></div></div>${button("О юристе", "/o-yuriste/", "secondary")}</div><div class="consultation-photo reveal"><img src="/assets/images/maxim-documents.webp" width="971" height="1600" loading="lazy" decoding="async" alt="Юрист Максим Шевчук работает с документами"></div></div></section>
       <section class="section section--services"><div class="wrap"><div class="section-head section-head--split reveal"><div><span class="eyebrow">Связанные вопросы</span><h2>Другие этапы защиты позиции</h2></div><p>Один спор может последовательно потребовать претензию, обращение в орган и иск. Перейдите к смежному направлению, чтобы увидеть его задачу.</p></div>${relatedServiceCards(service.related)}</div></section>
       ${cta(`Обсудить: ${service.name.toLowerCase()}`, "Опишите обстоятельства и перечислите документы. Вопрос можно сформулировать обычными словами.")}

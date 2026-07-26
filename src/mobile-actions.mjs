@@ -1,3 +1,5 @@
+import { fillBuildSlot } from "./html-slots.mjs";
+
 const icon = (name) => {
   const paths = {
     dialog: '<path d="M5 6h14v9H9l-4 4V6Z"/><path d="M8 10h8M8 13h5"/>',
@@ -17,8 +19,6 @@ const mobileActionsMarkup = `
   </div>`;
 
 export const injectMobileActions = (html, pathname) => {
-  const pattern = /\n\s*<div class="mobile-contact" aria-label="Быстрые действия" data-mobile-contact>[\s\S]*?<\/div>/;
-  if (!pattern.test(html)) throw new Error(`Не найдена мобильная панель действий: ${pathname}`);
-  if ((html.match(/data-mobile-contact/g) || []).length !== 1) throw new Error(`Нарушена уникальность мобильной панели: ${pathname}`);
-  return html.replace(pattern, mobileActionsMarkup);
+  if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);
+  return fillBuildSlot(html, "mobile-actions", mobileActionsMarkup);
 };

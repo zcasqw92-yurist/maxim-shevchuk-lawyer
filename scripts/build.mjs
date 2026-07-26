@@ -7,6 +7,7 @@ import { composeRenderedPage } from "../src/page-composer.mjs";
 import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
 import { injectCaseStudies } from "../src/case-studies.mjs";
 import { contentDateForPath } from "../src/content-dates.mjs";
+import { appendToBuildSlot, buildSlot, finalizeBuildSlots } from "../src/html-slots.mjs";
 import { injectSearchVisibility } from "../src/search-visibility.mjs";
 import { injectPrivacyPolicy } from "../src/privacy-policy.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
@@ -49,11 +50,11 @@ const buildInfo = {
   production: site.production,
 };
 
-const injectBuildMetadata = (html) => html
-  .replace(
-    "</head>",
-    `  <meta name="site-build-sha" content="${attr(buildSha)}">\n  <meta name="site-build-version" content="${attr(buildVersion)}">\n  <meta name="site-build-time" content="${attr(buildTime)}">\n</head>`,
-  )
+const injectBuildMetadata = (html) => appendToBuildSlot(
+  html,
+  "head-assets",
+  `  <meta name="site-build-sha" content="${attr(buildSha)}">\n  <meta name="site-build-version" content="${attr(buildVersion)}">\n  <meta name="site-build-time" content="${attr(buildTime)}">\n`,
+)
   .replace(/(\/assets\/(?:styles\.css|app\.js|visual-trust\.js))(["'])/g, `$1?v=${buildVersion}$2`);
 
 if (!/^\d{4}-\d{2}-\d{2}$/.test(site.contentLastModified)) {
@@ -102,7 +103,10 @@ const writePage = async (pathname, options, context = {}) => {
   const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
   const withVisualTrust = injectVisualTrust(withSearchVisibility, pathname);
   const withVideo = injectOnDemandVideo(withVisualTrust, pathname);
-  const html = injectBuildMetadata(injectMobileActions(withVideo, pathname));
+  const html = finalizeBuildSlots(
+    injectBuildMetadata(injectMobileActions(withVideo, pathname)),
+    pathname,
+  );
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html, "utf8");
 };
@@ -112,7 +116,7 @@ const writeRedirect = async (pathname, destination) => {
   const canonical = `${site.siteUrl}${destination}`;
   const localDestination = `${site.basePath || ""}${destination}`;
   await mkdir(dirname(output), { recursive: true });
-  const html = injectBuildMetadata(`<!doctype html>
+  const html = finalizeBuildSlots(injectBuildMetadata(`<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
@@ -122,11 +126,12 @@ const writeRedirect = async (pathname, destination) => {
   <link rel="canonical" href="${canonical}">
   <title>Страница перемещена | Максим Шевчук</title>
   <meta name="description" content="Материал перемещён на актуальную страницу сайта юридической практики Максима Шевчука.">
+  ${buildSlot("head-assets")}
 </head>
 <body>
   <main id="main"><h1>Страница перемещена</h1><p><a href="${localDestination}">Перейти к актуальному материалу</a></p></main>
 </body>
-</html>`);
+</html>`), pathname);
   await writeFile(output, html, "utf8");
 };
 

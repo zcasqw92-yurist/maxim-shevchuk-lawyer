@@ -1,4 +1,5 @@
 import { site } from "../site.config.mjs";
+import { appendToBuildSlot, fillBuildSlot } from "./html-slots.mjs";
 
 const base = site.basePath || "";
 const escapeHtml = (value = "") => String(value)
@@ -32,13 +33,15 @@ const videoDialog = () => {
 };
 
 export const injectOnDemandVideo = (html, pathname) => {
-  let result = html.replace(
-    /\s*<dialog class="video-placeholder-dialog"[\s\S]*?<\/dialog>/,
+  let result = fillBuildSlot(
+    html,
+    "video-dialog",
     site.video?.enabled ? videoDialog() : "",
   );
-  result = result.replace(
-    "</head>",
-    `  <script type="module" src="${base}/assets/web-vitals.js?v=${webVitalsVersion}"></script>\n</head>`,
+  result = appendToBuildSlot(
+    result,
+    "head-assets",
+    `  <script type="module" src="${base}/assets/web-vitals.js?v=${webVitalsVersion}"></script>\n`,
   );
 
   if (!site.video?.enabled) return result;

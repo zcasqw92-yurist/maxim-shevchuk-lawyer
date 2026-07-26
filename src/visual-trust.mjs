@@ -1,5 +1,6 @@
 import { site } from "../site.config.mjs";
 import { caseStudies } from "./case-studies.mjs";
+import { appendToBuildSlot, fillBuildSlot } from "./html-slots.mjs";
 
 const base = site.basePath || "";
 const asset = (name) => `${base}/assets/images/${name}`;
@@ -26,12 +27,6 @@ const icon = (name, className = "icon") => {
 const replaceRequired = (html, pattern, replacement, label) => {
   if (!pattern.test(html)) throw new Error(`Не найден блок для визуальной архитектуры: ${label}`);
   return html.replace(pattern, replacement);
-};
-
-const insertAfterRequired = (html, pattern, insertion, label) => {
-  const match = html.match(pattern);
-  if (!match) throw new Error(`Не найдено место для визуальной архитектуры: ${label}`);
-  return html.replace(match[0], `${match[0]}${insertion}`);
 };
 
 const videoHero = () => `
@@ -222,30 +217,33 @@ const staticOffice = () => `
 const interactiveOffice = () => `
     <section class="footer__map footer__map--interactive" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${escapeHtml(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу.</p><a class="text-link" href="${escapeHtml(site.publicOffice.mapUrl)}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><button class="map-poster" type="button" data-map-load aria-label="Загрузить интерактивную карту офиса">${icon("pin")}<span><small>Интерактивная карта не загружена</small><strong>Показать офис на карте</strong><em>Загрузится только после нажатия</em></span></button></div></section>`;
 
-const injectGlobalAssets = (html) => html
-  .replace('</head>', `  <script type="module" src="${base}/assets/visual-trust.js"></script>\n</head>`);
+const injectGlobalAssets = (html) => appendToBuildSlot(
+  html,
+  "head-assets",
+  `  <script type="module" src="${base}/assets/visual-trust.js"></script>\n`,
+);
 
 const injectFooterMap = (html, pathname) => {
-  if (!site.publicOffice?.enabled) return html;
-  const pattern = /\s*<section class="footer__map"[\s\S]*?<\/section>/;
-  if (!pattern.test(html)) return html;
-  return html.replace(pattern, pathname === "/kontakty" ? interactiveOffice() : staticOffice());
+  const map = site.publicOffice?.enabled
+    ? pathname === "/kontakty" ? interactiveOffice() : staticOffice()
+    : "";
+  return fillBuildSlot(html, "footer-map", map);
 };
 
 const injectHomeArchitecture = (html) => {
   let result = html;
-  result = insertAfterRequired(result, /<section class="hero">[\s\S]*?<\/section>/, trustStrip(), "полоса доверия");
+  result = fillBuildSlot(result, "home-trust", trustStrip());
 
   // Неподтверждённые кейсы и образцы не публикуются. Этот защитный проход
   // также удаляет устаревший блок, если он вернётся из более раннего шаблона.
   result = result.replace(/\s*<section class="section section--case-studies"[\s\S]*?<\/section>/, "");
 
-  result = replaceRequired(result, /\s*<section class="section section--value">[\s\S]*?<\/section>/, valueBlock(), "результат работы");
+  result = fillBuildSlot(result, "home-value", valueBlock());
 
   const aboutButton = `<a class="button button--secondary" href="${base}/o-yuriste/"`;
   if (!result.includes(aboutButton)) throw new Error("Не найдена ссылка на сведения об образовании");
 
-  result = replaceRequired(result, /\s*<section class="section section--cta">[\s\S]*?<\/section>/, finalCta(), "финальный призыв");
+  result = fillBuildSlot(result, "home-cta", finalCta());
   return result;
 };
 

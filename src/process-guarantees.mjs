@@ -1,3 +1,5 @@
+import { fillBuildSlot } from "./html-slots.mjs";
+
 const guaranteeItems = [
   {
     title: "Первично — бесплатно",
@@ -39,17 +41,6 @@ export const processGuaranteesBlock = () => `
     </div>
   </section>`;
 
-const insertAfterRequired = (html, pattern, insertion, label) => {
-  const match = html.match(pattern);
-  if (!match) throw new Error(`Не найдено место для блока гарантий: ${label}`);
-  return html.replace(match[0], `${match[0]}${insertion}`);
-};
-
-const insertBeforeRequired = (html, marker, insertion, label) => {
-  if (!html.includes(marker)) throw new Error(`Не найдено место для блока гарантий: ${label}`);
-  return html.replace(marker, `${insertion}${marker}`);
-};
-
 export const injectProcessGuarantees = (html, pathname) => {
   // На главной эти условия уже кратко представлены в полосе доверия.
   if (pathname === "/") return html;
@@ -60,10 +51,10 @@ export const injectProcessGuarantees = (html, pathname) => {
 
   const block = processGuaranteesBlock();
   if (pathname === "/uslugi") {
-    return insertBeforeRequired(html, '<section class="section section--services">', block, "страница услуг");
+    return fillBuildSlot(html, "services-guarantees", block);
   }
   if (/^\/uslugi\/[^/]+$/.test(pathname)) {
-    return insertAfterRequired(html, /<section class="contact-path[^"]*"[\s\S]*?<\/section>/, block, `страница услуги ${pathname}`);
+    return fillBuildSlot(html, "service-guarantees", block);
   }
   return html;
 };

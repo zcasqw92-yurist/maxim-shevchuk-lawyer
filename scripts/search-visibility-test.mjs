@@ -39,7 +39,7 @@ for (const [slug, title] of Object.entries(servicePages)) {
   if (!html.includes(title)) errors.push(`${slug}: отсутствует индивидуальный заголовок`);
   if (!html.includes("Какие сведения подготовить")) errors.push(`${slug}: отсутствует практический список материалов`);
   if (!html.includes("Материал подготовлен")) errors.push(`${slug}: отсутствует авторство`);
-  if (!html.includes("Актуализировано")) errors.push(`${slug}: отсутствует дата актуализации`);
+  if (!html.includes("Проверено <time datetime=")) errors.push(`${slug}: отсутствует дата проверки`);
   if (/data-search-visibility=[^>]*(?:hidden|aria-hidden="true")/.test(html)) errors.push(`${slug}: экспертный блок скрыт`);
   const section = html.match(/<section class="section section--search-guide section--service-guide"[\s\S]*?<\/section>/)?.[0] || "";
   const words = section.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;

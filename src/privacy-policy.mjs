@@ -1,4 +1,5 @@
 import { site } from "../site.config.mjs";
+import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
 
 const escapeHtml = (value = "") => String(value)
   .replaceAll("&", "&amp;")
@@ -6,12 +7,7 @@ const escapeHtml = (value = "") => String(value)
   .replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;");
 
-const updatedLabel = new Intl.DateTimeFormat("ru-RU", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-}).format(new Date(`${site.contentLastModified}T12:00:00Z`));
+const policyDate = contentDateForPath("/politika-konfidencialnosti");
 
 const officeAddress = site.publicOffice?.enabled
   ? [
@@ -27,7 +23,7 @@ const analyticsText = site.analytics?.enabled
   : "На дату этой редакции рекламные трекеры и системы веб-аналитики на сайте отключены. Если состав сервисов изменится, Политика будет актуализирована до их подключения.";
 
 const policySection = () => `
-      <section class="legal-page"><div class="wrap legal-page__grid"><aside><span class="eyebrow">Документ</span><h1>Политика конфиденциальности</h1><p>Редакция от ${escapeHtml(updatedLabel)}.</p></aside><article class="legal-copy">
+      <section class="legal-page"><div class="wrap legal-page__grid"><aside><span class="eyebrow">Документ</span><h1>Политика конфиденциальности</h1><p>Редакция от <time datetime="${policyDate}">${escapeHtml(formatContentDate(policyDate))}</time>.</p></aside><article class="legal-copy">
         <h2>1. Общие положения</h2>
         <p>Настоящая Политика определяет порядок обработки и защиты персональных данных посетителей сайта ${escapeHtml(site.siteUrl)}. Оператором персональных данных является ${escapeHtml(site.name)}.</p>
         <p>Политика применяется к сведениям, которые пользователь добровольно сообщает при обращении, а также к ограниченным техническим данным, необходимым для загрузки и безопасной работы сайта.</p>

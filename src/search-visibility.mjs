@@ -1,4 +1,5 @@
 import { site } from "../site.config.mjs";
+import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
 
 const escapeHtml = (value = "") => String(value)
   .replaceAll("&", "&amp;")
@@ -7,18 +8,14 @@ const escapeHtml = (value = "") => String(value)
   .replaceAll('"', "&quot;");
 
 const href = (pathname) => `${site.basePath || ""}${pathname}`;
-const updatedLabel = new Intl.DateTimeFormat("ru-RU", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-}).format(new Date(`${site.contentLastModified}T12:00:00Z`));
-
-const authorNote = () => `
+const authorNote = (pathname) => {
+  const date = contentDateForPath(pathname);
+  return `
       <div class="search-guide__author">
         <span>Материал подготовлен <a href="${href("/o-yuriste/")}">Максимом Юрьевичем Шевчуком</a>, юристом</span>
-        <span>Актуализировано ${escapeHtml(updatedLabel)}</span>
+        <span>Проверено <time datetime="${date}">${escapeHtml(formatContentDate(date))}</time></span>
       </div>`;
+};
 
 const homeTopics = [
   {
@@ -78,7 +75,7 @@ const homeBlock = () => `
         <p><strong>С чего начать:</strong> кратко опишите хронологию, сумму или требование и перечислите документы — договор, чек, переписку, претензию, ответ или постановление. Первичное знакомство с ситуацией и основными материалами бесплатно.</p>
         <button class="button button--secondary" type="button" data-dialog-open data-topic="юридическая помощь по гражданскому делу">Описать ситуацию юристу</button>
       </div>
-      ${authorNote()}
+      ${authorNote("/")}
     </div>
   </section>`;
 
@@ -96,7 +93,7 @@ const directoryBlock = () => `
           ${homeTopics.flatMap((topic) => topic.links).map(([label, url]) => `<a href="${href(url)}">${escapeHtml(label)}</a>`).join("")}
         </nav>
       </div>
-      ${authorNote()}
+      ${authorNote("/uslugi")}
     </div>
   </section>`;
 
@@ -182,7 +179,7 @@ const serviceBlock = (service) => {
         <ul>${guide.checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
         <button class="text-link" type="button" data-dialog-open data-topic="${escapeHtml(service.name)}">Передать материалы юристу</button>
       </aside>
-      ${authorNote()}
+      ${authorNote(`/uslugi/${service.slug}`)}
     </div>
   </section>`;
 };

@@ -2,6 +2,7 @@ import { access, readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
+import { contentDateForPath } from "../src/content-dates.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -111,7 +112,7 @@ for (const file of files) {
       graphTypes.push(...graph.flatMap((node) => Array.isArray(node["@type"]) ? node["@type"] : [node["@type"]]));
       const webPage = graph.find((node) => ["WebPage", "ProfilePage", "ContactPage", "CollectionPage"].includes(node["@type"]));
       if (route !== "/404.html" && !isLegacyRedirect(route) && !webPage) errors.push(`${route}: нет сущности WebPage/подтипа в JSON-LD`);
-      if (webPage && webPage.dateModified !== site.contentLastModified) errors.push(`${route}: неверный dateModified в JSON-LD`);
+      if (webPage && webPage.dateModified !== contentDateForPath(route)) errors.push(`${route}: неверный dateModified в JSON-LD`);
     } catch (error) {
       errors.push(`${route}: JSON-LD не разбирается (${error.message})`);
     }

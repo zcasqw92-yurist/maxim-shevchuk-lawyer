@@ -6,6 +6,7 @@ import { services } from "../src/data.mjs";
 import { composeRenderedPage } from "../src/page-composer.mjs";
 import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
 import { injectCaseStudies } from "../src/case-studies.mjs";
+import { contentDateForPath } from "../src/content-dates.mjs";
 import { injectSearchVisibility } from "../src/search-visibility.mjs";
 import { injectPrivacyPolicy } from "../src/privacy-policy.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
@@ -176,7 +177,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${indexablePages.map(({ path, images = [] }) => `  <url>
     <loc>${xml(`${site.siteUrl}${path}`)}</loc>
-    <lastmod>${xml(site.contentLastModified)}</lastmod>${images.map((image) => `
+    <lastmod>${xml(contentDateForPath(path))}</lastmod>${images.map((image) => `
     <image:image><image:loc>${xml(`${site.siteUrl}${image}`)}</image:loc></image:image>`).join("")}
   </url>`).join("\n")}
 </urlset>\n`;

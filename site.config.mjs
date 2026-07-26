@@ -14,7 +14,22 @@ export const site = {
   production: process.env.SITE_PRODUCTION === "true",
   siteUrl: normalizeSiteUrl(process.env.SITE_URL),
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
-  contentLastModified: "2026-07-17",
+  // Максимальная дата содержательного обновления. Даты отдельных страниц
+  // задаются явно и не меняются от технической пересборки.
+  contentLastModified: "2026-07-26",
+  contentLastModifiedByPath: {
+    "/": "2026-07-26",
+    "/uslugi": "2026-07-17",
+    "/uslugi/dosudebnoe-uregulirovanie": "2026-07-17",
+    "/uslugi/vozvrat-deneg": "2026-07-17",
+    "/uslugi/zhaloby-i-obrashcheniya": "2026-07-17",
+    "/uslugi/iskovoe-zayavlenie": "2026-07-17",
+    "/uslugi/spory-biznesa": "2026-07-17",
+    "/uslugi/marketpleysy": "2026-07-17",
+    "/o-yuriste": "2026-07-17",
+    "/kontakty": "2026-07-17",
+    "/politika-konfidencialnosti": "2026-07-17",
+  },
   name: "Максим Юрьевич Шевчук",
   shortName: "Максим Шевчук",
   businessName: "Юридическая консультация Шевчука М. Ю.",

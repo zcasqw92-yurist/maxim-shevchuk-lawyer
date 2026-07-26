@@ -1,4 +1,5 @@
 import { site } from "../site.config.mjs";
+import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
 import { faqs, services } from "./data.mjs";
 
 const esc = (value = "") =>
@@ -21,13 +22,6 @@ const officeAddress = () => hasPublicOffice()
   ? `${site.publicOffice.addressLocality}, ${site.publicOffice.streetAddress}`
   : "";
 const yandexMapsLink = () => site.publicOffice?.mapUrl || `https://yandex.ru/maps/?text=${encodeURIComponent(officeAddress())}`;
-const lastModifiedLabel = new Intl.DateTimeFormat("ru-RU", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-}).format(new Date(`${site.contentLastModified}T12:00:00Z`));
-
 const icon = (name, className = "icon") => {
   const paths = {
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
@@ -119,7 +113,7 @@ const header = (pathname) => `
     </div>
   </nav>`;
 
-const footer = () => `
+const footer = (pageLastModified) => `
   <footer class="site-footer">
     <div class="wrap footer__grid">
       <div class="footer__identity">
@@ -156,7 +150,7 @@ const footer = () => `
     ${hasPublicOffice() ? `<section class="footer__map" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${esc(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу в мессенджер.</p><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><iframe src="https://yandex.ru/map-widget/v1/?z=12&amp;ol=biz&amp;oid=118077889231" width="560" height="400" frameborder="0" loading="lazy" title="Офис юридической практики Максима Шевчука на Яндекс Картах"></iframe></div></section>` : ""}
     <div class="wrap footer__bottom">
       <p>© ${new Date().getFullYear()} Максим Юрьевич Шевчук</p>
-      <p>Материалы обновлены ${lastModifiedLabel}. Информация не является гарантией результата по конкретному делу.</p>
+      <p>Страница проверена <time datetime="${pageLastModified}">${formatContentDate(pageLastModified)}</time>. Информация не является гарантией результата по конкретному делу.</p>
       ${site.analytics?.enabled ? '<button class="footer__settings" type="button" data-consent-settings>Настройки аналитики</button>' : ""}
     </div>
   </footer>`;
@@ -380,6 +374,7 @@ export const renderShell = ({
   bodyClass = "",
 }) => {
   const canonical = `${site.siteUrl}${canonicalPath(pathname)}`;
+  const pageLastModified = contentDateForPath(pathname);
   const robots = site.production && indexable ? "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" : "noindex,follow";
   const breadcrumb = schema.find((item) => item["@type"] === "BreadcrumbList");
   const primaryImageId = `${canonical}#primaryimage`;
@@ -400,7 +395,7 @@ export const renderShell = ({
     name: title,
     description,
     inLanguage: "ru-RU",
-    dateModified: site.contentLastModified,
+    dateModified: pageLastModified,
     isPartOf: { "@id": `${site.siteUrl}/#website` },
     primaryImageOfPage: { "@id": primaryImageId },
     ...(breadcrumb ? { breadcrumb: { "@id": breadcrumb["@id"] } } : {}),
@@ -462,7 +457,7 @@ export const renderShell = ({
   <div class="scroll-progress" aria-hidden="true" data-scroll-progress></div>
   ${header(pathname)}
   <main id="main">${content}</main>
-  ${footer()}
+  ${footer(pageLastModified)}
   ${dialog()}
   ${priceQuizDialog()}
   ${stickyContact()}

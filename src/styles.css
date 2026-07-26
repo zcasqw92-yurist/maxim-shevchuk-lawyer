@@ -126,7 +126,7 @@
   .brand__home, .brand__text strong { color: inherit; font-family: var(--serif); font-size: 17px; font-weight: 600; }
   .brand__home:hover { color: inherit; }
   .brand__text small { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
-  .header__online { display: inline-flex; align-items: center; gap: 8px; margin-top: 5px; padding: 0; color: #416550; border: 0; background: transparent; cursor: pointer; font: inherit; font-size: 10px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .header__online { display: inline-flex; min-height: 32px; align-items: center; gap: 8px; margin: -3px -2px -7px; padding: 4px 2px; color: #416550; border: 0; background: transparent; border-radius: 999px; cursor: pointer; font: inherit; font-size: 10px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
   .header__online:hover span { text-decoration: underline; text-underline-offset: 3px; }
   .header__online i { width: 8px; aspect-ratio: 1; flex: 0 0 auto; background: #41b86b; border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); animation: online-pulse 1.8s ease-out infinite; }
   .header__online.is-offline { color: var(--muted); }

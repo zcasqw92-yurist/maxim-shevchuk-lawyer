@@ -152,6 +152,26 @@ try {
   if (!await dialog.evaluate((element) => element.open)) errors.push("interaction: online status did not open contact dialog");
   await interactionPage.close();
 
+  for (const width of [320, 390, 430]) {
+    const targetPage = await browser.newPage({ viewport: { width, height: 844 } });
+    await targetPage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
+    const status = targetPage.locator(".header__online");
+    const box = await status.boundingBox();
+    if (!box || box.width < 24 || box.height < 24) {
+      errors.push(`interaction: online status target is smaller than 24×24 at ${width}px: ${JSON.stringify(box)}`);
+    }
+    let keyboardFocused = false;
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      await targetPage.keyboard.press("Tab");
+      if (await status.evaluate((element) => element === document.activeElement)) {
+        keyboardFocused = true;
+        break;
+      }
+    }
+    if (!keyboardFocused) errors.push(`interaction: online status is not keyboard reachable at ${width}px`);
+    await targetPage.close();
+  }
+
   const quizPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await quizPage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
   await quizPage.locator(".hero__actions [data-price-quiz-open]").click();

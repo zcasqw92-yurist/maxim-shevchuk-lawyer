@@ -161,7 +161,13 @@ const openMobileMenu = () => {
   document.body.style.width = "100%";
   document.body.style.overflowY = "scroll";
   setMenuBackgroundInert(true);
-  requestAnimationFrame(() => $("a[href], button:not([disabled])", mobileMenu)?.focus());
+  const firstMenuControl = $("a[href], button:not([disabled])", mobileMenu);
+  firstMenuControl?.focus({ preventScroll: true });
+  requestAnimationFrame(() => {
+    if (!document.activeElement?.closest("[data-mobile-menu]")) {
+      firstMenuControl?.focus({ preventScroll: true });
+    }
+  });
 };
 
 const closeMobileMenu = ({ restoreFocus = true } = {}) => {

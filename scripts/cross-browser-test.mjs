@@ -85,6 +85,11 @@ for (const [engineName, engine] of engines) {
     const menuScrollY = await page.evaluate(() => window.scrollY);
     await menuToggle.click();
     await page.waitForFunction(() => !document.querySelector("[data-mobile-menu]")?.hidden);
+    await page.waitForFunction(
+      () => Boolean(document.activeElement?.closest("[data-mobile-menu]")),
+      null,
+      { timeout: 1500 },
+    );
     const openMenu = await state(page);
     if (openMenu.bodyPosition !== "fixed" || !openMenu.mainInert || !openMenu.activeInMenu) {
       errors.push(`${engineName}: mobile menu isolation failed ${JSON.stringify(openMenu)}`);

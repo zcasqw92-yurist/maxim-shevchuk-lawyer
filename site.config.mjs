@@ -16,7 +16,7 @@ export const site = {
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
   // Максимальная дата содержательного обновления. Даты отдельных страниц
   // задаются явно и не меняются от технической пересборки.
-  contentLastModified: "2026-07-26",
+  contentLastModified: "2026-07-27",
   contentLastModifiedByPath: {
     "/": "2026-07-26",
     "/uslugi": "2026-07-17",
@@ -28,7 +28,7 @@ export const site = {
     "/uslugi/marketpleysy": "2026-07-26",
     "/o-yuriste": "2026-07-17",
     "/kontakty": "2026-07-17",
-    "/politika-konfidencialnosti": "2026-07-26",
+    "/politika-konfidencialnosti": "2026-07-27",
   },
   name: "Максим Юрьевич Шевчук",
   shortName: "Максим Шевчук",

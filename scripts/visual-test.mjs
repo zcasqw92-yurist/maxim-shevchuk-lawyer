@@ -63,10 +63,13 @@ await new Promise((resolve, reject) => {
 });
 
 const checks = [
-  { name: "home-desktop", path: "/", viewport: { width: 1440, height: 1000 }, fullPage: true },
   { name: "home-mobile-small", path: "/", viewport: { width: 320, height: 568 }, fullPage: true },
   { name: "home-mobile", path: "/", viewport: { width: 390, height: 844 }, fullPage: true },
   { name: "home-mobile-wide", path: "/", viewport: { width: 430, height: 932 }, fullPage: true },
+  { name: "home-tablet", path: "/", viewport: { width: 768, height: 1024 }, fullPage: true },
+  { name: "home-laptop", path: "/", viewport: { width: 1366, height: 768 }, fullPage: true },
+  { name: "home-desktop", path: "/", viewport: { width: 1440, height: 900 }, fullPage: true },
+  { name: "home-fullhd", path: "/", viewport: { width: 1920, height: 1080 }, fullPage: true },
   { name: "services-tablet", path: "/uslugi/", viewport: { width: 820, height: 1180 }, fullPage: true },
   { name: "service-mobile", path: "/uslugi/dosudebnoe-uregulirovanie/", viewport: { width: 390, height: 844 }, fullPage: true },
   { name: "about-desktop", path: "/o-yuriste/", viewport: { width: 1440, height: 1000 }, fullPage: true },
@@ -123,6 +126,16 @@ try {
       return { viewport, scrollWidth: document.documentElement.scrollWidth, offenders, wideContainers };
     });
     if (layout.scrollWidth > layout.viewport + 1) errors.push(`${check.name}: horizontal overflow ${JSON.stringify(layout)}`);
+    if (check.path === "/") {
+      const primaryCta = page.locator(".hero__actions [data-dialog-open]");
+      if (await primaryCta.count() !== 1) errors.push(`${check.name}: primary hero CTA is not unique`);
+      else {
+        const box = await primaryCta.boundingBox();
+        if (!box || box.y < 0 || box.y + box.height > check.viewport.height + 1) {
+          errors.push(`${check.name}: primary hero CTA is outside the first viewport ${JSON.stringify(box)}`);
+        }
+      }
+    }
     await page.close();
   }
 
@@ -139,6 +152,9 @@ try {
   if (!whatsappHref?.startsWith("https://api.whatsapp.com/send?phone=79065297970&text=")) errors.push("interaction: WhatsApp link is missing prepared message");
   if (!telegramHref?.startsWith("https://t.me/lawrazbor?text=")) errors.push("interaction: Telegram link is missing prepared message");
   if (!messageText(telegramHref).includes("Хочу получить первичную оценку ситуации")) errors.push("interaction: Telegram generic message is incomplete");
+  await interactionPage.locator("[data-dialog-close]").click();
+  await interactionPage.locator(".hero__actions [data-dialog-open]").click();
+  if (!await dialog.evaluate((element) => element.open)) errors.push("interaction: primary hero CTA did not open the contact dialog");
   await interactionPage.locator("[data-dialog-close]").click();
   await interactionPage.locator(".hero__quick-choices [data-topic='возврат денежных средств']").click();
   const selectedTopic = await interactionPage.locator("#contact-dialog [data-dialog-topic]").textContent();
@@ -247,6 +263,7 @@ try {
   await mobilePage.waitForFunction(() => window.scrollY >= 590);
   await mobilePage.evaluate(() => window.scrollTo(0, 550));
   await mobilePage.waitForFunction(() => window.scrollY <= 560 && !document.querySelector("[data-header]")?.classList.contains("is-header-hidden"));
+  await mobilePage.waitForTimeout(320);
   const menuStartScroll = await mobilePage.evaluate(() => window.scrollY);
   if (await menuButton.count() === 1) await menuButton.tap();
   await mobilePage.waitForFunction(() => document.activeElement?.closest("[data-mobile-menu]"));

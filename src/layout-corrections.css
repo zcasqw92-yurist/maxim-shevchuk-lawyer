@@ -21,6 +21,10 @@
 .menu-toggle__icon--close { display: none; }
 .menu-toggle[aria-expanded="true"] .menu-toggle__icon--open { display: none; }
 .menu-toggle[aria-expanded="true"] .menu-toggle__icon--close { display: block; }
+.home .hero { padding-top: clamp(36px, 4vw, 56px); }
+.home .hero__content { padding-bottom: 20px; }
+.home .hero__lead { margin-top: 22px; }
+.home .hero__actions { margin-top: 26px; }
 
 .section--cta-portrait {
   display: block;
@@ -72,6 +76,11 @@ html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
 }
 
 @media (max-width: 680px) {
+  .home .hero { padding-top: 12px; }
+  .home .hero__content { padding-bottom: 20px; }
+  .home .hero__lead { margin-top: 10px; }
+  .home .hero__actions { margin-top: 12px; }
+
   /* Mobile reading scale: content roles are sized deliberately, not by a global font replacement. */
   main p:not(.about-hero__role),
   main dd,

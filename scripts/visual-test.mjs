@@ -83,6 +83,39 @@ const messageText = (href) => {
   try { return new URL(href).searchParams.get("text") || ""; } catch { return ""; }
 };
 
+const revealProofBlocks = async (page, label) => {
+  const proofs = page.locator(".proof-reveal");
+  const count = await proofs.count();
+  for (let index = 0; index < count; index += 1) {
+    await proofs.nth(index).scrollIntoViewIfNeeded();
+    try {
+      await page.waitForFunction(
+        (itemIndex) => document.querySelectorAll(".proof-reveal")[itemIndex]?.classList.contains("is-proof-visible"),
+        index,
+        { timeout: 2000 },
+      );
+    } catch {
+      errors.push(`${label}: proof block ${index + 1}/${count} was not revealed by IntersectionObserver`);
+    }
+  }
+  if (count) await page.waitForTimeout(450);
+  const invalid = await proofs.evaluateAll((items) => items.map((item, index) => {
+    const style = getComputedStyle(item);
+    const rect = item.getBoundingClientRect();
+    return {
+      index,
+      visibleClass: item.classList.contains("is-proof-visible"),
+      opacity: Number(style.opacity),
+      visibility: style.visibility,
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+    };
+  }).filter((item) => !item.visibleClass || item.opacity < .99 || item.visibility === "hidden" || item.width <= 0 || item.height <= 0));
+  if (invalid.length) errors.push(`${label}: hidden or empty proof blocks ${JSON.stringify(invalid.slice(0, 5))}`);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => window.scrollY === 0);
+};
+
 try {
   browser = await chromium.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-background-networking", "--disable-extensions", "--font-render-hinting=none"],
@@ -95,6 +128,7 @@ try {
     page.on("console", (message) => { if (message.type() === "error") errors.push(`${check.name}: console ${message.text()}`); });
     const response = await page.goto(`http://127.0.0.1:4173${check.path}`, { waitUntil: "networkidle" });
     if (!response?.ok()) errors.push(`${check.name}: HTTP ${response?.status()}`);
+    await revealProofBlocks(page, check.name);
     await page.evaluate(async () => {
       document.querySelectorAll(".reveal").forEach((item) => item.classList.add("is-visible"));
       document.querySelectorAll("img").forEach((image) => { image.loading = "eager"; });

@@ -11,7 +11,13 @@ const moscowDateFormatter = new Intl.DateTimeFormat("en-CA", {
 const dateInMoscow = (value) => {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) throw new Error(`Некорректное время автоматической проверки: ${value}`);
-  return moscowDateFormatter.format(date);
+  const parts = Object.fromEntries(
+    moscowDateFormatter
+      .formatToParts(date)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+  return `${parts.year}-${parts.month}-${parts.day}`;
 };
 
 export const automatedReviewDate = () => {

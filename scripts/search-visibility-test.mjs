@@ -91,12 +91,13 @@ for (const marker of [
   "GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}",
   "YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}",
   "INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}",
-  "npm run lock:indexing && npm run test:indexing-lock",
-  "npm run test:live-indexing-lock",
+  "schedule:",
+  "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)",
+  "npm run test:content-dates",
 ]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует настройка ${marker}`);
 }
-if (workflow.includes("npm run submit:indexnow")) errors.push("pages.yml: IndexNow должен быть отключён, пока сайт закрыт от индексации");
+if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production-сайт не должен снова закрываться от индексации");
 if (/if:\s*\$\{\{\s*env\.INDEXNOW_KEY/.test(workflow)) errors.push("pages.yml: IndexNow не должен зависеть от необязательного секрета");
 
 if (errors.length) {
@@ -104,4 +105,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: expert content remains visible to users while publication indexing is globally locked");
+console.log("Search visibility checks passed: expert content, official sources and weekly review metadata are present");

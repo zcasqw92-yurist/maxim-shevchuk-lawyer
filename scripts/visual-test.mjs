@@ -234,13 +234,118 @@ try {
   if (!completeQuiz(quizTelegramText)) errors.push("interaction: price quiz Telegram summary is incomplete");
   await quizPage.close();
 
-  const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await mobilePage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
   const menuButton = mobilePage.locator("[data-menu-toggle]");
+  const mobileMenu = mobilePage.locator("[data-mobile-menu]");
+  const menuBackdrop = mobilePage.locator("[data-menu-backdrop]");
   if (await menuButton.count() !== 1) errors.push("interaction: mobile menu trigger is not unique");
-  else await menuButton.click();
-  if (!await mobilePage.locator("[data-mobile-menu]").isVisible()) errors.push("interaction: mobile menu did not open");
-  await menuButton.click();
+  await mobilePage.evaluate(() => {
+    document.documentElement.style.scrollBehavior = "auto";
+    window.scrollTo(0, 600);
+  });
+  await mobilePage.waitForFunction(() => window.scrollY >= 590);
+  await mobilePage.evaluate(() => window.scrollTo(0, 550));
+  await mobilePage.waitForFunction(() => window.scrollY <= 560 && !document.querySelector("[data-header]")?.classList.contains("is-header-hidden"));
+  const menuStartScroll = await mobilePage.evaluate(() => window.scrollY);
+  if (await menuButton.count() === 1) await menuButton.tap();
+  await mobilePage.waitForFunction(() => document.activeElement?.closest("[data-mobile-menu]"));
+  if (!await mobileMenu.isVisible() || !await menuBackdrop.isVisible()) errors.push("interaction: mobile menu layers did not open");
+  await mobilePage.screenshot({ path: join(shots, "home-mobile-menu.png"), fullPage: false });
+  const openMenuState = await mobilePage.evaluate(() => {
+    const menu = document.querySelector("[data-mobile-menu]");
+    const backdrop = document.querySelector("[data-menu-backdrop]");
+    const backdropRect = backdrop.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const activeRect = document.activeElement?.getBoundingClientRect();
+    const alpha = (color) => color.startsWith("rgba(") ? Number(color.split(",").at(-1).replace(")", "").trim()) : 1;
+    return {
+      expanded: document.querySelector("[data-menu-toggle]")?.getAttribute("aria-expanded"),
+      bodyPosition: getComputedStyle(document.body).position,
+      bodyTop: document.body.style.top,
+      mainInert: document.querySelector("main")?.inert,
+      menuAlpha: alpha(getComputedStyle(menu).backgroundColor),
+      backdropAlpha: alpha(getComputedStyle(backdrop).backgroundColor),
+      backdropDisplay: getComputedStyle(backdrop).display,
+      backdropRect: { top: backdropRect.top, right: backdropRect.right, bottom: backdropRect.bottom, left: backdropRect.left, width: backdropRect.width, height: backdropRect.height },
+      backdropZ: getComputedStyle(backdrop).zIndex,
+      menuRect: { top: menuRect.top, right: menuRect.right, bottom: menuRect.bottom, left: menuRect.left, width: menuRect.width, height: menuRect.height },
+      menuZ: getComputedStyle(menu).zIndex,
+      activeRect: activeRect ? { top: activeRect.top, right: activeRect.right, bottom: activeRect.bottom, left: activeRect.left, width: activeRect.width, height: activeRect.height } : null,
+      headerTransform: getComputedStyle(document.querySelector("[data-header]")).transform,
+    };
+  });
+  if (openMenuState.expanded !== "true"
+    || openMenuState.bodyPosition !== "fixed"
+    || openMenuState.bodyTop !== `-${menuStartScroll}px`
+    || !openMenuState.mainInert
+    || openMenuState.menuAlpha !== 1
+    || openMenuState.backdropAlpha !== 1
+    || openMenuState.menuRect.top < 70
+    || openMenuState.menuRect.top > 74
+    || openMenuState.menuRect.bottom <= openMenuState.menuRect.top
+    || Number(openMenuState.menuZ) <= Number(openMenuState.backdropZ)
+    || !openMenuState.activeRect
+    || openMenuState.activeRect.top < openMenuState.menuRect.top
+    || openMenuState.activeRect.bottom > 844) {
+    errors.push(`interaction: mobile menu is not isolated ${JSON.stringify(openMenuState)}`);
+  }
+
+  await mobilePage.keyboard.press("Shift+Tab");
+  if (!await menuButton.evaluate((element) => element === document.activeElement)) errors.push("interaction: mobile menu does not include its toggle in the focus cycle");
+  await mobilePage.keyboard.press("Tab");
+  if (!await mobileMenu.locator("a").first().evaluate((element) => element === document.activeElement)) errors.push("interaction: mobile menu did not return focus to its first link");
+  await mobileMenu.locator("button").last().focus();
+  await mobilePage.keyboard.press("Tab");
+  if (!await menuButton.evaluate((element) => element === document.activeElement)) errors.push("interaction: mobile menu focus did not wrap to its toggle");
+
+  await mobilePage.keyboard.press("Escape");
+  const escapedMenuState = await mobilePage.evaluate(() => ({
+    hidden: document.querySelector("[data-mobile-menu]")?.hidden,
+    backdropHidden: document.querySelector("[data-menu-backdrop]")?.hidden,
+    expanded: document.querySelector("[data-menu-toggle]")?.getAttribute("aria-expanded"),
+    bodyPosition: getComputedStyle(document.body).position,
+    mainInert: document.querySelector("main")?.inert,
+    scrollY: window.scrollY,
+    focusReturned: document.activeElement === document.querySelector("[data-menu-toggle]"),
+  }));
+  if (!escapedMenuState.hidden
+    || !escapedMenuState.backdropHidden
+    || escapedMenuState.expanded !== "false"
+    || escapedMenuState.bodyPosition === "fixed"
+    || escapedMenuState.mainInert
+    || Math.abs(escapedMenuState.scrollY - menuStartScroll) > 1
+    || !escapedMenuState.focusReturned) {
+    errors.push(`interaction: Escape did not restore mobile menu state ${JSON.stringify(escapedMenuState)}`);
+  }
+
+  await menuButton.tap();
+  await mobilePage.waitForFunction(() => !document.querySelector("[data-mobile-menu]")?.hidden);
+  await menuButton.tap();
+  await mobilePage.waitForFunction(() => document.querySelector("[data-mobile-menu]")?.hidden);
+  if (await mobileMenu.isVisible()) errors.push("interaction: repeated menu toggle did not close the menu");
+
+  await menuButton.tap();
+  await mobilePage.waitForFunction(() => !document.querySelector("[data-menu-backdrop]")?.hidden);
+  if (await menuBackdrop.isVisible()) await menuBackdrop.click();
+  else {
+    const state = await menuBackdrop.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return { rect: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width, height: rect.height }, display: style.display, visibility: style.visibility, opacity: style.opacity, position: style.position };
+    });
+    errors.push(`interaction: mobile menu backdrop has no clickable area ${JSON.stringify(state)}`);
+    await menuBackdrop.evaluate((element) => element.click());
+  }
+  await mobilePage.waitForFunction(() => document.querySelector("[data-mobile-menu]")?.hidden);
+  if (await mobileMenu.isVisible()) errors.push("interaction: backdrop did not close the mobile menu");
+
+  await menuButton.tap();
+  await mobilePage.waitForFunction(() => !document.querySelector("[data-mobile-menu]")?.hidden);
+  const firstMenuLink = mobileMenu.locator("a").first();
+  await firstMenuLink.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault(), { once: true }));
+  await firstMenuLink.tap();
+  if (await mobileMenu.isVisible()) errors.push("interaction: selecting a navigation item did not close the mobile menu");
 
   await mobilePage.evaluate(() => {
     window.scrollTo(0, 720);

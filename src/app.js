@@ -83,10 +83,17 @@ const header = $("[data-header]");
 const progress = $("[data-scroll-progress]");
 const mobileContact = $("[data-mobile-contact]");
 let previousScrollY = window.scrollY;
+let mobileMenuOpen = false;
 
 const updateScroll = () => {
   const y = window.scrollY;
   header?.classList.toggle("is-scrolled", y > 12);
+  if (mobileMenuOpen) {
+    header?.classList.remove("is-header-hidden");
+    mobileContact?.classList.remove("is-visible");
+    previousScrollY = y;
+    return;
+  }
   const scrollingDown = y > previousScrollY + 8;
   const scrollingUp = y < previousScrollY - 8;
   const mobileViewport = matchMedia("(max-width: 680px)").matches;
@@ -109,12 +116,106 @@ addEventListener("resize", updateScroll, { passive: true });
 
 const menuToggle = $("[data-menu-toggle]");
 const mobileMenu = $("[data-mobile-menu]");
-menuToggle?.addEventListener("click", () => {
-  const open = menuToggle.getAttribute("aria-expanded") === "true";
+const menuBackdrop = $("[data-menu-backdrop]");
+const menuLabel = $("[data-menu-label]", menuToggle);
+const menuInertTargets = $$("main, .site-footer, [data-mobile-contact], [data-consent-banner], [data-header] .brand, [data-header] .desktop-nav, [data-header] .header__actions");
+let menuScrollY = 0;
+let menuBodyStyles = null;
+
+const setMenuBackgroundInert = (inert) => {
+  menuInertTargets.forEach((element) => {
+    if (inert && !element.inert) {
+      element.inert = true;
+      element.dataset.menuInerted = "true";
+    } else if (!inert && element.dataset.menuInerted === "true") {
+      element.inert = false;
+      delete element.dataset.menuInerted;
+    }
+  });
+};
+
+const menuFocusables = () => [
+  menuToggle,
+  ...$$("a[href], button:not([disabled])", mobileMenu),
+].filter(Boolean);
+
+const openMobileMenu = () => {
+  if (!menuToggle || !mobileMenu || !menuBackdrop || mobileMenuOpen) return;
+  menuScrollY = window.scrollY;
+  menuBodyStyles = {
+    position: document.body.style.position,
+    top: document.body.style.top,
+    width: document.body.style.width,
+    overflowY: document.body.style.overflowY,
+  };
+  mobileMenuOpen = true;
   header?.classList.remove("is-header-hidden");
-  menuToggle.setAttribute("aria-expanded", String(!open));
-  mobileMenu.hidden = open;
+  mobileContact?.classList.remove("is-visible");
+  menuToggle.setAttribute("aria-expanded", "true");
+  if (menuLabel) menuLabel.textContent = "Закрыть меню";
+  mobileMenu.hidden = false;
+  menuBackdrop.hidden = false;
+  document.documentElement.classList.add("mobile-menu-open");
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${menuScrollY}px`;
+  document.body.style.width = "100%";
+  document.body.style.overflowY = "scroll";
+  setMenuBackgroundInert(true);
+  requestAnimationFrame(() => $("a[href], button:not([disabled])", mobileMenu)?.focus());
+};
+
+const closeMobileMenu = ({ restoreFocus = true } = {}) => {
+  if (!menuToggle || !mobileMenu || !menuBackdrop || !mobileMenuOpen) return;
+  mobileMenuOpen = false;
+  mobileMenu.hidden = true;
+  menuBackdrop.hidden = true;
+  menuToggle.setAttribute("aria-expanded", "false");
+  if (menuLabel) menuLabel.textContent = "Открыть меню";
+  document.documentElement.classList.remove("mobile-menu-open");
+  setMenuBackgroundInert(false);
+  if (menuBodyStyles) {
+    document.body.style.position = menuBodyStyles.position;
+    document.body.style.top = menuBodyStyles.top;
+    document.body.style.width = menuBodyStyles.width;
+    document.body.style.overflowY = menuBodyStyles.overflowY;
+  }
+  window.scrollTo(0, menuScrollY);
+  previousScrollY = menuScrollY;
+  if (restoreFocus) menuToggle.focus({ preventScroll: true });
+};
+
+menuToggle?.addEventListener("click", () => {
+  if (mobileMenuOpen) closeMobileMenu();
+  else openMobileMenu();
 });
+menuBackdrop?.addEventListener("click", () => closeMobileMenu());
+$$("a[href], button", mobileMenu).forEach((control) => {
+  control.addEventListener("click", () => closeMobileMenu({ restoreFocus: false }));
+});
+document.addEventListener("keydown", (event) => {
+  if (!mobileMenuOpen) return;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeMobileMenu();
+    return;
+  }
+  if (event.key !== "Tab") return;
+  const focusables = menuFocusables();
+  const first = focusables[0];
+  const last = focusables.at(-1);
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last?.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first?.focus();
+  }
+});
+addEventListener("resize", () => {
+  if (mobileMenuOpen && matchMedia("(min-width: 901px)").matches) {
+    closeMobileMenu({ restoreFocus: false });
+  }
+}, { passive: true });
 
 const genericMessage = "Здравствуйте, Максим Юрьевич. Хочу получить первичную оценку ситуации. Кратко опишу, что произошло, и приложу имеющиеся документы:";
 const defaultDialogCopy = "Напишите, что произошло, и приложите имеющиеся материалы. Максим Юрьевич лично ознакомится с ними, ответит на основные вопросы и объяснит, с чего разумнее начать.";

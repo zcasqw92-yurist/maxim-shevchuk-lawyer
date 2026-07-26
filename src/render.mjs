@@ -105,16 +105,19 @@ const header = (pathname) => `
         <button class="button button--compact" type="button" data-dialog-open>Обсудить ситуацию</button>
       </div>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-        <span class="sr-only">Открыть меню</span>${icon("menu")}
+        <span class="sr-only" data-menu-label>Открыть меню</span>
+        ${icon("menu", "menu-toggle__icon menu-toggle__icon--open")}
+        ${icon("close", "menu-toggle__icon menu-toggle__icon--close")}
       </button>
     </div>
-    <nav class="mobile-nav" id="mobile-menu" aria-label="Мобильная навигация" data-mobile-menu hidden>
-      <div class="wrap">
-        ${navItems.map(([label, href]) => `<a href="${href}">${label}${icon("arrow")}</a>`).join("")}
-        <button class="button button--primary" type="button" data-dialog-open>Описать ситуацию</button>
-      </div>
-    </nav>
-  </header>`;
+  </header>
+  <button class="mobile-nav__backdrop" type="button" tabindex="-1" aria-label="Закрыть меню" data-menu-backdrop hidden></button>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="Мобильная навигация" data-mobile-menu hidden>
+    <div class="wrap">
+      ${navItems.map(([label, href]) => `<a href="${href}">${label}${icon("arrow")}</a>`).join("")}
+      <button class="button button--primary" type="button" data-dialog-open>Описать ситуацию</button>
+    </div>
+  </nav>`;
 
 const footer = () => `
   <footer class="site-footer">

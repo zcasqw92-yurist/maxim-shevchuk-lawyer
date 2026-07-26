@@ -1,3 +1,6 @@
+import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
+import { automatedReviewDate, formatReviewDate } from "./review-dates.mjs";
+
 const slotNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const unresolvedSlotPattern = /<!-- build-slot:([a-z0-9-]+) -->/g;
 
@@ -29,11 +32,29 @@ export const appendToBuildSlot = (html, name, content = "") => {
   return html.replace(marker, `${String(content)}${marker}`);
 };
 
+const injectAutomatedReviewStatus = (html, pathname) => {
+  if (!html.includes("Страница проверена <time")) return html;
+
+  const contentDate = contentDateForPath(pathname);
+  const contentLabel = formatContentDate(contentDate);
+  const reviewDate = automatedReviewDate();
+  const reviewLabel = formatReviewDate(reviewDate);
+  const oldFooter = `Страница проверена <time datetime="${contentDate}">${contentLabel}</time>. Информация не является гарантией результата по конкретному делу.`;
+  const newFooter = `Автоматическая проверка страницы и ссылок: <time datetime="${reviewDate}">${reviewLabel}</time>. Содержательно обновлено: <time datetime="${contentDate}">${contentLabel}</time>. Информация не является гарантией результата по конкретному делу.`;
+  const oldAuthorDate = `<span>Проверено <time datetime="${contentDate}">${contentLabel}</time></span>`;
+  const newAuthorDate = `<span>Автоматическая проверка источников: <time datetime="${reviewDate}">${reviewLabel}</time></span><span>Материал обновлён: <time datetime="${contentDate}">${contentLabel}</time></span>`;
+
+  let result = html.replace(oldFooter, newFooter).replaceAll(oldAuthorDate, newAuthorDate);
+  const reviewMeta = `  <meta name="site-automated-review-date" content="${reviewDate}">\n`;
+  result = result.replace("</head>", `${reviewMeta}</head>`);
+  return result;
+};
+
 export const finalizeBuildSlots = (html, pathname) => {
   const unresolved = [...html.matchAll(unresolvedSlotPattern)].map((match) => match[1]);
   const unexpected = unresolved.filter((name) => name !== "head-assets");
   if (unexpected.length) {
     throw new Error(`Не заполнены сборочные слоты ${pathname}: ${[...new Set(unexpected)].join(", ")}`);
   }
-  return fillBuildSlot(html, "head-assets", "");
+  return fillBuildSlot(injectAutomatedReviewStatus(html, pathname), "head-assets", "");
 };

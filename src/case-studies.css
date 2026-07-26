@@ -52,7 +52,7 @@
   .case-study__category {
     display: block;
     margin-bottom: 20px;
-    color: var(--gold);
+    color: var(--gold-text);
     font-size: .6875rem;
     font-weight: 780;
     letter-spacing: .13em;

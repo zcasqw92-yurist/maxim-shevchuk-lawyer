@@ -54,6 +54,9 @@ jobs:
       - name: Проверить часы статуса юриста
         run: npm run test:online-status
 
+      - name: Проверить контрастность интерфейса
+        run: npm run test:accessibility
+
       - name: Проверить быстрые ситуации
         run: npm run test:quick-choices
 

@@ -61,7 +61,7 @@
 
   .search-guide__card h3 a:hover,
   .search-guide__card h3 a:focus-visible {
-    color: var(--gold);
+    color: var(--gold-text);
   }
 
   .search-guide__card p,
@@ -96,7 +96,7 @@
   .service-guide__links a:focus-visible,
   .search-guide__directory-links a:hover,
   .search-guide__directory-links a:focus-visible {
-    color: var(--gold);
+    color: var(--gold-text);
   }
 
   .search-guide__summary {
@@ -181,7 +181,7 @@
   .service-guide__checklist > span {
     display: block;
     margin-bottom: 12px;
-    color: var(--gold);
+    color: var(--gold-text);
     font-size: .6875rem;
     font-weight: 780;
     letter-spacing: .12em;

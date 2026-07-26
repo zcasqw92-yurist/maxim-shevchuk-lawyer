@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # Еженедельная автоматическая проверка и перепубликация по понедельникам.
+    - cron: '17 3 * * 1'
 
 permissions:
   contents: read
@@ -44,6 +47,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set automated review date
+        run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -62,7 +68,7 @@ jobs:
       - name: Validate generated site
         env:
           CROSS_BROWSER_REQUIRED: 'true'
-        run: npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser
+        run: npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

@@ -40,9 +40,9 @@ const injectAutomatedReviewStatus = (html, pathname) => {
   const reviewDate = automatedReviewDate();
   const reviewLabel = formatReviewDate(reviewDate);
   const oldFooter = `Страница проверена <time datetime="${contentDate}">${contentLabel}</time>. Информация не является гарантией результата по конкретному делу.`;
-  const newFooter = `Автоматическая проверка страницы и ссылок: <time datetime="${reviewDate}">${reviewLabel}</time>. Содержательно обновлено: <time datetime="${contentDate}">${contentLabel}</time>. Информация не является гарантией результата по конкретному делу.`;
+  const newFooter = `Автоматическая проверка публикации: <time datetime="${reviewDate}">${reviewLabel}</time>. Правовая редакция материала: <time datetime="${contentDate}">${contentLabel}</time>. Информация не является гарантией результата по конкретному делу.`;
   const oldAuthorDate = `<span>Проверено <time datetime="${contentDate}">${contentLabel}</time></span>`;
-  const newAuthorDate = `<span>Автоматическая проверка источников: <time datetime="${reviewDate}">${reviewLabel}</time></span><span>Материал обновлён: <time datetime="${contentDate}">${contentLabel}</time></span>`;
+  const newAuthorDate = `<span>Автоматическая проверка публикации: <time datetime="${reviewDate}">${reviewLabel}</time></span><span>Правовая редакция: <time datetime="${contentDate}">${contentLabel}</time></span>`;
 
   let result = html.replace(oldFooter, newFooter).replaceAll(oldAuthorDate, newAuthorDate);
   const reviewMeta = `  <meta name="site-automated-review-date" content="${reviewDate}">\n`;

@@ -179,6 +179,38 @@ for (const [engineName, engine] of engines) {
       errors.push(`${engineName}: primary desktop CTA is outside the first viewport ${JSON.stringify(primaryRect)}`);
     }
     await desktop.close();
+
+    if (engineName === "Chromium") {
+      const vitalEvents = [];
+      const vitalsContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+      await vitalsContext.exposeBinding("__recordWebVital", (_source, params) => {
+        vitalEvents.push(params);
+      });
+      await vitalsContext.addInitScript(() => {
+        window.__bfcacheRestored = false;
+        addEventListener("pageshow", (event) => {
+          window.__bfcacheRestored = event.persisted;
+        });
+        window.gtag = (_command, _eventName, params) => window.__recordWebVital(params);
+      });
+      const vitalsPage = await vitalsContext.newPage();
+      await vitalsPage.goto(`${origin}/`, { waitUntil: "networkidle" });
+      await vitalsPage.goto(`${origin}/uslugi/`, { waitUntil: "networkidle" });
+      await vitalsPage.goBack({ waitUntil: "domcontentloaded" });
+      const restored = await vitalsPage.waitForFunction(
+        () => window.__bfcacheRestored === true,
+        null,
+        { timeout: 3000 },
+      ).then(() => true).catch(() => false);
+      await vitalsPage.goto(`${origin}/kontakty/`, { waitUntil: "networkidle" });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const zeroCls = vitalEvents.some((metric) => metric?.metric_name === "CLS" && metric.metric_value === 0);
+      const bfcacheMetric = vitalEvents.some((metric) => metric?.navigation_type === "back-forward-cache");
+      if (!restored) errors.push("Chromium: synthetic navigation did not restore the page from bfcache");
+      if (!zeroCls) errors.push("Chromium: zero CLS was not reported when the page became hidden");
+      if (!bfcacheMetric) errors.push("Chromium: restored bfcache navigation did not produce a Web Vital event");
+      await vitalsContext.close();
+    }
   } catch (error) {
     errors.push(`${engineName}: ${error instanceof Error ? error.message : String(error)}`);
   } finally {

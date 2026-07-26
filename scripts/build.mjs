@@ -153,6 +153,14 @@ await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
 await cp(join(root, "src", "online-status.mjs"), join(dist, "assets", "online-status.mjs"));
 await cp(join(root, "src", "visual-trust.js"), join(dist, "assets", "visual-trust.js"));
 await cp(join(root, "public"), dist, { recursive: true });
+await cp(
+  join(root, "node_modules", "web-vitals", "dist", "web-vitals.js"),
+  join(dist, "assets", "vendor-web-vitals.js"),
+);
+await cp(
+  join(root, "node_modules", "web-vitals", "LICENSE"),
+  join(dist, "assets", "vendor-web-vitals.LICENSE.txt"),
+);
 
 await writePage("/", renderHome());
 await writePage("/uslugi", renderServices());

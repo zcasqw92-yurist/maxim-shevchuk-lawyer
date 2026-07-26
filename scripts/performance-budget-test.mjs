@@ -13,6 +13,7 @@ const limits = {
   "assets/app.js": 90 * 1024,
   "assets/visual-trust.js": 40 * 1024,
   "assets/web-vitals.js": 10 * 1024,
+  "assets/vendor-web-vitals.js": 16 * 1024,
   "assets/images/maxim-hero.webp": 260 * 1024,
 };
 
@@ -29,6 +30,7 @@ const criticalPaths = [
   "assets/app.js",
   "assets/visual-trust.js",
   "assets/web-vitals.js",
+  "assets/vendor-web-vitals.js",
   "assets/images/maxim-hero.webp",
 ];
 const criticalBytes = (await Promise.all(criticalPaths.map(async (path) => (await stat(join(dist, path))).size)))

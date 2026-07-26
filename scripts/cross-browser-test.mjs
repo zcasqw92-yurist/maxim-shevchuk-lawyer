@@ -52,6 +52,15 @@ const assertNoOverflow = async (page, label) => {
   if (overflow > 1) errors.push(`${label}: horizontal overflow ${overflow}px`);
 };
 
+const rejectOptionalAnalytics = async (page, engineName) => {
+  const rejectButton = page.locator("[data-consent-reject]");
+  if (!await rejectButton.count() || !await rejectButton.isVisible()) return;
+  await rejectButton.click();
+  await page.waitForFunction(() => document.querySelector("[data-consent-banner]")?.hidden === true);
+  const consent = await page.evaluate(() => localStorage.getItem("analytics_consent"));
+  if (consent !== "denied") errors.push(`${engineName}: analytics refusal was not saved`);
+};
+
 for (const [engineName, engine] of engines) {
   let browser;
   try {
@@ -79,6 +88,7 @@ for (const [engineName, engine] of engines) {
     });
 
     await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+    await rejectOptionalAnalytics(page, engineName);
     await assertNoOverflow(page, `${engineName} mobile home`);
 
     const menuToggle = page.locator("[data-menu-toggle]");

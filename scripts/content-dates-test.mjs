@@ -31,11 +31,11 @@ for (const [pathname, file] of pages) {
     });
   const webPage = jsonLd.find((node) => ["WebPage", "ProfilePage", "ContactPage", "CollectionPage"].includes(node["@type"]));
   if (webPage?.dateModified !== expected) errors.push(`${pathname}: JSON-LD dateModified ${webPage?.dateModified || "missing"} != ${expected}`);
-  if (!html.includes(`Автоматическая проверка страницы и ссылок: <time datetime="${reviewDate}">${reviewLabel}</time>.`)) {
+  if (!html.includes(`Автоматическая проверка публикации: <time datetime="${reviewDate}">${reviewLabel}</time>.`)) {
     errors.push(`${pathname}: отсутствует единая дата автоматической проверки`);
   }
-  if (!html.includes(`Содержательно обновлено: <time datetime="${expected}">${label}</time>.`)) {
-    errors.push(`${pathname}: не сохранена достоверная дата содержательного обновления`);
+  if (!html.includes(`Правовая редакция материала: <time datetime="${expected}">${label}</time>.`)) {
+    errors.push(`${pathname}: не сохранена достоверная дата правовой редакции`);
   }
   if (!html.includes(`<meta name="site-automated-review-date" content="${reviewDate}">`)) {
     errors.push(`${pathname}: отсутствует машинно-читаемая дата автоматической проверки`);
@@ -50,11 +50,11 @@ for (const [pathname, file] of pages) {
 for (const [pathname, file] of pages.filter(([pathname]) => pathname === "/uslugi" || pathname.startsWith("/uslugi/"))) {
   const html = await readFile(join(dist, file), "utf8");
   const expected = contentDateForPath(pathname);
-  if (!html.includes(`Автоматическая проверка источников: <time datetime="${reviewDate}">${reviewLabel}</time>`)) {
-    errors.push(`${pathname}: дата автоматической проверки источников не синхронизирована`);
+  if (!html.includes(`Автоматическая проверка публикации: <time datetime="${reviewDate}">${reviewLabel}</time>`)) {
+    errors.push(`${pathname}: дата автоматической проверки публикации не синхронизирована`);
   }
-  if (!html.includes(`Материал обновлён: <time datetime="${expected}">${formatContentDate(expected)}</time>`)) {
-    errors.push(`${pathname}: дата содержательного обновления экспертного материала не сохранена`);
+  if (!html.includes(`Правовая редакция: <time datetime="${expected}">${formatContentDate(expected)}</time>`)) {
+    errors.push(`${pathname}: дата правовой редакции экспертного материала не сохранена`);
   }
 }
 
@@ -69,4 +69,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Content dates passed: ${pages.length} pages separate automated review from real content modification`);
+console.log(`Content dates passed: ${pages.length} pages separate automated review from real legal revision`);

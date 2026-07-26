@@ -47,7 +47,8 @@ for (const [slug, title] of Object.entries(servicePages)) {
   if (!html.includes(title)) errors.push(`${slug}: отсутствует индивидуальный заголовок`);
   if (!html.includes("Какие сведения подготовить")) errors.push(`${slug}: отсутствует практический список материалов`);
   if (!html.includes("Материал подготовлен")) errors.push(`${slug}: отсутствует авторство`);
-  if (!html.includes("Проверено <time datetime=")) errors.push(`${slug}: отсутствует дата проверки`);
+  if (!html.includes("Автоматическая проверка источников: <time datetime=")) errors.push(`${slug}: отсутствует дата автоматической проверки источников`);
+  if (!html.includes("Материал обновлён: <time datetime=")) errors.push(`${slug}: отсутствует достоверная дата обновления материала`);
   if (!html.includes("Материал носит общий информационный характер и не заменяет индивидуальный правовой анализ.")) errors.push(`${slug}: отсутствует предупреждение о границах общей информации`);
   if (/data-search-visibility=[^>]*(?:hidden|aria-hidden="true")/.test(html)) errors.push(`${slug}: экспертный блок скрыт`);
   const section = html.match(/<section class="section section--search-guide section--service-guide"[\s\S]*?<\/section>/)?.[0] || "";

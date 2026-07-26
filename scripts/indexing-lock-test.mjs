@@ -2,6 +2,7 @@ import { access, readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
+import { services } from "../src/data.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -18,6 +19,12 @@ const walk = async (directory) => {
 
 const attr = (tag, name) => tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, "i"))?.[1] || "";
 const htmlFiles = (await walk(dist)).filter((file) => file.endsWith(".html"));
+const expectedHtmlCount = services.length + 8;
+const requiredTokens = ["noindex", "nofollow", "noarchive", "nosnippet", "noimageindex"];
+
+if (htmlFiles.length !== expectedHtmlCount) {
+  errors.push(`Ожидалось ${expectedHtmlCount} HTML-файлов по текущей карте маршрутов, найдено ${htmlFiles.length}`);
+}
 
 for (const file of htmlFiles) {
   const html = await readFile(file, "utf8");
@@ -25,8 +32,9 @@ for (const file of htmlFiles) {
   const tokens = attr(tag, "content").toLowerCase().split(",").map((value) => value.trim()).filter(Boolean);
   const label = relative(dist, file).split(sep).join("/");
   if (!tag) errors.push(`${label}: отсутствует meta robots`);
-  if (!tokens.includes("noindex")) errors.push(`${label}: отсутствует noindex`);
-  if (!tokens.includes("nofollow")) errors.push(`${label}: отсутствует nofollow`);
+  for (const token of requiredTokens) {
+    if (!tokens.includes(token)) errors.push(`${label}: отсутствует ${token}`);
+  }
   if (tokens.includes("index")) errors.push(`${label}: обнаружен index`);
 }
 
@@ -55,4 +63,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Indexing lock verified: ${htmlFiles.length} HTML files are noindex,nofollow; sitemap is empty`);
+console.log(`Indexing lock verified: ${htmlFiles.length} HTML files have all five noindex directives; sitemap is empty`);

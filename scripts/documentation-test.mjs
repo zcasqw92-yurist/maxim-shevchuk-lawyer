@@ -36,6 +36,7 @@ for (const marker of [
   "noindex,nofollow,noarchive,nosnippet,noimageindex",
   "пустой `sitemap.xml`",
   "удаляет ключ IndexNow",
+  "запрет индексации HTML обеспечивается строгим meta robots",
   "EXPECTED_BUILD_SHA='<полный commit SHA>' npm run test:live",
   "npm run test:live-indexing-lock",
   "site.contentLastModifiedByPath",

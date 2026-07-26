@@ -26,7 +26,7 @@
 
 - устанавливает на всех 14 HTML-файлах `noindex,nofollow,noarchive,nosnippet,noimageindex`;
 - публикует пустой `sitemap.xml`;
-- блокирует обход через `robots.txt`;
+- не рекламирует sitemap через `robots.txt`; запрет индексации HTML обеспечивается строгим meta robots на каждой странице;
 - удаляет ключ IndexNow и не отправляет URL;
 - записывает `indexingLocked: true` в `build-info.json`.
 

@@ -47,6 +47,7 @@ export const site = {
   ],
   webmasterVerification: {
     google: env("GOOGLE_SITE_VERIFICATION"),
+    googleDomainVerified: true,
     yandex: env("YANDEX_SITE_VERIFICATION") || "e7084a7111f8d766",
   },
   analytics: {

@@ -24,9 +24,10 @@ jobs:
       SITE_BASE_PATH: ''
       GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
       YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
-      SITE_ANALYTICS_ENABLED: ${{ vars.SITE_ANALYTICS_ENABLED || 'false' }}
+      # Метрика запускается на клиенте только после отдельного согласия посетителя.
+      SITE_ANALYTICS_ENABLED: 'true'
       GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
-      YANDEX_METRICA_ID: ${{ vars.YANDEX_METRICA_ID }}
+      YANDEX_METRICA_ID: '111050150'
       SITE_VIDEO_ENABLED: ${{ vars.SITE_VIDEO_ENABLED || 'false' }}
       SITE_VIDEO_TITLE: ${{ vars.SITE_VIDEO_TITLE }}
       SITE_VIDEO_DURATION: ${{ vars.SITE_VIDEO_DURATION }}

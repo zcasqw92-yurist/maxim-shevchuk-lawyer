@@ -35,6 +35,103 @@ html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
 }
 
 @media (max-width: 680px) {
+  /* Mobile reading scale: content roles are sized deliberately, not by a global font replacement. */
+  main p:not(.about-hero__role),
+  main dd,
+  main blockquote {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .hero__lead,
+  .lead,
+  .inner-hero h1 + p,
+  .service-hero h1 + p {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  .text-link,
+  .card-link,
+  main figcaption,
+  main dt,
+  main small,
+  main summary,
+  .document-sample__copy li,
+  .about-proof strong,
+  .about-proof em,
+  .messenger-dialog__topic,
+  .messenger-dialog__status,
+  .messenger-dialog__note,
+  .messenger-dialog__privacy,
+  .price-quiz__progress,
+  .price-quiz__back,
+  .price-quiz__telegram-note,
+  .price-quiz__privacy,
+  .callback-field,
+  .callback-consent,
+  .callback-form__note,
+  .search-guide__author,
+  .search-guide__author a,
+  .mobile-contact__action,
+  .proof-dialog figcaption,
+  .site-footer p,
+  .site-footer li,
+  .site-footer a,
+  .site-footer em,
+  .consent-banner p,
+  .consent-banner a {
+    font-size: .875rem;
+    line-height: 1.55;
+  }
+
+  .callback-field input,
+  .callback-field select,
+  .callback-field textarea,
+  .callback-copy,
+  .price-quiz__step > p,
+  .price-quiz__result > p {
+    font-size: 1rem;
+  }
+
+  .eyebrow,
+  .hero__kicker,
+  .hero__quick-choices > span,
+  .service-card__number,
+  .identity-card > span,
+  .identity-card > small,
+  .brand__text small,
+  .brand--footer small,
+  .header__online,
+  .about-preview__seal small,
+  .about-hero__role,
+  .inner-hero__aside > span,
+  .service-hero__price small,
+  .document-sample__copy > small,
+  .featured-case__copy dt,
+  .visual-case > div > span,
+  .visual-case dt,
+  .about-proof small,
+  .footer__title,
+  .footer__office small,
+  .footer-map-card small,
+  .map-poster small,
+  .callback-form__availability,
+  .process-guarantee > span,
+  .case-study__category,
+  .service-guide__checklist > span {
+    font-size: .75rem;
+    line-height: 1.45;
+  }
+
+  .hero__quick-choices button,
+  .breadcrumbs,
+  .breadcrumbs ol,
+  .breadcrumbs li,
+  .breadcrumbs a {
+    font-size: .875rem;
+  }
+
   .about-hero__copy { order: 1; }
   .about-hero__photo { order: 2; width: 100%; }
 
@@ -53,4 +150,8 @@ html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
 
   .cta-portrait > img { height: 64px; }
   .about-preview__seal { right: 10px; }
+}
+
+@media (max-width: 350px) {
+  .brand__text small { display: none; }
 }

@@ -18,8 +18,10 @@ jobs:
   build-and-deploy:
     env:
       SITE_PRODUCTION: 'true'
-      SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
-      SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || format('/{0}', github.event.repository.name) }}
+      # Публичный адрес сайта после подключения custom domain в GitHub Pages.
+      SITE_URL: 'https://yuristshevchuk.com'
+      # На собственном домене сайт публикуется из корня, без имени репозитория.
+      SITE_BASE_PATH: ''
       GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
       YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
       SITE_ANALYTICS_ENABLED: ${{ vars.SITE_ANALYTICS_ENABLED || 'false' }}

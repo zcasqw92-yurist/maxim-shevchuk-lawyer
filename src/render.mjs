@@ -643,22 +643,6 @@ export const renderHome = () => ({
       </div>
     </section>
 
-    <section class="section section--dark">
-      <div class="wrap position-grid">
-        <div class="position-intro reveal">
-          <span class="eyebrow eyebrow--light">Подход</span>
-          <h2>Не пересказать конфликт, а собрать позицию</h2>
-          <p>Убедительный документ показывает проверяющему, оппоненту или суду логическую связь между событием, доказательством, нормой и требованием.</p>
-          ${button("Как проходит работа", "/o-yuriste/#process", "gold")}
-        </div>
-        <ol class="position-steps">
-          <li class="reveal"><span>01</span><div><strong>Факты</strong><p>Восстанавливаю хронологию и отделяю юридически значимое от эмоций и предположений.</p></div></li>
-          <li class="reveal"><span>02</span><div><strong>Доказательства</strong><p>Проверяю, чем подтверждаются оплата, договорённости, нарушения и реакция второй стороны.</p></div></li>
-          <li class="reveal"><span>03</span><div><strong>Требования</strong><p>Формулирую конкретный результат, сроки и последствия неисполнения.</p></div></li>
-        </ol>
-      </div>
-    </section>
-
     <section class="section section--services">
       <div class="wrap">
         <div class="section-head section-head--split reveal">
@@ -671,23 +655,6 @@ export const renderHome = () => ({
 
     ${valueBlock()}
     ${priceBlock()}
-
-    <section class="section section--consultation">
-      <div class="wrap consultation-grid">
-        <div class="consultation-photo reveal"><img src="/assets/images/maxim-consultation.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Максим Шевчук объясняет клиенту юридическую позицию"></div>
-        <div class="consultation-copy reveal">
-          <span class="eyebrow">Без лишней неопределённости</span>
-          <h2>Вы понимаете, что происходит на каждом этапе</h2>
-          <p class="lead">Юридическая помощь не должна превращаться в ещё один источник тревоги. После анализа я объясняю, на чём строится позиция и какой шаг следует дальше.</p>
-          <ul class="feature-list">
-            <li>${icon("check")}<div><strong>Что имеет значение</strong><span>Какие факты и документы действительно усиливают позицию.</span></div></li>
-            <li>${icon("check")}<div><strong>Чего можно требовать</strong><span>Основное требование и дополнительные последствия при наличии оснований.</span></div></li>
-            <li>${icon("check")}<div><strong>Что делать после ответа</strong><span>Как действовать при согласии, отказе, отписке или полном молчании.</span></div></li>
-          </ul>
-          <button class="text-link" type="button" data-dialog-open>Задать вопрос по ситуации ${icon("arrow")}</button>
-        </div>
-      </div>
-    </section>
 
     <section class="section section--about-preview">
       <div class="wrap about-preview">

@@ -19,11 +19,8 @@ const readPage = (route) => readFile(join(dist, route, "index.html"), "utf8");
 const count = (text, pattern) => (text.match(pattern) || []).length;
 
 const home = await readFile(join(dist, "index.html"), "utf8");
-if (count(home, /data-search-visibility="home"/g) !== 1) errors.push("Главная: нужен один видимый экспертный поисковый блок");
-if (!home.includes("Юрист по гражданским делам в Москве и дистанционно по России")) errors.push("Главная: отсутствует основной поисковый заголовок");
-if (!home.includes("Материал подготовлен")) errors.push("Главная: отсутствует авторство материала");
-if (!home.includes("Актуализировано")) errors.push("Главная: отсутствует дата актуализации");
-if (/data-search-visibility="home"[^>]*(?:hidden|aria-hidden="true")/.test(home)) errors.push("Главная: поисковый блок не должен быть скрыт от пользователей");
+if (count(home, /data-search-visibility="home"/g) !== 0) errors.push("Главная: повторяющий каталог поисковый блок должен быть удалён");
+if (!home.includes('class="section section--services"')) errors.push("Главная: видимый каталог направлений должен сохраниться");
 
 for (const slug of Object.keys(servicePages)) {
   if (!home.includes(`href="/uslugi/${slug}/"`)) errors.push(`Главная: отсутствует внутренняя ссылка на ${slug}`);

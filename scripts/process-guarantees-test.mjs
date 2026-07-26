@@ -7,7 +7,6 @@ const dist = join(root, "dist");
 const errors = [];
 
 const expectedPages = [
-  ["главная", "index.html", "after-contact"],
   ["услуги", join("uslugi", "index.html"), "before-services"],
   ...services.map((service) => [service.slug, join("uslugi", service.slug, "index.html"), "after-contact"]),
 ];
@@ -41,6 +40,10 @@ for (const [label, pagePath, placement] of expectedPages) {
   }
 }
 
+const home = await readFile(join(dist, "index.html"), "utf8");
+if (home.includes('class="section section--process-guarantees"')) errors.push("главная: повторяющий полосу доверия блок гарантий не должен публиковаться");
+if (!home.includes("trust-strip__grid")) errors.push("главная: краткие условия работы должны остаться в полосе доверия");
+
 for (const pagePath of [join("o-yuriste", "index.html"), join("kontakty", "index.html"), join("politika-konfidencialnosti", "index.html")]) {
   const html = await readFile(join(dist, pagePath), "utf8");
   if (html.includes('class="section section--process-guarantees"')) errors.push(`${pagePath}: блок гарантий добавлен на непредусмотренную страницу`);
@@ -61,4 +64,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Process guarantees checks passed: ${expectedPages.length} pages, four items and responsive layout`);
+console.log(`Process guarantees checks passed: ${expectedPages.length} detail pages; the home page uses one compact trust strip`);

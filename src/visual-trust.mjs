@@ -236,16 +236,11 @@ const injectHomeArchitecture = (html) => {
   let result = html;
   result = insertAfterRequired(result, /<section class="hero">[\s\S]*?<\/section>/, trustStrip(), "полоса доверия");
 
-  const guarantees = result.match(/\s*<section class="section section--process-guarantees"[\s\S]*?<\/section>/)?.[0] || "";
-  if (!guarantees) throw new Error("Не найден блок гарантий для переноса к стоимости");
-  result = result.replace(guarantees, "");
-
   // Неподтверждённые кейсы и образцы не публикуются. Этот защитный проход
   // также удаляет устаревший блок, если он вернётся из более раннего шаблона.
   result = result.replace(/\s*<section class="section section--case-studies"[\s\S]*?<\/section>/, "");
 
   result = replaceRequired(result, /\s*<section class="section section--value">[\s\S]*?<\/section>/, valueBlock(), "результат работы");
-  result = insertAfterRequired(result, /<section class="section section--prices"[^>]*>[\s\S]*?<\/section>/, guarantees, "гарантии после стоимости");
 
   const aboutButton = `<a class="button button--secondary" href="${base}/o-yuriste/"`;
   if (!result.includes(aboutButton)) throw new Error("Не найдена ссылка на сведения об образовании");

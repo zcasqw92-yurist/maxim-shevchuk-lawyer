@@ -20,7 +20,6 @@ for (const marker of [
 ]) assert(home.includes(marker), `Главная страница не содержит обязательный маркер: ${marker}`);
 
 assert(home.includes('class="hero__visual"'), "Главная страница должна содержать статичный фотопортрет без обещания будущего видео");
-assert(home.indexOf("section--prices") < home.indexOf("section--process-guarantees"), "Гарантии должны находиться после блока стоимости");
 assert(home.includes("mobile-contact--dual"), "Согласованная мобильная панель должна сохраниться");
 assert(!home.includes("yandex.ru/map-widget"), "На главной не должен загружаться iframe Яндекс Карт");
 assert(contacts.includes("data-map-load"), "На странице контактов должен быть постер ленивой карты");
@@ -52,6 +51,10 @@ const collectHtml = async (directory) => {
 };
 
 const forbiddenMarkers = [
+  "section--dark",
+  "section--process-guarantees",
+  "section--consultation",
+  'data-search-visibility="home"',
   "section--document-samples",
   "section--featured-case",
   "section--visual-cases",
@@ -68,11 +71,38 @@ const forbiddenMarkers = [
   "демонстрационные обезличенные макеты",
   ...demoAssets,
 ];
-for (const path of await collectHtml(join(root, "dist"))) {
+const htmlFiles = await collectHtml(join(root, "dist"));
+for (const path of htmlFiles) {
   const html = await readFile(path, "utf8");
   for (const marker of forbiddenMarkers) {
-    assert(!html.includes(marker), `Публичная страница содержит неподтверждённый материал: ${marker} (${path})`);
+    if (path === join(root, "dist", "index.html")) {
+      assert(!html.includes(marker), `Главная страница содержит повторяющийся или неподтверждённый блок: ${marker}`);
+    } else if (!["section--dark", "section--process-guarantees", "section--consultation", 'data-search-visibility="home"'].includes(marker)) {
+      assert(!html.includes(marker), `Публичная страница содержит неподтверждённый материал: ${marker} (${path})`);
+    }
   }
 }
+
+const homeMain = home.match(/<main[^>]*>[\s\S]*?<\/main>/)?.[0] || "";
+const sectionFlow = [
+  'class="hero"',
+  'class="trust-strip"',
+  'class="contact-path contact-path--home"',
+  'class="section section--situations"',
+  'class="section section--services"',
+  'class="section section--value section--value-editorial"',
+  'class="section section--prices"',
+  'class="section section--about-preview"',
+  'class="section section--faq"',
+  'class="section section--cta section--cta-portrait"',
+];
+let previousPosition = -1;
+for (const marker of sectionFlow) {
+  const position = homeMain.indexOf(marker);
+  assert(position > previousPosition, `Нарушена последовательность содержательных блоков главной: ${marker}`);
+  previousPosition = position;
+}
+assert((homeMain.match(/<h2\b/g) || []).length <= 8, "На главной снова появились повторяющиеся смысловые секции");
+assert((homeMain.match(/data-dialog-open/g) || []).length <= 15, "На главной снова появилось избыточное число равнозначных CTA");
 
 console.log("Visual trust architecture: only confirmed materials are published");

@@ -194,10 +194,11 @@ const insertBefore = (html, marker, insertion, label) => {
 };
 
 export const injectSearchVisibility = (html, pathname, service = null) => {
+  // На главной ссылки и краткие объяснения уже находятся в видимом каталоге
+  // направлений. Подробные материалы остаются на страницах услуг.
+  if (pathname === "/") return html;
+
   if (html.includes("data-search-visibility=")) throw new Error(`Экспертный поисковый блок уже добавлен: ${pathname}`);
-  if (pathname === "/") {
-    return insertBefore(html, '<section class="section section--faq">', homeBlock(), "главная страница");
-  }
   if (pathname === "/uslugi") {
     return insertBefore(html, '<section class="section section--prices"', directoryBlock(), "каталог услуг");
   }

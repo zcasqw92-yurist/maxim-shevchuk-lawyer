@@ -51,14 +51,14 @@ const insertBeforeRequired = (html, marker, insertion, label) => {
 };
 
 export const injectProcessGuarantees = (html, pathname) => {
+  // На главной эти условия уже кратко представлены в полосе доверия.
+  if (pathname === "/") return html;
+
   if (html.includes('class="section section--process-guarantees"')) {
     throw new Error(`Блок гарантий уже присутствует: ${pathname}`);
   }
 
   const block = processGuaranteesBlock();
-  if (pathname === "/") {
-    return insertAfterRequired(html, /<section class="contact-path[^"]*"[\s\S]*?<\/section>/, block, "главная страница");
-  }
   if (pathname === "/uslugi") {
     return insertBeforeRequired(html, '<section class="section section--services">', block, "страница услуг");
   }

@@ -5,35 +5,6 @@ const proofTrack = (event, params = {}) => {
   if (metricaId && typeof window.ym === "function") window.ym(metricaId, "reachGoal", event, params);
 };
 
-const moscowHour = () => {
-  try {
-    const hour = new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow", hour: "2-digit", hourCycle: "h23" })
-      .formatToParts(new Date())
-      .find((part) => part.type === "hour")?.value;
-    return Number(hour);
-  } catch {
-    return new Date().getHours();
-  }
-};
-
-// Keeps the existing online-status design, but aligns every label to 08:00–22:00 MSK.
-const syncOnlineStatus = () => {
-  const online = moscowHour() >= 8 && moscowHour() < 22;
-  document.querySelectorAll("[data-online-status]").forEach((status) => {
-    status.classList.toggle("is-offline", !online);
-    const label = status.querySelector("[data-online-label]");
-    if (label) label.textContent = status.classList.contains("header__online")
-      ? (online ? "Юрист онлайн" : "Юрист офлайн")
-      : (online ? "На связи в мессенджерах" : "Сейчас офлайн · отвечу после 08:00 МСК");
-    if (status.classList.contains("header__online")) {
-      status.setAttribute("aria-label", `${online ? "Юрист онлайн" : "Юрист офлайн"} — задать вопрос`);
-    }
-  });
-};
-
-syncOnlineStatus();
-setInterval(syncOnlineStatus, 10_000);
-
 const motionAllowed = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (motionAllowed && "IntersectionObserver" in window) {
   document.documentElement.dataset.proofMotion = "ready";

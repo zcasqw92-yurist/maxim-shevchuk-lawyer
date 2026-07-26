@@ -10,7 +10,7 @@ const assert = (condition, message) => {
 
 const home = await read("dist/index.html");
 const contacts = await read("dist/kontakty/index.html");
-const script = await read("dist/assets/visual-trust.js");
+const onlineStatusScript = await read("dist/assets/online-status.mjs");
 
 for (const marker of [
   "data-video-launch",
@@ -33,7 +33,7 @@ assert(home.includes("mobile-contact--dual"), "Согласованная моб
 assert(!home.includes("yandex.ru/map-widget"), "На главной не должен загружаться iframe Яндекс Карт");
 assert(contacts.includes("data-map-load"), "На странице контактов должен быть постер ленивой карты");
 assert(!contacts.includes("yandex.ru/map-widget"), "Карта не должна загружаться до действия пользователя");
-assert(script.includes("moscowHour() >= 8") && script.includes("moscowHour() < 22"), "Онлайн-статус должен работать с 08:00 до 22:00 МСК");
+assert(onlineStatusScript.includes("hour >= ONLINE_FROM_HOUR && hour < ONLINE_UNTIL_HOUR"), "Онлайн-статус должен использовать единое правило времени");
 
 for (const name of [
   "document-pretenziya-demo.svg",

@@ -144,6 +144,7 @@ const styles = [
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
+await cp(join(root, "src", "online-status.mjs"), join(dist, "assets", "online-status.mjs"));
 await cp(join(root, "src", "visual-trust.js"), join(dist, "assets", "visual-trust.js"));
 await cp(join(root, "public"), dist, { recursive: true });
 

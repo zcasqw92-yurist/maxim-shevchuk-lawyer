@@ -2,11 +2,14 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { site } from "../site.config.mjs";
 import { contentDateForPath, formatContentDate } from "../src/content-dates.mjs";
+import { automatedReviewDate, formatReviewDate } from "../src/review-dates.mjs";
 import { services } from "../src/data.mjs";
 
 const root = new URL("../", import.meta.url).pathname;
 const dist = join(root, "dist");
 const errors = [];
+const reviewDate = automatedReviewDate();
+const reviewLabel = formatReviewDate(reviewDate);
 const pages = [
   ["/", "index.html"],
   ["/uslugi", join("uslugi", "index.html")],
@@ -28,7 +31,15 @@ for (const [pathname, file] of pages) {
     });
   const webPage = jsonLd.find((node) => ["WebPage", "ProfilePage", "ContactPage", "CollectionPage"].includes(node["@type"]));
   if (webPage?.dateModified !== expected) errors.push(`${pathname}: JSON-LD dateModified ${webPage?.dateModified || "missing"} != ${expected}`);
-  if (!html.includes(`Страница проверена <time datetime="${expected}">${label}</time>.`)) errors.push(`${pathname}: видимая дата не совпадает с JSON-LD`);
+  if (!html.includes(`Автоматическая проверка страницы и ссылок: <time datetime="${reviewDate}">${reviewLabel}</time>.`)) {
+    errors.push(`${pathname}: отсутствует единая дата автоматической проверки`);
+  }
+  if (!html.includes(`Содержательно обновлено: <time datetime="${expected}">${label}</time>.`)) {
+    errors.push(`${pathname}: не сохранена достоверная дата содержательного обновления`);
+  }
+  if (!html.includes(`<meta name="site-automated-review-date" content="${reviewDate}">`)) {
+    errors.push(`${pathname}: отсутствует машинно-читаемая дата автоматической проверки`);
+  }
   if (/г\.\./.test(html)) errors.push(`${pathname}: двойная точка после года`);
 
   const canonicalPath = pathname === "/" ? "/" : `${pathname}/`;
@@ -39,8 +50,11 @@ for (const [pathname, file] of pages) {
 for (const [pathname, file] of pages.filter(([pathname]) => pathname === "/uslugi" || pathname.startsWith("/uslugi/"))) {
   const html = await readFile(join(dist, file), "utf8");
   const expected = contentDateForPath(pathname);
-  if (!html.includes(`Проверено <time datetime="${expected}">${formatContentDate(expected)}</time>`)) {
-    errors.push(`${pathname}: дата экспертного материала не совпадает с датой страницы`);
+  if (!html.includes(`Автоматическая проверка источников: <time datetime="${reviewDate}">${reviewLabel}</time>`)) {
+    errors.push(`${pathname}: дата автоматической проверки источников не синхронизирована`);
+  }
+  if (!html.includes(`Материал обновлён: <time datetime="${expected}">${formatContentDate(expected)}</time>`)) {
+    errors.push(`${pathname}: дата содержательного обновления экспертного материала не сохранена`);
   }
 }
 
@@ -55,4 +69,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Content dates passed: ${pages.length} pages use explicit visible, JSON-LD and sitemap dates`);
+console.log(`Content dates passed: ${pages.length} pages separate automated review from real content modification`);

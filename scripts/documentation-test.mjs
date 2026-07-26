@@ -60,15 +60,19 @@ for (const forbidden of [
 }
 
 const packageJson = JSON.parse(packageText);
-for (const script of ["test:content-dates", "test:composition-contract", "test:documentation", "test:indexing-lock", "test:live-indexing-lock"]) {
+for (const script of ["test:content-dates", "test:composition-contract", "test:documentation", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock"]) {
   if (!packageJson.scripts?.[script]) errors.push(`package.json: отсутствует ${script}`);
 }
 if (!workflow.includes("npm run lock:indexing && npm run test:indexing-lock")) errors.push("pages.yml: публикация не защищена локальной проверкой indexing lock");
 if (!workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: публикация не защищена live-проверкой indexing lock");
+if (!workflow.includes("playwright install --with-deps chromium firefox webkit")) errors.push("pages.yml: три браузерных движка не устанавливаются");
+if (!workflow.includes("npm run test:cross-browser")) errors.push("pages.yml: кроссбраузерный smoke не запускается");
+if (!workflow.includes("CROSS_BROWSER_REQUIRED: 'true'")) errors.push("pages.yml: отсутствие браузерного движка не останавливает деплой");
 
 for (const relativePath of [
   "docs/current-production-state.md",
   "tests/golden-render-contract.json",
+  "docs/manual-device-qa.md",
   "INDEXING_POLICY.md",
 ]) {
   try {

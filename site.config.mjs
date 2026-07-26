@@ -28,7 +28,7 @@ export const site = {
     "/uslugi/marketpleysy": "2026-07-26",
     "/o-yuriste": "2026-07-17",
     "/kontakty": "2026-07-17",
-    "/politika-konfidencialnosti": "2026-07-17",
+    "/politika-konfidencialnosti": "2026-07-26",
   },
   name: "Максим Юрьевич Шевчук",
   shortName: "Максим Шевчук",

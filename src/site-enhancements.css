@@ -167,7 +167,7 @@
     .number-list p, .plain-checks li { font-size: 1rem; }
     .callback-form__intro { font-size: 15px; }
     .callback-form__fields { gap: 14px; margin-top: 22px; }
-    .callback-open-link { min-height: 44px; }
+    .callback-open-link { min-height: 46px; }
     .legal-page aside h1 { font-size: clamp(2.35rem, 12vw, 4.2rem); }
 
     .section--process-guarantees { padding-block: 62px; }

@@ -116,6 +116,26 @@ const revealProofBlocks = async (page, label) => {
   await page.waitForFunction(() => window.scrollY === 0);
 };
 
+const auditTouchTargets = async (page, label, selector) => {
+  const invalid = await page.locator(selector).evaluateAll((items) => items
+    .filter((item) => {
+      const style = getComputedStyle(item);
+      const rect = item.getBoundingClientRect();
+      return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0;
+    })
+    .map((item) => {
+      const rect = item.getBoundingClientRect();
+      return {
+        target: `${item.tagName.toLowerCase()}.${[...item.classList].slice(0, 3).join(".")}`,
+        width: Math.round(rect.width * 10) / 10,
+        height: Math.round(rect.height * 10) / 10,
+        text: item.textContent.trim().replace(/\s+/g, " ").slice(0, 60),
+      };
+    })
+    .filter((item) => item.width < 44 || item.height < 44));
+  if (invalid.length) errors.push(`${label}: touch targets below 44×44 ${JSON.stringify(invalid)}`);
+};
+
 try {
   browser = await chromium.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-background-networking", "--disable-extensions", "--font-render-hinting=none"],
@@ -207,6 +227,11 @@ try {
   for (const width of [320, 390, 430]) {
     const targetPage = await browser.newPage({ viewport: { width, height: 844 } });
     await targetPage.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
+    await auditTouchTargets(
+      targetPage,
+      `interaction ${width}px`,
+      "[data-menu-toggle], .hero__actions .button, .hero__quick-choices button",
+    );
     const status = targetPage.locator(".header__online");
     const box = await status.boundingBox();
     if (!box || box.width < 24 || box.height < 24) {
@@ -240,6 +265,41 @@ try {
     if (trustTypography.minSize < 14 || trustTypography.clipped) {
       errors.push(`interaction: trust strip is unreadable at ${width}px ${JSON.stringify(trustTypography)}`);
     }
+
+    await targetPage.locator(".hero__actions [data-dialog-open]").click();
+    const targetDialog = targetPage.locator("#contact-dialog");
+    await targetPage.waitForTimeout(320);
+    await auditTouchTargets(
+      targetPage,
+      `contact dialog ${width}px`,
+      "#contact-dialog button, #contact-dialog a",
+    );
+    await targetDialog.locator("[data-dialog-close]").click();
+
+    const longTopic = "договорный спор с удержанием оплаты, несколькими платежами, перепиской и необходимостью проверить дальнейший порядок действий";
+    const longTopicButton = targetPage.locator(".hero__quick-choices [data-dialog-open]").first();
+    await longTopicButton.evaluate((element, topic) => { element.dataset.topic = topic; }, longTopic);
+    await longTopicButton.click();
+    const longTopicState = await targetDialog.evaluate((element, topic) => {
+      const rect = element.getBoundingClientRect();
+      const topicLabel = element.querySelector("[data-dialog-topic]");
+      return {
+        topicVisible: topicLabel?.textContent.includes(topic),
+        viewport: innerWidth,
+        pageScrollWidth: document.documentElement.scrollWidth,
+        dialogLeft: rect.left,
+        dialogRight: rect.right,
+        clipped: topicLabel ? topicLabel.scrollWidth > topicLabel.clientWidth + 1 || topicLabel.scrollHeight > topicLabel.clientHeight + 1 : true,
+      };
+    }, longTopic);
+    if (!longTopicState.topicVisible
+      || longTopicState.pageScrollWidth > longTopicState.viewport + 1
+      || longTopicState.dialogLeft < -1
+      || longTopicState.dialogRight > longTopicState.viewport + 1
+      || longTopicState.clipped) {
+      errors.push(`interaction: long topic is clipped at ${width}px ${JSON.stringify(longTopicState)}`);
+    }
+    await targetDialog.locator("[data-dialog-close]").click();
 
     await targetPage.addStyleTag({ content: `
       html { font-size: 200% !important; }
@@ -292,11 +352,11 @@ try {
   if (await menuButton.count() !== 1) errors.push("interaction: mobile menu trigger is not unique");
   await mobilePage.evaluate(() => {
     document.documentElement.style.scrollBehavior = "auto";
-    window.scrollTo(0, 600);
+    window.scrollTo(0, 650);
   });
-  await mobilePage.waitForFunction(() => window.scrollY >= 590);
-  await mobilePage.evaluate(() => window.scrollTo(0, 550));
-  await mobilePage.waitForFunction(() => window.scrollY <= 560 && !document.querySelector("[data-header]")?.classList.contains("is-header-hidden"));
+  await mobilePage.waitForFunction(() => window.scrollY >= 640);
+  await mobilePage.evaluate(() => window.scrollTo(0, 300));
+  await mobilePage.waitForFunction(() => window.scrollY <= 310 && !document.querySelector("[data-header]")?.classList.contains("is-header-hidden"));
   await mobilePage.waitForTimeout(320);
   const menuStartScroll = await mobilePage.evaluate(() => window.scrollY);
   if (await menuButton.count() === 1) await menuButton.tap();

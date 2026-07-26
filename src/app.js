@@ -417,7 +417,10 @@ const callbackMessage = () => {
     `Контакт: ${String(data.get("contact") || "").trim()}`,
     `Удобный день: ${String(data.get("day") || "").trim()}`,
     `Удобное время: ${String(data.get("period") || "").trim()}`,
-    `Кратко о ситуации: ${String(data.get("summary") || "").trim()}`,
+    `Тип вопроса: ${String(data.get("issue") || "").trim()}`,
+    `Стадия: ${String(data.get("stage") || "").trim()}`,
+    `Ближайший срок: ${String(data.get("deadline") || "").trim()}`,
+    `Материалы: ${String(data.get("materials") || "").trim()}`,
     `Страница сайта: ${String(data.get("source") || location.pathname).trim()}`,
   ].join("\n");
 };

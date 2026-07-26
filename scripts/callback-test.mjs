@@ -22,9 +22,12 @@ for (const pagePath of pagePaths) {
   const triggerCount = (html.match(/data-callback-open/g) || []).length;
   if (dialogCount !== 1) errors.push(`${pagePath}: expected one callback dialog, found ${dialogCount}`);
   if (triggerCount < 3) errors.push(`${pagePath}: expected at least three callback triggers, found ${triggerCount}`);
-  for (const field of ["name", "contact", "day", "period", "summary", "consent"]) {
+  for (const field of ["name", "contact", "day", "period", "issue", "stage", "deadline", "materials", "consent"]) {
     if (!html.includes(`name="${field}"`)) errors.push(`${pagePath}: missing callback field ${field}`);
   }
+  if (html.includes('name="summary"')) errors.push(`${pagePath}: callback still includes an unrestricted situation field`);
+  if (!html.includes("не указывайте паспортные данные")) errors.push(`${pagePath}: missing data-minimization warning`);
+  if (!html.includes("порядок их передачи согласуйте с юристом отдельно")) errors.push(`${pagePath}: missing separate document-transfer warning`);
   if (!html.includes("Попросить связаться со мной")) errors.push(`${pagePath}: missing callback submit label`);
   if (!html.includes("Данные не сохраняются на сайте")) errors.push(`${pagePath}: missing no-storage notice`);
   if (!html.includes(site.whatsapp)) errors.push(`${pagePath}: missing WhatsApp base link`);

@@ -141,7 +141,10 @@ try {
     await callback.locator('[name="contact"]').fill("@test_client");
     await callback.locator('[name="day"]').selectOption({ label: "Завтра" });
     await callback.locator('[name="period"]').selectOption({ label: "День, 12:00–17:00" });
-    await callback.locator('[name="summary"]').fill("Нужно обсудить возврат денег по договору.");
+    await callback.locator('[name="issue"]').selectOption({ label: "Договор, покупка или услуга" });
+    await callback.locator('[name="stage"]').selectOption({ label: "Переговоры или претензия" });
+    await callback.locator('[name="deadline"]').selectOption({ label: "В течение недели" });
+    await callback.locator('[name="materials"]').selectOption({ label: "Документы есть" });
     await callback.locator('[name="consent"]').check();
 
     await callback.locator("[data-callback-telegram]").click();
@@ -152,7 +155,10 @@ try {
       "Контакт: @test_client",
       "Удобный день: Завтра",
       "Удобное время: День, 12:00–17:00 МСК",
-      "Кратко о ситуации: Нужно обсудить возврат денег по договору.",
+      "Тип вопроса: Договор, покупка или услуга",
+      "Стадия: Переговоры или претензия",
+      "Ближайший срок: В течение недели",
+      "Материалы: Документы есть",
     ];
     expectParts(`${profile.name}: callback Telegram`, textParam(callbackTelegramUrl), callbackParts);
     if (await page.evaluate(() => window.__clipboardCalls) !== 0) errors.push(`${profile.name}: callback Telegram still depends on clipboard`);

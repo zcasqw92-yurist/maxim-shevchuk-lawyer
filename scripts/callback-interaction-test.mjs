@@ -124,7 +124,10 @@ try {
     await callbackDialog.locator('[name="contact"]').fill("@test_client");
     await callbackDialog.locator('[name="day"]').selectOption({ label: "Завтра" });
     await callbackDialog.locator('[name="period"]').selectOption({ label: "День, 12:00–17:00" });
-    await callbackDialog.locator('[name="summary"]').fill("Нужно обсудить возврат денег по договору.");
+    await callbackDialog.locator('[name="issue"]').selectOption({ label: "Договор, покупка или услуга" });
+    await callbackDialog.locator('[name="stage"]').selectOption({ label: "Переговоры или претензия" });
+    await callbackDialog.locator('[name="deadline"]').selectOption({ label: "В течение недели" });
+    await callbackDialog.locator('[name="materials"]').selectOption({ label: "Документы есть" });
     await callbackDialog.locator('[name="consent"]').check();
 
     const callbackLayout = await callbackDialog.evaluate((element) => ({
@@ -147,7 +150,10 @@ try {
       "Контакт: @test_client",
       "Удобный день: Завтра",
       "Удобное время: День, 12:00–17:00 МСК",
-      "Кратко о ситуации: Нужно обсудить возврат денег по договору.",
+      "Тип вопроса: Договор, покупка или услуга",
+      "Стадия: Переговоры или претензия",
+      "Ближайший срок: В течение недели",
+      "Материалы: Документы есть",
       "Страница сайта: /",
     ]) {
       if (!telegramText.includes(part)) errors.push(`${profile.name}: Telegram draft is missing: ${part}`);

@@ -50,6 +50,16 @@
     outline: 2px solid rgba(195,154,93,.24);
     outline-offset: 0;
   }
+  .callback-form__data-warning {
+    padding: 13px 14px;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--gold);
+    background: var(--paper-2);
+    font-size: 13px;
+    font-weight: 560;
+    line-height: 1.55;
+    text-align: left;
+  }
   .callback-consent {
     display: grid;
     grid-template-columns: 20px minmax(0, 1fr);

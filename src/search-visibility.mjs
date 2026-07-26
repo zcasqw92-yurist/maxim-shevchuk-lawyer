@@ -8,6 +8,7 @@ const escapeHtml = (value = "") => String(value)
   .replaceAll('"', "&quot;");
 
 const href = (pathname) => `${site.basePath || ""}${pathname}`;
+const generalInformationNotice = "Материал носит общий информационный характер и не заменяет индивидуальный правовой анализ. Применимые нормы, состав требований и перспективы зависят от обстоятельств, документов, статуса сторон и актуальной редакции законодательства.";
 const authorNote = (pathname) => {
   const date = contentDateForPath(pathname);
   return `
@@ -107,6 +108,10 @@ const serviceGuides = {
     ],
     checklist: ["договор, заказ или иное подтверждение договорённости", "чеки, переводы и сведения о сумме", "переписка, акты, фотографии и полученные ответы", "дата нарушения и ранее заявленные требования"],
     links: [["Возврат денежных средств", "/uslugi/vozvrat-deneg/"], ["Исковое заявление", "/uslugi/iskovoe-zayavlenie/"]],
+    sources: [
+      ["Гражданский кодекс Российской Федерации, часть первая", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102033239"],
+      ["Как правильно составить претензию", "Государственный информационный ресурс в сфере защиты прав потребителей", "https://zpp.rospotrebnadzor.ru/Core/Content/ShowContentById/490700"],
+    ],
   },
   "vozvrat-deneg": {
     title: "Как юрист помогает вернуть деньги за товар, услугу, работу или по договору",
@@ -117,6 +122,11 @@ const serviceGuides = {
     ],
     checklist: ["кому, когда и за что были переданы деньги", "сумма оплаты и способ её подтверждения", "что обещала и что фактически сделала вторая сторона", "какие требования уже направлялись и что на них ответили"],
     links: [["Досудебное урегулирование", "/uslugi/dosudebnoe-uregulirovanie/"], ["Подготовка иска", "/uslugi/iskovoe-zayavlenie/"]],
+    sources: [
+      ["Гражданский кодекс Российской Федерации, часть вторая", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102039276"],
+      ["Правила возврата товаров при дистанционной покупке", "Управление Роспотребнадзора по г. Москве", "https://77.rospotrebnadzor.ru/index.php/napravlenie/zpp/13817-pravila-vozvrata-tovarov-pri-pokupke-distantsionnym-sposobom-09-01-2025"],
+      ["Возврат денег за товар: разъяснение для потребителей", "Управление Роспотребнадзора", "https://26.rospotrebnadzor.ru/press-center/pr/9995/"],
+    ],
   },
   "zhaloby-i-obrashcheniya": {
     title: "Как подготовить жалобу на бездействие, отказ или нарушение прав",
@@ -127,6 +137,10 @@ const serviceGuides = {
     ],
     checklist: ["текст первоначального заявления или жалобы", "подтверждение даты и способа подачи", "ответ, отказ, постановление или уведомление", "описание результата, которого необходимо добиться"],
     links: [["Досудебное урегулирование", "/uslugi/dosudebnoe-uregulirovanie/"], ["Исковое заявление", "/uslugi/iskovoe-zayavlenie/"]],
+    sources: [
+      ["Федеральный закон № 59-ФЗ «О порядке рассмотрения обращений граждан Российской Федерации»", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102106413"],
+      ["Права гражданина при рассмотрении обращений", "Генеральная прокуратура Российской Федерации", "https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e142599/"],
+    ],
   },
   "iskovoe-zayavlenie": {
     title: "Что входит в составление искового заявления в суд",
@@ -137,6 +151,10 @@ const serviceGuides = {
     ],
     checklist: ["договор, расписка, чеки и платежные документы", "претензия и подтверждение её направления", "переписка, акты, фотографии и другие доказательства", "сведения об ответчике и сформулированный результат"],
     links: [["Досудебная претензия", "/uslugi/dosudebnoe-uregulirovanie/"], ["Возврат денег", "/uslugi/vozvrat-deneg/"]],
+    sources: [
+      ["Гражданский процессуальный кодекс Российской Федерации", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102078828"],
+      ["Гражданский кодекс Российской Федерации, часть первая", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102033239"],
+    ],
   },
   "spory-biznesa": {
     title: "Договорные споры и взыскание задолженности между ИП и организациями",
@@ -147,6 +165,10 @@ const serviceGuides = {
     ],
     checklist: ["договор и дополнительные соглашения", "счета, акты, накладные и платежи", "деловая переписка и уведомления", "расчёт долга, штрафов или убытков"],
     links: [["Досудебное урегулирование", "/uslugi/dosudebnoe-uregulirovanie/"], ["Споры с маркетплейсами", "/uslugi/marketpleysy/"]],
+    sources: [
+      ["Гражданский кодекс Российской Федерации, часть первая", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102033239"],
+      ["Арбитражный процессуальный кодекс Российской Федерации", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102079219"],
+    ],
   },
   marketpleysy: {
     title: "Юрист для продавцов Ozon, Wildberries и Яндекс Маркета",
@@ -157,6 +179,10 @@ const serviceGuides = {
     ],
     checklist: ["оферта или договор и дата присоединения", "отчёты, акты и детализация удержаний", "скриншоты кабинета и обращения в поддержку", "расчёт спорной суммы и последствия блокировки"],
     links: [["Споры бизнеса", "/uslugi/spory-biznesa/"], ["Исковое заявление", "/uslugi/iskovoe-zayavlenie/"]],
+    sources: [
+      ["Арбитражный процессуальный кодекс Российской Федерации", "Официальный интернет-портал правовой информации", "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102079219"],
+      ["Принципы взаимодействия маркетплейсов с продавцами", "Федеральная антимонопольная служба", "https://fas.gov.ru/news/34312"],
+    ],
   },
 };
 
@@ -179,6 +205,19 @@ const serviceBlock = (service) => {
         <ul>${guide.checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
         <button class="text-link" type="button" data-dialog-open data-topic="${escapeHtml(service.name)}">Передать материалы юристу</button>
       </aside>
+      <div class="service-guide__verification reveal" data-official-sources>
+        <div>
+          <span class="eyebrow">Правовая основа</span>
+          <h3>Официальные источники для проверки</h3>
+          <p>${escapeHtml(generalInformationNotice)}</p>
+        </div>
+        <ul>${guide.sources.map(([title, publisher, url]) => `
+          <li>
+            <a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(title)}</a>
+            <span>${escapeHtml(publisher)}</span>
+          </li>`).join("")}
+        </ul>
+      </div>
       ${authorNote(`/uslugi/${service.slug}`)}
     </div>
   </section>`;

@@ -62,13 +62,10 @@ jobs:
       - name: Install browser engines
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Build production site
-        run: npm run build
-
-      - name: Validate generated site
+      - name: Build and validate production site
         env:
           CROSS_BROWSER_REQUIRED: 'true'
-        run: npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser
+        run: npm run check
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -89,3 +86,7 @@ jobs:
           SITE_PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
           EXPECTED_BUILD_SHA: ${{ github.sha }}
         run: npm run test:live
+
+      - name: Notify IndexNow about changed pages
+        if: github.event_name != 'schedule'
+        run: INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow

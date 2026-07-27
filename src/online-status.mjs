@@ -1,6 +1,6 @@
 const MOSCOW_TIME_ZONE = "Europe/Moscow";
 const MOSCOW_UTC_OFFSET_HOURS = 3;
-const ONLINE_FROM_HOUR = 7;
+const ONLINE_FROM_HOUR = 8;
 const ONLINE_UNTIL_HOUR = 23;
 
 export const moscowHour = (date = new Date()) => {
@@ -32,7 +32,7 @@ export const updateOnlineStatus = (root = document, date = new Date()) => {
     if (label) {
       label.textContent = status.classList.contains("header__online")
         ? (online ? "Юрист онлайн" : "Юрист офлайн")
-        : (online ? "На связи в мессенджерах" : "Сейчас офлайн · отвечу после 07:00 МСК");
+        : (online ? "На связи в мессенджерах" : "Сейчас офлайн · отвечу после 08:00 МСК");
     }
     if (status.classList.contains("header__online")) {
       status.setAttribute("aria-label", `${online ? "Юрист онлайн" : "Юрист офлайн"} — задать вопрос`);

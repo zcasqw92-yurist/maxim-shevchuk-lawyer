@@ -80,7 +80,8 @@ for (const marker of [
   'google: env("GOOGLE_SITE_VERIFICATION")',
   'yandex: env("YANDEX_SITE_VERIFICATION")',
   'indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158"',
-  'defaultTitle: "Юрист по гражданским делам в Москве | Максим Шевчук"',
+  'defaultTitle: "Юрист по гражданским делам в Москве и Московской области | Максим Шевчук"',
+  'publicLabel: "Офис в Химках · услуги по Москве и Московской области · онлайн по России"',
 ]) {
   if (!config.includes(marker)) errors.push(`site.config.mjs: отсутствует настройка ${marker}`);
 }
@@ -93,16 +94,26 @@ for (const marker of [
   "INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}",
   "schedule:",
   "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)",
-  "npm run test:content-dates",
+  "npm run check",
+  "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
 ]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует настройка ${marker}`);
 }
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production-сайт не должен снова закрываться от индексации");
 if (/if:\s*\$\{\{\s*env\.INDEXNOW_KEY/.test(workflow)) errors.push("pages.yml: IndexNow не должен зависеть от необязательного секрета");
 
+const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+if (/lock:indexing/.test(packageJson.scripts.check || "")) errors.push("package.json: npm run check не должен менять production-индексацию");
+if (!packageJson.scripts["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельная проверка закрытого preview должна сохраниться");
+
+const indexNow = await readFile(join(root, "scripts", "submit-indexnow.mjs"), "utf8");
+for (const marker of ["INDEXNOW_CHANGED_DATE", "lastmod", "--all", "нет URL с содержательным обновлением"]) {
+  if (!indexNow.includes(marker)) errors.push(`submit-indexnow.mjs: отсутствует ${marker}`);
+}
+
 if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: expert content, official sources and weekly review metadata are present");
+console.log("Search visibility checks passed: production indexing, geography and automatic IndexNow are configured");

@@ -1,4 +1,5 @@
 import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
+import { applyServiceGeography } from "./geography.mjs";
 import { automatedReviewDate, formatReviewDate } from "./review-dates.mjs";
 
 const slotNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -56,5 +57,6 @@ export const finalizeBuildSlots = (html, pathname) => {
   if (unexpected.length) {
     throw new Error(`Не заполнены сборочные слоты ${pathname}: ${[...new Set(unexpected)].join(", ")}`);
   }
-  return fillBuildSlot(injectAutomatedReviewStatus(html, pathname), "head-assets", "");
+  const finalized = fillBuildSlot(injectAutomatedReviewStatus(html, pathname), "head-assets", "");
+  return applyServiceGeography(finalized);
 };

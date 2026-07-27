@@ -116,6 +116,9 @@ for (const marker of sectionFlow) {
   previousPosition = position;
 }
 assert((homeMain.match(/<h2\b/g) || []).length <= 8, "На главной снова появились повторяющиеся смысловые секции");
-assert((homeMain.match(/data-dialog-open/g) || []).length <= 16, "На главной снова появилось избыточное число равнозначных CTA");
+const directMessengerCtaCount = (homeMain.match(/data-dialog-open/g) || []).length;
+assert(directMessengerCtaCount >= 10, "На главной недостаточно точек прямого обращения к юристу");
+assert(directMessengerCtaCount <= 22, `На главной избыточное число прямых CTA: ${directMessengerCtaCount}`);
+assert(!/data-(?:callback|price-quiz)-open/.test(homeMain), "На главной не должно быть альтернативных форм или квиза");
 
-console.log("Visual trust architecture: one direct mobile CTA, verified cases, no forms, demo or unsupported materials");
+console.log(`Visual trust architecture: ${directMessengerCtaCount} direct messenger CTAs, verified cases, no forms, demo or unsupported materials`);

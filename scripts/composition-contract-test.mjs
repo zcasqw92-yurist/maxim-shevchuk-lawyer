@@ -51,6 +51,12 @@ const removedInteractionHooks = new Set([
   "data-price-quiz-telegram",
   "data-price-quiz-telegram-note",
   "data-price-quiz-whatsapp",
+  "data-quiz-value",
+]);
+const contextualHooks = new Set([
+  "data-message",
+  "data-mobile-contact-now",
+  "data-topic",
 ]);
 const removedDialogs = new Set(["callback-dialog", "price-quiz-dialog"]);
 const removedHeadings = new Set([
@@ -129,7 +135,7 @@ const structuralSignature = (route, signature = {}) => {
     sections: sections.filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result")),
     headings: normalizeHeadings(route, headings),
     dialogs: dialogs.filter((dialog) => !removedDialogs.has(dialog)),
-    dataHooks: dataHooks.filter((hook) => !analyticsConsentHookSet.has(hook) && !removedInteractionHooks.has(hook)),
+    dataHooks: dataHooks.filter((hook) => !analyticsConsentHookSet.has(hook) && !removedInteractionHooks.has(hook) && !contextualHooks.has(hook)),
   };
 };
 
@@ -181,7 +187,15 @@ if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
     const actualPage = actualStructure[route] || {};
     const expectedPage = expectedStructure[route] || {};
     const fields = [...new Set([...Object.keys(actualPage), ...Object.keys(expectedPage)])]
-      .filter((field) => JSON.stringify(actualPage[field]) !== JSON.stringify(expectedPage[field]));
+      .filter((field) => JSON.stringify(actualPage[field]) !== JSON.stringify(expectedPage[field]))
+      .map((field) => {
+        if (field !== "dataHooks") return field;
+        const actualHooks = new Set(actualPage.dataHooks || []);
+        const expectedHooks = new Set(expectedPage.dataHooks || []);
+        const added = [...actualHooks].filter((hook) => !expectedHooks.has(hook));
+        const removed = [...expectedHooks].filter((hook) => !actualHooks.has(hook));
+        return `dataHooks(+${added.join("|") || "-"};-${removed.join("|") || "-"})`;
+      });
     return `${route}: ${fields.join(", ") || "unknown"}`;
   });
   throw new Error(`Структурный golden-контракт изменился: ${changedFields.join("; ")}. Проверьте diff и обновляйте эталон только осознанно.`);

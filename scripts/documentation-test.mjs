@@ -29,20 +29,30 @@ const [
 ]);
 
 const canonicalCount = services.length + 5;
-const htmlCount = canonicalCount + 3;
 for (const marker of [
   `${canonicalCount} канонических содержательных URL`,
-  `${htmlCount} HTML-файлов`,
-  "noindex,nofollow,noarchive,nosnippet,noimageindex",
-  "пустой `sitemap.xml`",
-  "удаляет ключ IndexNow",
-  "запрет индексации HTML обеспечивается строгим meta robots",
-  "EXPECTED_BUILD_SHA='<полный commit SHA>' npm run test:live",
-  "npm run test:live-indexing-lock",
-  "site.contentLastModifiedByPath",
-  "tests/golden-render-contract.json",
+  "https://yuristshevchuk.com",
+  "физический офис: Московская область, Химки, улица Горшина, 2",
+  "юридические услуги оказываются клиентам из Москвы и всей Московской области",
+  "дистанционная работа доступна по всей России",
+  "онлайн: ежедневно с 08:00 до 23:00 МСК",
+  "канонические страницы получают `index,follow`",
+  "`robots.txt` разрешает обход",
+  "не входит в обычную команду `npm run check`",
+  "INDEXNOW_CHANGED_DATE=2026-07-27 npm run submit:indexnow",
+  "npm run check:preview-indexing-lock",
+  "Production workflow запускает именно `npm run check`",
 ]) {
   if (!current.includes(marker)) errors.push(`current-production-state.md: отсутствует актуальный маркер «${marker}»`);
+}
+
+for (const obsolete of [
+  "Индексация намеренно закрыта",
+  "публикует пустой `sitemap.xml`",
+  "удаляет ключ IndexNow",
+  "npm run test:live-indexing-lock подтвердил блокировку",
+]) {
+  if (current.includes(obsolete)) errors.push(`current-production-state.md: осталось устаревшее утверждение «${obsolete}»`);
 }
 
 if (!readme.includes("docs/current-production-state.md")) errors.push("README.md: нет ссылки на текущий источник истины");
@@ -50,24 +60,26 @@ if (!quality.includes("АРХИВНЫЙ ОТЧЁТ")) errors.push("QUALITY_REPOR
 if (!roadmap.includes("ИСТОРИЧЕСКИЙ ПЛАН")) errors.push("SEO_AUDIT_AND_ROADMAP.md: старый план не помечен историческим");
 if (!deployment.includes("не разрешение на индексацию")) errors.push("DEPLOYMENT.md: будущая инструкция не отделена от текущего режима");
 if (!seoLaunch.includes("HOLD: только для будущего запуска")) errors.push("docs/seo-launch-checklist.md: отсутствует HOLD");
-if (!indexingPolicy.includes("новые страницы услуг")) errors.push("INDEXING_POLICY.md: новые страницы не охвачены блокировкой");
-
-for (const forbidden of [
-  "публичная сборка всегда создаётся с `index,follow`",
-  "После успешного деплоя workflow:\n\n1. публикует файл",
-]) {
-  if (seoLaunch.includes(forbidden)) errors.push(`docs/seo-launch-checklist.md: осталось устаревшее утверждение «${forbidden}»`);
-}
+if (!indexingPolicy.includes("новые страницы услуг")) errors.push("INDEXING_POLICY.md: историческая политика не охватывает новые страницы услуг");
 
 const packageJson = JSON.parse(packageText);
-for (const script of ["test:content-dates", "test:composition-contract", "test:documentation", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock"]) {
+for (const script of ["test:content-dates", "test:geography", "test:composition-contract", "test:documentation", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock", "check:preview-indexing-lock"]) {
   if (!packageJson.scripts?.[script]) errors.push(`package.json: отсутствует ${script}`);
 }
-if (!workflow.includes("npm run lock:indexing && npm run test:indexing-lock")) errors.push("pages.yml: публикация не защищена локальной проверкой indexing lock");
-if (!workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: публикация не защищена live-проверкой indexing lock");
-if (!workflow.includes("playwright install --with-deps chromium firefox webkit")) errors.push("pages.yml: три браузерных движка не устанавливаются");
-if (!workflow.includes("npm run test:cross-browser")) errors.push("pages.yml: кроссбраузерный smoke не запускается");
-if (!workflow.includes("CROSS_BROWSER_REQUIRED: 'true'")) errors.push("pages.yml: отсутствие браузерного движка не останавливает деплой");
+if (/lock:indexing/.test(packageJson.scripts?.check || "")) errors.push("package.json: npm run check не должен включать indexing lock");
+if (!packageJson.scripts?.["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельный preview-контур должен сохранять indexing lock");
+
+for (const marker of [
+  "npm run check",
+  "playwright install --with-deps chromium firefox webkit",
+  "CROSS_BROWSER_REQUIRED: 'true'",
+  "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
+  "if: github.event_name != 'schedule'",
+]) {
+  if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует production-маркер ${marker}`);
+}
+if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production workflow не должен выполнять indexing lock");
+if (workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: production workflow не должен проверять закрытый режим");
 
 for (const relativePath of [
   "docs/current-production-state.md",
@@ -87,4 +99,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} canonical routes, ${htmlCount} HTML files and indexing lock are current`);
+console.log(`Documentation contract passed: ${canonicalCount} canonical routes, open production indexing and automatic IndexNow are current`);

@@ -1,4 +1,110 @@
 @layer utilities {
+  .engagement-nudge {
+    position: fixed;
+    z-index: 92;
+    right: 24px;
+    bottom: 24px;
+    width: min(390px, calc(100% - 32px));
+    padding: 23px;
+    color: var(--ink);
+    border: 1px solid rgba(195, 154, 93, .48);
+    background: rgba(255, 254, 251, .98);
+    box-shadow: 0 24px 70px rgba(9, 28, 44, .2);
+    opacity: 0;
+    transform: translateY(14px) scale(.985);
+    transition: opacity .22s ease, transform .22s ease;
+  }
+
+  .engagement-nudge[hidden] { display: none; }
+  .engagement-nudge.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+
+  .engagement-nudge__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    padding: 0;
+    color: var(--muted);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .engagement-nudge__close:hover { color: var(--ink); }
+  .engagement-nudge__close svg { width: 18px; height: 18px; }
+
+  .engagement-nudge__eyebrow {
+    display: block;
+    margin: 0 44px 8px 0;
+    color: var(--gold-text);
+    font-size: .6875rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .engagement-nudge strong {
+    display: block;
+    max-width: 315px;
+    padding-right: 24px;
+    color: var(--ink-deep);
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 560;
+    line-height: 1.14;
+  }
+
+  .engagement-nudge p {
+    margin-top: 12px;
+    color: var(--ink-soft);
+    font-size: .875rem;
+    line-height: 1.55;
+  }
+
+  .engagement-nudge__actions {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .engagement-nudge__dismiss,
+  .engagement-nudge__write {
+    min-height: 46px;
+    padding: 0 17px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: .8125rem;
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  .engagement-nudge__dismiss {
+    color: var(--muted);
+    border: 0;
+    background: transparent;
+  }
+
+  .engagement-nudge__dismiss:hover { color: var(--ink); }
+
+  .engagement-nudge__write {
+    color: var(--ink-deep);
+    border: 1px solid var(--gold);
+    background: var(--gold-bright);
+  }
+
+  .engagement-nudge__write:hover { border-color: var(--gold-text); background: #e7c785; }
+
+  @keyframes mobile-contact-soft-attention {
+    0%, 9%, 100% { box-shadow: 0 0 0 0 rgba(221, 185, 121, 0); }
+    2% { box-shadow: 0 0 0 0 rgba(221, 185, 121, .34); }
+    5% { box-shadow: 0 0 0 8px rgba(221, 185, 121, 0), 0 0 18px rgba(221, 185, 121, .13); }
+  }
+
   @media (max-width: 680px) {
     body { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 
@@ -20,16 +126,27 @@
       white-space: nowrap;
     }
 
+    .mobile-contact--dual .mobile-contact__action--later {
+      order: 1;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,.34);
+      background: rgba(255,255,255,.06);
+    }
+
     .mobile-contact--dual .mobile-contact__action--now {
+      order: 2;
       color: var(--ink);
       border: 1px solid var(--gold-bright);
       background: var(--gold-bright);
     }
 
-    .mobile-contact--dual .mobile-contact__action--later {
-      color: var(--white);
-      border: 1px solid rgba(255,255,255,.34);
-      background: rgba(255,255,255,.06);
+    .mobile-contact--dual.is-visible .mobile-contact__action--now {
+      animation: mobile-contact-soft-attention 18s ease-out 8s infinite;
+    }
+
+    .mobile-contact--dual .mobile-contact__action--now:hover,
+    .mobile-contact--dual .mobile-contact__action--now:focus-visible {
+      animation: none;
     }
 
     .mobile-contact--dual .mobile-contact__action--later:hover,
@@ -44,11 +161,31 @@
       height: 17px;
       flex: 0 0 17px;
     }
+
+    .engagement-nudge {
+      right: 10px;
+      bottom: calc(90px + env(safe-area-inset-bottom));
+      left: 10px;
+      width: auto;
+      padding: 20px 18px 18px;
+    }
+
+    .engagement-nudge strong { max-width: 290px; font-size: 1.375rem; }
+    .engagement-nudge p { font-size: .875rem; }
   }
 
   @media (max-width: 350px) {
     .mobile-contact--dual { gap: 6px; padding-inline: 8px; }
     .mobile-contact--dual .mobile-contact__action { gap: 5px; padding-inline: 7px; font-size: .8125rem; }
     .mobile-contact--dual .mobile-contact__action svg { width: 16px; height: 16px; flex-basis: 16px; }
+    .engagement-nudge { padding-inline: 16px; }
+    .engagement-nudge__actions { gap: 6px; }
+    .engagement-nudge__dismiss,
+    .engagement-nudge__write { padding-inline: 13px; font-size: .78125rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-contact--dual.is-visible .mobile-contact__action--now { animation: none; }
+    .engagement-nudge { transition: none; }
   }
 }

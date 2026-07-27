@@ -9,14 +9,39 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: site-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
+    env:
+      SITE_PRODUCTION: 'true'
+      SITE_URL: 'https://yuristshevchuk.com'
+      SITE_BASE_PATH: ''
+      GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+      YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
+      SITE_ANALYTICS_ENABLED: 'true'
+      GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
+      YANDEX_METRICA_ID: '111050150'
+      SITE_VIDEO_ENABLED: ${{ vars.SITE_VIDEO_ENABLED || 'false' }}
+      SITE_VIDEO_TITLE: ${{ vars.SITE_VIDEO_TITLE }}
+      SITE_VIDEO_DURATION: ${{ vars.SITE_VIDEO_DURATION }}
+      SITE_VIDEO_POSTER: ${{ vars.SITE_VIDEO_POSTER }}
+      SITE_VIDEO_WEBM: ${{ vars.SITE_VIDEO_WEBM }}
+      SITE_VIDEO_MP4: ${{ vars.SITE_VIDEO_MP4 }}
+      SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
+      INDEXNOW_KEY: ci-indexnow-key
+      CROSS_BROWSER_REQUIRED: 'true'
 
     steps:
       - name: Получить код
         uses: actions/checkout@v4
+
+      - name: Установить дату автоматической проверки
+        run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"
 
       - name: Настроить Node.js
         uses: actions/setup-node@v4
@@ -27,100 +52,24 @@ jobs:
       - name: Установить зависимости
         run: npm ci
 
-      - name: Собрать сайт
+      - name: Установить браузеры
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Выполнить полную production-проверку
         shell: bash
         run: |
-          set +e
-          npm run build > build.log 2>&1
-          code=$?
-          cat build.log
-          exit $code
+          set -o pipefail
+          npm run check 2>&1 | tee check.log
 
-      - name: Сохранить журнал ошибки сборки
+      - name: Сохранить диагностику при ошибке
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-error-log
-          path: build.log
+          name: site-check-diagnostics-${{ github.run_id }}
+          path: |
+            check.log
+            reports
+            test-results
+            *.log
           if-no-files-found: ignore
-          retention-days: 3
-
-      - name: Проверить HTML
-        run: npm run validate
-
-      - name: Проверить SEO
-        run: npm run audit:seo
-
-      - name: Проверить часы статуса юриста
-        run: npm run test:online-status
-
-      - name: Проверить контрастность интерфейса
-        run: npm run test:accessibility
-
-      - name: Проверить быстрые ситуации
-        run: npm run test:quick-choices
-
-      - name: Проверить форму связи позже
-        run: npm run test:callback
-
-      - name: Проверить форму связи в браузере
-        run: npm run test:callback-interaction
-
-      - name: Проверить сообщения мессенджеров
-        run: npm run test:messenger-intents
-
-      - name: Проверить содержание страниц услуг
-        run: npm run test:service-pages
-
-      - name: Проверить типографику и сообщения услуг
-        run: npm run test:service-pages-interaction
-
-      - name: Проверить гарантии процесса
-        run: npm run test:process-guarantees
-
-      - name: Проверить примеры работы
-        run: npm run test:case-studies
-
-      - name: Проверить экспертный поисковый контент
-        run: npm run test:search-visibility
-
-      - name: Проверить мобильную панель
-        run: npm run test:mobile-actions
-
-      - name: Проверить версию сборки и события аналитики
-        run: npm run test:deployment-observability
-
-      - name: Проверить бюджеты производительности
-        run: npm run test:performance-budget
-
-      - name: Проверить видео по требованию
-        run: npm run test:video-ready
-
-      - name: Проверить Core Web Vitals
-        run: npm run test:core-web-vitals
-
-      - name: Проверить вёрстку и взаимодействия
-        shell: bash
-        run: |
-          set +e
-          npm run test:visual > visual-test.log 2>&1
-          code=$?
-          cat visual-test.log
-          exit $code
-
-      - name: Сохранить журнал визуальной проверки
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-test-log
-          path: visual-test.log
-          if-no-files-found: ignore
-          retention-days: 3
-
-      - name: Проверить рабочую production-сборку
-        env:
-          SITE_PRODUCTION: 'true'
-          SITE_URL: ${{ format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
-          SITE_BASE_PATH: ${{ format('/{0}', github.event.repository.name) }}
-          INDEXNOW_KEY: ci-indexnow-key
-        run: npm run build && npm run validate && npm run audit:seo && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals
+          retention-days: 7

@@ -39,10 +39,12 @@ jobs:
       SITE_VIDEO_MP4: ${{ vars.SITE_VIDEO_MP4 }}
       SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
       INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+      CROSS_BROWSER_REQUIRED: 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,7 +55,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22.17.0'
           cache: npm
 
       - name: Install dependencies
@@ -63,9 +65,23 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Build and validate production site
-        env:
-          CROSS_BROWSER_REQUIRED: 'true'
-        run: npm run check
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run check 2>&1 | tee check.log
+
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-check-diagnostics-${{ github.run_id }}
+          path: |
+            check.log
+            reports
+            test-results
+            *.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

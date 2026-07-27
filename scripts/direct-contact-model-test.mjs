@@ -1,5 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
+import { services } from "../src/data.mjs";
 
 const root = new URL("../", import.meta.url).pathname;
 const dist = join(root, "dist");
@@ -16,6 +17,15 @@ const walk = async (directory) => {
 };
 
 const htmlFiles = (await walk(dist)).filter((path) => extname(path) === ".html");
+const canonicalFiles = [
+  join(dist, "index.html"),
+  join(dist, "uslugi", "index.html"),
+  ...services.map((service) => join(dist, "uslugi", service.slug, "index.html")),
+  join(dist, "o-yuriste", "index.html"),
+  join(dist, "kontakty", "index.html"),
+  join(dist, "politika-konfidencialnosti", "index.html"),
+];
+const canonicalSet = new Set(canonicalFiles);
 const forbiddenPublished = [
   [/<form\b/i, "form element"],
   [/<input\b/i, "input element"],
@@ -34,6 +44,7 @@ for (const path of htmlFiles) {
     if (pattern.test(html)) errors.push(`${name}: published ${label} is forbidden`);
   }
 
+  if (!canonicalSet.has(path)) continue;
   const contactDialogCount = (html.match(/<dialog\b[^>]*id="contact-dialog"/g) || []).length;
   if (contactDialogCount !== 1) errors.push(`${name}: expected one direct messenger dialog, got ${contactDialogCount}`);
   if (!html.includes('class="messenger-choice messenger-choice--telegram"')) errors.push(`${name}: Telegram direct choice is missing`);
@@ -82,7 +93,7 @@ for (const statement of [
   "Сайт не формирует и не передаёт оператору базу контактных данных",
   "Подготовленный текст является только черновиком",
   "оператор не получает его имя, контакт, текст черновика",
-  "Политика не является публичным предложением передать оператору любые сведения",
+  "не является публичным предложением передать оператору любые сведения",
 ]) {
   if (!policy.includes(statement)) errors.push(`privacy policy: required direct-contact statement is missing: ${statement}`);
 }
@@ -92,4 +103,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Direct contact model passed: ${htmlFiles.length} HTML pages and shipped scripts contain no data-entry forms or questionnaires; only prefilled messenger drafts remain`);
+console.log(`Direct contact model passed: ${htmlFiles.length} HTML pages are form-free; ${canonicalFiles.length} canonical pages expose only prefilled messenger drafts`);

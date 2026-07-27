@@ -6,7 +6,7 @@
   "description": "Персональный сайт юриста Максима Юрьевича Шевчука",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:geography && npm run test:composition-contract && npm run test:documentation && npm run test:online-status && npm run test:accessibility && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual-trust && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser && npm run test:visual",
+    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:geography && npm run test:composition-contract && npm run test:documentation && npm run test:workflow-contract && npm run test:online-status && npm run test:accessibility && npm run test:quick-choices && npm run test:callback && npm run test:callback-interaction && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:visual-trust && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser && npm run test:visual",
     "check:preview-indexing-lock": "npm run check && npm run lock:indexing && npm run test:indexing-lock",
     "dev": "node scripts/server.mjs",
     "validate": "node scripts/validate.mjs",
@@ -16,6 +16,7 @@
     "test:content-dates": "node scripts/content-dates-test.mjs",
     "test:geography": "node scripts/geography-test.mjs",
     "test:documentation": "node scripts/documentation-test.mjs",
+    "test:workflow-contract": "node scripts/workflow-contract-test.mjs",
     "test:online-status": "node scripts/online-status-test.mjs",
     "test:quick-choices": "node scripts/quick-choices-test.mjs",
     "test:callback": "node scripts/callback-test.mjs",

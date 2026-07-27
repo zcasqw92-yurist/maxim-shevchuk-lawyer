@@ -21,7 +21,8 @@ for (const [label, content] of Object.entries(workflows)) {
   requirePattern(label, content, /CROSS_BROWSER_REQUIRED:\s*['"]true['"]/, "обязательная cross-browser проверка должна быть включена");
   requirePattern(label, content, /node-version:\s*['"]22\.17\.0['"]/, "версия Node.js должна быть одинаково закреплена");
   requirePattern(label, content, /npx playwright install --with-deps chromium firefox webkit/, "должны устанавливаться все проверяемые браузеры");
-  requirePattern(label, content, /run:\s*npm run check(?:\s|$)/, "должен запускаться единый npm run check");
+  requirePattern(label, content, /npm run check 2>&1 \| tee check\.log/, "должен запускаться единый npm run check с сохранением полного журнала");
+  requirePattern(label, content, /check\.log/, "check.log должен входить в диагностический артефакт");
   requirePattern(label, content, /if-no-files-found:\s*ignore/, "при ошибке должны сохраняться диагностические артефакты без вторичного падения");
 }
 
@@ -48,4 +49,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Workflow contract passed: PR and deploy use the same pinned production check with diagnostics");
+console.log("Workflow contract passed: PR and deploy use the same pinned production check with full diagnostics");

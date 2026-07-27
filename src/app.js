@@ -164,9 +164,7 @@ const openMobileMenu = () => {
   const firstMenuControl = $("a[href], button:not([disabled])", mobileMenu);
   firstMenuControl?.focus({ preventScroll: true });
   requestAnimationFrame(() => {
-    if (!document.activeElement?.closest("[data-mobile-menu]")) {
-      firstMenuControl?.focus({ preventScroll: true });
-    }
+    if (!document.activeElement?.closest("[data-mobile-menu]")) firstMenuControl?.focus({ preventScroll: true });
   });
 };
 
@@ -218,14 +216,11 @@ document.addEventListener("keydown", (event) => {
   }
 });
 addEventListener("resize", () => {
-  if (mobileMenuOpen && matchMedia("(min-width: 901px)").matches) {
-    closeMobileMenu({ restoreFocus: false });
-  }
+  if (mobileMenuOpen && matchMedia("(min-width: 901px)").matches) closeMobileMenu({ restoreFocus: false });
 }, { passive: true });
 
 const genericMessage = "Здравствуйте, Максим Юрьевич. Хочу получить первичную оценку ситуации. Кратко опишу, что произошло, и приложу имеющиеся документы:";
-const defaultDialogCopy = "Напишите, что произошло, и приложите имеющиеся материалы. Максим Юрьевич лично ознакомится с ними, ответит на основные вопросы и объяснит, с чего разумнее начать.";
-const quizNoteText = "Telegram откроется с заполненным черновиком. Проверьте ответы и отправьте сообщение Максиму Юрьевичу.";
+const defaultDialogCopy = "Выберите мессенджер. В нём откроется заполненный черновик, который можно изменить или не отправлять. Сайт не получает содержание сообщения.";
 
 const cleanTelegramBase = (href) => {
   const url = new URL(href || "https://t.me/lawrazbor", location.href);
@@ -288,7 +283,7 @@ const openDialog = (control) => {
     topicLabel.textContent = topic ? `Вы выбрали: ${topic}` : "";
   }
   if (dialogCopy) dialogCopy.textContent = topic
-    ? "Опишите, что произошло, и приложите важные детали. Максим Юрьевич лично уточнит недостающее и подскажет, с чего начать."
+    ? "Выберите мессенджер. В нём откроется готовый черновик по выбранному вопросу. Измените его при необходимости и отправьте самостоятельно."
     : defaultDialogCopy;
   dialog.showModal();
   track("messenger_dialog_open", { topic: topic || "general", page_path: location.pathname });
@@ -305,170 +300,6 @@ dialog?.addEventListener("click", (event) => {
   if (event.target === dialog) dialog.close();
 });
 updateContactLinks();
-
-const priceQuizDialog = $("#price-quiz-dialog");
-const priceQuizSteps = $$('[data-price-quiz-step]', priceQuizDialog);
-const priceQuizResult = $('[data-price-quiz-result]', priceQuizDialog);
-const priceQuizProgress = $('[data-price-quiz-progress]', priceQuizDialog);
-const priceQuizProgressBar = $('[data-price-quiz-progress-bar]', priceQuizDialog);
-const priceQuizBack = $('[data-price-quiz-back]', priceQuizDialog);
-const priceQuizControls = $('[data-price-quiz-controls]', priceQuizDialog);
-const priceQuizWhatsapp = $('[data-price-quiz-whatsapp]', priceQuizDialog);
-const priceQuizTelegram = $('[data-price-quiz-telegram]', priceQuizDialog);
-const priceQuizTelegramNote = $('[data-price-quiz-telegram-note]', priceQuizDialog);
-const priceQuizFields = [
-  ["issue", "Ситуация"],
-  ["materials", "Материалы"],
-  ["timing", "Срок"],
-];
-const priceQuizWhatsappBase = cleanWhatsappBase(priceQuizWhatsapp?.href);
-const priceQuizTelegramBase = cleanTelegramBase(priceQuizTelegram?.href);
-let priceQuizStep = 0;
-let priceQuizAnswers = {};
-
-const quizSummaryText = () => priceQuizFields
-  .map(([key, label]) => `${label}: ${priceQuizAnswers[key] || "Не указано"}`)
-  .join("\n");
-
-const priceQuizMessage = () => `Здравствуйте, Максим Юрьевич. Я прошёл(а) короткий опрос на сайте и хочу уточнить ориентир стоимости.\n\n${quizSummaryText()}\n\nКратко дополню обстоятельства:`;
-
-const renderPriceQuiz = () => {
-  if (!priceQuizDialog) return;
-  const finished = priceQuizStep >= priceQuizSteps.length;
-  priceQuizSteps.forEach((step, index) => { step.hidden = finished || index !== priceQuizStep; });
-  if (priceQuizResult) priceQuizResult.hidden = !finished;
-  if (priceQuizControls) priceQuizControls.hidden = finished || priceQuizStep === 0;
-  if (priceQuizProgress) priceQuizProgress.textContent = finished ? "Готово" : `Шаг ${priceQuizStep + 1} из ${priceQuizSteps.length}`;
-  if (priceQuizProgressBar) priceQuizProgressBar.style.width = `${finished ? 100 : ((priceQuizStep + 1) / priceQuizSteps.length) * 100}%`;
-  if (priceQuizBack) priceQuizBack.hidden = priceQuizStep === 0 || finished;
-  $$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
-    option.setAttribute("aria-pressed", String(priceQuizAnswers[option.dataset.quizKey] === option.dataset.quizValue));
-  });
-};
-
-const resetPriceQuiz = () => {
-  priceQuizStep = 0;
-  priceQuizAnswers = {};
-  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = quizNoteText;
-  renderPriceQuiz();
-};
-
-const showPriceQuizResult = () => {
-  priceQuizStep = priceQuizSteps.length;
-  const message = priceQuizMessage();
-  if (priceQuizWhatsapp) priceQuizWhatsapp.href = whatsappDraftUrl(priceQuizWhatsappBase, message);
-  if (priceQuizTelegram) priceQuizTelegram.href = telegramDraftUrl(priceQuizTelegramBase, message);
-  renderPriceQuiz();
-  track("price_quiz_complete", { page_path: location.pathname });
-};
-
-$$('[data-price-quiz-open]').forEach((control) => {
-  control.addEventListener("click", () => {
-    if (!priceQuizDialog) return;
-    resetPriceQuiz();
-    priceQuizDialog.showModal();
-    track("price_quiz_open", { page_path: location.pathname });
-  });
-});
-
-$$('[data-price-quiz-option]', priceQuizDialog).forEach((option) => {
-  option.addEventListener("click", () => {
-    const { quizKey: key, quizValue: value } = option.dataset;
-    priceQuizAnswers[key] = value;
-    if (priceQuizStep === priceQuizSteps.length - 1) showPriceQuizResult();
-    else {
-      priceQuizStep += 1;
-      renderPriceQuiz();
-    }
-  });
-});
-
-priceQuizBack?.addEventListener("click", () => {
-  priceQuizStep = Math.max(0, priceQuizStep - 1);
-  renderPriceQuiz();
-});
-
-priceQuizTelegram?.addEventListener("click", (event) => {
-  event.preventDefault();
-  priceQuizTelegram.href = telegramDraftUrl(priceQuizTelegramBase, priceQuizMessage());
-  window.open(priceQuizTelegram.href, "_blank", "noopener");
-  if (priceQuizTelegramNote) priceQuizTelegramNote.textContent = quizNoteText;
-  track("contact_click", { channel: "telegram", source: "price_quiz", page_path: location.pathname });
-});
-
-$$('[data-price-quiz-close]').forEach((control) => control.addEventListener("click", () => priceQuizDialog?.close()));
-priceQuizDialog?.addEventListener("click", (event) => {
-  if (event.target === priceQuizDialog) priceQuizDialog.close();
-});
-
-const callbackDialog = $("#callback-dialog");
-const callbackForm = callbackDialog?.querySelector("[data-callback-form]");
-const callbackNote = callbackDialog?.querySelector("[data-callback-note]");
-const callbackCopy = callbackDialog?.querySelector("[data-callback-copy]");
-const callbackWhatsapp = callbackDialog?.querySelector("[data-callback-whatsapp]");
-const callbackTelegram = callbackDialog?.querySelector("[data-callback-telegram]");
-
-const callbackMessage = () => {
-  const data = new FormData(callbackForm);
-  return [
-    "Здравствуйте, Максим Юрьевич. Прошу связаться со мной позже.",
-    "",
-    `Имя: ${String(data.get("name") || "").trim()}`,
-    `Контакт: ${String(data.get("contact") || "").trim()}`,
-    `Удобный день: ${String(data.get("day") || "").trim()}`,
-    `Удобное время: ${String(data.get("period") || "").trim()}`,
-    `Тип вопроса: ${String(data.get("issue") || "").trim()}`,
-    `Стадия: ${String(data.get("stage") || "").trim()}`,
-    `Ближайший срок: ${String(data.get("deadline") || "").trim()}`,
-    `Материалы: ${String(data.get("materials") || "").trim()}`,
-    `Страница сайта: ${String(data.get("source") || location.pathname).trim()}`,
-  ].join("\n");
-};
-
-const validateCallbackForm = () => {
-  const valid = Boolean(callbackForm?.reportValidity());
-  if (!valid && callbackNote) callbackNote.textContent = "Заполните обязательные поля и подтвердите согласие на обработку данных.";
-  return valid;
-};
-
-$$('[data-callback-open]').forEach((control) => {
-  control.addEventListener("click", (event) => {
-    event.preventDefault();
-    const parentDialog = control.closest("dialog");
-    if (parentDialog?.open) parentDialog.close();
-    const source = callbackForm?.elements.namedItem("source");
-    if (source) source.value = location.pathname;
-    if (callbackNote) callbackNote.textContent = "Первичное знакомство с ситуацией бесплатно. Данные не сохраняются на сайте и передаются только через выбранный вами мессенджер.";
-    if (callbackCopy) callbackCopy.hidden = true;
-    callbackDialog?.showModal();
-    callbackForm?.elements.namedItem("name")?.focus();
-    track("callback_open", { page_path: location.pathname });
-  });
-});
-
-callbackForm?.addEventListener("submit", (event) => {
-  event.preventDefault();
-  if (!validateCallbackForm() || !callbackWhatsapp) return;
-  const url = whatsappDraftUrl(callbackWhatsapp.dataset.baseHref, callbackMessage());
-  window.open(url, "_blank", "noopener");
-  if (callbackNote) callbackNote.textContent = "WhatsApp открыт с готовым сообщением. Проверьте текст и нажмите отправить.";
-  track("callback_request_whatsapp", { page_path: location.pathname });
-});
-
-callbackTelegram?.addEventListener("click", (event) => {
-  event.preventDefault();
-  if (!validateCallbackForm()) return;
-  const url = telegramDraftUrl(callbackTelegram.dataset.telegramHref, callbackMessage());
-  if (callbackCopy) callbackCopy.hidden = true;
-  if (callbackNote) callbackNote.textContent = "Telegram открыт с заполненным обращением. Проверьте текст и нажмите отправить.";
-  window.open(url, "_blank", "noopener");
-  track("callback_request_telegram", { page_path: location.pathname });
-});
-
-callbackDialog?.querySelector("[data-callback-close]")?.addEventListener("click", () => callbackDialog.close());
-callbackDialog?.addEventListener("click", (event) => {
-  if (event.target === callbackDialog) callbackDialog.close();
-});
 
 $$('[data-track]').forEach((link) => {
   link.addEventListener("click", () => {

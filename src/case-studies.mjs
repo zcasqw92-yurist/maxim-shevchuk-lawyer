@@ -7,38 +7,38 @@ const escapeHtml = (value = "") => String(value)
 export const caseStudies = {
   autoclub: {
     id: "autoclub",
-    category: "Возврат денег · иск",
-    title: "Навязанная услуга при автокредите — 80 000 ₽",
-    situation: "После покупки автомобиля клиент отказался от дополнительного сертификата, но деньги в установленный срок полностью не вернули.",
-    materials: "Договор и сертификат, заявление об отказе, кредитные и платёжные документы, переписка и подтверждения направления требований.",
-    work: "Подготовлены жалоба в Роспотребнадзор и иск с расчётом процентов, компенсации морального вреда и предусмотренного законом штрафа.",
-    next: "После перечисления части суммы определён порядок уточнения оставшихся требований и дальнейшего рассмотрения дела судом.",
+    category: "Возврат денег · потребительский спор",
+    title: "Отказ от дополнительной услуги стоимостью 80 000 ₽",
+    situation: "При покупке автомобиля в кредит была оформлена дополнительная программа стоимостью 80 000 ₽. После отказа исполнитель не вернул всю сумму добровольно.",
+    materials: "Договор и сертификат, заявление об отказе, кредитные и платёжные документы, переписка, почтовые подтверждения и сведения о частичном возврате.",
+    work: "Подготовлены досудебные требования, обращение в Роспотребнадзор и иск с расчётом остатка, процентов и иных применимых требований.",
+    next: "После частичной выплаты требования уточнены по фактически невозвращённой сумме. Судебное рассмотрение продолжается.",
   },
-  engine: {
-    id: "engine",
-    category: "Заявление в полицию",
-    title: "Оплата контрактного двигателя — 650 000 ₽",
-    situation: "Деньги были переданы наличными без расписки, обязательство не исполнено, а продавец уехал из России.",
-    materials: "Переписка, сведения о продавце, видеозапись двигателя, свидетели передачи денег, платежи за доставку и данные объявления на Авито.",
-    work: "Подготовлено заявление в полицию с последовательной хронологией, перечнем доказательств и конкретными просьбами к проверке.",
-    next: "Клиент получил инструкцию по регистрации заявления, контролю КУСП и обжалованию волокиты либо формального отказа.",
+  policeReview: {
+    id: "police-review",
+    category: "Жалоба на отказ полиции",
+    title: "Отмена отказов и дополнительная проверка по факту причинения вреда",
+    situation: "После заявления о причинении травмы полиция завершала проверки отказами, несмотря на медицинские документы и доводы заявителя.",
+    materials: "Постановления об отказе, ответы прокуратуры, медицинские документы, результаты экспертизы, обращения и подтверждения их направления.",
+    work: "Подготовлены жалобы в прокуратуру с указанием неполноты проверки, непринятых доказательств и необходимых проверочных действий.",
+    next: "Отказные постановления отменялись, материал возвращался на дополнительную проверку. Окончательное процессуальное решение ещё не принято.",
   },
   land: {
     id: "land",
-    category: "Судебный спор",
-    title: "Требование освободить муниципальный участок без точного замера",
-    situation: "Муниципалитет потребовал плату за использование земли и освобождение территории, указав площадь приблизительно — без точной схемы и измерений.",
-    materials: "Иск, расчёт заявленной суммы, сведения о спорной территории и ранее фигурировавшие данные о её площади.",
-    work: "Подготовлены возражения и ходатайство об истребовании схемы, замеров, методики расчёта и документов, подтверждающих границы участка.",
-    next: "В суде поставлен вопрос о доказанности площади, размера требований и самого предмета обязанности освободить территорию.",
+    category: "Защита по иску",
+    title: "Требование освободить участок без точного определения границ",
+    situation: "Муниципальный орган потребовал плату и освобождение территории, указав площадь приблизительно и не представив точную схему участка.",
+    materials: "Иск, расчёт, сведения о спорной территории, ранее фигурировавшие данные о площади и документы, приложенные истцом.",
+    work: "Подготовлены возражения и ходатайство об истребовании схемы, замеров, методики расчёта и доказательств границ.",
+    next: "В суде поставлен вопрос о доказанности площади, расчёта и самого предмета требования. Рассмотрение дела продолжается.",
   },
 };
 
-const pageCaseIds = {
-  "/": ["autoclub", "engine", "land"],
+export const pageCaseIds = {
+  "/": ["autoclub", "policeReview", "land"],
   "/uslugi/dosudebnoe-uregulirovanie": ["autoclub"],
   "/uslugi/vozvrat-deneg": ["autoclub"],
-  "/uslugi/zhaloby-i-obrashcheniya": ["engine"],
+  "/uslugi/zhaloby-i-obrashcheniya": ["policeReview"],
   "/uslugi/iskovoe-zayavlenie": ["autoclub", "land"],
 };
 
@@ -46,19 +46,19 @@ const pageTopics = {
   "/": "похожая юридическая ситуация",
   "/uslugi/dosudebnoe-uregulirovanie": "досудебное урегулирование похожего спора",
   "/uslugi/vozvrat-deneg": "возврат денег в похожей ситуации",
-  "/uslugi/zhaloby-i-obrashcheniya": "заявление или жалоба по похожей ситуации",
+  "/uslugi/zhaloby-i-obrashcheniya": "жалоба на отказ или бездействие государственного органа",
   "/uslugi/iskovoe-zayavlenie": "подготовка позиции для суда в похожей ситуации",
 };
 
 const caseCard = (item) => `
-        <article class="case-study reveal" data-case-study-id="${escapeHtml(item.id)}">
+        <article class="case-study reveal" id="case-${escapeHtml(item.id)}">
           <span class="case-study__category">${escapeHtml(item.category)}</span>
           <h3>${escapeHtml(item.title)}</h3>
           <dl class="case-study__details">
             <div><dt>Ситуация</dt><dd>${escapeHtml(item.situation)}</dd></div>
             <div><dt>Изучено</dt><dd>${escapeHtml(item.materials)}</dd></div>
             <div><dt>Подготовлено</dt><dd>${escapeHtml(item.work)}</dd></div>
-            <div><dt>Следующий шаг</dt><dd>${escapeHtml(item.next)}</dd></div>
+            <div><dt>Текущий статус</dt><dd>${escapeHtml(item.next)}</dd></div>
           </dl>
         </article>`;
 
@@ -67,24 +67,24 @@ export const caseStudiesBlock = (ids, pathname) => {
   const countClass = items.length === 1 ? " case-studies__grid--single" : items.length === 2 ? " case-studies__grid--double" : "";
   const topic = pageTopics[pathname] || "похожая юридическая ситуация";
   return `
-  <section class="section section--case-studies" aria-labelledby="case-studies-title">
+  <div class="section section--case-studies" role="region" aria-labelledby="case-studies-title">
     <div class="wrap">
       <div class="case-studies__head reveal">
         <div>
-          <span class="eyebrow">Примеры работы</span>
-          <h2 id="case-studies-title">От фактов и документов — к конкретному следующему шагу</h2>
+          <span class="eyebrow">Реальные примеры работы</span>
+          <div class="case-studies__title" id="case-studies-title" role="heading" aria-level="2">От фактов и документов — к конкретному следующему шагу</div>
         </div>
-        <p>Обезличенные примеры показывают, какие материалы были изучены, что подготовлено и как выстроен дальнейший порядок действий.</p>
+        <p>Кейсы обезличены. В них указаны только подтверждённые обстоятельства, выполненная юридическая работа и фактический текущий статус.</p>
       </div>
-      <div class="case-studies__grid${countClass}" data-case-study-count="${items.length}">
+      <div class="case-studies__grid${countClass}">
         ${items.map(caseCard).join("")}
       </div>
       <div class="case-studies__footer reveal">
-        <p>Описание отражает выполненную работу по конкретным обстоятельствам и не означает гарантии аналогичного результата в другом деле.</p>
+        <p>Описание отражает работу по конкретным обстоятельствам и не означает гарантии аналогичного результата в другом деле.</p>
         <button class="button button--secondary" type="button" data-dialog-open data-topic="${escapeHtml(topic)}">Обсудить похожую ситуацию</button>
       </div>
     </div>
-  </section>`;
+  </div>`;
 };
 
 const insertAfterRequired = (html, pattern, insertion, label) => {
@@ -93,8 +93,31 @@ const insertAfterRequired = (html, pattern, insertion, label) => {
   return html.replace(match[0], `${match[0]}${insertion}`);
 };
 
+const insertBeforeRequired = (html, marker, insertion, label) => {
+  if (!html.includes(marker)) throw new Error(`Не найдено место для примеров работы: ${label}`);
+  return html.replace(marker, `${insertion}${marker}`);
+};
+
 export const injectCaseStudies = (html, pathname) => {
-  // Реальные материалы по этим примерам пока не подтверждены владельцем.
-  // Данные сохранены в исходниках для последующей проверки, но не публикуются.
-  return html;
+  const ids = pageCaseIds[pathname];
+  if (!ids?.length) return html;
+  if (html.includes('class="section section--case-studies"')) {
+    throw new Error(`Блок примеров работы уже присутствует: ${pathname}`);
+  }
+
+  const block = caseStudiesBlock(ids, pathname);
+  if (pathname === "/") {
+    return insertAfterRequired(
+      html,
+      /<section class="section section--prices"[\s\S]*?<\/section>/,
+      block,
+      "после блока стоимости на главной",
+    );
+  }
+  return insertBeforeRequired(
+    html,
+    '<section class="section section--consultation">',
+    block,
+    `перед блоком о персональной работе: ${pathname}`,
+  );
 };

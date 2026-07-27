@@ -14,9 +14,13 @@
     margin-bottom: clamp(34px, 5vw, 56px);
   }
 
-  .case-studies__head h2 {
+  .case-studies__title {
     max-width: 800px;
+    font-family: var(--font-display);
     font-size: clamp(2.15rem, 3.45vw, 3.3rem);
+    font-weight: 620;
+    line-height: 1.04;
+    letter-spacing: -.035em;
   }
 
   .case-studies__head > p {
@@ -53,7 +57,7 @@
     display: block;
     margin-bottom: 20px;
     color: var(--gold-text);
-    font-size: .6875rem;
+    font-size: .75rem;
     font-weight: 780;
     letter-spacing: .13em;
     text-transform: uppercase;
@@ -80,7 +84,7 @@
   .case-study__details dt {
     margin-bottom: 6px;
     color: var(--muted);
-    font-size: .6875rem;
+    font-size: .75rem;
     font-weight: 760;
     letter-spacing: .08em;
     text-transform: uppercase;
@@ -123,7 +127,7 @@
   @media (max-width: 680px) {
     .section--case-studies { padding-block: 62px; }
     .case-studies__head { gap: 18px; margin-bottom: 30px; }
-    .case-studies__head h2 { font-size: clamp(1.95rem, 8.5vw, 2.4rem); }
+    .case-studies__title { font-size: clamp(1.95rem, 8.5vw, 2.4rem); }
     .case-studies__head > p { font-size: 1rem; }
     .case-studies__grid,
     .case-studies__grid--single,

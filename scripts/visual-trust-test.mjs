@@ -16,6 +16,10 @@ for (const marker of [
   "trust-strip__grid",
   "section--value-editorial",
   "section--cta-portrait",
+  "section--case-studies",
+  'id="case-autoclub"',
+  'id="case-police-review"',
+  'id="case-land"',
   "assets/visual-trust.js",
 ]) assert(home.includes(marker), `Главная страница не содержит обязательный маркер: ${marker}`);
 
@@ -58,7 +62,6 @@ const forbiddenMarkers = [
   "section--document-samples",
   "section--featured-case",
   "section--visual-cases",
-  "section--case-studies",
   "data-proof-open",
   "data-proof-dialog",
   "data-video-launch",
@@ -92,6 +95,7 @@ const sectionFlow = [
   'class="section section--services"',
   'class="section section--value section--value-editorial"',
   'class="section section--prices"',
+  'class="section section--case-studies"',
   'class="section section--about-preview"',
   'class="section section--faq"',
   'class="section section--cta section--cta-portrait"',
@@ -103,6 +107,6 @@ for (const marker of sectionFlow) {
   previousPosition = position;
 }
 assert((homeMain.match(/<h2\b/g) || []).length <= 8, "На главной снова появились повторяющиеся смысловые секции");
-assert((homeMain.match(/data-dialog-open/g) || []).length <= 15, "На главной снова появилось избыточное число равнозначных CTA");
+assert((homeMain.match(/data-dialog-open/g) || []).length <= 16, "На главной снова появилось избыточное число равнозначных CTA");
 
-console.log("Visual trust architecture: only confirmed materials are published");
+console.log("Visual trust architecture: verified anonymized cases are public; demo and unsupported materials are absent");

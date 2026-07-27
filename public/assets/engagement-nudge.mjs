@@ -48,10 +48,10 @@ export const startEngagementNudge = () => {
     nudge.classList.remove("is-visible");
   };
 
-  const hideNudge = () => {
+  const hideNudge = ({ immediate = false } = {}) => {
     clearTimeout(hideTimer);
     nudge.classList.remove("is-visible");
-    if (reducedMotion) finalizeHide();
+    if (immediate || reducedMotion) finalizeHide();
     else setTimeout(finalizeHide, 220);
   };
 
@@ -89,10 +89,10 @@ export const startEngagementNudge = () => {
 
   document.addEventListener("visibilitychange", () => { previousTick = performance.now(); });
 
-  const suppressForSession = () => {
+  const suppressForSession = ({ immediate = false } = {}) => {
     if (!shownInMemory) markShown();
     clearInterval(intervalId);
-    if (!nudge.hidden) hideNudge();
+    if (!nudge.hidden) hideNudge({ immediate });
   };
 
   document.addEventListener("click", (event) => {
@@ -100,7 +100,7 @@ export const startEngagementNudge = () => {
     if (!target) return;
 
     if (target.closest("#engagement-nudge-write")) {
-      suppressForSession();
+      suppressForSession({ immediate: true });
       requestAnimationFrame(() => document.querySelector("[data-mobile-contact-now]")?.click());
       return;
     }
@@ -111,7 +111,7 @@ export const startEngagementNudge = () => {
     }
 
     if (target.closest("[data-dialog-open], [data-callback-open], [data-price-quiz-open], [data-track='telegram'], [data-track='whatsapp']")) {
-      suppressForSession();
+      suppressForSession({ immediate: true });
     }
   }, { capture: true });
 

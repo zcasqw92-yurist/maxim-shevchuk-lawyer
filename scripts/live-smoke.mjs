@@ -39,6 +39,11 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       "section--value-editorial",
       "section--cta-portrait",
       "data-price-quiz-step",
+      "section--case-studies",
+      'id="case-autoclub"',
+      'id="case-police-review"',
+      'id="case-land"',
+      "Кейсы обезличены",
     ];
     for (const marker of requiredMarkers) {
       if (!html.includes(marker)) throw new Error(`home page is missing marker: ${marker}`);
@@ -47,7 +52,6 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       "section--document-samples",
       "section--featured-case",
       "section--visual-cases",
-      "section--case-studies",
       "data-video-launch",
       "data-video-dialog",
       "data-proof-dialog",
@@ -55,9 +59,16 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       "Демо-макет",
       "Демо-визуал",
       "-demo.svg",
+      "Топникова",
+      "Алиакбарова",
+      "Шибаева",
+      "КУСП №",
+      "УИД",
+      "дело выиграно",
+      "деньги возвращены полностью",
     ];
     for (const marker of forbiddenMarkers) {
-      if (html.includes(marker)) throw new Error(`home page exposes unconfirmed material: ${marker}`);
+      if (html.includes(marker)) throw new Error(`home page exposes unconfirmed or private material: ${marker}`);
     }
 
     const videoResponse = await fetch(noCacheUrl("video-config.json"), { cache: "no-store", redirect: "follow" });

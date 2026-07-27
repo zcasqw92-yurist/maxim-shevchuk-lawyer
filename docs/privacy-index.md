@@ -1,1 +1,0 @@
-См. `current-production-state.md`, `privacy-implementation-note.md`, `privacy-legal-basis.md` и публичную Политику.

@@ -25,7 +25,17 @@
 .home .hero__content { padding-bottom: 20px; }
 .home .hero__lead { margin-top: 22px; }
 .home .hero__actions { margin-top: 26px; }
-.consent-banner__actions [data-consent-reject] { order: 1; }
+.consent-banner__actions [data-consent-reject] {
+  order: 1;
+  color: var(--white);
+  border-color: rgba(255,255,255,.58);
+  background: transparent;
+}
+.consent-banner__actions [data-consent-reject]:hover {
+  color: var(--white);
+  border-color: var(--white);
+  background: rgba(255,255,255,.1);
+}
 .consent-banner__actions [data-consent-accept] { order: 2; }
 
 @media (min-width: 901px) and (max-height: 820px) {

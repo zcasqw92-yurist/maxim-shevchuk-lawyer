@@ -65,7 +65,10 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Build and validate production site
-        run: npm run check
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run check 2>&1 | tee check.log
 
       - name: Upload diagnostics on failure
         if: failure()
@@ -73,6 +76,7 @@ jobs:
         with:
           name: deploy-check-diagnostics-${{ github.run_id }}
           path: |
+            check.log
             reports
             test-results
             *.log

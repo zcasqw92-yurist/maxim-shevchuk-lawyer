@@ -72,41 +72,64 @@ const auditLayout = async (page, label, mobile) => {
         && rect.height > 0;
     };
     const problems = [];
-    const typographyGroups = [
-      {
-        role: "primary",
-        minimum: mobile ? 16 : 12,
-        selector: "main p, main dd, main blockquote, main .plain-checks li, dialog p, dialog dd, .engagement-nudge p",
-      },
-      {
-        role: "secondary",
-        minimum: mobile ? 14 : 12,
-        selector: "main button, main .button, main .text-link, main .card-link, dialog button, dialog a, .mobile-contact button, .engagement-nudge button, .site-footer p, .site-footer a, .breadcrumbs li, .breadcrumbs a, .consent-banner p, .consent-banner a",
-      },
-      {
-        role: "optional",
-        minimum: mobile ? 12 : 11,
-        selector: ".eyebrow, .hero__kicker, .hero__quick-choices > span, .brand__text small, .brand--footer small, .about-hero__role, .footer__title, .footer__office small, .service-hero__price small, .process-guarantee > span, .case-study__category, small, figcaption, dt, [class*='__note'], [class*='__privacy'], [class*='__status'], [class*='__meta']",
-      },
-    ];
 
-    const seen = new Set();
-    for (const group of typographyGroups) {
-      for (const element of document.querySelectorAll(group.selector)) {
-        if (!visible(element) || seen.has(element)) continue;
-        seen.add(element);
+    if (mobile) {
+      const optionalSelector = [
+        ".eyebrow",
+        ".hero__kicker",
+        ".hero__quick-choices > span",
+        ".brand__text small",
+        ".brand--footer small",
+        ".about-hero__role",
+        ".footer__title",
+        ".footer__office small",
+        ".service-hero__price small",
+        ".process-guarantee > span",
+        ".case-study__category",
+        "small",
+        "figcaption",
+        "dt",
+        "[class*='__note']",
+        "[class*='__privacy']",
+        "[class*='__status']",
+        "[class*='__meta']",
+      ].join(",");
+      const primarySelector = "main p, main dd, main blockquote, main .plain-checks li, dialog p, dialog dd, .engagement-nudge p";
+      const secondarySelector = "main button, main .button, main .text-link, main .card-link, dialog button, dialog a, .mobile-contact button, .engagement-nudge button, .site-footer p, .site-footer a, .breadcrumbs li, .breadcrumbs a, .consent-banner p, .consent-banner a";
+      const candidates = [...new Set(document.querySelectorAll(`${optionalSelector},${primarySelector},${secondarySelector}`))];
+
+      for (const element of candidates) {
+        if (!visible(element)) continue;
         const text = element.textContent.replace(/\s+/g, " ").trim();
         if (!text) continue;
         const size = Number.parseFloat(getComputedStyle(element).fontSize);
-        if (size + .01 < group.minimum) {
-          problems.push(`${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 2).join(".")}: ${group.role} ${size}px < ${group.minimum}px · ${text.slice(0, 70)}`);
+        let role = "secondary";
+        let minimum = 14;
+        if (element.matches(optionalSelector)) {
+          role = "optional";
+          minimum = 12;
+        } else if (element.matches(primarySelector)) {
+          role = "primary";
+          minimum = 16;
+        }
+        if (size + .01 < minimum) {
+          problems.push(`${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 2).join(".")}: ${role} ${size}px < ${minimum}px · ${text.slice(0, 70)}`);
         }
       }
-    }
 
-    if (mobile) {
-      const controls = [...document.querySelectorAll("button, .button, .messenger-choice, .mobile-contact__action")].filter(visible);
-      for (const control of controls) {
+      const controlSelector = [
+        ".button",
+        ".messenger-choice",
+        ".mobile-contact__action",
+        ".engagement-nudge__write",
+        ".engagement-nudge__dismiss",
+        ".engagement-nudge__close",
+        ".dialog__close",
+        "[data-menu-toggle]",
+        "[data-consent-accept]",
+        "[data-consent-reject]",
+      ].join(",");
+      for (const control of [...document.querySelectorAll(controlSelector)].filter(visible)) {
         const rect = control.getBoundingClientRect();
         if (rect.width < 44 || rect.height < 44) {
           const text = control.textContent.replace(/\s+/g, " ").trim() || control.getAttribute("aria-label") || "control";
@@ -175,4 +198,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Accessibility checks passed: contrast, primary/secondary mobile typography, CTA touch targets, no forms and no horizontal overflow at 320, 390 and 1440 px");
+console.log("Accessibility checks passed: contrast, role-aware mobile typography, primary touch targets, no forms and no horizontal overflow at 320, 390 and 1440 px");

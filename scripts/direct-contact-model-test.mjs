@@ -42,13 +42,12 @@ for (const path of htmlFiles) {
   if (/<form\b[^>]*\baction=/i.test(html)) errors.push(`${name}: form action must not exist`);
 }
 
-const activeFiles = [
+const runtimeFiles = [
   "src/app.js",
-  "src/page-composer.mjs",
   "src/mobile-actions.mjs",
   "public/assets/engagement-nudge.mjs",
 ];
-const forbiddenActive = [
+const forbiddenRuntime = [
   "new FormData",
   "reportValidity",
   "data-callback-open",
@@ -59,12 +58,18 @@ const forbiddenActive = [
   "priceQuiz",
   "price-quiz-dialog",
 ];
-for (const file of activeFiles) {
+for (const file of runtimeFiles) {
   const source = await readFile(join(root, file), "utf8");
-  for (const marker of forbiddenActive) {
-    if (source.includes(marker)) errors.push(`${file}: active form/questionnaire marker remains: ${marker}`);
+  for (const marker of forbiddenRuntime) {
+    if (source.includes(marker)) errors.push(`${file}: active runtime form/questionnaire marker remains: ${marker}`);
   }
 }
+
+const composer = await readFile(join(root, "src", "page-composer.mjs"), "utf8");
+for (const marker of ["<form", "<input", "<select", "<textarea", "new FormData", "reportValidity", "callbackDialog", "callbackForm"]) {
+  if (composer.includes(marker)) errors.push(`src/page-composer.mjs: form generator remains: ${marker}`);
+}
+if (!composer.includes("removeContactQuestionnaires")) errors.push("src/page-composer.mjs: legacy template cleanup stage is missing");
 
 const app = await readFile(join(dist, "assets", "app.js"), "utf8");
 for (const marker of ["new FormData", "reportValidity", "data-callback", "data-price-quiz", "priceQuiz", "callbackForm"]) {
@@ -87,4 +92,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Direct contact model passed: ${htmlFiles.length} HTML pages contain no data-entry forms or questionnaires; only prefilled messenger drafts remain`);
+console.log(`Direct contact model passed: ${htmlFiles.length} HTML pages and shipped scripts contain no data-entry forms or questionnaires; only prefilled messenger drafts remain`);

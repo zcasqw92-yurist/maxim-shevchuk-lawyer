@@ -31,7 +31,7 @@ await new Promise((resolve, reject) => {
 });
 
 const prepareContext = async (browser, viewport) => {
-  const context = await browser.newContext({ viewport, locale: "ru-RU" });
+  const context = await browser.newContext({ viewport, locale: "ru-RU", reducedMotion: "no-preference" });
   await context.addInitScript(() => {
     localStorage.setItem("analytics_consent", "denied");
     window.__SITE_TEST_ENGAGEMENT_DELAY_MS__ = 120;
@@ -47,9 +47,7 @@ const checkMobileScenario = async (engineName, browser) => {
     if (!response?.ok()) errors.push(`${engineName}: home returned ${response?.status()}`);
 
     await page.evaluate(() => window.scrollTo(0, 760));
-    await page.waitForTimeout(280);
-    const panel = page.locator("[data-mobile-contact]");
-    await panel.waitFor({ state: "visible" });
+    await page.waitForFunction(() => document.querySelector("[data-mobile-contact]")?.classList.contains("is-visible"));
 
     const panelState = await page.evaluate(() => {
       const later = document.querySelector("[data-mobile-contact-later]");
@@ -114,8 +112,8 @@ const checkWriteAction = async (engineName, browser) => {
     const nudge = page.locator("#engagement-nudge");
     await nudge.waitFor({ state: "visible", timeout: 2_000 });
     await page.locator("#engagement-nudge-write").click();
+    await page.waitForFunction(() => document.querySelector("#engagement-nudge")?.hidden === true);
     await page.locator("#contact-dialog[open]").waitFor({ state: "visible" });
-    if (await nudge.isVisible()) errors.push(`${engineName}: nudge remains visible after opening messenger dialog`);
     const topic = await page.locator("#contact-dialog").getAttribute("data-topic");
     if (!topic) errors.push(`${engineName}: messenger dialog opened without a valid intent`);
     await page.close();

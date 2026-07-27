@@ -10,6 +10,13 @@ const legacyPersonArea = '"areaServed":["Москва","Московская о�
 const legacyPracticeArea = '"areaServed":[{"@type":"City","name":"Москва"},{"@type":"AdministrativeArea","name":"Московская область"}]';
 const schemaArea = `"areaServed":${JSON.stringify(site.serviceGeography.schemaAreaServed)}`;
 
+const footerServiceArea = () => {
+  const localAreas = escapeAttribute(site.serviceGeography.localServiceAreas.join(" и "));
+  const remoteCountry = escapeAttribute(site.serviceGeography.remoteServiceCountry);
+  const remoteLabel = remoteCountry === "Россия" ? "Онлайн по всей России" : `Онлайн: ${remoteCountry}`;
+  return `<small>Услуги: ${localAreas}</small><small>${remoteLabel}</small>`;
+};
+
 export const applyServiceGeography = (html) => {
   let result = String(html);
 
@@ -24,7 +31,7 @@ export const applyServiceGeography = (html) => {
   );
   result = result.replaceAll(
     "<em>Открыть в Яндекс Картах</em>",
-    `<small>${escapeAttribute(site.serviceGeography.publicLabel)}</small><em>Открыть в Яндекс Картах</em>`,
+    `${footerServiceArea()}<em>Открыть в Яндекс Картах</em>`,
   );
 
   result = result.replaceAll("Утро, 07:00–12:00 МСК", "Утро, 08:00–12:00 МСК");

@@ -56,7 +56,10 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Выполнить полную production-проверку
-        run: npm run check
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run check 2>&1 | tee check.log
 
       - name: Сохранить диагностику при ошибке
         if: failure()
@@ -64,6 +67,7 @@ jobs:
         with:
           name: site-check-diagnostics-${{ github.run_id }}
           path: |
+            check.log
             reports
             test-results
             *.log

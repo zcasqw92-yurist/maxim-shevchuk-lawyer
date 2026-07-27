@@ -21,7 +21,7 @@ const hasBlockingInterface = () => Boolean(
   || document.documentElement.classList.contains("mobile-menu-open")
   || document.querySelector("dialog[open]")
   || visibleConsentBanner()
-  || document.activeElement?.matches("input, textarea, select, [contenteditable='true']")
+  || document.activeElement?.isContentEditable
 );
 
 export const startEngagementNudge = () => {
@@ -110,7 +110,7 @@ export const startEngagementNudge = () => {
       return;
     }
 
-    if (target.closest("[data-dialog-open], [data-callback-open], [data-price-quiz-open], [data-track='telegram'], [data-track='whatsapp']")) {
+    if (target.closest("[data-dialog-open], [data-track='telegram'], [data-track='whatsapp']")) {
       suppressForSession({ immediate: true });
     }
   }, { capture: true });

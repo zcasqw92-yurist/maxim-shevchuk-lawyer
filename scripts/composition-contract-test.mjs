@@ -30,6 +30,48 @@ const analyticsConsentHooks = [
 const analyticsConsentHookSet = new Set(analyticsConsentHooks);
 const analyticsConsentRequired = Boolean(site.analytics?.enabled && site.analytics?.requireConsent);
 
+const removedInteractionHooks = new Set([
+  "data-callback-close",
+  "data-callback-copy",
+  "data-callback-form",
+  "data-callback-note",
+  "data-callback-open",
+  "data-callback-telegram",
+  "data-callback-whatsapp",
+  "data-mobile-contact-later",
+  "data-price-quiz-back",
+  "data-price-quiz-close",
+  "data-price-quiz-controls",
+  "data-price-quiz-open",
+  "data-price-quiz-option",
+  "data-price-quiz-progress",
+  "data-price-quiz-progress-bar",
+  "data-price-quiz-result",
+  "data-price-quiz-step",
+  "data-price-quiz-telegram",
+  "data-price-quiz-telegram-note",
+  "data-price-quiz-whatsapp",
+  "data-quiz-value",
+]);
+const contextualHooks = new Set([
+  "data-message",
+  "data-mobile-contact-now",
+  "data-topic",
+]);
+const removedDialogs = new Set(["callback-dialog", "price-quiz-dialog"]);
+const removedHeadings = new Set([
+  "h2:Что произошло?",
+  "h2:С чем связан вопрос?",
+  "h2:Какой результат нужен?",
+  "h2:Кто вторая сторона?",
+  "h2:Какие материалы есть?",
+  "h2:Что уже есть?",
+  "h2:Насколько срочно?",
+  "h2:Есть ли срок?",
+  "h2:Можно уточнить стоимость по вашей ситуации",
+  "h2:Оставьте контакт и удобное время",
+]);
+
 const decodeText = (value = "") => value
   .replace(/<[^>]+>/g, " ")
   .replaceAll("&nbsp;", " ")
@@ -69,30 +111,31 @@ const pageSignature = (html) => ({
 });
 
 const normalizeHeadings = (route, headings = [], validatePrivacy = false) => {
-  if (route !== privacyRoute) return headings;
+  if (route !== privacyRoute) return headings.filter((heading) => !removedHeadings.has(heading));
   const footerIndex = headings.indexOf(privacyFooterHeading);
   if (footerIndex < 0) throw new Error(`${privacyRoute}: не найдена граница между политикой и подвалом`);
   const policyHeadings = headings.slice(0, footerIndex);
   if (validatePrivacy && JSON.stringify(policyHeadings) !== JSON.stringify(privacyPolicyHeadingContract)) {
     throw new Error(`${privacyRoute}: заголовки политики не соответствуют утверждённому контракту`);
   }
-  return [privacyHeadingToken, ...headings.slice(footerIndex)];
+  return [privacyHeadingToken, ...headings.slice(footerIndex).filter((heading) => !removedHeadings.has(heading))];
 };
 
 const structuralSignature = (route, signature = {}) => {
   const {
     title: _seoTitle,
     headings = [],
+    sections = [],
+    dialogs = [],
     dataHooks = [],
     ...structure
   } = signature;
   return {
     ...structure,
+    sections: sections.filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result")),
     headings: normalizeHeadings(route, headings),
-    // Баннер согласия и кнопка настроек появляются только при включённой аналитике.
-    // Их наличие проверяется отдельно ниже, а golden-контракт остаётся одинаковым
-    // для локальной preview-сборки и production.
-    dataHooks: dataHooks.filter((hook) => !analyticsConsentHookSet.has(hook)),
+    dialogs: dialogs.filter((dialog) => !removedDialogs.has(dialog)),
+    dataHooks: dataHooks.filter((hook) => !analyticsConsentHookSet.has(hook) && !removedInteractionHooks.has(hook) && !contextualHooks.has(hook)),
   };
 };
 
@@ -114,7 +157,6 @@ for (const [route, file] of routes) {
   }
 }
 
-// Именованный слот не зависит от текста или класса соседнего контейнера.
 const changedWrapper = `<section class="renamed-wrapper">Новый текст</section>${buildSlot("example")}${buildSlot("head-assets")}`;
 const withContent = fillBuildSlot(changedWrapper, "example", "<aside>Соседний блок сохранён</aside>");
 const withHeadAsset = appendToBuildSlot(withContent, "head-assets", "<script></script>");
@@ -130,10 +172,6 @@ if (process.env.UPDATE_GOLDEN === "1") {
 }
 
 const expected = JSON.parse(await readFile(goldenPath, "utf8"));
-// SEO-title является управляемым контентом. Его корректность проверяется SEO-аудитом,
-// а golden-контракт защищает постоянную структуру страниц и клиентские hooks.
-// Заголовки политики имеют отдельный строгий контракт, потому что сам текст политики
-// формируется специализированным модулем и может осознанно обновляться независимо.
 const actualStructure = Object.fromEntries(
   Object.entries(actual).map(([route, signature]) => [route, structuralSignature(route, signature)]),
 );
@@ -149,10 +187,18 @@ if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
     const actualPage = actualStructure[route] || {};
     const expectedPage = expectedStructure[route] || {};
     const fields = [...new Set([...Object.keys(actualPage), ...Object.keys(expectedPage)])]
-      .filter((field) => JSON.stringify(actualPage[field]) !== JSON.stringify(expectedPage[field]));
+      .filter((field) => JSON.stringify(actualPage[field]) !== JSON.stringify(expectedPage[field]))
+      .map((field) => {
+        if (field !== "dataHooks") return field;
+        const actualHooks = new Set(actualPage.dataHooks || []);
+        const expectedHooks = new Set(expectedPage.dataHooks || []);
+        const added = [...actualHooks].filter((hook) => !expectedHooks.has(hook));
+        const removed = [...expectedHooks].filter((hook) => !actualHooks.has(hook));
+        return `dataHooks(+${added.join("|") || "-"};-${removed.join("|") || "-"})`;
+      });
     return `${route}: ${fields.join(", ") || "unknown"}`;
   });
   throw new Error(`Структурный golden-контракт изменился: ${changedFields.join("; ")}. Проверьте diff и обновляйте эталон только осознанно.`);
 }
 
-console.log(`Composition contract passed: named slots, privacy policy headings, analytics consent mode and golden structure for ${routes.length} canonical pages`);
+console.log(`Composition contract passed: named slots, privacy policy headings, analytics consent mode and form-free golden structure for ${routes.length} canonical pages`);

@@ -14,11 +14,6 @@ const replaceRequired = (content, from, to, label) => {
   return content.replace(from, to);
 };
 
-const insertBeforeRequired = (content, marker, insertion, label) => {
-  if (!content.includes(marker)) throw new Error(`Не найден обязательный фрагмент исходного шаблона: ${label}`);
-  return content.replace(marker, `${insertion}${marker}`);
-};
-
 const commonReplacements = [
   [
     '<h1>Сильная правовая позиция начинается <em data-hero-rotator>с точных фактов</em></h1>',
@@ -43,7 +38,7 @@ const commonReplacements = [
   ],
   [
     '<p>Не нужно заполнять анкету или заранее выбирать документ. Первое сообщение помогает определить, что важно уточнить.</p>',
-    '<p>Первичное знакомство с ситуацией и материалами бесплатно. Вы можете описать проблему обычными словами — юридический путь определю после проверки фактов.</p>',
+    '<p>Никаких анкет и заявок на сайте. Вы самостоятельно открываете мессенджер, проверяете готовый текст и отправляете сообщение только по своему решению.</p>',
   ],
   [
     '<strong>Уточняю важное</strong><p>Максим Юрьевич лично задаёт вопросы по обстоятельствам, срокам и материалам.</p>',
@@ -56,11 +51,11 @@ const commonReplacements = [
   ['<h2 id="dialog-title">Готов разобрать ситуацию</h2>', '<h2 id="dialog-title">Опишите ситуацию — первично посмотрю бесплатно</h2>'],
   [
     'Напишите в удобный мессенджер, что произошло. Максим Юрьевич лично уточнит важные детали и подскажет, с чего начать.',
-    'Напишите, что произошло, и приложите имеющиеся материалы. Максим Юрьевич лично ознакомится с ними, ответит на основные вопросы и объяснит, с чего разумнее начать.',
+    'Выберите мессенджер. В нём откроется заполненный черновик, который можно изменить или не отправлять. Сайт не получает содержание сообщения.',
   ],
   [
     '<p class="messenger-dialog__note">Первичное сообщение ни к чему вас не обязывает.</p>',
-    '<p class="messenger-dialog__note">Первичное знакомство с ситуацией и материалами бесплатно и ни к чему вас не обязывает.</p>',
+    '<p class="messenger-dialog__note">Сообщение будет передано юристу только после того, как вы самостоятельно нажмёте «Отправить» в мессенджере.</p>',
   ],
   [
     '<div><span class="eyebrow">Результат работы</span><h2>Что вы получите после разбора</h2></div>',
@@ -88,7 +83,7 @@ const commonReplacements = [
   ['<h2>Разберём, на чём можно построить позицию</h2>', '<h2>Передайте ситуацию юристу — дальше не придётся разбираться одному</h2>'],
   [
     '<p>Опишите ситуацию и перечислите документы. Этого достаточно, чтобы определить первый предметный шаг.</p>',
-    '<p>Опишите, что произошло, и перечислите документы. Первично ознакомлюсь бесплатно, отвечу на основные вопросы и предложу понятный следующий шаг.</p>',
+    '<p>Откройте удобный мессенджер и отправьте сообщение напрямую юристу. На сайте не нужно оставлять имя, телефон или иные сведения.</p>',
   ],
 ];
 
@@ -96,27 +91,6 @@ const applyCommonContent = (html) => {
   let result = html;
   for (const [from, to] of commonReplacements) {
     if (result.includes(from)) result = result.replaceAll(from, to);
-  }
-  return result;
-};
-
-const simplifyPriceQuiz = (html) => {
-  let result = html;
-  result = replaceRequired(result, "Шаг 1 из 5", "Шаг 1 из 3", "счётчик шагов квиза");
-  result = replaceRequired(result, '<h2 id="price-quiz-title">С чем связан вопрос?</h2>', '<h2 id="price-quiz-title">Что произошло?</h2>', "заголовок первого шага квиза");
-  result = replaceRequired(result, '<p>Выберите наиболее близкую ситуацию — это поможет понять объём работы.</p>', '<p>Выберите наиболее близкую ситуацию. Подробности можно будет дописать в мессенджере.</p>', "пояснение первого шага квиза");
-  result = replaceRequired(result, '<h2>Что уже есть?</h2>', '<h2>Какие материалы есть?</h2>', "заголовок материалов");
-  result = replaceRequired(result, '<h2>Есть ли срок?</h2>', '<h2>Насколько срочно?</h2>', "заголовок срочности");
-  result = replaceRequired(
-    result,
-    '<p>Ответы собраны в краткую сводку. Максим Юрьевич уточнит детали и назовёт стоимость до начала работы.</p>',
-    '<p>Ответы собраны в краткую сводку. Максим Юрьевич первично ознакомится с ситуацией бесплатно, уточнит детали и назовёт стоимость до начала работы.</p>',
-    "пояснение результата квиза",
-  );
-  for (const step of ["goal", "other-side"]) {
-    const pattern = new RegExp(`\\n\\s*<section class="price-quiz__step" data-price-quiz-step="${step}" hidden>[\\s\\S]*?<\\/section>\\n`, "m");
-    if (!pattern.test(result)) throw new Error(`Не найден удаляемый шаг квиза: ${step}`);
-    result = result.replace(pattern, "\n");
   }
   return result;
 };
@@ -198,49 +172,15 @@ const applyServiceContent = (html, service) => {
   return replaceServiceFinalCta(result, content, service.slug);
 };
 
-const callbackTrigger = (className = "callback-open-link") =>
-  `<button class="text-link ${className}" type="button" data-callback-open>Связаться позже</button>`;
-
-const callbackDialog = () => {
-  const privacyHref = `${site.basePath || ""}/politika-konfidencialnosti/`;
-  return `
-  <dialog class="price-quiz-dialog callback-dialog" id="callback-dialog" aria-labelledby="callback-title">
-    <button class="dialog__close" type="button" data-callback-close aria-label="Закрыть">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
-    </button>
-    <form class="price-quiz callback-form" data-callback-form>
-      <div class="price-quiz__head callback-form__head"><span class="eyebrow">Связаться позже</span></div>
-      <h2 id="callback-title">Оставьте контакт и удобное время</h2>
-      <p class="callback-form__intro">Заполните короткую форму. После нажатия откроется выбранный мессенджер с готовым сообщением — останется проверить и отправить его.</p>
-      <div class="callback-form__fields">
-        <label class="callback-field"><span>Имя</span><input type="text" name="name" autocomplete="name" maxlength="80" required placeholder="Как к вам обращаться"></label>
-        <label class="callback-field"><span>Телефон или Telegram</span><input type="text" name="contact" autocomplete="tel" maxlength="120" required placeholder="Например, +7 900 000-00-00 или @username"></label>
-        <label class="callback-field"><span>Удобный день</span><select name="day" required><option value="">Выберите вариант</option><option value="Сегодня">Сегодня</option><option value="Завтра">Завтра</option><option value="В ближайший будний день">В ближайший будний день</option><option value="В выходной день">В выходной день</option><option value="День неважен">День неважен</option></select></label>
-        <label class="callback-field"><span>Удобное время по Москве</span><select name="period" required><option value="">Выберите вариант</option><option value="Утро, 07:00–12:00 МСК">Утро, 07:00–12:00</option><option value="День, 12:00–17:00 МСК">День, 12:00–17:00</option><option value="Вечер, 17:00–22:00 МСК">Вечер, 17:00–22:00</option><option value="Время неважно">Время неважно</option></select></label>
-        <label class="callback-field"><span>Тип вопроса</span><select name="issue" required><option value="">Выберите вариант</option><option value="Договор, покупка или услуга">Договор, покупка или услуга</option><option value="Документ или требование">Документ или требование</option><option value="Жалоба в государственный орган">Жалоба в государственный орган</option><option value="Судебный спор">Судебный спор</option><option value="Иной вопрос — без подробностей">Иной вопрос — без подробностей</option></select></label>
-        <label class="callback-field"><span>Текущая стадия</span><select name="stage" required><option value="">Выберите вариант</option><option value="Только оцениваю ситуацию">Только оцениваю ситуацию</option><option value="Переговоры или претензия">Переговоры или претензия</option><option value="Жалоба уже подана">Жалоба уже подана</option><option value="Дело рассматривается в суде">Дело рассматривается в суде</option><option value="Исполнение решения">Исполнение решения</option></select></label>
-        <label class="callback-field"><span>Ближайший срок</span><select name="deadline" required><option value="">Выберите вариант</option><option value="В ближайшие 3 дня">В ближайшие 3 дня</option><option value="В течение недели">В течение недели</option><option value="Позже недели">Позже недели</option><option value="Точный срок неизвестен">Точный срок неизвестен</option></select></label>
-        <label class="callback-field"><span>Какие материалы есть</span><select name="materials" required><option value="">Выберите вариант</option><option value="Документы есть">Документы есть</option><option value="Только переписка или подтверждение оплаты">Только переписка или подтверждение оплаты</option><option value="Материалов пока нет">Материалов пока нет</option><option value="Не уверен">Не уверен</option></select></label>
-        <p class="callback-form__data-warning">Для первичной заявки не указывайте паспортные данные, полный адрес, сведения о здоровье, детях и других лицах. Не прикладывайте документы: порядок их передачи согласуйте с юристом отдельно.</p>
-        <input type="hidden" name="source" value="">
-        <label class="callback-consent"><input type="checkbox" name="consent" required><span>Согласен на обработку переданных данных для ответа на обращение. <a href="${escapeAttribute(privacyHref)}">Политика конфиденциальности</a>.</span></label>
-      </div>
-      <div class="callback-form__actions">
-        <button class="button button--primary button--wide" type="submit" data-callback-whatsapp data-base-href="${escapeAttribute(site.whatsapp)}">Попросить связаться со мной</button>
-        <button class="button button--secondary button--wide" type="button" data-callback-telegram data-telegram-href="${escapeAttribute(site.telegram)}">Передать через Telegram</button>
-      </div>
-      <p class="callback-form__note" data-callback-note>Первичное знакомство с ситуацией бесплатно. Данные не сохраняются на сайте и передаются только через выбранный вами мессенджер.</p>
-      <textarea class="callback-copy" data-callback-copy readonly hidden aria-label="Текст обращения"></textarea>
-    </form>
-  </dialog>`;
-};
-
-const injectCallback = (html) => {
-  let result = html;
-  result = insertBeforeRequired(result, '<p class="messenger-dialog__privacy">', `${callbackTrigger()}\n      `, "связаться позже в выборе мессенджера");
-  result = insertBeforeRequired(result, '<p class="price-quiz__privacy">', `${callbackTrigger()}\n        `, "связаться позже в квизе");
-  result = insertBeforeRequired(result, '<button class="text-link" type="button" data-dialog-open>Описать ситуацию ', `${callbackTrigger("callback-open-link callback-open-link--footer")}\n        `, "связаться позже в подвале");
-  return insertBeforeRequired(result, "</body>", `${callbackDialog()}\n`, "диалог связи позже");
+const removeContactQuestionnaires = (html) => {
+  const quizPattern = /\n\s*<dialog class="price-quiz-dialog" id="price-quiz-dialog"[\s\S]*?<\/dialog>/;
+  if (!quizPattern.test(html)) throw new Error("Не найден удаляемый квиз стоимости");
+  let result = html.replace(quizPattern, "");
+  result = result.replaceAll(
+    'data-price-quiz-open',
+    'data-dialog-open data-topic="ориентир стоимости юридической помощи" data-message="Здравствуйте, Максим Юрьевич. Хочу уточнить ориентир стоимости юридической помощи. Кратко опишу ситуацию и приложу имеющиеся материалы:"',
+  );
+  return result;
 };
 
 const draftUrl = (base, message) => {
@@ -253,21 +193,16 @@ const prefillMessengerLinks = (html) => {
   const telegram = escapeAttribute(draftUrl(site.telegram, genericContactMessage));
   const whatsapp = escapeAttribute(draftUrl(site.whatsapp, genericContactMessage));
   let result = html.replaceAll(`href="${site.telegram}"`, `href="${telegram}"`);
-  const whatsappHref = new RegExp(`href="${site.whatsapp.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}(?:&amp;|&)text=[^"]*"`, "g");
+  const whatsappHref = new RegExp(`href="${site.whatsapp.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:&amp;|&)text=[^"]*"`, "g");
   result = result.replace(whatsappHref, `href="${whatsapp}"`);
-  result = result.replaceAll(`href="${site.whatsapp}"`, `href="${whatsapp}"`);
-  return result.replaceAll(
-    "Нажмите кнопку: Telegram откроется, а текст с ответами уже скопируется. Вставьте его в чат с Максимом Юрьевичем.",
-    "Telegram откроется с заполненным черновиком. Проверьте ответы и отправьте сообщение Максиму Юрьевичу.",
-  );
+  return result.replaceAll(`href="${site.whatsapp}"`, `href="${whatsapp}"`);
 };
 
 export const composeRenderedPage = (html, { pathname, service = null } = {}) => {
   let result = html;
   if (pathname !== "/politika-konfidencialnosti") result = applyCommonContent(result);
-  result = simplifyPriceQuiz(result);
+  result = removeContactQuestionnaires(result);
   if (pathname === "/") result = expandQuickChoices(result);
   if (service) result = applyServiceContent(result, service);
-  result = injectCallback(result);
   return prefillMessengerLinks(result);
 };

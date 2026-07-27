@@ -38,7 +38,9 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       "trust-strip__grid",
       "section--value-editorial",
       "section--cta-portrait",
-      "data-price-quiz-step",
+      "messenger-choices--dialog",
+      "data-mobile-contact-now",
+      "mobile-contact--single",
       "section--case-studies",
       'id="case-autoclub"',
       'id="case-police-review"',
@@ -49,6 +51,14 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       if (!html.includes(marker)) throw new Error(`home page is missing marker: ${marker}`);
     }
     const forbiddenMarkers = [
+      "<form",
+      "<input",
+      "<select",
+      "<textarea",
+      "data-callback",
+      "callback-dialog",
+      "data-price-quiz",
+      "price-quiz-dialog",
       "section--document-samples",
       "section--featured-case",
       "section--visual-cases",
@@ -68,7 +78,14 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       "деньги возвращены полностью",
     ];
     for (const marker of forbiddenMarkers) {
-      if (html.includes(marker)) throw new Error(`home page exposes unconfirmed or private material: ${marker}`);
+      if (html.includes(marker)) throw new Error(`home page exposes forbidden or unconfirmed material: ${marker}`);
+    }
+
+    const appResponse = await fetch(noCacheUrl("assets/app.js"), { cache: "no-store", redirect: "follow" });
+    if (!appResponse.ok) throw new Error(`assets/app.js returned ${appResponse.status}`);
+    const app = await appResponse.text();
+    for (const marker of ["new FormData", "reportValidity", "data-callback", "data-price-quiz", "priceQuiz", "callbackForm"]) {
+      if (app.includes(marker)) throw new Error(`published app contains removed data-entry logic: ${marker}`);
     }
 
     const videoResponse = await fetch(noCacheUrl("video-config.json"), { cache: "no-store", redirect: "follow" });
@@ -76,7 +93,7 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const videoConfig = await videoResponse.json();
     if (typeof videoConfig.enabled !== "boolean") throw new Error("video-config.json has no enabled boolean");
 
-    console.log(`Published GitHub Pages build verified: ${expectedSha.slice(0, 12)} · ${base}`);
+    console.log(`Published GitHub Pages build verified: ${expectedSha.slice(0, 12)} · direct messenger model · ${base}`);
     process.exit(0);
   } catch (error) {
     lastError = error instanceof Error ? error.message : String(error);

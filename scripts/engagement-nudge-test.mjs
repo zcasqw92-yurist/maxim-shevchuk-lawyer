@@ -50,28 +50,30 @@ const checkMobileScenario = async (engineName, browser) => {
     await page.waitForFunction(() => document.querySelector("[data-mobile-contact]")?.classList.contains("is-visible"));
 
     const panelState = await page.evaluate(() => {
-      const later = document.querySelector("[data-mobile-contact-later]");
+      const panel = document.querySelector("[data-mobile-contact]");
       const now = document.querySelector("[data-mobile-contact-now]");
-      const laterRect = later.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
       const nowRect = now.getBoundingClientRect();
       const nowStyle = getComputedStyle(now);
       return {
-        laterLeft: laterRect.left,
-        nowLeft: nowRect.left,
-        laterWidth: laterRect.width,
+        panelWidth: panelRect.width,
         nowWidth: nowRect.width,
+        rightGap: innerWidth - nowRect.right,
+        leftGap: nowRect.left,
         animationName: nowStyle.animationName,
         animationDuration: nowStyle.animationDuration,
         animationDelay: nowStyle.animationDelay,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        callbackCount: document.querySelectorAll("[data-mobile-contact-later], [data-callback-open]").length,
       };
     });
 
-    if (!(panelState.nowLeft > panelState.laterLeft)) errors.push(`${engineName}: immediate CTA is not under the right thumb ${JSON.stringify(panelState)}`);
-    if (panelState.nowWidth < 120 || panelState.laterWidth < 120) errors.push(`${engineName}: mobile CTA is too narrow ${JSON.stringify(panelState)}`);
-    if (!panelState.animationName.includes("mobile-contact-soft-attention")) errors.push(`${engineName}: subtle attention animation is missing ${JSON.stringify(panelState)}`);
-    if (!panelState.animationDuration.includes("18s") || !panelState.animationDelay.includes("8s")) errors.push(`${engineName}: attention rhythm is too frequent or has no initial pause ${JSON.stringify(panelState)}`);
+    if (panelState.nowWidth < 300) errors.push(`${engineName}: direct messenger CTA is not thumb-friendly ${JSON.stringify(panelState)}`);
+    if (Math.abs(panelState.leftGap - panelState.rightGap) > 4) errors.push(`${engineName}: single CTA is not balanced across mobile width ${JSON.stringify(panelState)}`);
+    if (!panelState.animationName.includes("mobile-contact-soft-attention")) errors.push(`${engineName}: attention animation is missing ${JSON.stringify(panelState)}`);
+    if (!panelState.animationDuration.includes("18s") || !panelState.animationDelay.includes("8s")) errors.push(`${engineName}: attention rhythm is incorrect ${JSON.stringify(panelState)}`);
     if (panelState.overflow > 1) errors.push(`${engineName}: mobile panel creates ${panelState.overflow}px overflow`);
+    if (panelState.callbackCount) errors.push(`${engineName}: callback controls remain in public mobile UI`);
 
     const nudge = page.locator("#engagement-nudge");
     await nudge.waitFor({ state: "visible", timeout: 2_000 });
@@ -90,7 +92,7 @@ const checkMobileScenario = async (engineName, browser) => {
     if (nudgeState.dialogOpen) errors.push(`${engineName}: delayed nudge must not open a modal automatically`);
     if (nudgeState.focusStolen) errors.push(`${engineName}: delayed nudge steals keyboard focus`);
     if (!nudgeState.insideViewport) errors.push(`${engineName}: delayed nudge is outside mobile viewport ${JSON.stringify(nudgeState)}`);
-    if (!nudgeState.text.includes("Нужен ориентир по вашей ситуации?")) errors.push(`${engineName}: delayed nudge copy is missing`);
+    if (!nudgeState.text.includes("Выбрать мессенджер")) errors.push(`${engineName}: delayed nudge is not limited to direct messenger choice`);
     await nudge.screenshot({ path: join(reports, `${engineName.toLowerCase()}-mobile-nudge.png`) });
 
     await page.locator(".engagement-nudge__dismiss").click();
@@ -114,8 +116,9 @@ const checkWriteAction = async (engineName, browser) => {
     await page.locator("#engagement-nudge-write").click();
     await page.waitForFunction(() => document.querySelector("#engagement-nudge")?.hidden === true);
     await page.locator("#contact-dialog[open]").waitFor({ state: "visible" });
-    const topic = await page.locator("#contact-dialog").getAttribute("data-topic");
-    if (!topic) errors.push(`${engineName}: messenger dialog opened without a valid intent`);
+    if (await page.locator("form, input, select, textarea").count()) errors.push(`${engineName}: data-entry controls appeared after nudge action`);
+    const links = await page.locator("#contact-dialog .messenger-choice").evaluateAll((elements) => elements.map((element) => element.href));
+    if (links.length !== 2 || links.some((href) => !href.includes("text="))) errors.push(`${engineName}: direct messenger drafts are incomplete ${JSON.stringify(links)}`);
     await page.close();
   } finally {
     await context.close();
@@ -151,4 +154,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Engagement nudge passed: right-thumb CTA, 18-second subtle pulse, 60-second non-modal prompt and one display per session");
+console.log("Engagement nudge passed: one direct messenger CTA, 18-second pulse, 60-second prompt and one display per session");

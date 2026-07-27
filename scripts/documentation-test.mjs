@@ -36,6 +36,10 @@ for (const marker of [
   "юридические услуги оказываются клиентам из Москвы и всей Московской области",
   "дистанционная работа доступна по всей России",
   "онлайн: ежедневно с 08:00 до 23:00 МСК",
+  "отсутствуют формы заявки, заказа звонка и обратной связи",
+  "все CTA открывают единый диалог выбора Telegram или WhatsApp",
+  "оператор получает сведения только после самостоятельного нажатия «Отправить»",
+  "Аналитика в текущей итерации не удаляется",
   "канонические страницы получают `index,follow`",
   "`robots.txt` разрешает обход",
   "не входит в обычную команду `npm run check`",
@@ -51,6 +55,7 @@ for (const obsolete of [
   "публикует пустой `sitemap.xml`",
   "удаляет ключ IndexNow",
   "npm run test:live-indexing-lock подтвердил блокировку",
+  "формы, квиз, диалоги и мессенджеры",
 ]) {
   if (current.includes(obsolete)) errors.push(`current-production-state.md: осталось устаревшее утверждение «${obsolete}»`);
 }
@@ -63,10 +68,14 @@ if (!seoLaunch.includes("HOLD: только для будущего запуск
 if (!indexingPolicy.includes("новые страницы услуг")) errors.push("INDEXING_POLICY.md: историческая политика не охватывает новые страницы услуг");
 
 const packageJson = JSON.parse(packageText);
-for (const script of ["test:content-dates", "test:geography", "test:composition-contract", "test:documentation", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock", "check:preview-indexing-lock"]) {
+for (const script of ["test:content-dates", "test:geography", "test:composition-contract", "test:documentation", "test:direct-contact", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock", "check:preview-indexing-lock"]) {
   if (!packageJson.scripts?.[script]) errors.push(`package.json: отсутствует ${script}`);
 }
+for (const removed of ["test:callback", "test:callback-interaction"]) {
+  if (packageJson.scripts?.[removed]) errors.push(`package.json: удалённый сценарий не должен оставаться: ${removed}`);
+}
 if (/lock:indexing/.test(packageJson.scripts?.check || "")) errors.push("package.json: npm run check не должен включать indexing lock");
+if (!packageJson.scripts?.check?.includes("test:direct-contact")) errors.push("package.json: npm run check должен включать прямую модель обращения");
 if (!packageJson.scripts?.["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельный preview-контур должен сохранять indexing lock");
 
 for (const marker of [
@@ -86,6 +95,7 @@ for (const relativePath of [
   "tests/golden-render-contract.json",
   "docs/manual-device-qa.md",
   "INDEXING_POLICY.md",
+  "scripts/direct-contact-model-test.mjs",
 ]) {
   try {
     await access(join(root, relativePath));
@@ -99,4 +109,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} canonical routes, open production indexing and automatic IndexNow are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, open indexing and automatic IndexNow are current`);

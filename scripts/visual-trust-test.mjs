@@ -24,7 +24,8 @@ for (const marker of [
 ]) assert(home.includes(marker), `Главная страница не содержит обязательный маркер: ${marker}`);
 
 assert(home.includes('class="hero__visual"'), "Главная страница должна содержать статичный фотопортрет без обещания будущего видео");
-assert(home.includes("mobile-contact--dual"), "Согласованная мобильная панель должна сохраниться");
+assert(home.includes("mobile-contact--single"), "Мобильная панель должна содержать один прямой CTA в мессенджер");
+assert(!home.includes("mobile-contact--dual"), "Двухкнопочная панель с callback не должна возвращаться");
 assert(!home.includes("yandex.ru/map-widget"), "На главной не должен загружаться iframe Яндекс Карт");
 assert(contacts.includes("data-map-load"), "На странице контактов должен быть постер ленивой карты");
 assert(!contacts.includes("yandex.ru/map-widget"), "Карта не должна загружаться до действия пользователя");
@@ -55,6 +56,14 @@ const collectHtml = async (directory) => {
 };
 
 const forbiddenMarkers = [
+  "<form",
+  "<input",
+  "<select",
+  "<textarea",
+  "data-callback",
+  "callback-dialog",
+  "data-price-quiz",
+  "price-quiz-dialog",
   "section--dark",
   "section--process-guarantees",
   "section--consultation",
@@ -79,9 +88,9 @@ for (const path of htmlFiles) {
   const html = await readFile(path, "utf8");
   for (const marker of forbiddenMarkers) {
     if (path === join(root, "dist", "index.html")) {
-      assert(!html.includes(marker), `Главная страница содержит повторяющийся или неподтверждённый блок: ${marker}`);
+      assert(!html.includes(marker), `Главная страница содержит повторяющийся, неподтверждённый или удалённый блок: ${marker}`);
     } else if (!["section--dark", "section--process-guarantees", "section--consultation", 'data-search-visibility="home"'].includes(marker)) {
-      assert(!html.includes(marker), `Публичная страница содержит неподтверждённый материал: ${marker} (${path})`);
+      assert(!html.includes(marker), `Публичная страница содержит неподтверждённый или удалённый материал: ${marker} (${path})`);
     }
   }
 }
@@ -107,6 +116,9 @@ for (const marker of sectionFlow) {
   previousPosition = position;
 }
 assert((homeMain.match(/<h2\b/g) || []).length <= 8, "На главной снова появились повторяющиеся смысловые секции");
-assert((homeMain.match(/data-dialog-open/g) || []).length <= 16, "На главной снова появилось избыточное число равнозначных CTA");
+const directMessengerCtaCount = (homeMain.match(/data-dialog-open/g) || []).length;
+assert(directMessengerCtaCount >= 10, "На главной недостаточно точек прямого обращения к юристу");
+assert(directMessengerCtaCount <= 22, `На главной избыточное число прямых CTA: ${directMessengerCtaCount}`);
+assert(!/data-(?:callback|price-quiz)-open/.test(homeMain), "На главной не должно быть альтернативных форм или квиза");
 
-console.log("Visual trust architecture: verified anonymized cases are public; demo and unsupported materials are absent");
+console.log(`Visual trust architecture: ${directMessengerCtaCount} direct messenger CTAs, verified cases, no forms, demo or unsupported materials`);

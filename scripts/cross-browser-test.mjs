@@ -90,6 +90,9 @@ for (const [engineName, engine] of engines) {
     await page.goto(`${origin}/`, { waitUntil: "networkidle" });
     await rejectOptionalAnalytics(page, engineName);
     await assertNoOverflow(page, `${engineName} mobile home`);
+    if (await page.locator("form, input, select, textarea, [data-callback-open], [data-price-quiz-open]").count()) {
+      errors.push(`${engineName}: removed form or questionnaire controls remain on mobile home`);
+    }
 
     const menuToggle = page.locator("[data-menu-toggle]");
     const menuScrollY = await page.evaluate(() => window.scrollY);
@@ -141,19 +144,23 @@ for (const [engineName, engine] of engines) {
       const rect = button.getBoundingClientRect();
       return { width: rect.width, height: rect.height };
     }));
-    if (buttonSizes.length !== 2 || buttonSizes.some(({ width, height }) => width < 120 || height < 44)) {
-      errors.push(`${engineName}: mobile fixed actions are inaccessible ${JSON.stringify(buttonSizes)}`);
+    if (buttonSizes.length !== 1 || buttonSizes.some(({ width, height }) => width < 300 || height < 44)) {
+      errors.push(`${engineName}: single mobile messenger action is inaccessible ${JSON.stringify(buttonSizes)}`);
     }
 
-    const callbackTrigger = page.locator("[data-mobile-contact-later]");
-    await callbackTrigger.click();
-    await page.waitForFunction(() => document.querySelector("#callback-dialog")?.open);
-    const callbackState = await state(page);
-    if (!callbackState.activeInDialog) errors.push(`${engineName}: callback dialog did not receive focus`);
+    const mobileMessengerTrigger = page.locator("[data-mobile-contact-now]");
+    await mobileMessengerTrigger.click();
+    await page.waitForFunction(() => document.querySelector("#contact-dialog")?.open);
+    const mobileContactState = await state(page);
+    if (!mobileContactState.activeInDialog) errors.push(`${engineName}: mobile messenger dialog did not receive focus`);
+    const messengerLinks = await page.locator("#contact-dialog .messenger-choice").evaluateAll((links) => links.map((link) => link.href));
+    if (messengerLinks.length !== 2 || messengerLinks.some((href) => !href.includes("text="))) {
+      errors.push(`${engineName}: mobile direct messenger drafts are incomplete ${JSON.stringify(messengerLinks)}`);
+    }
     await page.keyboard.press("Escape");
-    await page.waitForFunction(() => !document.querySelector("#callback-dialog")?.open);
-    if (!await callbackTrigger.evaluate((element) => element === document.activeElement)) {
-      errors.push(`${engineName}: callback dialog did not return focus`);
+    await page.waitForFunction(() => !document.querySelector("#contact-dialog")?.open);
+    if (!await mobileMessengerTrigger.evaluate((element) => element === document.activeElement)) {
+      errors.push(`${engineName}: mobile messenger dialog did not return focus`);
     }
 
     await page.evaluate(() => {
@@ -236,4 +243,4 @@ if (errors.length) {
 }
 
 const completed = engines.length - skipped.length;
-console.log(`Cross-browser smoke passed for ${completed}/${engines.length} installed engines; CI requires Chromium, Firefox and WebKit`);
+console.log(`Cross-browser smoke passed for ${completed}/${engines.length} installed engines: one direct mobile messenger CTA, no forms, focus and overflow contracts`);

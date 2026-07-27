@@ -17,6 +17,15 @@ const routes = [
   ["/politika-konfidencialnosti", join("politika-konfidencialnosti", "index.html")],
 ];
 
+const analyticsConsentHooks = [
+  "data-consent-accept",
+  "data-consent-banner",
+  "data-consent-reject",
+  "data-consent-settings",
+];
+const analyticsConsentHookSet = new Set(analyticsConsentHooks);
+const analyticsConsentRequired = Boolean(site.analytics?.enabled && site.analytics?.requireConsent);
+
 const decodeText = (value = "") => value
   .replace(/<[^>]+>/g, " ")
   .replaceAll("&nbsp;", " ")
@@ -56,8 +65,18 @@ const pageSignature = (html) => ({
 });
 
 const structuralSignature = (signature = {}) => {
-  const { title: _seoTitle, ...structure } = signature;
-  return structure;
+  const {
+    title: _seoTitle,
+    dataHooks = [],
+    ...structure
+  } = signature;
+  return {
+    ...structure,
+    // Баннер согласия и кнопка настроек появляются только при включённой аналитике.
+    // Их наличие проверяется отдельно ниже, а golden-контракт остаётся одинаковым
+    // для локальной preview-сборки и production.
+    dataHooks: dataHooks.filter((hook) => !analyticsConsentHookSet.has(hook)),
+  };
 };
 
 const actual = {};
@@ -65,6 +84,16 @@ for (const [route, file] of routes) {
   const html = await readFile(join(dist, file), "utf8");
   if (html.includes("<!-- build-slot:")) throw new Error(`${route}: в публикации остался сборочный слот`);
   actual[route] = pageSignature(html);
+
+  const hookSet = new Set(actual[route].dataHooks);
+  const presentConsentHooks = analyticsConsentHooks.filter((hook) => hookSet.has(hook));
+  if (analyticsConsentRequired && presentConsentHooks.length !== analyticsConsentHooks.length) {
+    const missing = analyticsConsentHooks.filter((hook) => !hookSet.has(hook));
+    throw new Error(`${route}: при включённой аналитике отсутствуют hooks согласия: ${missing.join(", ")}`);
+  }
+  if (!analyticsConsentRequired && presentConsentHooks.length) {
+    throw new Error(`${route}: hooks согласия не должны выводиться при выключенной аналитике: ${presentConsentHooks.join(", ")}`);
+  }
 }
 
 // Именованный слот не зависит от текста или класса соседнего контейнера.
@@ -84,7 +113,7 @@ if (process.env.UPDATE_GOLDEN === "1") {
 
 const expected = JSON.parse(await readFile(goldenPath, "utf8"));
 // SEO-title является управляемым контентом. Его корректность проверяется SEO-аудитом,
-// а golden-контракт защищает именно структуру страниц и клиентские hooks.
+// а golden-контракт защищает постоянную структуру страниц и клиентские hooks.
 const actualStructure = Object.fromEntries(
   Object.entries(actual).map(([route, signature]) => [route, structuralSignature(signature)]),
 );
@@ -96,7 +125,14 @@ if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
   const changedRoutes = routes
     .map(([route]) => route)
     .filter((route) => JSON.stringify(actualStructure[route]) !== JSON.stringify(expectedStructure[route]));
-  throw new Error(`Структурный golden-контракт изменился: ${changedRoutes.join(", ")}. Проверьте diff и обновляйте эталон только осознанно.`);
+  const changedFields = changedRoutes.map((route) => {
+    const actualPage = actualStructure[route] || {};
+    const expectedPage = expectedStructure[route] || {};
+    const fields = [...new Set([...Object.keys(actualPage), ...Object.keys(expectedPage)])]
+      .filter((field) => JSON.stringify(actualPage[field]) !== JSON.stringify(expectedPage[field]));
+    return `${route}: ${fields.join(", ") || "unknown"}`;
+  });
+  throw new Error(`Структурный golden-контракт изменился: ${changedFields.join("; ")}. Проверьте diff и обновляйте эталон только осознанно.`);
 }
 
-console.log(`Composition contract passed: named slots and golden structure for ${routes.length} canonical pages`);
+console.log(`Composition contract passed: named slots, analytics consent mode and golden structure for ${routes.length} canonical pages`);

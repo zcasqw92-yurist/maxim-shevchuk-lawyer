@@ -4,17 +4,21 @@ import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
 import { services } from "../src/data.mjs";
 import { appendToBuildSlot, buildSlot, fillBuildSlot, finalizeBuildSlots } from "../src/html-slots.mjs";
+import { privacyPolicyHeadingContract } from "../src/privacy-policy.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const goldenPath = join(root, "tests", "golden-render-contract.json");
+const privacyRoute = "/politika-konfidencialnosti";
+const privacyFooterHeading = "h2:Направления";
+const privacyHeadingToken = "privacy-policy-headings:validated";
 const routes = [
   ["/", "index.html"],
   ["/uslugi", join("uslugi", "index.html")],
   ...services.map((service) => [`/uslugi/${service.slug}`, join("uslugi", service.slug, "index.html")]),
   ["/o-yuriste", join("o-yuriste", "index.html")],
   ["/kontakty", join("kontakty", "index.html")],
-  ["/politika-konfidencialnosti", join("politika-konfidencialnosti", "index.html")],
+  [privacyRoute, join("politika-konfidencialnosti", "index.html")],
 ];
 
 const analyticsConsentHooks = [
@@ -64,14 +68,27 @@ const pageSignature = (html) => ({
   jsonLdTypes: jsonLdTypes(html),
 });
 
-const structuralSignature = (signature = {}) => {
+const normalizeHeadings = (route, headings = [], validatePrivacy = false) => {
+  if (route !== privacyRoute) return headings;
+  const footerIndex = headings.indexOf(privacyFooterHeading);
+  if (footerIndex < 0) throw new Error(`${privacyRoute}: не найдена граница между политикой и подвалом`);
+  const policyHeadings = headings.slice(0, footerIndex);
+  if (validatePrivacy && JSON.stringify(policyHeadings) !== JSON.stringify(privacyPolicyHeadingContract)) {
+    throw new Error(`${privacyRoute}: заголовки политики не соответствуют утверждённому контракту`);
+  }
+  return [privacyHeadingToken, ...headings.slice(footerIndex)];
+};
+
+const structuralSignature = (route, signature = {}) => {
   const {
     title: _seoTitle,
+    headings = [],
     dataHooks = [],
     ...structure
   } = signature;
   return {
     ...structure,
+    headings: normalizeHeadings(route, headings),
     // Баннер согласия и кнопка настроек появляются только при включённой аналитике.
     // Их наличие проверяется отдельно ниже, а golden-контракт остаётся одинаковым
     // для локальной preview-сборки и production.
@@ -84,6 +101,7 @@ for (const [route, file] of routes) {
   const html = await readFile(join(dist, file), "utf8");
   if (html.includes("<!-- build-slot:")) throw new Error(`${route}: в публикации остался сборочный слот`);
   actual[route] = pageSignature(html);
+  normalizeHeadings(route, actual[route].headings, true);
 
   const hookSet = new Set(actual[route].dataHooks);
   const presentConsentHooks = analyticsConsentHooks.filter((hook) => hookSet.has(hook));
@@ -114,11 +132,13 @@ if (process.env.UPDATE_GOLDEN === "1") {
 const expected = JSON.parse(await readFile(goldenPath, "utf8"));
 // SEO-title является управляемым контентом. Его корректность проверяется SEO-аудитом,
 // а golden-контракт защищает постоянную структуру страниц и клиентские hooks.
+// Заголовки политики имеют отдельный строгий контракт, потому что сам текст политики
+// формируется специализированным модулем и может осознанно обновляться независимо.
 const actualStructure = Object.fromEntries(
-  Object.entries(actual).map(([route, signature]) => [route, structuralSignature(signature)]),
+  Object.entries(actual).map(([route, signature]) => [route, structuralSignature(route, signature)]),
 );
 const expectedStructure = Object.fromEntries(
-  Object.entries(expected).map(([route, signature]) => [route, structuralSignature(signature)]),
+  Object.entries(expected).map(([route, signature]) => [route, structuralSignature(route, signature)]),
 );
 
 if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
@@ -135,4 +155,4 @@ if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
   throw new Error(`Структурный golden-контракт изменился: ${changedFields.join("; ")}. Проверьте diff и обновляйте эталон только осознанно.`);
 }
 
-console.log(`Composition contract passed: named slots, analytics consent mode and golden structure for ${routes.length} canonical pages`);
+console.log(`Composition contract passed: named slots, privacy policy headings, analytics consent mode and golden structure for ${routes.length} canonical pages`);

@@ -9,6 +9,23 @@ const escapeHtml = (value = "") => String(value)
 
 const policyDate = contentDateForPath("/politika-konfidencialnosti");
 
+export const privacyPolicyHeadingContract = [
+  "h1:Политика обработки персональных данных и использования файлов cookie",
+  "h2:1. Общие положения",
+  "h2:2. Какие процессы необходимо различать",
+  "h2:3. Интерактивные формы и черновики сообщений",
+  "h2:4. Яндекс Метрика, cookies и технические сведения",
+  "h2:5. Переход к способам связи",
+  "h2:6. Данные, получаемые после обращения",
+  "h2:7. Минимизация данных",
+  "h2:8. Получатели, передача и конфиденциальность",
+  "h2:9. Сроки обработки",
+  "h2:10. Права пользователя",
+  "h2:11. Меры защиты",
+  "h2:12. Контакты оператора",
+  "h2:13. Изменение Политики",
+];
+
 const officeAddress = site.publicOffice?.enabled
   ? [
       site.publicOffice.postalCode,

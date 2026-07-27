@@ -21,31 +21,23 @@ for (const pagePath of pages) {
   const laterCount = (html.match(/data-mobile-contact-later/g) || []).length;
   const nudgeCount = (html.match(/id="engagement-nudge"/g) || []).length;
   if (panelCount !== 1) errors.push(`${pagePath}: expected one mobile panel, found ${panelCount}`);
-  if (nowCount !== 1 || laterCount !== 1) errors.push(`${pagePath}: mobile actions are incomplete`);
+  if (nowCount !== 1) errors.push(`${pagePath}: expected one direct messenger action, found ${nowCount}`);
+  if (laterCount !== 0) errors.push(`${pagePath}: removed callback action is still public`);
   if (nudgeCount !== 1) errors.push(`${pagePath}: expected one engagement nudge, found ${nudgeCount}`);
   if (!html.includes("Написать сейчас")) errors.push(`${pagePath}: missing immediate action label`);
-  if (!html.includes("Связаться позже")) errors.push(`${pagePath}: missing callback action label`);
-  if (!html.includes("Нужен ориентир по вашей ситуации?")) errors.push(`${pagePath}: missing engagement nudge copy`);
+  if (html.includes("Связаться позже")) errors.push(`${pagePath}: callback label must not remain`);
+  if (!html.includes("Выбрать мессенджер")) errors.push(`${pagePath}: nudge must lead to messenger choice`);
   if (!html.includes("data-mobile-contact-now") || !html.includes("data-dialog-open")) errors.push(`${pagePath}: immediate action is not connected to messenger dialog`);
-  if (!html.includes("data-mobile-contact-later") || !html.includes("data-callback-open")) errors.push(`${pagePath}: later action is not connected to callback form`);
   if (!html.includes("/assets/engagement-nudge.mjs")) errors.push(`${pagePath}: engagement module is not loaded`);
-
-  const panelStart = html.indexOf('class="mobile-contact mobile-contact--dual"');
-  const laterPosition = html.indexOf("data-mobile-contact-later", panelStart);
-  const nowPosition = html.indexOf("data-mobile-contact-now", panelStart);
-  if (panelStart < 0 || laterPosition < panelStart || nowPosition < panelStart || laterPosition > nowPosition) {
-    errors.push(`${pagePath}: immediate action must be the right-hand second control`);
-  }
+  if (!html.includes('class="mobile-contact mobile-contact--single"')) errors.push(`${pagePath}: mobile panel must use the single-action layout`);
 }
 
 const styles = await readFile(join(dist, "assets", "styles.css"), "utf8");
 for (const marker of [
-  ".mobile-contact--dual",
-  "grid-template-columns: repeat(2, minmax(0, 1fr));",
+  ".mobile-contact--single",
+  "grid-template-columns: minmax(0, 1fr);",
   "padding-bottom: calc(80px + env(safe-area-inset-bottom));",
   ".mobile-contact__action--now",
-  ".mobile-contact__action--later",
-  "order: 2",
   "mobile-contact-soft-attention 18s ease-out 8s infinite",
   ".engagement-nudge",
   "bottom: calc(90px + env(safe-area-inset-bottom));",
@@ -53,6 +45,9 @@ for (const marker of [
   "@media (max-width: 350px)",
 ]) {
   if (!styles.includes(marker)) errors.push(`styles.css: missing ${marker}`);
+}
+for (const obsolete of [".mobile-contact--dual", ".mobile-contact__action--later"]) {
+  if (styles.includes(obsolete)) errors.push(`styles.css: obsolete callback selector remains: ${obsolete}`);
 }
 
 const engagementScript = await readFile(join(dist, "assets", "engagement-nudge.mjs"), "utf8");
@@ -68,10 +63,13 @@ for (const marker of [
 ]) {
   if (!engagementScript.includes(marker)) errors.push(`engagement-nudge.mjs: missing ${marker}`);
 }
+for (const obsolete of ["data-callback-open", "data-price-quiz-open"]) {
+  if (engagementScript.includes(obsolete)) errors.push(`engagement-nudge.mjs: obsolete interaction remains: ${obsolete}`);
+}
 
 if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
 
-console.log(`Mobile action panel checks passed: ${pages.length} pages, right-thumb CTA, subtle pulse and one-session nudge`);
+console.log(`Mobile action panel checks passed: ${pages.length} pages, one direct messenger CTA and one-session nudge`);

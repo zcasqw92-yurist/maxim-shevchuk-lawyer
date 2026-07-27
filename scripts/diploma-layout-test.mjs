@@ -73,6 +73,8 @@ try {
 
         const response = await page.goto(`${origin}/o-yuriste/`, { waitUntil: "networkidle" });
         if (!response?.ok()) errors.push(`${engineName} ${viewportName}: HTTP ${response?.status()}`);
+        const imageLocator = page.locator(".section--education .diploma-card img");
+        await imageLocator.scrollIntoViewIfNeeded();
         await page.waitForFunction(() => {
           const image = document.querySelector(".section--education .diploma-card img");
           return Boolean(image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0);
@@ -155,7 +157,11 @@ try {
           }
         }
 
+        await page.addStyleTag({
+          content: ".site-header,.mobile-contact,.skip-link{display:none!important}",
+        });
         const sectionLocator = page.locator(".section--education");
+        await sectionLocator.scrollIntoViewIfNeeded();
         await sectionLocator.screenshot({
           path: join(reports, `${engineName.toLowerCase()}-${viewportName}.png`),
         });

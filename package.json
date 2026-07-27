@@ -38,7 +38,7 @@
     "test:video-ready": "node scripts/video-ready-test.mjs",
     "test:core-web-vitals": "node scripts/core-web-vitals-test.mjs",
     "test:cross-browser": "node scripts/cross-browser-test.mjs",
-    "test:visual": "node --import ./scripts/playwright-consent-isolation-preload.mjs scripts/visual-test.mjs",
+    "test:visual": "node --import ./scripts/playwright-consent-isolation-preload.mjs scripts/visual-direct-contact-test.mjs",
     "lock:indexing": "node scripts/lock-indexing.mjs",
     "test:indexing-lock": "node scripts/indexing-lock-test.mjs",
     "test:live": "node scripts/live-smoke.mjs",

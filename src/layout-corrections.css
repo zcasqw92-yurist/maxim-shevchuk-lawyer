@@ -59,18 +59,65 @@
 .home .hero__content { padding-bottom: 20px; }
 .home .hero__lead { margin-top: 22px; }
 .home .hero__actions { margin-top: 26px; }
+
+/* The refusal remains available but visually secondary; consent is the primary action. */
 .consent-banner__actions [data-consent-reject] {
   order: 1;
-  color: var(--white);
-  border-color: rgba(255,255,255,.58);
+  color: rgba(255,255,255,.72);
+  border: 0;
   background: transparent;
+  box-shadow: none;
+  opacity: .82;
 }
 .consent-banner__actions [data-consent-reject]:hover {
-  color: var(--white);
-  border-color: var(--white);
-  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.94);
+  border: 0;
+  background: rgba(255,255,255,.07);
+  opacity: 1;
 }
-.consent-banner__actions [data-consent-accept] { order: 2; }
+.consent-banner__actions [data-consent-accept] {
+  order: 2;
+  color: var(--ink-deep);
+  border: 2px solid #f4d89e;
+  background: var(--gold-bright);
+  box-shadow: 0 0 0 1px rgba(9,28,44,.2), 0 10px 28px rgba(0,0,0,.2);
+}
+.consent-banner__actions [data-consent-accept]:hover {
+  color: var(--ink-deep);
+  border-color: var(--white);
+  background: #e8c88d;
+  transform: translateY(-2px);
+}
+
+/* Main portrait: a strict rectangular frame with the same gold corner language as the about page. */
+.home .hero__visual { isolation: isolate; }
+.home .hero__visual::before {
+  position: absolute;
+  z-index: 0;
+  top: -18px;
+  left: -18px;
+  width: 46%;
+  height: 34%;
+  content: "";
+  border-top: 2px solid var(--gold);
+  border-left: 2px solid var(--gold);
+  pointer-events: none;
+}
+.home .hero__image-wrap {
+  z-index: 1;
+  overflow: visible;
+  border-radius: 0;
+}
+.home .hero__image-wrap::after {
+  z-index: 2;
+  border-radius: 0;
+}
+.home .hero__image-wrap img {
+  position: relative;
+  z-index: 1;
+  border-radius: 0;
+}
+.home .identity-card { z-index: 3; }
 
 @media (min-width: 901px) and (max-width: 1180px) {
   .section--education .education-grid {
@@ -150,6 +197,13 @@ html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
     max-width: 760px;
     justify-self: center;
     margin-inline: auto;
+  }
+
+  .home .hero__visual::before {
+    top: -12px;
+    left: -12px;
+    width: 42%;
+    height: 28%;
   }
 }
 
@@ -284,6 +338,15 @@ html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
     min-height: 0;
     padding: 10px 4px 2px;
     font-size: .875rem;
+  }
+
+  .home .hero__visual::before {
+    top: -8px;
+    left: -8px;
+    width: 38%;
+    height: 24%;
+    border-top-width: 2px;
+    border-left-width: 2px;
   }
 
   .legal-page aside h1 {

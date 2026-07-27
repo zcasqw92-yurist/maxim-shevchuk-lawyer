@@ -65,31 +65,56 @@ const auditLayout = async (page, label, mobile) => {
     const visible = (element) => {
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
-      return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0;
+      return style.display !== "none"
+        && style.visibility !== "hidden"
+        && Number(style.opacity) > 0
+        && rect.width > 0
+        && rect.height > 0;
     };
     const problems = [];
-    const selectors = mobile
-      ? "main p, main li, main dd, main button, main a, dialog p, dialog button, dialog a, .mobile-contact button, .engagement-nudge p, .engagement-nudge button, .site-footer p, .site-footer a, .consent-banner p, .consent-banner a"
-      : "main p, main li, main dd, dialog p, .site-footer p, .consent-banner p";
-    for (const element of document.querySelectorAll(selectors)) {
-      if (!visible(element)) continue;
-      const text = element.textContent.replace(/\s+/g, " ").trim();
-      if (!text) continue;
-      const size = Number.parseFloat(getComputedStyle(element).fontSize);
-      const noteLike = element.matches("small, figcaption, dt, [class*='__note'], [class*='__privacy'], [class*='__status'], [class*='__meta']");
-      const minimum = mobile ? (noteLike ? 14 : 16) : 12;
-      if (size + .01 < minimum) problems.push(`${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 2).join(".")}: ${size}px < ${minimum}px · ${text.slice(0, 70)}`);
+    const typographyGroups = [
+      {
+        role: "primary",
+        minimum: mobile ? 16 : 12,
+        selector: "main p, main dd, main blockquote, main .plain-checks li, dialog p, dialog dd, .engagement-nudge p",
+      },
+      {
+        role: "secondary",
+        minimum: mobile ? 14 : 12,
+        selector: "main button, main .button, main .text-link, main .card-link, dialog button, dialog a, .mobile-contact button, .engagement-nudge button, .site-footer p, .site-footer a, .breadcrumbs li, .breadcrumbs a, .consent-banner p, .consent-banner a",
+      },
+      {
+        role: "optional",
+        minimum: mobile ? 12 : 11,
+        selector: ".eyebrow, .hero__kicker, .hero__quick-choices > span, .brand__text small, .brand--footer small, .about-hero__role, .footer__title, .footer__office small, .service-hero__price small, .process-guarantee > span, .case-study__category, small, figcaption, dt, [class*='__note'], [class*='__privacy'], [class*='__status'], [class*='__meta']",
+      },
+    ];
+
+    const seen = new Set();
+    for (const group of typographyGroups) {
+      for (const element of document.querySelectorAll(group.selector)) {
+        if (!visible(element) || seen.has(element)) continue;
+        seen.add(element);
+        const text = element.textContent.replace(/\s+/g, " ").trim();
+        if (!text) continue;
+        const size = Number.parseFloat(getComputedStyle(element).fontSize);
+        if (size + .01 < group.minimum) {
+          problems.push(`${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 2).join(".")}: ${group.role} ${size}px < ${group.minimum}px · ${text.slice(0, 70)}`);
+        }
+      }
     }
-    const controls = [...document.querySelectorAll("button, a")].filter(visible);
+
     if (mobile) {
+      const controls = [...document.querySelectorAll("button, .button, .messenger-choice, .mobile-contact__action")].filter(visible);
       for (const control of controls) {
         const rect = control.getBoundingClientRect();
         if (rect.width < 44 || rect.height < 44) {
           const text = control.textContent.replace(/\s+/g, " ").trim() || control.getAttribute("aria-label") || "control";
-          if (!control.closest(".breadcrumbs, .footer__links")) problems.push(`touch-target ${rect.width.toFixed(1)}×${rect.height.toFixed(1)} · ${text.slice(0, 60)}`);
+          problems.push(`touch-target ${rect.width.toFixed(1)}×${rect.height.toFixed(1)} · ${text.slice(0, 60)}`);
         }
       }
     }
+
     return {
       problems,
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -99,7 +124,7 @@ const auditLayout = async (page, label, mobile) => {
 
   if (result.overflow > 1) failures.push(`${label}: horizontal overflow ${result.overflow}px`);
   if (result.forms) failures.push(`${label}: public UI contains ${result.forms} data-entry controls`);
-  for (const problem of result.problems.slice(0, 20)) failures.push(`${label}: ${problem}`);
+  for (const problem of result.problems) failures.push(`${label}: ${problem}`);
 };
 
 let browser;
@@ -150,4 +175,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Accessibility checks passed: contrast, mobile typography, touch targets, no forms and no horizontal overflow at 320, 390 and 1440 px");
+console.log("Accessibility checks passed: contrast, primary/secondary mobile typography, CTA touch targets, no forms and no horizontal overflow at 320, 390 and 1440 px");

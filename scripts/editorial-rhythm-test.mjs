@@ -58,15 +58,23 @@ const waitForLayout = (page) => page.evaluate(async () => {
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 });
 
-const inspectRhythm = (containerSelector) => {
-  const number = (name) => Number.parseFloat(getComputedStyle(document.body).getPropertyValue(name));
-  const flow = {
-    xs: number("--editorial-flow-xs"),
-    sm: number("--editorial-flow-sm"),
-    md: number("--editorial-flow-md"),
-    lg: number("--editorial-flow-lg"),
-    xl: number("--editorial-flow-xl"),
+const inspectRhythm = ({ containerSelector, kind }) => {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;height:1px;";
+  document.body.append(probe);
+  const resolveToken = (name) => {
+    probe.style.width = `var(${name})`;
+    return Number.parseFloat(getComputedStyle(probe).width);
   };
+  const flow = {
+    xs: resolveToken("--editorial-flow-xs"),
+    sm: resolveToken("--editorial-flow-sm"),
+    md: resolveToken("--editorial-flow-md"),
+    lg: resolveToken("--editorial-flow-lg"),
+    xl: resolveToken("--editorial-flow-xl"),
+  };
+  probe.remove();
+
   const container = document.querySelector(containerSelector);
   const children = [...container.children].filter((element) => {
     const rect = element.getBoundingClientRect();
@@ -109,10 +117,18 @@ const inspectRhythm = (containerSelector) => {
     const rect = paragraph.getBoundingClientRect();
     return { text: paragraph.textContent.trim().slice(0, 60), gapBefore: rect.top - previousRect.bottom };
   });
-  const lastContent = children.at(-1);
+
+  const tailCandidates = kind === "case"
+    ? [container.lastElementChild, document.querySelector(".editorial-case-aside")]
+    : [children.at(-1)];
+  const visibleTailBottoms = tailCandidates
+    .filter(Boolean)
+    .map((element) => element.getBoundingClientRect())
+    .filter((rect) => rect.height > 0)
+    .map((rect) => rect.bottom);
+  const tailBottom = visibleTailBottoms.length ? Math.max(...visibleTailBottoms) : null;
   const helpfulness = document.querySelector("[data-editorial-helpfulness]");
   const cta = document.querySelector(".editorial-cta");
-  const lastRect = lastContent?.getBoundingClientRect();
   const helpfulnessRect = helpfulness?.getBoundingClientRect();
   const ctaRect = cta?.getBoundingClientRect();
   return {
@@ -120,7 +136,7 @@ const inspectRhythm = (containerSelector) => {
     topLevel,
     headings,
     paragraphs,
-    tailGap: lastRect && helpfulnessRect ? helpfulnessRect.top - lastRect.bottom : null,
+    tailGap: tailBottom !== null && helpfulnessRect ? helpfulnessRect.top - tailBottom : null,
     ctaGap: helpfulnessRect && ctaRect ? ctaRect.top - helpfulnessRect.bottom : null,
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
   };
@@ -158,7 +174,7 @@ try {
           if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route.path}: status ${response?.status()}`);
           await waitForLayout(page);
 
-          const state = await page.evaluate(inspectRhythm, route.container);
+          const state = await page.evaluate(inspectRhythm, { containerSelector: route.container, kind: route.kind });
           if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route.path}: ${state.overflow}px horizontal overflow`);
           if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
             errors.push(`${engineName} ${viewport.width}px ${route.path}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
@@ -185,7 +201,7 @@ try {
             }
           }
           if (!closeTo(state.tailGap, state.flow.xl, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: author-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
+            errors.push(`${engineName} ${viewport.width}px ${route.path}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
           }
           if (!closeTo(state.ctaGap, state.flow.md, 4)) {
             errors.push(`${engineName} ${viewport.width}px ${route.path}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);

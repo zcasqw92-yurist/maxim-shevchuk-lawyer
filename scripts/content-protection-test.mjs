@@ -58,7 +58,8 @@ for (const path of files) {
   }
   if ([".js", ".mjs", ".css", ".html"].includes(extension)) {
     const content = await readFile(path, "utf8");
-    if (/sourceMappingURL\s*=/.test(content)) errors.push(`${name}: sourceMappingURL must not be published`);
+    const isPinnedVendor = name === "assets/vendor-web-vitals.js";
+    if (!isPinnedVendor && /sourceMappingURL\s*=/.test(content)) errors.push(`${name}: sourceMappingURL must not be published in project code`);
   }
   if ([".webp", ".avif", ".jpg", ".jpeg", ".png", ".svg"].includes(extension)) {
     const info = await stat(path);
@@ -176,4 +177,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Content protection passed: ${canonicalPages.length} pages, non-clickable images, no source maps, selectable text, Chromium and WebKit`);
+console.log(`Content protection passed: ${canonicalPages.length} pages, non-clickable images, no source-map files, selectable text, Chromium and WebKit`);

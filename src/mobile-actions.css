@@ -104,20 +104,6 @@
 
   .engagement-nudge__write:hover { border-color: var(--gold-text); background: #e7c785; }
 
-  /* Article lists are informational, not interactive controls. */
-  .editorial-page .editorial-body .editorial-checklist li::before {
-    top: 0;
-    left: 0;
-    width: auto;
-    height: auto;
-    color: var(--gold-text);
-    border: 0;
-    content: "—";
-    font-size: 1rem;
-    font-weight: 800;
-    line-height: 1.75;
-  }
-
   /* Keep all published sections discoverable without crowding medium desktop widths. */
   .desktop-nav a { white-space: nowrap; }
   .mobile-nav a[aria-current="page"] { color: var(--gold-text); }

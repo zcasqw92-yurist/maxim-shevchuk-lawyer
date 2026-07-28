@@ -166,7 +166,7 @@ try {
           if (route === articleRoute) {
             if (!state.checklistMarker) errors.push(`${engineName} ${viewport.width}px ${route}: checklist marker is missing`);
             else {
-              if (!state.checklistMarker.content.includes("—")) errors.push(`${engineName} ${viewport.width}px ${route}: article marker is not an editorial dash ${JSON.stringify(state.checklistMarker)}`);
+              if (!state.checklistMarker.content.includes("✓")) errors.push(`${engineName} ${viewport.width}px ${route}: article marker is not a semantic check ${JSON.stringify(state.checklistMarker)}`);
               if (state.checklistMarker.borderTopWidth !== "0px" || state.checklistMarker.borderStyle !== "none") {
                 errors.push(`${engineName} ${viewport.width}px ${route}: checkbox-like square remains ${JSON.stringify(state.checklistMarker)}`);
               }

@@ -52,16 +52,16 @@ const articleIntake = (article) => {
 
 const helpfulness = (id, kind) => `
     <section class="editorial-helpfulness" aria-labelledby="editorial-helpfulness-title" data-editorial-helpfulness data-publication-id="${esc(id)}" data-publication-kind="${esc(kind)}">
-      <div>
+      <div class="editorial-helpfulness__copy">
         <span>Обратная связь без персональных данных</span>
         <h2 id="editorial-helpfulness-title">Материал помог понять следующий шаг?</h2>
       </div>
       <div class="editorial-helpfulness__actions" role="group" aria-label="Оценка полезности материала">
-        <button type="button" data-helpfulness-value="yes">Да</button>
-        <button type="button" data-helpfulness-value="no">Нет</button>
-        <button type="button" data-helpfulness-value="partly">Частично</button>
+        <button type="button" aria-pressed="false" data-helpfulness-value="yes">Да</button>
+        <button type="button" aria-pressed="false" data-helpfulness-value="no">Нет</button>
+        <button type="button" aria-pressed="false" data-helpfulness-value="partly">Частично</button>
       </div>
-      <p data-helpfulness-status aria-live="polite"></p>
+      <p data-helpfulness-status aria-live="polite" aria-atomic="true"></p>
     </section>`;
 
 const injectBefore = (html, marker, content, label) => {

@@ -100,11 +100,11 @@ try {
           sample.remove();
           return normalized;
         });
-        await globalSummary.hover();
-        await page.waitForTimeout(250);
-        const globalHoverBorder = await globalToggle.evaluate((element) => getComputedStyle(element).borderTopColor);
-        if (globalHoverBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: home FAQ hover border is ${globalHoverBorder}, expected ${expectedGold}`);
-        if (globalHoverBorder === globalControl.borderColor) errors.push(`${engineName} ${viewport.width}px: home FAQ hover does not change the control border`);
+        if (viewport.width >= 1000) await globalDetails.hover();
+        else await globalSummary.focus();
+        const globalActiveBorder = await globalToggle.evaluate((element) => getComputedStyle(element).borderTopColor);
+        if (globalActiveBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: home FAQ hover/focus border is ${globalActiveBorder}, expected ${expectedGold}`);
+        if (globalActiveBorder === globalControl.borderColor) errors.push(`${engineName} ${viewport.width}px: home FAQ hover/focus does not change the control border`);
 
         await page.goto(`${origin}${articleRoute}`, { waitUntil: "networkidle" });
         const details = page.locator("#faq .faq-item").first();
@@ -133,11 +133,11 @@ try {
             errors.push(`${engineName} ${viewport.width}px: editorial FAQ ${property} ${openedControl[property]} differs from brand FAQ ${globalControl[property]}`);
           }
         }
-        await summary.hover();
-        await page.waitForTimeout(250);
-        const editorialHoverBorder = await summary.evaluate((element) => getComputedStyle(element, "::after").borderTopColor);
-        if (editorialHoverBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover border is ${editorialHoverBorder}, expected ${expectedGold}`);
-        if (editorialHoverBorder === openedControl.borderColor) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover does not change the control border`);
+        if (viewport.width >= 1000) await details.hover();
+        else await summary.focus();
+        const editorialActiveBorder = await summary.evaluate((element) => getComputedStyle(element, "::after").borderTopColor);
+        if (editorialActiveBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover/focus border is ${editorialActiveBorder}, expected ${expectedGold}`);
+        if (editorialActiveBorder === openedControl.borderColor) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover/focus does not change the control border`);
 
         await summary.click();
         if (await details.getAttribute("open") !== null) errors.push(`${engineName} ${viewport.width}px: FAQ did not close after summary click`);

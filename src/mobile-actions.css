@@ -118,6 +118,20 @@
     line-height: 1.75;
   }
 
+  /* Keep all published sections discoverable without crowding medium desktop widths. */
+  .desktop-nav a { white-space: nowrap; }
+  .mobile-nav a[aria-current="page"] { color: var(--gold-text); }
+
+  @media (min-width: 901px) and (max-width: 1120px) {
+    .header__inner { gap: 20px; }
+    .desktop-nav { gap: 14px; }
+    .desktop-nav a { font-size: 13px; }
+  }
+
+  @media (min-width: 901px) and (max-width: 1000px) {
+    .header__actions { display: none; }
+  }
+
   @keyframes mobile-contact-soft-attention {
     0%, 12%, 100% {
       box-shadow: 0 0 0 0 rgba(255, 218, 137, 0);

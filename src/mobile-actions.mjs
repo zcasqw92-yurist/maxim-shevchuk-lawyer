@@ -13,7 +13,7 @@ const base = site.basePath || "";
 const engagementScript = `${base}/assets/engagement-nudge.mjs`;
 
 const narrowLayoutStyles = `
-  <style data-narrow-layout-contract>
+  <style>
     @media (max-width: 350px) {
       .about-preview__visual { display: grid; min-width: 0; }
       .about-preview__seal {

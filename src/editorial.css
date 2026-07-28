@@ -9,19 +9,14 @@
 
   .editorial-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
   }
 
   .editorial-card {
     display: flex;
     min-width: 0;
-    min-height: 100%;
     flex-direction: column;
-    padding: 30px;
     border: 1px solid rgba(16, 40, 61, .13);
     background: #fffefa;
-    box-shadow: 0 16px 42px rgba(16, 40, 61, .08);
   }
 
   .editorial-card__category {
@@ -31,14 +26,6 @@
     font-weight: 800;
     letter-spacing: .12em;
     text-transform: uppercase;
-  }
-
-  .editorial-card h2 {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: clamp(1.45rem, 2.5vw, 2rem);
-    font-weight: 560;
-    line-height: 1.18;
   }
 
   .editorial-card h2 a {
@@ -52,29 +39,12 @@
     text-underline-offset: .18em;
   }
 
-  .editorial-card > p {
-    margin: 16px 0 20px;
-    color: var(--ink-soft);
-    line-height: 1.7;
-  }
-
   .editorial-card__meta {
     display: flex;
     flex-wrap: wrap;
     gap: 8px 16px;
-    margin-top: auto;
     color: var(--muted);
     font-size: .8125rem;
-  }
-
-  .editorial-card .card-link {
-    margin-top: 18px;
-  }
-
-  .editorial-card__status {
-    margin: auto 0 0;
-    padding-top: 18px;
-    border-top: 1px solid rgba(16, 40, 61, .1);
   }
 
   .editorial-card__status strong,
@@ -99,7 +69,6 @@
   .editorial-article__header {
     max-width: 980px;
     padding-top: clamp(46px, 7vw, 90px);
-    padding-bottom: clamp(36px, 6vw, 72px);
     text-align: center;
   }
 
@@ -107,11 +76,6 @@
     max-width: 900px;
     margin: 14px auto 20px;
     color: var(--ink-deep);
-    font-family: var(--serif);
-    font-size: clamp(2.3rem, 5.4vw, 4.75rem);
-    font-weight: 520;
-    line-height: 1.04;
-    text-wrap: balance;
   }
 
   .editorial-lead {
@@ -138,7 +102,6 @@
     justify-content: center;
     align-items: start;
     gap: clamp(32px, 6vw, 72px);
-    padding-bottom: clamp(56px, 8vw, 110px);
   }
 
   .editorial-toc {
@@ -173,7 +136,6 @@
   }
 
   .editorial-answer {
-    margin-bottom: 42px;
     padding: 28px;
     border: 1px solid rgba(195, 154, 93, .55);
     background: #fffaf0;
@@ -198,36 +160,16 @@
 
   .article-section {
     scroll-margin-top: 110px;
-    margin-top: 46px;
   }
 
-  .article-section:first-of-type {
-    margin-top: 0;
-  }
-
-  .article-section h2 {
-    margin: 0 0 18px;
-    color: var(--ink-deep);
-    font-family: var(--serif);
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
-    font-weight: 560;
-    line-height: 1.15;
-  }
-
+  .article-section h2,
   .article-section h3 {
-    margin: 0 0 10px;
     color: var(--ink-deep);
-    font-size: 1rem;
-  }
-
-  .article-section p + p {
-    margin-top: 16px;
   }
 
   .editorial-checklist {
     display: grid;
     gap: 12px;
-    margin: 22px 0 0;
     padding: 0;
     list-style: none;
   }
@@ -237,20 +179,9 @@
     padding-left: 28px;
   }
 
-  .editorial-checklist li::before {
-    position: absolute;
-    top: .55em;
-    left: 0;
-    width: 10px;
-    height: 10px;
-    border: 2px solid var(--gold);
-    content: "";
-  }
-
   .editorial-options {
     display: grid;
     gap: 14px;
-    margin-top: 24px;
   }
 
   .editorial-options article {
@@ -265,7 +196,6 @@
   }
 
   .editorial-note {
-    margin-top: 24px;
     padding: 22px;
     color: #f8f3e8;
     background: var(--ink-deep);
@@ -293,15 +223,10 @@
     color: #274f73;
   }
 
-  .editorial-related > .editorial-card {
-    margin-top: 18px;
-  }
-
   .editorial-author {
     display: grid;
     grid-template-columns: 92px minmax(0, 1fr);
     gap: 20px;
-    margin-top: 54px;
     padding: 24px;
     border: 1px solid rgba(16, 40, 61, .13);
     background: #fffefa;
@@ -329,7 +254,6 @@
   .editorial-author strong {
     margin-top: 4px;
     color: var(--ink-deep);
-    font-family: var(--serif);
     font-size: 1.35rem;
   }
 
@@ -354,9 +278,7 @@
   .editorial-cta h2 {
     margin: 8px 0 10px;
     color: #fff;
-    font-family: var(--serif);
     font-size: clamp(1.7rem, 3vw, 2.65rem);
-    font-weight: 540;
   }
 
   .editorial-cta p {
@@ -372,7 +294,6 @@
     justify-content: center;
     align-items: start;
     gap: clamp(34px, 6vw, 72px);
-    padding-bottom: clamp(56px, 8vw, 110px);
   }
 
   .editorial-case-aside {
@@ -420,18 +341,8 @@
   }
 
   @media (max-width: 680px) {
-    .editorial-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .editorial-card {
-      padding: 22px;
-    }
-
     .editorial-article__header {
       padding-top: 38px;
-      padding-bottom: 34px;
       text-align: left;
     }
 

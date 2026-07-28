@@ -17,6 +17,7 @@ const practiceCase = practiceCases[0];
 const articleRoute = `/razbory/${article.slug}/`;
 const caseRoute = `/praktika/${practiceCase.slug}/`;
 const pageFile = (route) => join(dist, route.replace(/^\/+|\/+$/g, ""), "index.html");
+const expectedHelpfulnessOrder = ["yes", "no", "partly"];
 
 for (const route of [articleRoute, caseRoute]) {
   const html = await readFile(pageFile(route), "utf8");
@@ -25,6 +26,11 @@ for (const route of [articleRoute, caseRoute]) {
   if (!html.includes('data-publication-kind=')) errors.push(`${route}: publication kind marker is missing`);
   if (!html.includes('data-editorial-helpfulness')) errors.push(`${route}: helpfulness block is missing`);
   if (/<(?:form|input|select|textarea)\b/i.test(html)) errors.push(`${route}: data-entry element appeared in publication`);
+
+  const actualHelpfulnessOrder = [...html.matchAll(/data-helpfulness-value="(yes|no|partly)"/g)].map((match) => match[1]);
+  if (JSON.stringify(actualHelpfulnessOrder) !== JSON.stringify(expectedHelpfulnessOrder)) {
+    errors.push(`${route}: helpfulness buttons must be ordered yes, no, partly; got ${actualHelpfulnessOrder.join(", ")}`);
+  }
 }
 
 const articleHtml = await readFile(pageFile(articleRoute), "utf8");
@@ -35,8 +41,8 @@ for (const marker of [
   "Что можно спросить у юриста",
   "Что написать юристу",
   'data-helpfulness-value="yes"',
-  'data-helpfulness-value="partly"',
   'data-helpfulness-value="no"',
+  'data-helpfulness-value="partly"',
 ]) {
   if (!articleHtml.includes(marker)) errors.push(`${articleRoute}: missing publication marker ${marker}`);
 }
@@ -111,4 +117,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Publication pipeline passed: ${articles.length} articles, ${practiceCases.length} cases, RSS discovery, supplemental sitemaps, anonymous reading analytics and direct build stages`);
+console.log(`Publication pipeline passed: ${articles.length} articles, ${practiceCases.length} cases, fixed helpfulness order, RSS discovery, supplemental sitemaps, anonymous reading analytics and direct build stages`);

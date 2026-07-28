@@ -88,8 +88,8 @@ for (const marker of [
 
 const analytics = await readFile(join(dist, "assets", "editorial-analytics.mjs"), "utf8");
 for (const marker of [
-  "publication_scroll_25",
-  "publication_active_60s",
+  "publication_scroll_${threshold}",
+  "publication_active_${threshold}s",
   "publication_section_view",
   "publication_helpfulness",
   "analytics_consent",

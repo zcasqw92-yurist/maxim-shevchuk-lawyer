@@ -164,7 +164,28 @@ try {
 
           const titleLink = card.locator("h2 a");
           await titleLink.focus();
-          await page.waitForTimeout(360);
+          const focusSettled = await page.waitForFunction((initialBorder) => {
+            const cardElement = document.querySelector(".editorial-grid .editorial-card");
+            const title = cardElement?.querySelector("h2 a");
+            const link = cardElement?.querySelector(".card-link");
+            if (!cardElement || !title || !link) return false;
+            const accent = getComputedStyle(cardElement, "::before").transform;
+            const arrow = getComputedStyle(link, "::after").transform;
+            const accentMatch = accent.match(/^matrix\(([-\d.]+)/);
+            const arrowMatch = arrow.match(/^matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([-\d.]+),/);
+            const accentScale = accentMatch ? Number(accentMatch[1]) : 0;
+            const arrowX = arrowMatch ? Number(arrowMatch[1]) : 0;
+            const titleStyle = getComputedStyle(title);
+            return getComputedStyle(cardElement).borderTopColor !== initialBorder
+              && titleStyle.outlineStyle !== "none"
+              && Number.parseFloat(titleStyle.outlineWidth) >= 1
+              && accentScale >= .95
+              && arrowX >= 3.5;
+          }, initial.borderColor, { timeout: 2_000 }).then(() => true).catch(() => false);
+          if (!focusSettled) {
+            errors.push(`${engineName} ${viewport.width}px ${route}: focus interaction did not settle within 2000ms`);
+          }
+
           const focused = await card.evaluate((element) => {
             const titleStyle = getComputedStyle(element.querySelector("h2 a"));
             const arrowStyle = getComputedStyle(element.querySelector(".card-link"), "::after");
@@ -198,7 +219,20 @@ try {
             await page.mouse.move(1, 1);
             await card.scrollIntoViewIfNeeded();
             await card.hover({ position: { x: 32, y: 32 } });
-            await page.waitForTimeout(420);
+            const hoverSettled = await page.waitForFunction((initialBorder) => {
+              const cardElement = document.querySelector(".editorial-grid .editorial-card");
+              if (!cardElement) return false;
+              const transform = getComputedStyle(cardElement).transform;
+              const match = transform.match(/^matrix\([^,]+,[^,]+,[^,]+,[^,]+,[^,]+,\s*([-\d.]+)\)$/);
+              const translateY = match ? Number(match[1]) : 0;
+              const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+              return getComputedStyle(cardElement).borderTopColor !== initialBorder
+                && (!finePointer || translateY <= -2.5);
+            }, initial.borderColor, { timeout: 2_000 }).then(() => true).catch(() => false);
+            if (!hoverSettled) {
+              errors.push(`${engineName} ${viewport.width}px ${route}: pointer hover did not settle within 2000ms`);
+            }
+
             const hovered = await card.evaluate((element) => ({
               borderColor: getComputedStyle(element).borderTopColor,
               transform: getComputedStyle(element).transform,
@@ -233,7 +267,6 @@ try {
             }));
           });
           await page.mouse.move(1, 1);
-          await page.waitForTimeout(260);
           await waitForLayout(page);
 
           const synthetic = await grid.locator(".editorial-card").evaluateAll((elements) => elements.map((element) => {
@@ -283,4 +316,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial cards passed: restrained width, future 1/2/3-column grids, equal rows, aligned links, shared hover/focus CSS contract in Chromium and WebKit, and physical hover in Chromium");
+console.log("Editorial cards passed: restrained width, future 1/2/3-column grids, equal rows, aligned links, fully settled shared hover/focus CSS state in Chromium and WebKit, and physical hover in Chromium");

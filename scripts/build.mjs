@@ -3,6 +3,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { site } from "../site.config.mjs";
 import { services } from "../src/data.mjs";
+import { articles, practiceCases, validateEditorialData } from "../src/editorial-data.mjs";
+import {
+  renderArticlePage,
+  renderArticlesIndex,
+  renderPracticeCasePage,
+  renderPracticeIndex,
+} from "../src/editorial-render.mjs";
 import { composeRenderedPage } from "../src/page-composer.mjs";
 import { injectProcessGuarantees } from "../src/process-guarantees.mjs";
 import { injectCaseStudies } from "../src/case-studies.mjs";
@@ -64,6 +71,8 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(site.contentLastModified)) {
 if (site.basePath && !/^\/[A-Za-z0-9._~-]+(?:\/[A-Za-z0-9._~-]+)*$/.test(site.basePath)) {
   throw new Error("SITE_BASE_PATH содержит недопустимые символы");
 }
+
+validateEditorialData();
 
 if (site.production) {
   const launchErrors = [];
@@ -151,6 +160,7 @@ const styles = [
   await readFile(join(root, "src", "video-ready.css"), "utf8"),
   await readFile(join(root, "src", "layout-corrections.css"), "utf8"),
   await readFile(join(root, "src", "content-protection.css"), "utf8"),
+  await readFile(join(root, "src", "editorial.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
@@ -171,6 +181,14 @@ await writePage("/uslugi", renderServices());
 for (const service of services) {
   await writePage(`/uslugi/${service.slug}`, renderService(service), { service });
 }
+await writePage("/razbory", renderArticlesIndex());
+for (const article of articles) {
+  await writePage(`/razbory/${article.slug}`, renderArticlePage(article), { article });
+}
+await writePage("/praktika", renderPracticeIndex());
+for (const item of practiceCases) {
+  await writePage(`/praktika/${item.slug}`, renderPracticeCasePage(item), { practiceCase: item });
+}
 await writePage("/o-yuriste", renderAbout());
 await writePage("/kontakty", renderContacts());
 await writePage("/politika-konfidencialnosti", renderPrivacy());
@@ -185,6 +203,10 @@ const indexablePages = [
   },
   { path: "/uslugi/", images: ["/assets/images/maxim-documents.webp"] },
   ...services.map((service) => ({ path: `/uslugi/${service.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
+  { path: "/razbory/", images: ["/assets/images/maxim-documents.webp"] },
+  ...articles.map((article) => ({ path: `/razbory/${article.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
+  { path: "/praktika/", images: ["/assets/images/maxim-documents.webp"] },
+  ...practiceCases.map((item) => ({ path: `/praktika/${item.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
   { path: "/o-yuriste/", images: ["/assets/images/maxim-documents.webp", "/assets/images/maxim-diploma.webp"] },
   { path: "/kontakty/", images: ["/assets/images/maxim-consultation.webp"] },
   { path: "/politika-konfidencialnosti/", images: [] },
@@ -199,6 +221,31 @@ ${indexablePages.map(({ path, images = [] }) => `  <url>
   </url>`).join("\n")}
 </urlset>\n`;
 await writeFile(join(dist, "sitemap.xml"), sitemap, "utf8");
+
+const feedItems = [...articles]
+  .sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt))
+  .map((article) => `    <item>
+      <title>${xml(article.title)}</title>
+      <link>${xml(`${site.siteUrl}/razbory/${article.slug}/`)}</link>
+      <guid isPermaLink="true">${xml(`${site.siteUrl}/razbory/${article.slug}/`)}</guid>
+      <description>${xml(article.lead)}</description>
+      <author>${xml(site.name)}</author>
+      <category>${xml(article.category)}</category>
+      <pubDate>${new Date(`${article.modifiedAt}T12:00:00Z`).toUTCString()}</pubDate>
+    </item>`)
+  .join("\n");
+const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>${xml(`Юридические разборы — ${site.shortName}`)}</title>
+    <link>${xml(`${site.siteUrl}/razbory/`)}</link>
+    <description>${xml("Практические юридические разборы Максима Юрьевича Шевчука")}</description>
+    <language>ru-RU</language>
+    <lastBuildDate>${new Date(`${site.contentLastModified}T12:00:00Z`).toUTCString()}</lastBuildDate>
+${feedItems}
+  </channel>
+</rss>\n`;
+await writeFile(join(dist, "feed.xml"), feed, "utf8");
 
 const robots = site.production
   ? `User-agent: *\nAllow: /\n\nSitemap: ${site.siteUrl}/sitemap.xml\n`
@@ -235,4 +282,5 @@ const renderedNotFound = notFound
   .replace(/(\b(?:href|src)=["'])\/(?!\/)/g, `$1${site.basePath || ""}/`);
 await writeFile(join(dist, "404.html"), renderedNotFound, "utf8");
 
-console.log(`Built ${6 + services.length + Object.keys(site.legacyRedirects || {}).length} HTML pages in ${dist} · ${buildVersion}`);
+const pageCount = 6 + services.length + 2 + articles.length + practiceCases.length + Object.keys(site.legacyRedirects || {}).length;
+console.log(`Built ${pageCount} HTML pages in ${dist} · ${buildVersion}`);

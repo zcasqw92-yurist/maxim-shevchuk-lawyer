@@ -22,6 +22,7 @@ export const caseStudies = {
     materials: "Постановления об отказе, ответы прокуратуры, медицинские документы, результаты экспертизы, обращения и подтверждения их направления.",
     work: "Подготовлены жалобы в прокуратуру с указанием неполноты проверки, непринятых доказательств и необходимых проверочных действий.",
     next: "Отказные постановления отменялись, материал возвращался на дополнительную проверку. Окончательное процессуальное решение ещё не принято.",
+    detailPath: "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
   },
   land: {
     id: "land",
@@ -60,6 +61,7 @@ const caseCard = (item) => `
             <div><dt>Подготовлено</dt><dd>${escapeHtml(item.work)}</dd></div>
             <div><dt>Текущий статус</dt><dd>${escapeHtml(item.next)}</dd></div>
           </dl>
+          ${item.detailPath ? `<a class="card-link case-study__link" href="${escapeHtml(item.detailPath)}">Открыть полный кейс</a>` : ""}
         </article>`;
 
 export const caseStudiesBlock = (ids, pathname) => {

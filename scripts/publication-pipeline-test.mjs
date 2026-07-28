@@ -104,7 +104,7 @@ for (const marker of [
   "publication_helpfulness",
   "analytics_consent",
   'helpfulness.dataset.submitted = "true"',
-  "Аналитика отключена настройками конфиденциальности",
+  "Аналитика отключена",
 ]) {
   if (!analytics.includes(marker)) errors.push(`editorial-analytics.mjs: missing ${marker}`);
 }

@@ -1,0 +1,121 @@
+@layer components {
+  .article-page,
+  .case-page {
+    --editorial-flow-xs: clamp(12px, 1.4vw, 16px);
+    --editorial-flow-sm: clamp(18px, 2vw, 24px);
+    --editorial-flow-md: clamp(28px, 3vw, 36px);
+    --editorial-flow-lg: clamp(38px, 4.8vw, 52px);
+    --editorial-flow-xl: clamp(46px, 6vw, 68px);
+  }
+
+  .article-page .editorial-article__header,
+  .case-page .editorial-article__header {
+    padding-bottom: clamp(30px, 4.5vw, 52px);
+  }
+
+  .article-page .editorial-layout,
+  .case-page .editorial-case-grid {
+    padding-bottom: var(--editorial-flow-xl);
+  }
+
+  .article-page .editorial-answer {
+    margin: 0;
+  }
+
+  .article-page .editorial-body > .article-section,
+  .case-page .editorial-case-main > .article-section {
+    margin-top: var(--editorial-flow-lg);
+  }
+
+  .article-page .editorial-body > .editorial-answer + .article-section {
+    margin-top: var(--editorial-flow-lg);
+  }
+
+  .case-page .editorial-case-main > .article-section:first-child {
+    margin-top: 0;
+  }
+
+  .article-page .editorial-intake + .editorial-message-guide,
+  .article-page .editorial-related + .editorial-related {
+    margin-top: var(--editorial-flow-md);
+  }
+
+  .article-page .editorial-body > .editorial-author,
+  .case-page .editorial-case-main > .editorial-author {
+    margin-top: var(--editorial-flow-xl);
+  }
+
+  .article-page .article-section h2,
+  .case-page .article-section h2 {
+    margin-bottom: var(--editorial-flow-sm);
+  }
+
+  .article-page .article-section h3,
+  .case-page .article-section h3 {
+    margin-bottom: 8px;
+  }
+
+  .article-page .article-section p + p,
+  .case-page .article-section p + p {
+    margin-top: var(--editorial-flow-xs);
+  }
+
+  .article-page .editorial-checklist,
+  .case-page .editorial-checklist,
+  .article-page .editorial-options,
+  .article-page .editorial-note {
+    margin-top: var(--editorial-flow-sm);
+  }
+
+  .article-page .editorial-related > .editorial-card,
+  .case-page .editorial-related > .editorial-card {
+    margin-top: 0;
+  }
+
+  .article-page .editorial-sources,
+  .article-page .faq-list {
+    margin-top: 0;
+  }
+
+  .article-page .editorial-helpfulness,
+  .case-page .editorial-helpfulness {
+    margin-bottom: var(--editorial-flow-md);
+  }
+
+  .case-page .editorial-case-aside p {
+    margin: 10px 0 16px;
+  }
+
+  .article-page .editorial-intake__questions ul {
+    margin-top: var(--editorial-flow-xs);
+    margin-bottom: var(--editorial-flow-sm);
+  }
+}
+
+@layer responsive {
+  @media (max-width: 760px) {
+    .article-page,
+    .case-page {
+      --editorial-flow-xs: 12px;
+      --editorial-flow-sm: 18px;
+      --editorial-flow-md: 24px;
+      --editorial-flow-lg: 32px;
+      --editorial-flow-xl: 42px;
+    }
+
+    .article-page .editorial-article__header,
+    .case-page .editorial-article__header {
+      padding-bottom: 30px;
+    }
+  }
+
+  @media (max-width: 390px) {
+    .article-page,
+    .case-page {
+      --editorial-flow-sm: 16px;
+      --editorial-flow-md: 22px;
+      --editorial-flow-lg: 28px;
+      --editorial-flow-xl: 36px;
+    }
+  }
+}

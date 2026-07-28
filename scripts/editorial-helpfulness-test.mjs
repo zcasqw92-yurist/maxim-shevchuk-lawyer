@@ -152,7 +152,25 @@ try {
           }
 
           await noButton.click();
-          await page.waitForTimeout(240);
+          const settled = await page.waitForFunction(() => {
+            const blockElement = document.querySelector("[data-editorial-helpfulness]");
+            const allButtons = [...(blockElement?.querySelectorAll("[data-helpfulness-value]") || [])];
+            const selectedButton = blockElement?.querySelector('[data-helpfulness-value="no"]');
+            const statusElement = blockElement?.querySelector("[data-helpfulness-status]");
+            if (!selectedButton || !statusElement || allButtons.length !== 3) return false;
+            const background = getComputedStyle(selectedButton).backgroundColor;
+            return selectedButton.getAttribute("aria-pressed") === "true"
+              && allButtons.filter((item) => item.getAttribute("aria-pressed") === "true").length === 1
+              && allButtons.every((item) => item.disabled)
+              && background !== "rgba(0, 0, 0, 0)"
+              && background !== "transparent"
+              && statusElement.textContent.includes("Аналитика отключена");
+          }, null, { timeout: 2_000 }).then(() => true).catch(() => false);
+
+          if (!settled) {
+            errors.push(`${engineName} ${viewport.width}px ${route}: selected state did not settle within 2000ms`);
+          }
+
           const after = await buttons.first().evaluate(metrics);
           const selected = after.buttons.find((item) => item.value === "no");
           if (selected?.pressed !== "true" || after.buttons.filter((item) => item.pressed === "true").length !== 1) {
@@ -191,4 +209,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial helpfulness passed: yes/no/partly order, equal controls, focus and locked selection without material layout shift in Chromium and WebKit");
+console.log("Editorial helpfulness passed: yes/no/partly order, equal controls, focus and fully settled locked selection without material layout shift in Chromium and WebKit");

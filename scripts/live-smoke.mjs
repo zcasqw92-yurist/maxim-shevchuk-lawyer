@@ -117,7 +117,7 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
       if (app.includes(marker)) throw new Error(`published app contains removed data-entry logic: ${marker}`);
     }
     const editorialAnalytics = await fetchText("assets/editorial-analytics.mjs");
-    for (const marker of ["publication_scroll_25", "publication_section_view", "publication_helpfulness", "analytics_consent"]) {
+    for (const marker of ["publication_scroll_${threshold}", "publication_active_${threshold}s", "publication_section_view", "publication_helpfulness", "analytics_consent"]) {
       if (!editorialAnalytics.includes(marker)) throw new Error(`editorial analytics is missing marker: ${marker}`);
     }
 

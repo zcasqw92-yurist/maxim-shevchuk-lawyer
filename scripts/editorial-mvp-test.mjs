@@ -142,16 +142,36 @@ try {
           const response = await page.goto(`${origin}${route}`, { waitUntil: "networkidle" });
           if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route}: status ${response?.status()}`);
 
-          const state = await page.evaluate(() => ({
-            h1Visible: Boolean(document.querySelector("h1")?.getBoundingClientRect().height),
-            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-            forms: document.querySelectorAll("form,input,select,textarea").length,
-            imagesUnprotected: [...document.images].filter((image) => !image.hasAttribute("data-protected-image") || image.draggable).length,
-          }));
+          const state = await page.evaluate(() => {
+            const checklistItem = document.querySelector(".editorial-checklist li");
+            const markerStyle = checklistItem ? getComputedStyle(checklistItem, "::before") : null;
+            return {
+              h1Visible: Boolean(document.querySelector("h1")?.getBoundingClientRect().height),
+              overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+              forms: document.querySelectorAll("form,input,select,textarea").length,
+              imagesUnprotected: [...document.images].filter((image) => !image.hasAttribute("data-protected-image") || image.draggable).length,
+              checklistMarker: markerStyle ? {
+                content: markerStyle.content,
+                borderTopWidth: markerStyle.borderTopWidth,
+                borderStyle: markerStyle.borderStyle,
+                width: markerStyle.width,
+                height: markerStyle.height,
+              } : null,
+            };
+          });
           if (!state.h1Visible) errors.push(`${engineName} ${viewport.width}px ${route}: H1 is not visible`);
           if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route}: ${state.overflow}px horizontal overflow`);
           if (state.forms) errors.push(`${engineName} ${viewport.width}px ${route}: ${state.forms} form elements found`);
           if (state.imagesUnprotected) errors.push(`${engineName} ${viewport.width}px ${route}: ${state.imagesUnprotected} unprotected images`);
+          if (route === articleRoute) {
+            if (!state.checklistMarker) errors.push(`${engineName} ${viewport.width}px ${route}: checklist marker is missing`);
+            else {
+              if (!state.checklistMarker.content.includes("—")) errors.push(`${engineName} ${viewport.width}px ${route}: article marker is not an editorial dash ${JSON.stringify(state.checklistMarker)}`);
+              if (state.checklistMarker.borderTopWidth !== "0px" || state.checklistMarker.borderStyle !== "none") {
+                errors.push(`${engineName} ${viewport.width}px ${route}: checkbox-like square remains ${JSON.stringify(state.checklistMarker)}`);
+              }
+            }
+          }
 
           const cta = page.locator(".editorial-cta [data-dialog-open]").last();
           await cta.scrollIntoViewIfNeeded();
@@ -176,4 +196,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Editorial MVP passed: ${routes.length} pages, verified content model, Article JSON-LD, RSS, sitemap, Chromium and WebKit`);
+console.log(`Editorial MVP passed: ${routes.length} pages, semantic article markers, verified content model, Article JSON-LD, RSS, sitemap, Chromium and WebKit`);

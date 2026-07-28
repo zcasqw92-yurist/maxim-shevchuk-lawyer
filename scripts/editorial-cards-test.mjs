@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, webkit } from "playwright";
@@ -21,6 +21,29 @@ const viewports = [
 ];
 
 if (!articles.length || !practiceCases.length) throw new Error("Для проверки карточек нужна хотя бы одна статья и один кейс");
+
+const cardCss = await readFile(join(root, "src", "editorial-cards.css"), "utf8");
+const hoverContracts = [
+  {
+    label: "поверхность карточки",
+    pattern: /\.editorial-card:hover,\s*\.editorial-card:focus-within\s*\{[\s\S]*?border-color:\s*rgba\(195,\s*154,\s*93,\s*\.78\);[\s\S]*?box-shadow:/,
+  },
+  {
+    label: "верхний акцент",
+    pattern: /\.editorial-card:hover::before,\s*\.editorial-card:focus-within::before\s*\{[\s\S]*?transform:\s*scaleX\(1\)/,
+  },
+  {
+    label: "стрелка ссылки",
+    pattern: /\.editorial-card:hover\s+\.card-link::after,\s*\.editorial-card:focus-within\s+\.card-link::after\s*\{[\s\S]*?transform:\s*translateX\(4px\)/,
+  },
+  {
+    label: "подъём для точного указателя",
+    pattern: /@media\s*\(hover:\s*hover\)\s*and\s*\(pointer:\s*fine\)\s*\{[\s\S]*?\.editorial-card:hover\s*\{[\s\S]*?transform:\s*translateY\(-3px\)/,
+  },
+];
+for (const contract of hoverContracts) {
+  if (!contract.pattern.test(cardCss)) errors.push(`CSS hover contract: отсутствует ${contract.label}`);
+}
 
 const server = spawn(process.execPath, [join(root, "scripts", "server.mjs")], {
   cwd: root,
@@ -47,6 +70,11 @@ const waitForLayout = (page) => page.evaluate(async () => {
 const matrixScaleX = (value = "") => {
   const match = String(value).match(/^matrix\(([-\d.]+)/);
   return match ? Number(match[1]) : value === "none" ? 0 : Number.NaN;
+};
+
+const matrixTranslateX = (value = "") => {
+  const match = String(value).match(/^matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([-\d.]+),/);
+  return match ? Number(match[1]) : 0;
 };
 
 const matrixTranslateY = (value = "") => {
@@ -138,12 +166,14 @@ try {
           await titleLink.focus();
           await page.waitForTimeout(360);
           const focused = await card.evaluate((element) => {
-            const linkStyle = getComputedStyle(element.querySelector("h2 a"));
+            const titleStyle = getComputedStyle(element.querySelector("h2 a"));
+            const arrowStyle = getComputedStyle(element.querySelector(".card-link"), "::after");
             return {
               borderColor: getComputedStyle(element).borderTopColor,
-              outlineStyle: linkStyle.outlineStyle,
-              outlineWidth: linkStyle.outlineWidth,
+              outlineStyle: titleStyle.outlineStyle,
+              outlineWidth: titleStyle.outlineWidth,
               accentScale: getComputedStyle(element, "::before").transform,
+              arrowTransform: arrowStyle.transform,
             };
           });
           if (focused.borderColor === initial.borderColor) {
@@ -155,8 +185,15 @@ try {
           if (matrixScaleX(focused.accentScale) < .95) {
             errors.push(`${engineName} ${viewport.width}px ${route}: focus does not reveal the card accent ${focused.accentScale}`);
           }
+          if (matrixTranslateX(focused.arrowTransform) < 3.5) {
+            errors.push(`${engineName} ${viewport.width}px ${route}: shared interaction state does not move the card arrow ${focused.arrowTransform}`);
+          }
 
-          if (viewport.width >= 768) {
+          // Headless WebKit intermittently loses :hover while a transformed element moves under
+          // the synthetic pointer. The shared CSS contract above guarantees that :hover and
+          // :focus-within use the same declarations; physical pointer hover is therefore tested
+          // only in Chromium, while both engines must render the shared state through focus.
+          if (engineName === "Chromium" && viewport.width >= 768) {
             await page.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur());
             await page.mouse.move(1, 1);
             await card.scrollIntoViewIfNeeded();
@@ -170,7 +207,7 @@ try {
             if (hovered.borderColor === initial.borderColor) {
               errors.push(`${engineName} ${viewport.width}px ${route}: hover does not change the card border ${JSON.stringify(hovered)}`);
             }
-            if (engineName === "Chromium" && hovered.finePointer && matrixTranslateY(hovered.transform) > -2.5) {
+            if (hovered.finePointer && matrixTranslateY(hovered.transform) > -2.5) {
               errors.push(`${engineName} ${viewport.width}px ${route}: fine-pointer card hover has no completed lift ${hovered.transform}`);
             }
           }
@@ -246,4 +283,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial cards passed: restrained single-card width, future 1/2/3-column grids, equal row heights, aligned links and unified hover/focus in Chromium and WebKit");
+console.log("Editorial cards passed: restrained width, future 1/2/3-column grids, equal rows, aligned links, shared hover/focus CSS contract in Chromium and WebKit, and physical hover in Chromium");

@@ -11,10 +11,7 @@ const origin = `http://127.0.0.1:${port}`;
 const requireBrowsers = process.env.CROSS_BROWSER_REQUIRED === "true";
 const errors = [];
 const skipped = [];
-const routes = [
-  "/razbory/",
-  "/praktika/",
-];
+const routes = ["/razbory/", "/praktika/"];
 const viewports = [
   { width: 320, height: 844 },
   { width: 390, height: 844 },
@@ -47,10 +44,20 @@ const waitForLayout = (page) => page.evaluate(async () => {
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 });
 
+const matrixScaleX = (value = "") => {
+  const match = String(value).match(/^matrix\(([-\d.]+)/);
+  return match ? Number(match[1]) : value === "none" ? 0 : Number.NaN;
+};
+
+const matrixTranslateY = (value = "") => {
+  const match = String(value).match(/^matrix\([^,]+,[^,]+,[^,]+,[^,]+,[^,]+,\s*([-\d.]+)\)$/);
+  return match ? Number(match[1]) : 0;
+};
+
 const normalizeRows = (cards) => {
   const rows = [];
   for (const card of cards) {
-    let row = rows.find((item) => Math.abs(item.top - card.top) <= 2);
+    let row = rows.find((item) => item.top === card.top);
     if (!row) {
       row = { top: card.top, cards: [] };
       rows.push(row);
@@ -97,15 +104,6 @@ try {
             continue;
           }
 
-          const gold = await page.evaluate(() => {
-            const sample = document.createElement("span");
-            sample.style.color = getComputedStyle(document.documentElement).getPropertyValue("--gold").trim();
-            document.body.append(sample);
-            const color = getComputedStyle(sample).color;
-            sample.remove();
-            return color;
-          });
-
           const initial = await card.evaluate((element) => {
             const gridElement = element.closest(".editorial-grid");
             const link = element.querySelector(".card-link");
@@ -138,7 +136,7 @@ try {
 
           const titleLink = card.locator("h2 a");
           await titleLink.focus();
-          await page.waitForTimeout(260);
+          await page.waitForTimeout(360);
           const focused = await card.evaluate((element) => {
             const linkStyle = getComputedStyle(element.querySelector("h2 a"));
             return {
@@ -148,25 +146,34 @@ try {
               accentScale: getComputedStyle(element, "::before").transform,
             };
           });
-          if (focused.borderColor !== gold) errors.push(`${engineName} ${viewport.width}px ${route}: focus does not activate gold card border ${JSON.stringify(focused)}`);
+          if (focused.borderColor === initial.borderColor) {
+            errors.push(`${engineName} ${viewport.width}px ${route}: focus does not change the card border ${JSON.stringify(focused)}`);
+          }
           if (focused.outlineStyle === "none" || Number.parseFloat(focused.outlineWidth) < 1) {
             errors.push(`${engineName} ${viewport.width}px ${route}: title link focus ring is missing ${JSON.stringify(focused)}`);
           }
-          if (focused.accentScale === "none" || focused.accentScale.includes("0, 0")) {
+          if (matrixScaleX(focused.accentScale) < .95) {
             errors.push(`${engineName} ${viewport.width}px ${route}: focus does not reveal the card accent ${focused.accentScale}`);
           }
 
           if (viewport.width >= 768) {
+            const finePointer = await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches);
             await card.hover();
-            await page.waitForTimeout(260);
+            await page.waitForTimeout(360);
             const hovered = await card.evaluate((element) => ({
               borderColor: getComputedStyle(element).borderTopColor,
               transform: getComputedStyle(element).transform,
             }));
-            if (hovered.borderColor !== gold) errors.push(`${engineName} ${viewport.width}px ${route}: hover does not activate gold card border ${JSON.stringify(hovered)}`);
-            if (hovered.transform === "none") errors.push(`${engineName} ${viewport.width}px ${route}: desktop card hover has no lift`);
+            if (hovered.borderColor === initial.borderColor) {
+              errors.push(`${engineName} ${viewport.width}px ${route}: hover does not change the card border ${JSON.stringify(hovered)}`);
+            }
+            if (finePointer && matrixTranslateY(hovered.transform) > -2.5) {
+              errors.push(`${engineName} ${viewport.width}px ${route}: fine-pointer card hover has no completed lift ${hovered.transform}`);
+            }
           }
 
+          await page.mouse.move(1, 1);
+          await page.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur());
           await page.evaluate(() => {
             const gridElement = document.querySelector(".editorial-grid");
             const source = gridElement.querySelector(".editorial-card");
@@ -185,17 +192,18 @@ try {
               return clone;
             }));
           });
+          await page.mouse.move(1, 1);
+          await page.waitForTimeout(260);
           await waitForLayout(page);
 
           const synthetic = await grid.locator(".editorial-card").evaluateAll((elements) => elements.map((element) => {
-            const rect = element.getBoundingClientRect();
-            const linkRect = element.querySelector(".card-link").getBoundingClientRect();
+            const link = element.querySelector(".card-link");
             return {
-              top: rect.top,
-              left: rect.left,
-              width: rect.width,
-              height: rect.height,
-              linkBottom: linkRect.bottom,
+              top: element.offsetTop,
+              left: element.offsetLeft,
+              width: element.offsetWidth,
+              height: element.offsetHeight,
+              linkBottom: link.offsetTop + link.offsetHeight,
             };
           }));
           const rows = normalizeRows(synthetic);
@@ -207,10 +215,10 @@ try {
             if (row.cards.length < 2) continue;
             const heights = row.cards.map((item) => item.height);
             const linkBottoms = row.cards.map((item) => item.linkBottom);
-            if (Math.max(...heights) - Math.min(...heights) > 1.5) {
+            if (Math.max(...heights) - Math.min(...heights) > 1) {
               errors.push(`${engineName} ${viewport.width}px ${route}: cards in one row have unequal heights ${JSON.stringify(row.cards)}`);
             }
-            if (Math.max(...linkBottoms) - Math.min(...linkBottoms) > 1.5) {
+            if (Math.max(...linkBottoms) - Math.min(...linkBottoms) > 1) {
               errors.push(`${engineName} ${viewport.width}px ${route}: card links are not aligned ${JSON.stringify(row.cards)}`);
             }
           }

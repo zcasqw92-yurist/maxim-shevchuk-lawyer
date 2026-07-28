@@ -36,8 +36,10 @@ if (publication) {
   };
 
   const trackOnce = (key, event, params = {}) => {
-    if (sent.has(key)) return;
-    if (track(event, params)) sent.add(key);
+    if (sent.has(key)) return false;
+    const tracked = track(event, params);
+    if (tracked) sent.add(key);
+    return tracked;
   };
 
   const trackView = () => trackOnce("view", "publication_view");
@@ -107,13 +109,23 @@ if (publication) {
   const helpfulness = document.querySelector("[data-editorial-helpfulness]");
   if (helpfulness) {
     const status = helpfulness.querySelector("[data-helpfulness-status]");
-    helpfulness.querySelectorAll("[data-helpfulness-value]").forEach((button) => {
+    const buttons = [...helpfulness.querySelectorAll("[data-helpfulness-value]")];
+    buttons.forEach((button) => {
       button.addEventListener("click", () => {
-        helpfulness.querySelectorAll("[data-helpfulness-value]").forEach((item) => {
+        if (helpfulness.dataset.submitted === "true") return;
+        helpfulness.dataset.submitted = "true";
+        buttons.forEach((item) => {
           item.setAttribute("aria-pressed", String(item === button));
+          item.disabled = true;
         });
-        trackOnce("helpfulness", "publication_helpfulness", { value: button.dataset.helpfulnessValue || "unknown" });
-        if (status) status.textContent = "Спасибо. Ответ учтён в обезличенной аналитике материала.";
+        const tracked = trackOnce("helpfulness", "publication_helpfulness", {
+          value: button.dataset.helpfulnessValue || "unknown",
+        });
+        if (status) {
+          status.textContent = tracked
+            ? "Спасибо. Ответ учтён в обезличенной аналитике материала."
+            : "Спасибо. Выбор отмечен на этой странице; передача аналитики отключена настройками конфиденциальности.";
+        }
       });
     });
   }

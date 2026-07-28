@@ -98,7 +98,7 @@ for (const [route] of routes) {
 }
 
 const feed = await readFile(join(dist, "feed.xml"), "utf8");
-for (const marker of ["<rss version=\"2.0\">", article.title, `${site.siteUrl}${articleRoute}`, `<pubDate>${new Date(`${article.modifiedAt}T12:00:00Z`).toUTCString()}</pubDate>`]) {
+for (const marker of ["<rss version=\"2.0\"", article.title, `${site.siteUrl}${articleRoute}`, `<pubDate>${new Date(`${article.modifiedAt}T12:00:00Z`).toUTCString()}</pubDate>`]) {
   if (!feed.includes(marker)) errors.push(`feed.xml: missing ${marker}`);
 }
 

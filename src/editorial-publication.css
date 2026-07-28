@@ -14,11 +14,11 @@
   }
 
   .faq-item__toggle {
-    transition: border-color .2s ease, background-color .2s ease;
+    transition: background-color .2s ease;
   }
 
-  .faq-item summary:hover .faq-item__toggle,
-  .faq-item summary:focus-visible .faq-item__toggle {
+  .faq-item:hover .faq-item__toggle,
+  .faq-item:focus-within .faq-item__toggle {
     border-color: var(--gold);
   }
 
@@ -101,11 +101,11 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: 17px 17px;
-    transition: border-color .2s ease, background-color .2s ease;
+    transition: background-color .2s ease;
   }
 
-  .editorial-page .faq-item summary:hover::after,
-  .editorial-page .faq-item summary:focus-visible::after {
+  .editorial-page .faq-item:hover summary::after,
+  .editorial-page .faq-item:focus-within summary::after {
     border-color: var(--gold);
   }
 

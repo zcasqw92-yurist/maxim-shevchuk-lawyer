@@ -58,8 +58,8 @@ const helpfulness = (id, kind) => `
       </div>
       <div class="editorial-helpfulness__actions" role="group" aria-label="Оценка полезности материала">
         <button type="button" data-helpfulness-value="yes">Да</button>
-        <button type="button" data-helpfulness-value="partly">Частично</button>
         <button type="button" data-helpfulness-value="no">Нет</button>
+        <button type="button" data-helpfulness-value="partly">Частично</button>
       </div>
       <p data-helpfulness-status aria-live="polite"></p>
     </section>`;

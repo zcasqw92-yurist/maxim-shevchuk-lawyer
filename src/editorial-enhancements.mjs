@@ -1,10 +1,80 @@
 import { appendToBuildSlot } from "./html-slots.mjs";
+import { publicationSeoMetadata } from "./seo-metadata.mjs";
 
 const esc = (value = "") => String(value)
   .replaceAll("&", "&amp;")
   .replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;")
-  .replaceAll('"', "&quot;");
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#39;");
+
+const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const replaceMetaContent = (html, attribute, key, value, pathname) => {
+  const pattern = new RegExp(`<meta\\s+[^>]*\\b${attribute}=["']${escapeRegExp(key)}["'][^>]*>`, "i");
+  const match = html.match(pattern);
+  if (!match) throw new Error(`Не найден meta ${attribute}=${key}: ${pathname}`);
+  const tag = /\bcontent=["'][^"']*["']/i.test(match[0])
+    ? match[0].replace(/\bcontent=["'][^"']*["']/i, `content="${esc(value)}"`)
+    : match[0].replace(/>$/, ` content="${esc(value)}">`);
+  return html.replace(match[0], tag);
+};
+
+const updateJsonLd = (html, metadata, pathname) => {
+  const pattern = /<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/i;
+  const match = html.match(pattern);
+  if (!match) throw new Error(`Не найден JSON-LD: ${pathname}`);
+
+  let parsed;
+  try {
+    parsed = JSON.parse(match[1]);
+  } catch (error) {
+    throw new Error(`Не удалось разобрать JSON-LD ${pathname}: ${error.message}`);
+  }
+
+  const graph = Array.isArray(parsed["@graph"]) ? parsed["@graph"] : [parsed];
+  const webPage = graph.find((node) => ["WebPage", "ProfilePage", "ContactPage", "CollectionPage"].includes(node["@type"]));
+  const articleNode = graph.find((node) => node["@type"] === "Article");
+  if (!webPage || !articleNode) throw new Error(`В JSON-LD публикации отсутствует WebPage или Article: ${pathname}`);
+
+  webPage.name = metadata.title;
+  webPage.description = metadata.description;
+  articleNode.description = metadata.description;
+  articleNode.datePublished = metadata.publishedTime;
+  articleNode.dateModified = metadata.modifiedTime;
+
+  const json = JSON.stringify(parsed).replaceAll("<", "\\u003c");
+  return html.replace(match[0], `<script type="application/ld+json">${json}</script>`);
+};
+
+const applyPublicationMetadata = (html, context, pathname) => {
+  const metadata = publicationSeoMetadata(context);
+  if (!metadata) return html;
+
+  let result = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(metadata.title)}</title>`);
+  result = replaceMetaContent(result, "name", "description", metadata.description, pathname);
+  result = replaceMetaContent(result, "property", "og:type", metadata.openGraphType, pathname);
+  result = replaceMetaContent(result, "property", "og:title", metadata.title, pathname);
+  result = replaceMetaContent(result, "property", "og:description", metadata.description, pathname);
+  result = replaceMetaContent(result, "name", "twitter:title", metadata.title, pathname);
+  result = replaceMetaContent(result, "name", "twitter:description", metadata.description, pathname);
+
+  if (/property=["']article:(?:published_time|modified_time|author|section)["']/i.test(result)) {
+    throw new Error(`Article Open Graph уже присутствует до редакционного этапа: ${pathname}`);
+  }
+
+  const articleMetadata = `
+  <meta property="article:published_time" content="${esc(metadata.publishedTime)}">
+  <meta property="article:modified_time" content="${esc(metadata.modifiedTime)}">
+  <meta property="article:author" content="${esc(metadata.authorUrl)}">
+  <meta property="article:section" content="${esc(metadata.section)}">`;
+  result = result.replace(
+    /(<meta\s+property=["']og:type["'][^>]*>)/i,
+    `$1${articleMetadata}`,
+  );
+
+  return updateJsonLd(result, metadata, pathname);
+};
 
 const unique = (items) => [...new Set(items.filter(Boolean))];
 
@@ -80,8 +150,9 @@ export const injectEditorialEnhancements = (html, pathname, context = {}) => {
   const practiceCase = context.practiceCase || null;
   if (!article && !practiceCase) return html;
 
-  let result = appendToBuildSlot(
-    html,
+  let result = applyPublicationMetadata(html, { article, practiceCase }, pathname);
+  result = appendToBuildSlot(
+    result,
     "head-assets",
     '  <script type="module" src="/assets/editorial-analytics.mjs"></script>\n',
   );

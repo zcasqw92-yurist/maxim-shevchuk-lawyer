@@ -80,7 +80,7 @@ for (const marker of [
   'google: env("GOOGLE_SITE_VERIFICATION")',
   'yandex: env("YANDEX_SITE_VERIFICATION")',
   'indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158"',
-  'defaultTitle: "Юрист по гражданским делам в Москве и Московской области | Максим Шевчук"',
+  'defaultTitle: "Юрист по гражданским делам в Москве | Максим Шевчук"',
   'publicLabel: "Офис в Химках · услуги по Москве и Московской области · онлайн по России"',
 ]) {
   if (!config.includes(marker)) errors.push(`site.config.mjs: отсутствует настройка ${marker}`);

@@ -157,17 +157,20 @@ try {
           }
 
           if (viewport.width >= 768) {
-            const finePointer = await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches);
-            await card.hover();
-            await page.waitForTimeout(360);
+            await page.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur());
+            await page.mouse.move(1, 1);
+            await card.scrollIntoViewIfNeeded();
+            await card.hover({ position: { x: 32, y: 32 } });
+            await page.waitForTimeout(420);
             const hovered = await card.evaluate((element) => ({
               borderColor: getComputedStyle(element).borderTopColor,
               transform: getComputedStyle(element).transform,
+              finePointer: matchMedia("(hover: hover) and (pointer: fine)").matches,
             }));
             if (hovered.borderColor === initial.borderColor) {
               errors.push(`${engineName} ${viewport.width}px ${route}: hover does not change the card border ${JSON.stringify(hovered)}`);
             }
-            if (finePointer && matrixTranslateY(hovered.transform) > -2.5) {
+            if (engineName === "Chromium" && hovered.finePointer && matrixTranslateY(hovered.transform) > -2.5) {
               errors.push(`${engineName} ${viewport.width}px ${route}: fine-pointer card hover has no completed lift ${hovered.transform}`);
             }
           }

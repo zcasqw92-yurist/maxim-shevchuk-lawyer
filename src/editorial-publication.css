@@ -13,6 +13,15 @@
     line-height: 1.75;
   }
 
+  .faq-item__toggle {
+    transition: background-color .2s ease;
+  }
+
+  .faq-item:hover .faq-item__toggle,
+  .faq-item:focus-within .faq-item__toggle {
+    border-color: var(--gold);
+  }
+
   .editorial-intake {
     padding: clamp(24px, 4vw, 38px);
     border: 1px solid rgba(195, 154, 93, .42);
@@ -92,10 +101,11 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: 17px 17px;
-    transition: border-color .2s ease, background-color .2s ease;
+    transition: background-color .2s ease;
   }
 
-  .editorial-page .faq-item summary:hover::after {
+  .editorial-page .faq-item:hover summary::after,
+  .editorial-page .faq-item:focus-within summary::after {
     border-color: var(--gold);
   }
 

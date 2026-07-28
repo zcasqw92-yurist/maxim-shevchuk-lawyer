@@ -76,7 +76,9 @@ try {
         }
 
         await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-        const globalToggle = page.locator(".faq-item__toggle").first();
+        const globalDetails = page.locator(".faq-list .faq-item").first();
+        const globalSummary = globalDetails.locator("summary");
+        const globalToggle = globalSummary.locator(".faq-item__toggle");
         if (!(await globalToggle.isVisible())) errors.push(`${engineName} ${viewport.width}px: brand FAQ control is not visible on home page`);
         const globalControl = await globalToggle.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -86,8 +88,23 @@ try {
             borderStyle: style.borderStyle,
             borderTopWidth: style.borderTopWidth,
             borderRadius: style.borderRadius,
+            borderColor: style.borderTopColor,
           };
         });
+        const expectedGold = await page.evaluate(() => {
+          const token = getComputedStyle(document.documentElement).getPropertyValue("--gold").trim();
+          const sample = document.createElement("span");
+          sample.style.color = token;
+          document.body.append(sample);
+          const normalized = getComputedStyle(sample).color;
+          sample.remove();
+          return normalized;
+        });
+        if (viewport.width >= 1000) await globalDetails.hover();
+        else await globalSummary.focus();
+        const globalActiveBorder = await globalToggle.evaluate((element) => getComputedStyle(element).borderTopColor);
+        if (globalActiveBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: home FAQ hover/focus border is ${globalActiveBorder}, expected ${expectedGold}`);
+        if (globalActiveBorder === globalControl.borderColor) errors.push(`${engineName} ${viewport.width}px: home FAQ hover/focus does not change the control border`);
 
         await page.goto(`${origin}${articleRoute}`, { waitUntil: "networkidle" });
         const details = page.locator("#faq .faq-item").first();
@@ -103,6 +120,7 @@ try {
             borderStyle: style.borderStyle,
             borderTopWidth: style.borderTopWidth,
             borderRadius: style.borderRadius,
+            borderColor: style.borderTopColor,
             backgroundImage: style.backgroundImage,
           };
         });
@@ -115,6 +133,11 @@ try {
             errors.push(`${engineName} ${viewport.width}px: editorial FAQ ${property} ${openedControl[property]} differs from brand FAQ ${globalControl[property]}`);
           }
         }
+        if (viewport.width >= 1000) await details.hover();
+        else await summary.focus();
+        const editorialActiveBorder = await summary.evaluate((element) => getComputedStyle(element, "::after").borderTopColor);
+        if (editorialActiveBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover/focus border is ${editorialActiveBorder}, expected ${expectedGold}`);
+        if (editorialActiveBorder === openedControl.borderColor) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover/focus does not change the control border`);
 
         await summary.click();
         if (await details.getAttribute("open") !== null) errors.push(`${engineName} ${viewport.width}px: FAQ did not close after summary click`);
@@ -141,4 +164,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial UI consistency passed: semantic checklist markers and one brand FAQ chevron control in Chromium and WebKit");
+console.log("Editorial UI consistency passed: semantic checklist markers, one brand FAQ chevron and gold hover/focus borders in Chromium and WebKit");

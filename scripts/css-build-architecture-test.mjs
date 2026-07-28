@@ -6,6 +6,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 const buildScript = await readFile(join(root, "scripts", "build-site.mjs"), "utf8");
 const bundle = await readFile(join(root, "dist", "assets", "styles.css"), "utf8");
+const editorialBase = await readFile(join(root, "src", "editorial.css"), "utf8");
 const moduleIds = [
   "styles",
   "site-enhancements",
@@ -63,9 +64,20 @@ if (!bundle.trimEnd().endsWith((await readFile(join(root, "src", "editorial-rhyt
   errors.push("Слой вертикального ритма должен завершать CSS bundle");
 }
 
+const forbiddenLegacyRules = [
+  [".editorial-checklist li::before", "старый квадратный маркер списка"],
+  ["margin-top: 46px", "старый фиксированный интервал разделов"],
+  ["margin-top: 54px", "старый фиксированный интервал авторского блока"],
+  [".editorial-related > .editorial-card", "старый отступ связанной карточки"],
+  ["grid-template-columns: repeat(2, minmax(0, 1fr));\n    gap: 24px", "старая фиксированная сетка публикаций"],
+];
+for (const [snippet, label] of forbiddenLegacyRules) {
+  if (editorialBase.includes(snippet)) errors.push(`editorial.css содержит ${label}`);
+}
+
 if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
 
-console.log("CSS build architecture passed: one ordered manifest, deterministic final write and single inclusion of every source module");
+console.log("CSS build architecture passed: one ordered manifest, deterministic final write, single inclusion and no legacy editorial overrides");

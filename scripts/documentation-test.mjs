@@ -2,12 +2,14 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { services } from "../src/data.mjs";
+import { articles, practiceCases } from "../src/editorial-data.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const errors = [];
 const read = (path) => readFile(join(root, path), "utf8");
 const [
   current,
+  publishing,
   readme,
   deployment,
   quality,
@@ -18,6 +20,7 @@ const [
   workflow,
 ] = await Promise.all([
   read("docs/current-production-state.md"),
+  read("docs/PUBLISHING.md"),
   read("README.md"),
   read("DEPLOYMENT.md"),
   read("QUALITY_REPORT.md"),
@@ -28,7 +31,7 @@ const [
   read(".github/workflows/pages.yml"),
 ]);
 
-const canonicalCount = services.length + 5;
+const canonicalCount = services.length + articles.length + practiceCases.length + 7;
 for (const marker of [
   `${canonicalCount} канонических содержательных URL`,
   "https://yuristshevchuk.com",
@@ -46,6 +49,10 @@ for (const marker of [
   "INDEXNOW_CHANGED_DATE=2026-07-27 npm run submit:indexnow",
   "npm run check:preview-indexing-lock",
   "Production workflow запускает именно `npm run check`",
+  "редакционный шлюз публикации",
+  "editorial-publications.json",
+  "sitemap-articles.xml",
+  "publication_scroll_25",
 ]) {
   if (!current.includes(marker)) errors.push(`current-production-state.md: отсутствует актуальный маркер «${marker}»`);
 }
@@ -60,6 +67,18 @@ for (const obsolete of [
   if (current.includes(obsolete)) errors.push(`current-production-state.md: осталось устаревшее утверждение «${obsolete}»`);
 }
 
+for (const marker of [
+  "src/editorial-data.mjs",
+  "npm run check",
+  "status: \"published\"",
+  "legalReviewedAt",
+  "editorial-publications.json",
+  "publication_helpfulness",
+  "Будущая админка должна работать поверх этой же схемы",
+]) {
+  if (!publishing.includes(marker)) errors.push(`docs/PUBLISHING.md: отсутствует маркер «${marker}»`);
+}
+
 if (!readme.includes("docs/current-production-state.md")) errors.push("README.md: нет ссылки на текущий источник истины");
 if (!quality.includes("АРХИВНЫЙ ОТЧЁТ")) errors.push("QUALITY_REPORT.md: старый отчёт не помечен архивным");
 if (!roadmap.includes("ИСТОРИЧЕСКИЙ ПЛАН")) errors.push("SEO_AUDIT_AND_ROADMAP.md: старый план не помечен историческим");
@@ -68,7 +87,7 @@ if (!seoLaunch.includes("HOLD: только для будущего запуск
 if (!indexingPolicy.includes("новые страницы услуг")) errors.push("INDEXING_POLICY.md: историческая политика не охватывает новые страницы услуг");
 
 const packageJson = JSON.parse(packageText);
-for (const script of ["test:content-dates", "test:geography", "test:composition-contract", "test:documentation", "test:direct-contact", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock", "check:preview-indexing-lock"]) {
+for (const script of ["test:content-dates", "test:geography", "test:composition-contract", "test:documentation", "test:direct-contact", "test:publication-pipeline", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock", "check:preview-indexing-lock"]) {
   if (!packageJson.scripts?.[script]) errors.push(`package.json: отсутствует ${script}`);
 }
 for (const removed of ["test:callback", "test:callback-interaction"]) {
@@ -76,6 +95,7 @@ for (const removed of ["test:callback", "test:callback-interaction"]) {
 }
 if (/lock:indexing/.test(packageJson.scripts?.check || "")) errors.push("package.json: npm run check не должен включать indexing lock");
 if (!packageJson.scripts?.check?.includes("test:direct-contact")) errors.push("package.json: npm run check должен включать прямую модель обращения");
+if (!packageJson.scripts?.check?.includes("test:publication-pipeline")) errors.push("package.json: npm run check должен включать редакционный шлюз");
 if (!packageJson.scripts?.["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельный preview-контур должен сохранять indexing lock");
 
 for (const marker of [
@@ -92,10 +112,12 @@ if (workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml
 
 for (const relativePath of [
   "docs/current-production-state.md",
+  "docs/PUBLISHING.md",
   "tests/golden-render-contract.json",
   "docs/manual-device-qa.md",
   "INDEXING_POLICY.md",
   "scripts/direct-contact-model-test.mjs",
+  "scripts/publication-pipeline-test.mjs",
 ]) {
   try {
     await access(join(root, relativePath));
@@ -109,4 +131,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, open indexing and automatic IndexNow are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, publication pipeline, open indexing and automatic IndexNow are current`);

@@ -1,6 +1,5 @@
 import { site } from "../site.config.mjs";
 import { fillBuildSlot } from "./html-slots.mjs";
-import { injectNavigationDiscovery } from "./navigation-discovery.mjs";
 
 const icon = (name) => {
   const paths = {
@@ -34,6 +33,5 @@ const mobileActionsMarkup = `
 
 export const injectMobileActions = (html, pathname) => {
   if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);
-  const withNavigation = injectNavigationDiscovery(html, pathname);
-  return fillBuildSlot(withNavigation, "mobile-actions", mobileActionsMarkup);
+  return fillBuildSlot(html, "mobile-actions", mobileActionsMarkup);
 };

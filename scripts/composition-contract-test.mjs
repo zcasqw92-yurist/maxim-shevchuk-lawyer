@@ -73,6 +73,7 @@ const removedHeadings = new Set([
   "h2:Оставьте контакт и удобное время",
 ]);
 const isEditorialRoute = (route = "") => /^\/(?:razbory|praktika)(?:\/|$)/.test(route);
+const isTechnicalDiscoveryRoute = (route = "") => route === "/feed.xml";
 
 const decodeText = (value = "") => value
   .replace(/<[^>]+>/g, " ")
@@ -135,7 +136,7 @@ const structuralSignature = (route, signature = {}) => {
   } = signature;
   return {
     ...structure,
-    internalRoutes: internalRoutes.filter((path) => !isEditorialRoute(path)),
+    internalRoutes: internalRoutes.filter((path) => !isEditorialRoute(path) && !isTechnicalDiscoveryRoute(path)),
     sections: sections.filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result")),
     headings: normalizeHeadings(route, headings),
     dialogs: dialogs.filter((dialog) => !removedDialogs.has(dialog)),

@@ -2,21 +2,26 @@
   .engagement-nudge {
     position: fixed;
     z-index: 92;
-    right: 24px;
-    bottom: 24px;
-    width: min(390px, calc(100% - 32px));
+    top: 50%;
+    left: 50%;
+    width: min(390px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    box-sizing: border-box;
+    overflow-y: auto;
+    margin: 0;
     padding: 23px;
     color: var(--ink);
     border: 1px solid rgba(195, 154, 93, .48);
     background: rgba(255, 254, 251, .98);
     box-shadow: 0 24px 70px rgba(9, 28, 44, .2);
     opacity: 0;
-    transform: translateY(14px) scale(.985);
+    overscroll-behavior: contain;
+    transform: translate(-50%, calc(-50% + 14px)) scale(.985);
     transition: opacity .22s ease, transform .22s ease;
   }
 
   .engagement-nudge[hidden] { display: none; }
-  .engagement-nudge.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+  .engagement-nudge.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
   .engagement-nudge__close {
     position: absolute;
@@ -99,6 +104,20 @@
 
   .engagement-nudge__write:hover { border-color: var(--gold-text); background: #e7c785; }
 
+  /* Article lists are informational, not interactive controls. */
+  .editorial-page .editorial-body .editorial-checklist li::before {
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    color: var(--gold-text);
+    border: 0;
+    content: "—";
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.75;
+  }
+
   @keyframes mobile-contact-soft-attention {
     0%, 12%, 100% {
       box-shadow: 0 0 0 0 rgba(255, 218, 137, 0);
@@ -165,10 +184,8 @@
     }
 
     .engagement-nudge {
-      right: 10px;
-      bottom: calc(90px + env(safe-area-inset-bottom));
-      left: 10px;
-      width: auto;
+      width: min(390px, calc(100vw - 20px));
+      max-height: calc(100dvh - 20px);
       padding: 20px 18px 18px;
     }
 

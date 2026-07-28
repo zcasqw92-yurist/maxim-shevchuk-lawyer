@@ -8,7 +8,7 @@
 
   .footer__copyright-note {
     max-width: 760px;
-    color: var(--muted);
+    color: rgba(255, 255, 255, .74);
     font-size: .75rem;
     line-height: 1.5;
   }

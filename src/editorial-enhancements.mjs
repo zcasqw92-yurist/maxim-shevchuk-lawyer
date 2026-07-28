@@ -83,7 +83,7 @@ export const injectEditorialEnhancements = (html, pathname, context = {}) => {
   let result = appendToBuildSlot(
     html,
     "head-assets",
-    '  <link rel="stylesheet" href="/assets/editorial-ui-v1.css">\n  <script type="module" src="/assets/editorial-analytics.mjs"></script>\n',
+    '  <script type="module" src="/assets/editorial-analytics.mjs"></script>\n',
   );
 
   if (article) {

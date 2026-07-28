@@ -59,12 +59,17 @@ const waitForLayout = (page) => page.evaluate(async () => {
 });
 
 const inspectRhythm = ({ containerSelector, kind }) => {
-  const probe = document.createElement("div");
-  probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;height:1px;";
-  document.body.append(probe);
   const resolveToken = (name) => {
-    probe.style.width = `var(${name})`;
-    return Number.parseFloat(getComputedStyle(probe).width);
+    const raw = getComputedStyle(document.body).getPropertyValue(name).trim();
+    const clamp = raw.match(/^clamp\(\s*([\d.]+)px\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)px\s*\)$/);
+    if (clamp) {
+      const minimum = Number(clamp[1]);
+      const preferred = innerWidth * Number(clamp[2]) / 100;
+      const maximum = Number(clamp[3]);
+      return Math.min(maximum, Math.max(minimum, preferred));
+    }
+    const pixels = raw.match(/^([\d.]+)px$/);
+    return pixels ? Number(pixels[1]) : Number.NaN;
   };
   const flow = {
     xs: resolveToken("--editorial-flow-xs"),
@@ -73,7 +78,6 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     lg: resolveToken("--editorial-flow-lg"),
     xl: resolveToken("--editorial-flow-xl"),
   };
-  probe.remove();
 
   const container = document.querySelector(containerSelector);
   const children = [...container.children].filter((element) => {

@@ -9,10 +9,71 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const errors = [];
 const skipped = [];
 const requireBrowsers = process.env.CROSS_BROWSER_REQUIRED === "true";
+const articleIndexRoute = "/razbory/";
+const practiceIndexRoute = "/praktika/";
 const articleRoute = `/razbory/${articles[0].slug}/`;
 const caseRoute = `/praktika/${practiceCases[0].slug}/`;
 const port = "4192";
 const origin = `http://127.0.0.1:${port}`;
+const viewports = [
+  { width: 390, height: 844 },
+  { width: 768, height: 1024 },
+  { width: 1024, height: 900 },
+  { width: 1440, height: 1000 },
+];
+
+const normalizeFontFamily = (value = "") => String(value)
+  .toLowerCase()
+  .replace(/["']/g, "")
+  .replace(/\s+/g, "");
+
+const firstFontFamily = (value = "") => normalizeFontFamily(value).split(",")[0];
+
+const assertTypography = async ({ page, engineName, viewport, route, checks }) => {
+  const response = await page.goto(`${origin}${route}`, { waitUntil: "networkidle" });
+  if (!response?.ok()) {
+    errors.push(`${engineName} ${viewport.width}px ${route}: status ${response?.status()}`);
+    return;
+  }
+
+  const tokens = await page.evaluate(() => {
+    const rootStyle = getComputedStyle(document.documentElement);
+    return {
+      serif: rootStyle.getPropertyValue("--serif").trim(),
+      sans: rootStyle.getPropertyValue("--sans").trim(),
+    };
+  });
+
+  for (const check of checks) {
+    const locator = page.locator(check.selector).first();
+    if (!(await locator.count())) {
+      if (!check.optional) errors.push(`${engineName} ${viewport.width}px ${route}: missing typography target ${check.selector}`);
+      continue;
+    }
+
+    const style = await locator.evaluate((element) => {
+      const computed = getComputedStyle(element);
+      return {
+        fontFamily: computed.fontFamily,
+        fontWeight: computed.fontWeight,
+        lineHeight: computed.lineHeight,
+      };
+    });
+    const expectedFamily = firstFontFamily(tokens[check.family]);
+    if (!normalizeFontFamily(style.fontFamily).includes(expectedFamily)) {
+      errors.push(`${engineName} ${viewport.width}px ${route} ${check.selector}: expected ${check.family} token, got ${style.fontFamily}`);
+    }
+    if (check.weight && Number.parseInt(style.fontWeight, 10) !== check.weight) {
+      errors.push(`${engineName} ${viewport.width}px ${route} ${check.selector}: expected weight ${check.weight}, got ${style.fontWeight}`);
+    }
+    if (!Number.isFinite(Number.parseFloat(style.lineHeight)) || Number.parseFloat(style.lineHeight) <= 0) {
+      errors.push(`${engineName} ${viewport.width}px ${route} ${check.selector}: invalid line-height ${style.lineHeight}`);
+    }
+  }
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  if (overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route}: ${overflow}px horizontal overflow after typography rules`);
+};
 
 const server = spawn(process.execPath, [join(root, "scripts", "server.mjs")], {
   cwd: root,
@@ -48,7 +109,7 @@ try {
     });
 
     try {
-      for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
+      for (const viewport of viewports) {
         const context = await browser.newContext({ viewport, locale: "ru-RU" });
         await context.addInitScript(() => localStorage.setItem("analytics_consent", "denied"));
         const page = await context.newPage();
@@ -148,6 +209,49 @@ try {
         if (await details.getAttribute("open") === null) errors.push(`${engineName} ${viewport.width}px: FAQ did not reopen after summary click`);
         const reopenedBackground = await summary.evaluate((element) => getComputedStyle(element, "::after").backgroundImage);
         if (reopenedBackground !== openedControl.backgroundImage) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not restore upward direction after reopening`);
+
+        const typographyRoutes = [
+          {
+            route: articleIndexRoute,
+            checks: [
+              { selector: ".editorial-index-hero h1", family: "serif", weight: 500 },
+              { selector: ".editorial-card h2", family: "serif", weight: 500 },
+              { selector: ".editorial-card > p", family: "sans" },
+            ],
+          },
+          {
+            route: practiceIndexRoute,
+            checks: [
+              { selector: ".editorial-index-hero h1", family: "serif", weight: 500 },
+              { selector: ".editorial-card h2", family: "serif", weight: 500 },
+              { selector: ".editorial-card__status", family: "sans" },
+            ],
+          },
+          {
+            route: articleRoute,
+            checks: [
+              { selector: ".editorial-article__header h1", family: "serif", weight: 500 },
+              { selector: ".article-section h2", family: "serif", weight: 500 },
+              { selector: ".article-section h3", family: "serif", weight: 500, optional: true },
+              { selector: ".editorial-lead", family: "sans" },
+              { selector: "#faq summary", family: "serif", weight: 500 },
+            ],
+          },
+          {
+            route: caseRoute,
+            checks: [
+              { selector: ".editorial-article__header h1", family: "serif", weight: 500 },
+              { selector: ".article-section h2", family: "serif", weight: 500 },
+              { selector: ".editorial-checklist li", family: "sans" },
+              { selector: ".editorial-author strong", family: "serif", weight: 500 },
+            ],
+          },
+        ];
+
+        for (const typographyRoute of typographyRoutes) {
+          await assertTypography({ page, engineName, viewport, ...typographyRoute });
+        }
+
         await context.close();
       }
     } finally {
@@ -164,4 +268,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial UI consistency passed: semantic checklist markers, one brand FAQ chevron and gold hover/focus borders in Chromium and WebKit");
+console.log("Editorial UI consistency passed: checklist markers, FAQ interactions and branded typography in Chromium and WebKit");

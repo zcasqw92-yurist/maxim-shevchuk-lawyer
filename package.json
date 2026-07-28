@@ -6,7 +6,7 @@
   "description": "Персональный сайт юриста Максима Юрьевича Шевчука",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:geography && npm run test:composition-contract && npm run test:documentation && npm run test:workflow-contract && npm run test:browser-contract && npm run test:source-form-residue && npm run test:direct-contact && npm run test:content-protection && npm run test:editorial-mvp && npm run test:editorial-ui && npm run test:publication-pipeline && npm run test:navigation && npm run test:online-status && npm run test:accessibility && npm run test:quick-choices && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:engagement-nudge && npm run test:visual-trust && npm run test:diploma-layout && npm run test:hero-consent && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser && npm run test:visual",
+    "check": "npm run build && npm run validate && npm run audit:seo && npm run test:content-dates && npm run test:geography && npm run test:composition-contract && npm run test:documentation && npm run test:workflow-contract && npm run test:browser-contract && npm run test:source-form-residue && npm run test:direct-contact && npm run test:content-protection && npm run test:editorial-mvp && npm run test:editorial-ui && npm run test:publication-pipeline && npm run test:navigation && npm run test:online-status && npm run test:accessibility && npm run test:quick-choices && npm run test:messenger-intents && npm run test:service-pages && npm run test:service-pages-interaction && npm run test:process-guarantees && npm run test:case-studies && npm run test:search-visibility && npm run test:mobile-actions && npm run test:engagement-nudge && npm run test:engagement-nudge-narrow && npm run test:visual-trust && npm run test:diploma-layout && npm run test:hero-consent && npm run test:deployment-observability && npm run test:performance-budget && npm run test:video-ready && npm run test:core-web-vitals && npm run test:cross-browser && npm run test:visual",
     "check:preview-indexing-lock": "npm run check && npm run lock:indexing && npm run test:indexing-lock",
     "dev": "node scripts/server.mjs",
     "validate": "node scripts/validate.mjs",
@@ -35,6 +35,7 @@
     "test:search-visibility": "node scripts/search-visibility-test.mjs",
     "test:mobile-actions": "node scripts/mobile-actions-test.mjs",
     "test:engagement-nudge": "node scripts/engagement-nudge-test.mjs",
+    "test:engagement-nudge-narrow": "node scripts/engagement-nudge-narrow-test.mjs",
     "test:visual-trust": "node scripts/visual-trust-test.mjs",
     "test:diploma-layout": "node scripts/diploma-layout-test.mjs",
     "test:hero-consent": "node scripts/hero-consent-contract-test.mjs",

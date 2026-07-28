@@ -1,5 +1,5 @@
 import { site } from "../site.config.mjs";
-import { fillBuildSlot } from "./html-slots.mjs";
+import { appendToBuildSlot, fillBuildSlot } from "./html-slots.mjs";
 
 const icon = (name) => {
   const paths = {
@@ -9,7 +9,56 @@ const icon = (name) => {
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${paths[name]}</svg>`;
 };
 
-const engagementScript = `${site.basePath || ""}/assets/engagement-nudge.mjs`;
+const base = site.basePath || "";
+const engagementScript = `${base}/assets/engagement-nudge.mjs`;
+
+const narrowLayoutStyles = `
+  <style>
+    @media (max-width: 350px) {
+      .about-preview__visual { display: grid; min-width: 0; }
+      .about-preview__seal {
+        position: static;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        min-width: 0;
+        min-height: 68px;
+        aspect-ratio: auto;
+        justify-self: stretch;
+        margin-top: 12px;
+        padding: 12px 16px;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .about-preview__seal span,
+      .about-preview__seal small {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+      .cta-portrait {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+        padding: 24px 18px;
+      }
+      .cta-portrait > img {
+        width: 64px;
+        height: 64px;
+        justify-self: start;
+      }
+      .cta-portrait > div { min-width: 0; }
+      .cta-portrait h2,
+      .cta-portrait p {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+      .cta-portrait .button {
+        grid-column: auto;
+        min-width: 0;
+        white-space: normal;
+      }
+    }
+  </style>\n`;
 
 const mobileActionsMarkup = `
   <aside class="engagement-nudge" id="engagement-nudge" aria-labelledby="engagement-nudge-title" aria-live="polite" hidden>
@@ -33,5 +82,6 @@ const mobileActionsMarkup = `
 
 export const injectMobileActions = (html, pathname) => {
   if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);
-  return fillBuildSlot(html, "mobile-actions", mobileActionsMarkup);
+  const withNarrowLayout = appendToBuildSlot(html, "head-assets", narrowLayoutStyles);
+  return fillBuildSlot(withNarrowLayout, "mobile-actions", mobileActionsMarkup);
 };

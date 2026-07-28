@@ -63,6 +63,18 @@ const readNudgeState = () => {
   };
 };
 
+const waitForSettledNudge = (page) => page.waitForFunction(() => {
+  const element = document.querySelector("#engagement-nudge.is-visible");
+  if (!element || element.hidden) return false;
+  const rect = element.getBoundingClientRect();
+  const style = getComputedStyle(element);
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  return Number(style.opacity) > .99
+    && Math.abs(centerX - innerWidth / 2) <= 2
+    && Math.abs(centerY - innerHeight / 2) <= 2;
+}, { timeout: 2_000 });
+
 const checkCenteredNudge = async (engineName, browser, viewport) => {
   const context = await prepareContext(browser, { width: viewport.width, height: viewport.height });
   try {
@@ -72,7 +84,7 @@ const checkCenteredNudge = async (engineName, browser, viewport) => {
 
     const nudge = page.locator("#engagement-nudge");
     await nudge.waitFor({ state: "visible", timeout: 2_000 });
-    await page.waitForFunction(() => document.querySelector("#engagement-nudge")?.classList.contains("is-visible"));
+    await waitForSettledNudge(page);
     const state = await page.evaluate(readNudgeState);
 
     if (state.sessionFlag !== "true") errors.push(`${engineName} ${viewport.name}: session flag is not written`);
@@ -189,4 +201,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Engagement nudge passed: centered on phone, tablet and desktop; one direct messenger CTA; 18-second pulse; one display per session");
+console.log("Engagement nudge passed: settled and centered on phone, tablet and desktop; one direct messenger CTA; 18-second pulse; one display per session");

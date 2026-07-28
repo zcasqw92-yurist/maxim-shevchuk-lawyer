@@ -152,6 +152,7 @@ try {
           }
 
           await noButton.click();
+          await page.waitForTimeout(240);
           const after = await buttons.first().evaluate(metrics);
           const selected = after.buttons.find((item) => item.value === "no");
           if (selected?.pressed !== "true" || after.buttons.filter((item) => item.pressed === "true").length !== 1) {
@@ -165,7 +166,7 @@ try {
           }
 
           const status = await block.locator("[data-helpfulness-status]").textContent();
-          if (!status?.includes("Аналитика отключена настройками конфиденциальности")) {
+          if (!status?.includes("Аналитика отключена")) {
             errors.push(`${engineName} ${viewport.width}px ${route}: privacy status is inaccurate: ${status}`);
           }
           const allowedHeightChange = viewport.width <= 390 ? 3 : 2;

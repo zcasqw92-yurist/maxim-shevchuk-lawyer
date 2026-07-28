@@ -157,9 +157,10 @@ await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));
 await cp(join(root, "src", "online-status.mjs"), join(dist, "assets", "online-status.mjs"));
 await cp(join(root, "src", "visual-trust.js"), join(dist, "assets", "visual-trust.js"));
 await cp(join(root, "public"), dist, { recursive: true });
-const vendorWebVitals = (await readFile(join(root, "node_modules", "web-vitals", "dist", "web-vitals.js"), "utf8"))
-  .replace(/\n?\/\/# sourceMappingURL=.*$/gm, "");
-await writeFile(join(dist, "assets", "vendor-web-vitals.js"), vendorWebVitals, "utf8");
+await cp(
+  join(root, "node_modules", "web-vitals", "dist", "web-vitals.js"),
+  join(dist, "assets", "vendor-web-vitals.js"),
+);
 await cp(
   join(root, "node_modules", "web-vitals", "LICENSE"),
   join(dist, "assets", "vendor-web-vitals.LICENSE.txt"),

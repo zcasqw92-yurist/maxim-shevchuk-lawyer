@@ -1,5 +1,5 @@
 import { site } from "../site.config.mjs";
-import { fillBuildSlot } from "./html-slots.mjs";
+import { appendToBuildSlot, fillBuildSlot } from "./html-slots.mjs";
 
 const icon = (name) => {
   const paths = {
@@ -9,7 +9,9 @@ const icon = (name) => {
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${paths[name]}</svg>`;
 };
 
-const engagementScript = `${site.basePath || ""}/assets/engagement-nudge.mjs`;
+const base = site.basePath || "";
+const engagementScript = `${base}/assets/engagement-nudge.mjs`;
+const narrowLayoutStyles = `${base}/assets/narrow-layout-v1.css`;
 
 const mobileActionsMarkup = `
   <aside class="engagement-nudge" id="engagement-nudge" aria-labelledby="engagement-nudge-title" aria-live="polite" hidden>
@@ -33,5 +35,10 @@ const mobileActionsMarkup = `
 
 export const injectMobileActions = (html, pathname) => {
   if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);
-  return fillBuildSlot(html, "mobile-actions", mobileActionsMarkup);
+  const withNarrowLayout = appendToBuildSlot(
+    html,
+    "head-assets",
+    `  <link rel="stylesheet" href="${narrowLayoutStyles}">\n`,
+  );
+  return fillBuildSlot(withNarrowLayout, "mobile-actions", mobileActionsMarkup);
 };

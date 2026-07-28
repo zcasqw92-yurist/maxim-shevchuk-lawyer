@@ -35,10 +35,14 @@ const insertAfterServices = (html, className, markup, pathname) => {
 };
 
 const insertFooterLinks = (html, pathname) => {
-  if (html.includes('data-editorial-footer-links')) throw new Error(`Редакционные ссылки подвала уже добавлены: ${pathname}`);
   const marker = '<h2 class="footer__title">Информация</h2>\n        <ul class="footer__links">';
-  if (!html.includes(marker)) throw new Error(`Не найден раздел «Информация» в подвале: ${pathname}`);
-  const links = `<li data-editorial-footer-links><a href="${hrefFor("/uslugi/")}">Все услуги</a></li><li><a href="${hrefFor("/razbory/")}">Разборы</a></li><li><a href="${hrefFor("/praktika/")}">Практика</a></li>`;
+  const footerPattern = /<h2 class="footer__title">Информация<\/h2>\s*<ul class="footer__links">([\s\S]*?)<\/ul>/;
+  const footer = html.match(footerPattern)?.[0] || "";
+  if (!footer) throw new Error(`Не найден раздел «Информация» в подвале: ${pathname}`);
+  if (footer.includes(hrefFor("/razbory/")) || footer.includes(hrefFor("/praktika/"))) {
+    throw new Error(`Редакционные ссылки подвала уже добавлены: ${pathname}`);
+  }
+  const links = `<li><a href="${hrefFor("/uslugi/")}">Все услуги</a></li><li><a href="${hrefFor("/razbory/")}">Разборы</a></li><li><a href="${hrefFor("/praktika/")}">Практика</a></li>`;
   return html.replace(marker, `${marker}\n          ${links}`);
 };
 

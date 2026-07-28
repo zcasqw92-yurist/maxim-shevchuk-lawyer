@@ -40,14 +40,22 @@ for (const marker of [
   ".mobile-contact__action--now",
   "mobile-contact-soft-attention 18s ease-out 8s infinite",
   ".engagement-nudge",
-  "bottom: calc(90px + env(safe-area-inset-bottom));",
+  "top: 50%;",
+  "left: 50%;",
+  "transform: translate(-50%, -50%) scale(1);",
+  "max-height: calc(100dvh - 20px);",
+  "overscroll-behavior: contain;",
   "@media (prefers-reduced-motion: reduce)",
   "@media (max-width: 350px)",
 ]) {
   if (!styles.includes(marker)) errors.push(`styles.css: missing ${marker}`);
 }
-for (const obsolete of [".mobile-contact--dual", ".mobile-contact__action--later"]) {
-  if (styles.includes(obsolete)) errors.push(`styles.css: obsolete callback selector remains: ${obsolete}`);
+for (const obsolete of [
+  ".mobile-contact--dual",
+  ".mobile-contact__action--later",
+  "bottom: calc(90px + env(safe-area-inset-bottom));",
+]) {
+  if (styles.includes(obsolete)) errors.push(`styles.css: obsolete mobile or nudge rule remains: ${obsolete}`);
 }
 
 const engagementScript = await readFile(join(dist, "assets", "engagement-nudge.mjs"), "utf8");
@@ -72,4 +80,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Mobile action panel checks passed: ${pages.length} pages, one direct messenger CTA and one-session nudge`);
+console.log(`Mobile action panel checks passed: ${pages.length} pages, one direct messenger CTA and centered one-session nudge`);

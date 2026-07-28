@@ -76,7 +76,9 @@ try {
         }
 
         await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-        const globalToggle = page.locator(".faq-item__toggle").first();
+        const globalDetails = page.locator(".faq-list .faq-item").first();
+        const globalSummary = globalDetails.locator("summary");
+        const globalToggle = globalSummary.locator(".faq-item__toggle");
         if (!(await globalToggle.isVisible())) errors.push(`${engineName} ${viewport.width}px: brand FAQ control is not visible on home page`);
         const globalControl = await globalToggle.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -86,8 +88,22 @@ try {
             borderStyle: style.borderStyle,
             borderTopWidth: style.borderTopWidth,
             borderRadius: style.borderRadius,
+            borderColor: style.borderTopColor,
           };
         });
+        const expectedGold = await page.evaluate(() => {
+          const token = getComputedStyle(document.documentElement).getPropertyValue("--gold").trim();
+          const sample = document.createElement("span");
+          sample.style.color = token;
+          document.body.append(sample);
+          const normalized = getComputedStyle(sample).color;
+          sample.remove();
+          return normalized;
+        });
+        await globalSummary.hover();
+        const globalHoverBorder = await globalToggle.evaluate((element) => getComputedStyle(element).borderTopColor);
+        if (globalHoverBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: home FAQ hover border is ${globalHoverBorder}, expected ${expectedGold}`);
+        if (globalHoverBorder === globalControl.borderColor) errors.push(`${engineName} ${viewport.width}px: home FAQ hover does not change the control border`);
 
         await page.goto(`${origin}${articleRoute}`, { waitUntil: "networkidle" });
         const details = page.locator("#faq .faq-item").first();
@@ -103,6 +119,7 @@ try {
             borderStyle: style.borderStyle,
             borderTopWidth: style.borderTopWidth,
             borderRadius: style.borderRadius,
+            borderColor: style.borderTopColor,
             backgroundImage: style.backgroundImage,
           };
         });
@@ -115,6 +132,10 @@ try {
             errors.push(`${engineName} ${viewport.width}px: editorial FAQ ${property} ${openedControl[property]} differs from brand FAQ ${globalControl[property]}`);
           }
         }
+        await summary.hover();
+        const editorialHoverBorder = await summary.evaluate((element) => getComputedStyle(element, "::after").borderTopColor);
+        if (editorialHoverBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover border is ${editorialHoverBorder}, expected ${expectedGold}`);
+        if (editorialHoverBorder === openedControl.borderColor) errors.push(`${engineName} ${viewport.width}px: editorial FAQ hover does not change the control border`);
 
         await summary.click();
         if (await details.getAttribute("open") !== null) errors.push(`${engineName} ${viewport.width}px: FAQ did not close after summary click`);
@@ -141,4 +162,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial UI consistency passed: semantic checklist markers and one brand FAQ chevron control in Chromium and WebKit");
+console.log("Editorial UI consistency passed: semantic checklist markers, one brand FAQ chevron and gold hover/focus borders in Chromium and WebKit");

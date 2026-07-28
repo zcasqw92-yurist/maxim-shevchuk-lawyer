@@ -301,6 +301,10 @@
     .editorial-helpfulness {
       padding: 20px 16px;
     }
+
+    .editorial-helpfulness > p {
+      min-height: 3em;
+    }
   }
 
   @media (max-width: 350px) {

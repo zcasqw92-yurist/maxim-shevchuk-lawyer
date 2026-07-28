@@ -75,33 +75,24 @@
     background: #fffefa;
   }
 
-  .editorial-page .faq-item summary {
-    padding-right: 4px;
-  }
-
   .editorial-page .faq-item summary > span:first-child {
     min-width: 0;
   }
 
-  .editorial-page .faq-item__toggle {
-    display: none;
-  }
-
   .editorial-page .faq-item summary::after {
-    display: grid;
+    display: block;
     width: 38px;
     aspect-ratio: 1;
     flex: 0 0 38px;
-    place-items: center;
-    color: var(--ink-deep);
+    content: "";
     border: 1px solid var(--line);
     border-radius: 50%;
-    content: "+";
-    font-family: var(--sans);
-    font-size: 1.3rem;
-    font-weight: 500;
-    line-height: 1;
-    transition: color .2s ease, border-color .2s ease, background .2s ease;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23091c2c' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 10 4 4 4-4'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 17px 17px;
+    transition: border-color .2s ease, background-color .2s ease;
   }
 
   .editorial-page .faq-item summary:hover::after {
@@ -109,10 +100,7 @@
   }
 
   .editorial-page .faq-item[open] summary::after {
-    color: var(--white);
-    border-color: var(--ink-deep);
-    background: var(--ink-deep);
-    content: "−";
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23091c2c' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 14 4-4 4 4'/%3E%3C/svg%3E");
   }
 
   .editorial-helpfulness {
@@ -184,17 +172,6 @@
 
     .editorial-helpfulness__actions button {
       padding-inline: 10px;
-    }
-  }
-
-  @media (max-width: 680px) {
-    .editorial-page .faq-item summary {
-      gap: 16px;
-    }
-
-    .editorial-page .faq-item summary::after {
-      width: 36px;
-      flex-basis: 36px;
     }
   }
 

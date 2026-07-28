@@ -75,6 +75,20 @@ try {
           if (overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route}: ${overflow}px horizontal overflow`);
         }
 
+        await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+        const globalToggle = page.locator(".faq-item__toggle").first();
+        if (!(await globalToggle.isVisible())) errors.push(`${engineName} ${viewport.width}px: brand FAQ control is not visible on home page`);
+        const globalControl = await globalToggle.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            width: style.width,
+            height: style.height,
+            borderStyle: style.borderStyle,
+            borderTopWidth: style.borderTopWidth,
+            borderRadius: style.borderRadius,
+          };
+        });
+
         await page.goto(`${origin}${articleRoute}`, { waitUntil: "networkidle" });
         const details = page.locator("#faq .faq-item").first();
         const summary = details.locator("summary");
@@ -82,18 +96,35 @@ try {
 
         const openedControl = await summary.evaluate((element) => {
           const style = getComputedStyle(element, "::after");
-          return { content: style.content, width: style.width, borderStyle: style.borderStyle };
+          return {
+            content: style.content,
+            width: style.width,
+            height: style.height,
+            borderStyle: style.borderStyle,
+            borderTopWidth: style.borderTopWidth,
+            borderRadius: style.borderRadius,
+            backgroundImage: style.backgroundImage,
+          };
         });
-        if (!openedControl.content.includes("−")) errors.push(`${engineName} ${viewport.width}px: opened FAQ control is not visible ${JSON.stringify(openedControl)}`);
-        if (openedControl.width === "auto" || openedControl.borderStyle === "none") errors.push(`${engineName} ${viewport.width}px: FAQ control has no visible circular affordance ${JSON.stringify(openedControl)}`);
+        if (openedControl.content.includes("+") || openedControl.content.includes("−")) {
+          errors.push(`${engineName} ${viewport.width}px: legacy plus/minus FAQ control remains ${JSON.stringify(openedControl)}`);
+        }
+        if (openedControl.backgroundImage === "none") errors.push(`${engineName} ${viewport.width}px: editorial FAQ chevron is missing`);
+        for (const property of ["width", "height", "borderStyle", "borderTopWidth", "borderRadius"]) {
+          if (openedControl[property] !== globalControl[property]) {
+            errors.push(`${engineName} ${viewport.width}px: editorial FAQ ${property} ${openedControl[property]} differs from brand FAQ ${globalControl[property]}`);
+          }
+        }
 
         await summary.click();
         if (await details.getAttribute("open") !== null) errors.push(`${engineName} ${viewport.width}px: FAQ did not close after summary click`);
-        const closedControl = await summary.evaluate((element) => getComputedStyle(element, "::after").content);
-        if (!closedControl.includes("+")) errors.push(`${engineName} ${viewport.width}px: closed FAQ control is not plus: ${closedControl}`);
+        const closedBackground = await summary.evaluate((element) => getComputedStyle(element, "::after").backgroundImage);
+        if (closedBackground === openedControl.backgroundImage) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not change direction after closing`);
 
         await summary.click();
         if (await details.getAttribute("open") === null) errors.push(`${engineName} ${viewport.width}px: FAQ did not reopen after summary click`);
+        const reopenedBackground = await summary.evaluate((element) => getComputedStyle(element, "::after").backgroundImage);
+        if (reopenedBackground !== openedControl.backgroundImage) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not restore upward direction after reopening`);
         await context.close();
       }
     } finally {
@@ -110,4 +141,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial UI consistency passed: semantic checklist markers and visible interactive FAQ controls in Chromium and WebKit");
+console.log("Editorial UI consistency passed: semantic checklist markers and one brand FAQ chevron control in Chromium and WebKit");

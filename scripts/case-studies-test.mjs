@@ -20,6 +20,18 @@ const fileForRoute = (route) => route === "/"
   ? join(dist, "index.html")
   : join(dist, route.replace(/^\/+|\/+$/g, ""), "index.html");
 
+const caseStudiesCss = await readFile(join(root, "src", "case-studies.css"), "utf8");
+if (caseStudiesCss.includes("var(--font-display)")) {
+  errors.push("case-studies.css: undefined display-font token must not be used");
+}
+for (const [selector, label] of [
+  ["\\.case-studies__title", "section title"],
+  ["\\.case-study h3", "case card title"],
+]) {
+  const rule = new RegExp(`${selector}\\s*\\{[\\s\\S]*?font-family:\\s*var\\(--serif\\)`, "m");
+  if (!rule.test(caseStudiesCss)) errors.push(`case-studies.css: ${label} does not use the brand serif token`);
+}
+
 const htmlFiles = (await walk(dist)).filter((path) => extname(path) === ".html");
 const expectedFiles = new Set(Object.keys(pageCaseIds).map(fileForRoute));
 
@@ -107,4 +119,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Verified anonymized case studies are published on ${expectedFiles.size} routes without private markers or unsupported outcomes`);
+console.log(`Verified anonymized case studies are published on ${expectedFiles.size} routes with brand typography, without private markers or unsupported outcomes`);

@@ -1,0 +1,22 @@
+@layer utilities {
+  img[data-protected-image] {
+    cursor: default;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+
+  .footer__copyright-note {
+    max-width: 760px;
+    color: rgba(255, 255, 255, .74);
+    font-size: .75rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 680px) {
+    .footer__copyright-note {
+      font-size: .75rem;
+      line-height: 1.55;
+    }
+  }
+}

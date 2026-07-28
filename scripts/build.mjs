@@ -13,6 +13,7 @@ import { injectPrivacyPolicy } from "../src/privacy-policy.mjs";
 import { injectMobileActions } from "../src/mobile-actions.mjs";
 import { injectVisualTrust } from "../src/visual-trust.mjs";
 import { injectOnDemandVideo } from "../src/video-ready.mjs";
+import { injectContentProtection } from "../src/content-protection.mjs";
 import { createVideoConfig, validateVideoAssets } from "../src/video-config.mjs";
 import {
   renderAbout,
@@ -55,7 +56,7 @@ const injectBuildMetadata = (html) => appendToBuildSlot(
   "head-assets",
   `  <meta name="site-build-sha" content="${attr(buildSha)}">\n  <meta name="site-build-version" content="${attr(buildVersion)}">\n  <meta name="site-build-time" content="${attr(buildTime)}">\n`,
 )
-  .replace(/(\/assets\/(?:styles\.css|app\.js|visual-trust\.js))(["'])/g, `$1?v=${buildVersion}$2`);
+  .replace(/(\/assets\/(?:styles\.css|app\.js|visual-trust\.js|content-protection\.mjs))(["'])/g, `$1?v=${buildVersion}$2`);
 
 if (!/^\d{4}-\d{2}-\d{2}$/.test(site.contentLastModified)) {
   throw new Error("contentLastModified должен быть датой YYYY-MM-DD");
@@ -103,8 +104,10 @@ const writePage = async (pathname, options, context = {}) => {
   const withSearchVisibility = injectSearchVisibility(withCases, pathname, context.service || null);
   const withVisualTrust = injectVisualTrust(withSearchVisibility, pathname);
   const withVideo = injectOnDemandVideo(withVisualTrust, pathname);
+  const withMobileActions = injectMobileActions(withVideo, pathname);
+  const withContentProtection = injectContentProtection(withMobileActions, pathname);
   const html = finalizeBuildSlots(
-    injectBuildMetadata(injectMobileActions(withVideo, pathname)),
+    injectBuildMetadata(withContentProtection),
     pathname,
   );
   await mkdir(dirname(output), { recursive: true });
@@ -147,6 +150,7 @@ const styles = [
   await readFile(join(root, "src", "visual-trust.css"), "utf8"),
   await readFile(join(root, "src", "video-ready.css"), "utf8"),
   await readFile(join(root, "src", "layout-corrections.css"), "utf8"),
+  await readFile(join(root, "src", "content-protection.css"), "utf8"),
 ].join("\n");
 await writeFile(join(dist, "assets", "styles.css"), styles, "utf8");
 await cp(join(root, "src", "app.js"), join(dist, "assets", "app.js"));

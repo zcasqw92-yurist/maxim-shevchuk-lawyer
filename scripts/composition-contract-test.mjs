@@ -56,6 +56,7 @@ const removedInteractionHooks = new Set([
 const contextualHooks = new Set([
   "data-message",
   "data-mobile-contact-now",
+  "data-protected-image",
   "data-topic",
 ]);
 const removedDialogs = new Set(["callback-dialog", "price-quiz-dialog"]);

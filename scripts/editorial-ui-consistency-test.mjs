@@ -104,7 +104,6 @@ try {
             borderTopWidth: style.borderTopWidth,
             borderRadius: style.borderRadius,
             backgroundImage: style.backgroundImage,
-            transform: style.transform,
           };
         });
         if (openedControl.content.includes("+") || openedControl.content.includes("−")) {
@@ -118,16 +117,14 @@ try {
         }
 
         await summary.click();
-        await page.waitForTimeout(320);
         if (await details.getAttribute("open") !== null) errors.push(`${engineName} ${viewport.width}px: FAQ did not close after summary click`);
-        const closedTransform = await summary.evaluate((element) => getComputedStyle(element, "::after").transform);
-        if (closedTransform === openedControl.transform) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not change direction after closing`);
+        const closedBackground = await summary.evaluate((element) => getComputedStyle(element, "::after").backgroundImage);
+        if (closedBackground === openedControl.backgroundImage) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not change direction after closing`);
 
         await summary.click();
-        await page.waitForTimeout(320);
         if (await details.getAttribute("open") === null) errors.push(`${engineName} ${viewport.width}px: FAQ did not reopen after summary click`);
-        const reopenedTransform = await summary.evaluate((element) => getComputedStyle(element, "::after").transform);
-        if (reopenedTransform === closedTransform) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not change direction after reopening`);
+        const reopenedBackground = await summary.evaluate((element) => getComputedStyle(element, "::after").backgroundImage);
+        if (reopenedBackground !== openedControl.backgroundImage) errors.push(`${engineName} ${viewport.width}px: FAQ chevron did not restore upward direction after reopening`);
         await context.close();
       }
     } finally {

@@ -14,11 +14,12 @@
     margin-bottom: clamp(34px, 5vw, 56px);
   }
 
+  /* Display headings use the same editorial serif as the rest of the brand. */
   .case-studies__title {
     max-width: 800px;
-    font-family: var(--font-display);
+    font-family: var(--serif);
     font-size: clamp(2.15rem, 3.45vw, 3.3rem);
-    font-weight: 620;
+    font-weight: 500;
     line-height: 1.04;
     letter-spacing: -.035em;
   }
@@ -66,8 +67,11 @@
   .case-study h3 {
     min-height: 3.25em;
     margin-bottom: 26px;
+    font-family: var(--serif);
     font-size: clamp(1.3rem, 1.75vw, 1.55rem);
+    font-weight: 500;
     line-height: 1.18;
+    letter-spacing: -.018em;
   }
 
   .case-study__details {

@@ -7,6 +7,11 @@ import { seoMetadataContract } from "../src/seo-metadata.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const errors = [];
+const brandStems = site.shortName
+  .toLocaleLowerCase("ru")
+  .split(/\s+/)
+  .filter(Boolean)
+  .map((part) => part.slice(0, Math.min(5, part.length)));
 
 const walk = async (directory) => {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -64,7 +69,10 @@ for (const file of files) {
   if (title.length < seoMetadataContract.title.min || title.length > seoMetadataContract.title.max) {
     errors.push(`${route}: title ${title.length} знаков, допустимо ${seoMetadataContract.title.min}–${seoMetadataContract.title.max}`);
   }
-  if (!title.includes(site.shortName)) errors.push(`${route}: title не содержит бренд «${site.shortName}»`);
+  const normalizedTitle = title.toLocaleLowerCase("ru");
+  if (!brandStems.every((stem) => normalizedTitle.includes(stem))) {
+    errors.push(`${route}: title не содержит узнаваемую форму бренда «${site.shortName}»`);
+  }
   if (descriptions.length !== 1) errors.push(`${route}: должен быть ровно один meta description, найдено ${descriptions.length}`);
   if (description.length < seoMetadataContract.description.min || description.length > seoMetadataContract.description.max) {
     errors.push(`${route}: description ${description.length} знаков, допустимо ${seoMetadataContract.description.min}–${seoMetadataContract.description.max}`);

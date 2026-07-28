@@ -72,6 +72,7 @@ const removedHeadings = new Set([
   "h2:Можно уточнить стоимость по вашей ситуации",
   "h2:Оставьте контакт и удобное время",
 ]);
+const isEditorialRoute = (route = "") => /^\/(?:razbory|praktika)(?:\/|$)/.test(route);
 
 const decodeText = (value = "") => value
   .replace(/<[^>]+>/g, " ")
@@ -129,10 +130,12 @@ const structuralSignature = (route, signature = {}) => {
     sections = [],
     dialogs = [],
     dataHooks = [],
+    internalRoutes = [],
     ...structure
   } = signature;
   return {
     ...structure,
+    internalRoutes: internalRoutes.filter((path) => !isEditorialRoute(path)),
     sections: sections.filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result")),
     headings: normalizeHeadings(route, headings),
     dialogs: dialogs.filter((dialog) => !removedDialogs.has(dialog)),
@@ -202,4 +205,4 @@ if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
   throw new Error(`Структурный golden-контракт изменился: ${changedFields.join("; ")}. Проверьте diff и обновляйте эталон только осознанно.`);
 }
 
-console.log(`Composition contract passed: named slots, privacy policy headings, analytics consent mode and form-free golden structure for ${routes.length} canonical pages`);
+console.log(`Composition contract passed: named slots, privacy policy headings, analytics consent mode and form-free golden structure for ${routes.length} canonical pages; editorial routes are verified separately`);

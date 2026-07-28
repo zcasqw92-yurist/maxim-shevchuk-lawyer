@@ -31,6 +31,10 @@ for (const route of [articleRoute, caseRoute]) {
   if (JSON.stringify(actualHelpfulnessOrder) !== JSON.stringify(expectedHelpfulnessOrder)) {
     errors.push(`${route}: helpfulness buttons must be ordered yes, no, partly; got ${actualHelpfulnessOrder.join(", ")}`);
   }
+  const initialPressedStates = [...html.matchAll(/aria-pressed="(true|false)"\s+data-helpfulness-value=/g)].map((match) => match[1]);
+  if (initialPressedStates.length !== 3 || initialPressedStates.some((value) => value !== "false")) {
+    errors.push(`${route}: helpfulness buttons must expose three initial aria-pressed=false states`);
+  }
 }
 
 const articleHtml = await readFile(pageFile(articleRoute), "utf8");
@@ -99,6 +103,8 @@ for (const marker of [
   "publication_section_view",
   "publication_helpfulness",
   "analytics_consent",
+  'helpfulness.dataset.submitted = "true"',
+  "Аналитика отключена настройками конфиденциальности",
 ]) {
   if (!analytics.includes(marker)) errors.push(`editorial-analytics.mjs: missing ${marker}`);
 }
@@ -117,4 +123,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Publication pipeline passed: ${articles.length} articles, ${practiceCases.length} cases, fixed helpfulness order, RSS discovery, supplemental sitemaps, anonymous reading analytics and direct build stages`);
+console.log(`Publication pipeline passed: ${articles.length} articles, ${practiceCases.length} cases, accessible fixed helpfulness order, truthful privacy status, RSS discovery, supplemental sitemaps, anonymous reading analytics and direct build stages`);

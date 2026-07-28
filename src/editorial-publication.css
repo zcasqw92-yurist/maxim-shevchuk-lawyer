@@ -1,4 +1,83 @@
 @layer components {
+  .editorial-page :is(
+    .editorial-index-hero h1,
+    .editorial-card h2,
+    .editorial-article__header h1,
+    .article-section h2,
+    .article-section h3,
+    .editorial-author strong,
+    .editorial-cta h2,
+    .editorial-intake__questions strong,
+    .editorial-helpfulness h2
+  ) {
+    font-family: var(--serif);
+    font-weight: 500;
+    letter-spacing: -.035em;
+    text-wrap: balance;
+  }
+
+  .editorial-index-page .inner-hero h1 {
+    max-width: 880px;
+    font-size: clamp(2.85rem, 5vw, 5.25rem);
+    line-height: 1.02;
+  }
+
+  .editorial-card h2 {
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    line-height: 1.14;
+  }
+
+  .editorial-article__header h1 {
+    font-size: clamp(2.35rem, 5vw, 4.5rem);
+    line-height: 1.04;
+  }
+
+  .article-section h2 {
+    font-size: clamp(1.8rem, 2.7vw, 2.45rem);
+    line-height: 1.12;
+  }
+
+  .article-section h3 {
+    font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+    line-height: 1.25;
+  }
+
+  .editorial-page .faq-item summary {
+    font-family: var(--serif);
+    font-weight: 500;
+    letter-spacing: -.025em;
+    line-height: 1.28;
+  }
+
+  .editorial-author strong,
+  .editorial-intake__questions strong {
+    letter-spacing: -.02em;
+    line-height: 1.25;
+  }
+
+  .editorial-cta h2,
+  .editorial-helpfulness h2 {
+    line-height: 1.15;
+  }
+
+  .editorial-page :is(
+    .editorial-card > p,
+    .editorial-card__status,
+    .editorial-lead,
+    .editorial-meta,
+    .editorial-toc,
+    .editorial-answer,
+    .article-section p,
+    .article-section li,
+    .editorial-author p,
+    .editorial-case-aside,
+    .editorial-cta p,
+    .editorial-intake,
+    .editorial-helpfulness
+  ) {
+    font-family: var(--sans);
+  }
+
   .editorial-page .editorial-checklist li::before {
     top: 0;
     left: 0;
@@ -57,7 +136,7 @@
     color: var(--gold-bright);
     font-family: var(--serif);
     font-size: 1.35rem;
-    font-weight: 560;
+    font-weight: 500;
   }
 
   .editorial-intake__questions ul {
@@ -129,8 +208,8 @@
     color: var(--ink-deep);
     font-family: var(--serif);
     font-size: clamp(1.35rem, 2.5vw, 1.9rem);
-    font-weight: 560;
-    line-height: 1.2;
+    font-weight: 500;
+    line-height: 1.15;
   }
 
   .editorial-helpfulness__actions {

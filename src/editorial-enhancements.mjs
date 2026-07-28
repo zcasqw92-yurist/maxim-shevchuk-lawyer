@@ -69,6 +69,12 @@ const injectBefore = (html, marker, content, label) => {
   return html.replace(marker, `${content}${marker}`);
 };
 
+const injectBeforePattern = (html, pattern, content, label) => {
+  const match = html.match(pattern);
+  if (!match) throw new Error(`Не найдено место для редакционного блока: ${label}`);
+  return html.replace(match[0], `${content}${match[0]}`);
+};
+
 export const injectEditorialEnhancements = (html, pathname, context = {}) => {
   const article = context.article || null;
   const practiceCase = context.practiceCase || null;
@@ -88,9 +94,9 @@ export const injectEditorialEnhancements = (html, pathname, context = {}) => {
       articleIntake(article),
       `${pathname}: перед источниками`,
     );
-    result = injectBefore(
+    result = injectBeforePattern(
       result,
-      '<div class="wrap"><section class="editorial-cta"',
+      /<div class="wrap">\s*<section class="editorial-cta"/,
       `<div class="wrap">${helpfulness(article.id, "article")}</div>`,
       `${pathname}: перед итоговым CTA`,
     );
@@ -101,9 +107,9 @@ export const injectEditorialEnhancements = (html, pathname, context = {}) => {
   }
 
   if (practiceCase) {
-    result = injectBefore(
+    result = injectBeforePattern(
       result,
-      '<div class="wrap"><section class="editorial-cta"',
+      /<div class="wrap">\s*<section class="editorial-cta"/,
       `<div class="wrap">${helpfulness(practiceCase.id, "case")}</div>`,
       `${pathname}: перед итоговым CTA кейса`,
     );

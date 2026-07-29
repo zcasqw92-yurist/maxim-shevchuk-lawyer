@@ -19,6 +19,15 @@ const guaranteeItems = [
   },
 ];
 
+const redundantCatalogCtaPattern = /\s*<section class="section section--cta">[\s\S]*?<h2>Начнём с правильной квалификации<\/h2>[\s\S]*?<\/section>/;
+
+const removeRedundantCatalogCta = (html, pathname) => {
+  if (!redundantCatalogCtaPattern.test(html)) {
+    throw new Error(`Не найден дублирующий финальный CTA каталога услуг: ${pathname}`);
+  }
+  return html.replace(redundantCatalogCtaPattern, "");
+};
+
 export const processGuaranteesBlock = () => `
   <section class="section section--process-guarantees" aria-labelledby="process-guarantees-title">
     <div class="wrap">
@@ -51,7 +60,8 @@ export const injectProcessGuarantees = (html, pathname) => {
 
   const block = processGuaranteesBlock();
   if (pathname === "/uslugi") {
-    return fillBuildSlot(html, "services-guarantees", block);
+    const withGuarantees = fillBuildSlot(html, "services-guarantees", block);
+    return removeRedundantCatalogCta(withGuarantees, pathname);
   }
   if (/^\/uslugi\/[^/]+$/.test(pathname)) {
     return fillBuildSlot(html, "service-guarantees", block);

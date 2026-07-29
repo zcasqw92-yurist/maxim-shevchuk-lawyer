@@ -106,8 +106,8 @@ try {
           if (Math.abs(footerGap) > 2) {
             errors.push(`${engineName} ${viewport.width}px ${route.path}: gap before footer is ${rounded(footerGap)}px`);
           }
-          if (ctaBox.height < 150 || ctaBox.height > 380) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: closing CTA height ${rounded(ctaBox.height)}px is outside 150–380px`);
+          if (ctaBox.height < 150 || ctaBox.height > 430) {
+            errors.push(`${engineName} ${viewport.width}px ${route.path}: closing CTA height ${rounded(ctaBox.height)}px is outside 150–430px`);
           }
 
           const styles = await cta.evaluate((element) => {

@@ -35,6 +35,7 @@ const requiredSourceTokens = [
   'send("cta_click"',
   '"contact_conversion"',
   'origin_cta_placement',
+  'source_cta_placement',
   'contact_mode',
   'page_group',
   'cta_placement',
@@ -171,6 +172,7 @@ try {
       contact_mode: "dialog",
       cta_placement: "messenger_dialog",
       origin_cta_placement: "hero_quick_choice",
+      source_cta_placement: "hero_quick_choice",
       topic: "возврат денежных средств",
     });
 
@@ -183,6 +185,7 @@ try {
       channel: "whatsapp",
       contact_mode: "direct",
       cta_placement: "contacts_methods",
+      source_cta_placement: "contacts_methods",
     });
   } else {
     console.log("Conversion analytics browser assertions skipped: production analytics is disabled in this build");

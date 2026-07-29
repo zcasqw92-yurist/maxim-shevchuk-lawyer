@@ -225,4 +225,22 @@
       min-height: var(--cta-height);
     }
   }
+
+  @media (max-width: 350px) {
+    .engagement-nudge__actions {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+
+    .engagement-nudge__write,
+    .engagement-nudge__dismiss {
+      width: 100%;
+      min-width: 0;
+      padding-inline: 14px;
+      white-space: normal;
+    }
+
+    .engagement-nudge__write { order: 1; }
+    .engagement-nudge__dismiss { order: 2; }
+  }
 }

@@ -72,6 +72,8 @@ const removedHeadings = new Set([
   "h2:Можно уточнить стоимость по вашей ситуации",
   "h2:Оставьте контакт и удобное время",
 ]);
+const intentionallyRemovedCatalogSections = new Set(["section section--cta"]);
+const intentionallyRemovedCatalogHeadings = new Set(["h2:Начнём с правильной квалификации"]);
 const isEditorialRoute = (route = "") => /^\/(?:razbory|praktika)(?:\/|$)/.test(route);
 const isTechnicalDiscoveryRoute = (route = "") => route === "/feed.xml";
 
@@ -134,11 +136,16 @@ const structuralSignature = (route, signature = {}) => {
     internalRoutes = [],
     ...structure
   } = signature;
+  const normalizedSections = sections
+    .filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result"))
+    .filter((section) => route !== "/uslugi" || !intentionallyRemovedCatalogSections.has(section));
+  const normalizedHeadings = normalizeHeadings(route, headings)
+    .filter((heading) => route !== "/uslugi" || !intentionallyRemovedCatalogHeadings.has(heading));
   return {
     ...structure,
     internalRoutes: internalRoutes.filter((path) => !isEditorialRoute(path) && !isTechnicalDiscoveryRoute(path)),
-    sections: sections.filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result")),
-    headings: normalizeHeadings(route, headings),
+    sections: normalizedSections,
+    headings: normalizedHeadings,
     dialogs: dialogs.filter((dialog) => !removedDialogs.has(dialog)),
     dataHooks: dataHooks.filter((hook) => !analyticsConsentHookSet.has(hook) && !removedInteractionHooks.has(hook) && !contextualHooks.has(hook)),
   };

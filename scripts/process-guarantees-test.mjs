@@ -22,6 +22,7 @@ for (const [label, pagePath, placement] of expectedPages) {
   const html = await readFile(join(dist, pagePath), "utf8");
   const sectionCount = (html.match(/class="section section--process-guarantees"/g) || []).length;
   const cardCount = (html.match(/class="process-guarantee reveal"/g) || []).length;
+  const finalCtaCount = (html.match(/class="section section--cta"/g) || []).length;
   if (sectionCount !== 1) errors.push(`${label}: ожидался один блок гарантий, найдено ${sectionCount}`);
   if (cardCount !== 4) errors.push(`${label}: ожидалось четыре гарантии, найдено ${cardCount}`);
   for (const title of titles) if (!html.includes(title)) errors.push(`${label}: отсутствует гарантия «${title}»`);
@@ -33,10 +34,16 @@ for (const [label, pagePath, placement] of expectedPages) {
   if (placement === "after-contact") {
     const contactIndex = html.indexOf('class="contact-path');
     if (contactIndex < 0 || guaranteeIndex < contactIndex) errors.push(`${label}: блок должен идти после сценария первого обращения`);
+    if (finalCtaCount !== 1) errors.push(`${label}: на странице услуги должен остаться один персональный финальный CTA, найдено ${finalCtaCount}`);
   }
   if (placement === "before-services") {
     const servicesIndex = html.indexOf('class="section section--services"');
     if (servicesIndex < 0 || guaranteeIndex > servicesIndex) errors.push(`${label}: блок должен идти перед каталогом услуг`);
+    if (finalCtaCount !== 0) errors.push(`${label}: общий финальный CTA дублирует блок «Не нашли точного совпадения?»`);
+    if (!html.includes('class="section section--dark compact-dark"') || !html.includes("Описать факты полезнее, чем самостоятельно выбирать документ")) {
+      errors.push(`${label}: должен остаться один предметный финальный блок каталога`);
+    }
+    if (html.includes("Начнём с правильной квалификации")) errors.push(`${label}: дублирующий заголовок финального CTA не удалён`);
   }
 }
 
@@ -64,4 +71,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Process guarantees checks passed: ${expectedPages.length} detail pages; the home page uses one compact trust strip`);
+console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; the catalog has one closing CTA and detail pages keep their personal CTA`);

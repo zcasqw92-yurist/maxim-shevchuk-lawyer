@@ -101,7 +101,6 @@ export const startEngagementNudge = () => {
 
     if (target.closest("#engagement-nudge-write")) {
       suppressForSession({ immediate: true });
-      requestAnimationFrame(() => document.querySelector("[data-mobile-contact-now]")?.click());
       return;
     }
 

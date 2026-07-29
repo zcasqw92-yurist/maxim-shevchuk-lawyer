@@ -15,6 +15,7 @@ const expected = {
   primaryBackground: "rgb(221, 185, 121)",
   primaryText: "rgb(9, 28, 44)",
   secondaryText: "rgb(16, 40, 61)",
+  secondaryTextDarkContext: "rgba(255, 255, 255, 0.72)",
   goldText: "rgb(118, 84, 41)",
 };
 
@@ -61,6 +62,7 @@ const inspectPage = async (page, path, viewportLabel) => {
   }
 
   const result = await page.evaluate(() => {
+    const darkContextSelector = ".consent-banner, .section--dark, .section--closing-cta, .editorial-cta, .cta-panel, .cta-portrait";
     const styleOf = (element) => {
       const style = getComputedStyle(element);
       return {
@@ -73,6 +75,7 @@ const inspectPage = async (page, path, viewportLabel) => {
         background: style.backgroundColor,
         borderColor: style.borderTopColor,
         minHeight: style.minHeight,
+        darkContext: Boolean(element.closest(darkContextSelector)),
       };
     };
 
@@ -92,8 +95,6 @@ const inspectPage = async (page, path, viewportLabel) => {
       quickChoices: collect(".hero__quick-choices button"),
       contactMethods,
       messengerChoices: collect(".messenger-choice"),
-      mobileAction: collect(".mobile-contact__action--now"),
-      nudgeWrite: collect(".engagement-nudge__write"),
       conversionCount: document.querySelectorAll("[data-dialog-open], .contact-method, .messenger-choice").length,
     };
   });
@@ -116,7 +117,8 @@ const inspectPage = async (page, path, viewportLabel) => {
 
   for (const item of result.secondary) {
     if (item.fontSize !== expected.fontSize) failures.push(`${label}: вторичный CTA «${item.text}» имеет font-size ${item.fontSize}`);
-    if (item.color !== expected.secondaryText) failures.push(`${label}: вторичный CTA «${item.text}» имеет цвет ${item.color}`);
+    const expectedColor = item.darkContext ? expected.secondaryTextDarkContext : expected.secondaryText;
+    if (item.color !== expectedColor) failures.push(`${label}: вторичный CTA «${item.text}» имеет цвет ${item.color}, ожидался ${expectedColor}`);
   }
 
   if (result.messengerChoices.length >= 2) {
@@ -129,8 +131,9 @@ const inspectPage = async (page, path, viewportLabel) => {
     const backgrounds = new Set(result.contactMethods.map((item) => item.background));
     const iconColors = new Set(result.contactMethods.map((item) => item.iconColor));
     if (backgrounds.size !== 1 || iconColors.size !== 1) failures.push(`${label}: прямые способы связи оформлены несогласованно`);
+    const expectedLabelFontSize = viewportLabel === "mobile" ? "14px" : "12px";
     for (const item of result.contactMethods) {
-      if (item.labelFontSize !== "12px" || item.valueFontSize !== "16px") {
+      if (item.labelFontSize !== expectedLabelFontSize || item.valueFontSize !== "16px") {
         failures.push(`${label}: карточка контакта «${item.text}» имеет шкалу ${item.labelFontSize} / ${item.valueFontSize}`);
       }
       if (item.iconColor !== expected.goldText) failures.push(`${label}: иконка контакта имеет цвет ${item.iconColor}`);

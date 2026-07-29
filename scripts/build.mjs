@@ -174,6 +174,7 @@ const styles = [
   await readFile(join(root, "src", "visual-trust.css"), "utf8"),
   await readFile(join(root, "src", "video-ready.css"), "utf8"),
   await readFile(join(root, "src", "layout-corrections.css"), "utf8"),
+  await readFile(join(root, "src", "page-endings.css"), "utf8"),
   await readFile(join(root, "src", "content-protection.css"), "utf8"),
   await readFile(join(root, "src", "editorial.css"), "utf8"),
   await readFile(join(root, "src", "editorial-publication.css"), "utf8"),

@@ -198,11 +198,47 @@ const prefillMessengerLinks = (html) => {
   return result.replaceAll(`href="${site.whatsapp}"`, `href="${whatsapp}"`);
 };
 
+const closingCtaArrow = '<svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+const closingPageCta = ({ title, text, topic, message }) => `
+  <section class="section section--cta section--closing-cta">
+    <div class="wrap cta-panel reveal">
+      <div>
+        <span class="eyebrow eyebrow--light">Первичный шаг бесплатный</span>
+        <h2>${escapeHtml(title)}</h2>
+        <p>${escapeHtml(text)}</p>
+      </div>
+      <button class="button button--gold" type="button" data-dialog-open data-topic="${escapeAttribute(topic)}" data-message="${escapeAttribute(message)}">Описать ситуацию юристу${closingCtaArrow}</button>
+    </div>
+  </section>`;
+
+const normalizePageEnding = (html, pathname) => {
+  if (pathname === "/o-yuriste") {
+    return replaceRequired(
+      html,
+      '<section class="section section--cta">',
+      '<section class="section section--cta section--closing-cta">',
+      "О юристе: финальный CTA",
+    );
+  }
+  if (pathname === "/kontakty") {
+    const finalCta = closingPageCta({
+      title: "Готовы передать ситуацию?",
+      text: "Кратко опишите хронологию и перечислите имеющиеся документы. В мессенджере откроется редактируемый черновик сообщения.",
+      topic: "первичный разбор юридической ситуации",
+      message: "Здравствуйте, Максим Юрьевич. Хочу передать ситуацию на первичный разбор. Кратко опишу хронологию и перечислю имеющиеся документы:",
+    });
+    return replaceRequired(html, "</main>", `${finalCta}\n  </main>`, "Контакты: финальный CTA");
+  }
+  return html;
+};
+
 export const composeRenderedPage = (html, { pathname, service = null } = {}) => {
   let result = html;
   if (pathname !== "/politika-konfidencialnosti") result = applyCommonContent(result);
   result = removeContactQuestionnaires(result);
   if (pathname === "/") result = expandQuickChoices(result);
   if (service) result = applyServiceContent(result, service);
+  result = normalizePageEnding(result, pathname);
   return prefillMessengerLinks(result);
 };

@@ -1,0 +1,36 @@
+/* Closing page actions: full-width dark transition with content aligned to the site grid. */
+.section--closing-cta {
+  margin: 0;
+  padding: 0;
+  color: rgba(255, 255, 255, .72);
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  background: var(--ink);
+}
+
+.section--closing-cta .cta-panel {
+  width: var(--wrap);
+  margin-inline: auto;
+  padding: clamp(48px, 6vw, 78px) 0;
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+}
+
+.section--closing-cta .cta-panel h2 {
+  max-width: 760px;
+}
+
+.section--closing-cta .cta-panel p {
+  max-width: 720px;
+}
+
+.section--closing-cta + .site-footer {
+  margin-top: 0;
+}
+
+@media (max-width: 680px) {
+  .section--closing-cta .cta-panel {
+    gap: 24px;
+    padding-block: 40px;
+  }
+}

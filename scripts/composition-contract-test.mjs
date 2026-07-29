@@ -74,6 +74,8 @@ const removedHeadings = new Set([
 ]);
 const intentionallyRemovedCatalogSections = new Set(["section section--cta"]);
 const intentionallyRemovedCatalogHeadings = new Set(["h2:Начнём с правильной квалификации"]);
+const closingSection = "section section--cta section--closing-cta";
+const closingContactHeading = "h2:Готовы передать ситуацию?";
 const isEditorialRoute = (route = "") => /^\/(?:razbory|praktika)(?:\/|$)/.test(route);
 const isTechnicalDiscoveryRoute = (route = "") => route === "/feed.xml";
 
@@ -126,6 +128,13 @@ const normalizeHeadings = (route, headings = [], validatePrivacy = false) => {
   return [privacyHeadingToken, ...headings.slice(footerIndex).filter((heading) => !removedHeadings.has(heading))];
 };
 
+const normalizeClosingSections = (route, sections = []) => sections
+  .map((section) => route === "/o-yuriste" && section === closingSection ? "section section--cta" : section)
+  .filter((section) => route !== "/kontakty" || section !== closingSection);
+
+const normalizeClosingHeadings = (route, headings = []) => headings
+  .filter((heading) => route !== "/kontakty" || heading !== closingContactHeading);
+
 const structuralSignature = (route, signature = {}) => {
   const {
     title: _seoTitle,
@@ -136,10 +145,10 @@ const structuralSignature = (route, signature = {}) => {
     internalRoutes = [],
     ...structure
   } = signature;
-  const normalizedSections = sections
+  const normalizedSections = normalizeClosingSections(route, sections)
     .filter((section) => !section.includes("price-quiz__step") && !section.includes("price-quiz__result"))
     .filter((section) => route !== "/uslugi" || !intentionallyRemovedCatalogSections.has(section));
-  const normalizedHeadings = normalizeHeadings(route, headings)
+  const normalizedHeadings = normalizeClosingHeadings(route, normalizeHeadings(route, headings))
     .filter((heading) => route !== "/uslugi" || !intentionallyRemovedCatalogHeadings.has(heading));
   return {
     ...structure,

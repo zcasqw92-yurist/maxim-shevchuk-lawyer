@@ -90,6 +90,22 @@
     margin-top: var(--editorial-flow-xs);
     margin-bottom: var(--editorial-flow-sm);
   }
+
+  /* Index pages use a full-width closing band, but its content follows the same site grid. */
+  .editorial-index-page .editorial-index-hero + .section {
+    padding-bottom: clamp(54px, 5.5vw, 78px);
+  }
+
+  .editorial-index-page .editorial-cta {
+    margin-bottom: 0;
+    padding-block: clamp(50px, 5vw, 72px);
+    padding-inline: max(24px, calc((100% - var(--wrap)) / 2));
+  }
+
+  .editorial-index-page .editorial-cta > div {
+    min-width: 0;
+    max-width: 760px;
+  }
 }
 
 @layer responsive {
@@ -106,6 +122,14 @@
     .article-page .editorial-article__header,
     .case-page .editorial-article__header {
       padding-bottom: 30px;
+    }
+
+    .editorial-index-page .editorial-index-hero + .section {
+      padding-bottom: 48px;
+    }
+
+    .editorial-index-page .editorial-cta {
+      padding-block: 44px;
     }
   }
 

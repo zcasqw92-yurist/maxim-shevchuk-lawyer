@@ -75,6 +75,18 @@ const removedHeadings = new Set([
 ]);
 const intentionallyRemovedCatalogSections = new Set(["section section--cta"]);
 const intentionallyRemovedCatalogHeadings = new Set(["h2:Начнём с правильной квалификации"]);
+const approvedPositioningHeadings = new Map([
+  ["h1:Досудебное урегулирование споров — до обращения в суд", "h1:Передайте ситуацию — разберусь и объясню следующий шаг"],
+  ["h2:Досудебное урегулирование и связанные направления", "h2:Юридическая помощь под задачу"],
+  ["h1:Досудебное урегулирование — основа юридической работы", "h1:Юридическая помощь, собранная под вашу ситуацию"],
+  ["h2:Досудебное урегулирование — основа практики", "h2:Юридические услуги по гражданским, денежным и договорным спорам"],
+  ["h1:Досудебное урегулирование споров до обращения в суд", "h1:Досудебная претензия и урегулирование спора"],
+  ["h2:Когда спор стоит решать в досудебном порядке", "h2:Когда стоит начинать с претензии"],
+  ["h2:Позиция, требования и план дальнейших действий", "h2:Требование, готовое к направлению"],
+  ["h2:Как выстраивается досудебное урегулирование", "h2:Как готовится досудебная позиция"],
+  ["h2:После досудебного документа я остаюсь на связи", "h2:После претензии я остаюсь на связи"],
+  ["h2:Что входит в досудебное урегулирование спора", "h2:Когда нужна досудебная претензия и что проверяет юрист"],
+]);
 const closingSection = "section section--cta section--closing-cta";
 const closingContactHeading = "h2:Готовы передать ситуацию?";
 const isEditorialRoute = (route = "") => /^\/(?:razbory|praktika)(?:\/|$)/.test(route);
@@ -119,14 +131,15 @@ const pageSignature = (html) => ({
 });
 
 const normalizeHeadings = (route, headings = [], validatePrivacy = false) => {
-  if (route !== privacyRoute) return headings.filter((heading) => !removedHeadings.has(heading));
-  const footerIndex = headings.indexOf(privacyFooterHeading);
+  const normalized = headings.map((heading) => approvedPositioningHeadings.get(heading) || heading);
+  if (route !== privacyRoute) return normalized.filter((heading) => !removedHeadings.has(heading));
+  const footerIndex = normalized.indexOf(privacyFooterHeading);
   if (footerIndex < 0) throw new Error(`${privacyRoute}: не найдена граница между политикой и подвалом`);
-  const policyHeadings = headings.slice(0, footerIndex);
+  const policyHeadings = normalized.slice(0, footerIndex);
   if (validatePrivacy && JSON.stringify(policyHeadings) !== JSON.stringify(privacyPolicyHeadingContract)) {
     throw new Error(`${privacyRoute}: заголовки политики не соответствуют утверждённому контракту`);
   }
-  return [privacyHeadingToken, ...headings.slice(footerIndex).filter((heading) => !removedHeadings.has(heading))];
+  return [privacyHeadingToken, ...normalized.slice(footerIndex).filter((heading) => !removedHeadings.has(heading))];
 };
 
 const normalizeClosingSections = (route, sections = []) => sections
@@ -223,4 +236,4 @@ if (JSON.stringify(actualStructure) !== JSON.stringify(expectedStructure)) {
   throw new Error(`Структурный golden-контракт изменился: ${changedFields.join("; ")}. Проверьте diff и обновляйте эталон только осознанно.`);
 }
 
-console.log(`Composition contract passed: named slots, privacy policy headings, analytics consent mode and form-free golden structure for ${routes.length} canonical pages; editorial routes are verified separately`);
+console.log(`Composition contract passed: named slots, privacy policy headings, approved positioning aliases, analytics consent mode and form-free golden structure for ${routes.length} canonical pages; editorial routes are verified separately`);

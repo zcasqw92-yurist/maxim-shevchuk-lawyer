@@ -21,6 +21,7 @@ const moduleIds = [
   "editorial",
   "editorial-publication",
   "editorial-cards",
+  "cta-system",
   "editorial-rhythm",
 ];
 const errors = [];

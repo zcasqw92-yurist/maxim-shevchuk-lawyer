@@ -15,6 +15,13 @@ const publicationTitleOverrides = {
   },
 };
 
+const publicationDescriptionOverrides = {
+  article: {},
+  case: {
+    "debt-demand": "Оплаченная юридическая работа по долгу: подготовлены досудебная претензия, расчёт процентов и комплект приложений без заявления неподтверждённого результата взыскания.",
+  },
+};
+
 const brandedTitle = (base) => `${base} | ${site.shortName}`;
 
 const assertMetadata = (metadata, id) => {
@@ -35,7 +42,7 @@ export const publicationSeoMetadata = ({ article = null, practiceCase = null } =
     const titleBase = publicationTitleOverrides.article[article.id] || article.seoTitle || article.title;
     return assertMetadata({
       title: brandedTitle(titleBase),
-      description: article.description,
+      description: publicationDescriptionOverrides.article[article.id] || article.description,
       openGraphType: "article",
       publishedTime: article.publishedAt,
       modifiedTime: article.modifiedAt,
@@ -48,7 +55,7 @@ export const publicationSeoMetadata = ({ article = null, practiceCase = null } =
     const titleBase = publicationTitleOverrides.case[practiceCase.id] || practiceCase.seoTitle || practiceCase.title;
     return assertMetadata({
       title: brandedTitle(titleBase),
-      description: practiceCase.description,
+      description: publicationDescriptionOverrides.case[practiceCase.id] || practiceCase.description,
       openGraphType: "article",
       publishedTime: practiceCase.publishedAt,
       modifiedTime: practiceCase.modifiedAt,

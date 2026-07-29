@@ -55,6 +55,19 @@ jobs:
       - name: Установить браузеры
         run: npx playwright install --with-deps chromium firefox webkit
 
+      - name: Сформировать обновлённый structural golden для проверки
+        run: |
+          npm run build
+          UPDATE_GOLDEN=1 npm run test:composition-contract
+
+      - name: Сохранить обновлённый structural golden
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-golden-${{ github.run_id }}
+          path: tests/golden-render-contract.json
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Выполнить полную production-проверку
         shell: bash
         run: |

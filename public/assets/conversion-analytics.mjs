@@ -96,7 +96,7 @@ const metadataFor = (element, extra = {}) => {
   const label = cleanText(element.getAttribute("aria-label") || element.textContent || element.dataset.track || "CTA");
   const placement = placementFor(element);
   const kind = kindFor(element);
-  const topic = cleanText(element.dataset.topic || extra.topic || "general", 100);
+  const topic = cleanText(element.dataset.analyticsTopic || element.dataset.topic || extra.topic || "general", 100);
   const ctaId = cleanText(element.dataset.ctaId || slugify(`${placement}-${kind}-${label}-${topic}`), 96);
 
   return {

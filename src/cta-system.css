@@ -194,7 +194,7 @@
   }
 
   .hero__quick-choices button {
-    min-height: 38px;
+    min-height: 44px;
     padding-inline: 14px;
     color: var(--ink);
     border-color: var(--cta-secondary-border);

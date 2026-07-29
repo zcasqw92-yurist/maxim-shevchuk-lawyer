@@ -219,3 +219,108 @@ const pageEntries = [
   { path: "/kontakty/", images: ["/assets/images/maxim-consultation.webp"] },
   { path: "/politika-konfidencialnosti/", images: [] },
 ];
+const serviceEntries = [
+  { path: "/uslugi/", images: ["/assets/images/maxim-documents.webp"] },
+  ...services.map((service) => ({ path: `/uslugi/${service.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
+];
+const articleEntries = [
+  { path: "/razbory/", images: ["/assets/images/maxim-documents.webp"] },
+  ...articles.map((article) => ({ path: `/razbory/${article.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
+];
+const caseEntries = [
+  { path: "/praktika/", images: ["/assets/images/maxim-documents.webp"] },
+  ...practiceCases.map((item) => ({ path: `/praktika/${item.slug}/`, images: ["/assets/images/maxim-documents.webp"] })),
+];
+const indexablePages = [...pageEntries, ...serviceEntries, ...articleEntries, ...caseEntries];
+
+await writeFile(join(dist, "sitemap.xml"), createUrlset({
+  entries: indexablePages,
+  siteUrl: site.siteUrl,
+  contentDateForPath,
+  xml,
+  includeImages: true,
+}), "utf8");
+await writeFile(join(dist, "sitemap-pages.xml"), createUrlset({ entries: pageEntries, siteUrl: site.siteUrl, contentDateForPath, xml }), "utf8");
+await writeFile(join(dist, "sitemap-services.xml"), createUrlset({ entries: serviceEntries, siteUrl: site.siteUrl, contentDateForPath, xml }), "utf8");
+await writeFile(join(dist, "sitemap-articles.xml"), createUrlset({ entries: articleEntries, siteUrl: site.siteUrl, contentDateForPath, xml }), "utf8");
+await writeFile(join(dist, "sitemap-cases.xml"), createUrlset({ entries: caseEntries, siteUrl: site.siteUrl, contentDateForPath, xml }), "utf8");
+await writeFile(join(dist, "sitemap-images.xml"), createImageSitemap({ entries: indexablePages, siteUrl: site.siteUrl, xml }), "utf8");
+
+const feedItems = [...articles]
+  .sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt))
+  .map((article) => `    <item>
+      <title>${xml(article.title)}</title>
+      <link>${xml(`${site.siteUrl}/razbory/${article.slug}/`)}</link>
+      <guid isPermaLink="true">${xml(`${site.siteUrl}/razbory/${article.slug}/`)}</guid>
+      <description>${xml(article.lead)}</description>
+      <dc:creator>${xml(site.name)}</dc:creator>
+      <category>${xml(article.category)}</category>
+      <pubDate>${new Date(`${article.modifiedAt}T12:00:00Z`).toUTCString()}</pubDate>
+    </item>`)
+  .join("\n");
+const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>${xml(`Юридические разборы — ${site.shortName}`)}</title>
+    <link>${xml(`${site.siteUrl}/razbory/`)}</link>
+    <atom:link href="${xml(`${site.siteUrl}/feed.xml`)}" rel="self" type="application/rss+xml"/>
+    <description>${xml("Практические юридические разборы Максима Юрьевича Шевчука")}</description>
+    <language>ru-RU</language>
+    <lastBuildDate>${new Date(`${site.contentLastModified}T12:00:00Z`).toUTCString()}</lastBuildDate>
+${feedItems}
+  </channel>
+</rss>
+`;
+await writeFile(join(dist, "feed.xml"), feed, "utf8");
+
+const sitemapFiles = [
+  "sitemap.xml",
+  "sitemap-pages.xml",
+  "sitemap-services.xml",
+  "sitemap-articles.xml",
+  "sitemap-cases.xml",
+  "sitemap-images.xml",
+];
+const robots = site.production
+  ? `User-agent: *\nAllow: /\n\n${sitemapFiles.map((file) => `Sitemap: ${site.siteUrl}/${file}`).join("\n")}\n`
+  : "User-agent: *\nDisallow: /\n";
+await writeFile(join(dist, "robots.txt"), robots, "utf8");
+
+const manifest = {
+  id: `${site.basePath || ""}/`,
+  name: `${site.name} — юридическая помощь`,
+  short_name: site.shortName,
+  description: site.defaultDescription,
+  lang: "ru",
+  start_url: `${site.basePath || ""}/`,
+  scope: `${site.basePath || ""}/`,
+  display: "standalone",
+  background_color: "#f3f0e9",
+  theme_color: "#10283d",
+  icons: [{ src: `${site.basePath || ""}/favicon.svg`, sizes: "any", type: "image/svg+xml" }],
+};
+await writeFile(join(dist, "site.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
+await writeFile(join(dist, "build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`, "utf8");
+await writeFile(join(dist, "editorial-publications.json"), `${JSON.stringify(buildPublicationManifest({
+  articles,
+  practiceCases,
+  generatedAt: buildTime,
+  siteUrl: site.siteUrl,
+}), null, 2)}\n`, "utf8");
+await writeFile(join(dist, "video-config.json"), `${JSON.stringify(createVideoConfig(), null, 2)}\n`, "utf8");
+
+if (site.indexNowKey) {
+  if (!/^[A-Za-z0-9-]{8,128}$/.test(site.indexNowKey)) {
+    throw new Error("indexNowKey должен содержать 8–128 латинских букв, цифр или дефисов");
+  }
+  await writeFile(join(dist, `${site.indexNowKey}.txt`), site.indexNowKey, "utf8");
+}
+
+const notFound = await readFile(join(root, "src", "404.html"), "utf8");
+const renderedNotFound = notFound
+  .replaceAll("{{SITE_URL}}", site.siteUrl)
+  .replace(/(\b(?:href|src)=["'])\/(?!\/)/g, `$1${site.basePath || ""}/`);
+await writeFile(join(dist, "404.html"), renderedNotFound, "utf8");
+
+const pageCount = 6 + services.length + 2 + articles.length + practiceCases.length + Object.keys(site.legacyRedirects || {}).length;
+console.log(`Built ${pageCount} HTML pages in ${dist} · ${buildVersion}`);

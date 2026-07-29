@@ -71,11 +71,11 @@ const mobileActionsMarkup = `
     <p>Откройте удобный мессенджер. Там будет готовый черновик — измените его при необходимости и отправьте напрямую юристу.</p>
     <div class="engagement-nudge__actions">
       <button class="engagement-nudge__dismiss" type="button">Не сейчас</button>
-      <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-topic="первичный ориентир по ситуации">Выбрать мессенджер</button>
+      <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-analytics-topic="первичный ориентир по ситуации">Выбрать мессенджер</button>
     </div>
   </aside>
   <div class="mobile-contact mobile-contact--single" aria-label="Быстрое действие" data-mobile-contact>
-    <button class="mobile-contact__action mobile-contact__action--now" type="button" data-dialog-open data-mobile-contact-now data-topic="первичный разбор юридической ситуации">
+    <button class="mobile-contact__action mobile-contact__action--now" type="button" data-dialog-open data-mobile-contact-now data-analytics-topic="первичный разбор юридической ситуации">
       ${icon("dialog")}<span>Написать сейчас</span>
     </button>
   </div>

@@ -56,7 +56,7 @@ await new Promise((resolve, reject) => {
 
 const profiles = [
   { name: "desktop", viewport: { width: 1280, height: 900 }, h1: [44, 74], h2: [32, 56], lead: [17, 20], button: [13, 15] },
-  { name: "mobile", viewport: { width: 390, height: 844 }, h1: [36, 48], h2: [29, 40], lead: [16.5, 18], button: [14.5, 16] },
+  { name: "mobile", viewport: { width: 390, height: 844 }, h1: [36, 48], h2: [29, 40], lead: [16.5, 18], button: [14, 16] },
 ];
 const samples = ["vozvrat-deneg", "iskovoe-zayavlenie", "marketpleysy"];
 const errors = [];

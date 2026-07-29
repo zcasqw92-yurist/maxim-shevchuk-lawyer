@@ -1,4 +1,8 @@
-/* Closing page actions: full-width dark transition with content aligned to the site grid. */
+/* Closing page actions: full-width dark transitions aligned to the site grid. */
+.section--cta-portrait .cta-portrait {
+  border: 0;
+}
+
 .section--closing-cta {
   margin: 0;
   padding: 0;

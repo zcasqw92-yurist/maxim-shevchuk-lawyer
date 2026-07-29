@@ -54,6 +54,7 @@ const removedInteractionHooks = new Set([
   "data-quiz-value",
 ]);
 const contextualHooks = new Set([
+  "data-analytics-topic",
   "data-message",
   "data-mobile-contact-now",
   "data-protected-image",

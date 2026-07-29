@@ -138,6 +138,16 @@ const originFields = () => lastDialogOrigin ? {
   origin_cta_variant: lastDialogOrigin.cta_variant,
 } : {};
 
+const sourceFields = (contactMeta, insideDialog) => {
+  const source = insideDialog && lastDialogOrigin ? lastDialogOrigin : contactMeta;
+  return {
+    source_cta_id: source.cta_id,
+    source_cta_label: source.cta_label,
+    source_cta_placement: source.cta_placement,
+    source_cta_variant: source.cta_variant,
+  };
+};
+
 document.addEventListener("click", (event) => {
   const target = event.target instanceof Element ? event.target : null;
   if (!target) return;
@@ -153,12 +163,13 @@ document.addEventListener("click", (event) => {
 
   const channel = cleanText(contactControl.dataset.track || "unknown", 40);
   const insideDialog = Boolean(contactControl.closest("#contact-dialog"));
-  const contactMeta = metadataFor(contactControl, {
+  const baseContactMeta = metadataFor(contactControl, {
     channel,
     contact_mode: insideDialog ? "dialog" : "direct",
     ...(insideDialog ? originFields() : {}),
     ...(insideDialog && lastDialogOrigin?.topic ? { topic: lastDialogOrigin.topic } : {}),
   });
+  const contactMeta = { ...baseContactMeta, ...sourceFields(baseContactMeta, insideDialog) };
 
   send("cta_click", contactMeta);
   send(PRIMARY_CONTACT_CHANNELS.has(channel) ? "contact_conversion" : "contact_action", contactMeta);

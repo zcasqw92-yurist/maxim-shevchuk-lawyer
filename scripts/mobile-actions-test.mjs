@@ -20,15 +20,19 @@ for (const pagePath of pages) {
   const nowCount = (html.match(/data-mobile-contact-now/g) || []).length;
   const laterCount = (html.match(/data-mobile-contact-later/g) || []).length;
   const nudgeCount = (html.match(/id="engagement-nudge"/g) || []).length;
+  const analyticsCount = (html.match(/conversion-analytics\.mjs/g) || []).length;
   if (panelCount !== 1) errors.push(`${pagePath}: expected one mobile panel, found ${panelCount}`);
   if (nowCount !== 1) errors.push(`${pagePath}: expected one direct messenger action, found ${nowCount}`);
   if (laterCount !== 0) errors.push(`${pagePath}: removed callback action is still public`);
   if (nudgeCount !== 1) errors.push(`${pagePath}: expected one engagement nudge, found ${nudgeCount}`);
+  if (analyticsCount !== 1) errors.push(`${pagePath}: expected one conversion analytics module, found ${analyticsCount}`);
   if (!html.includes("Написать сейчас")) errors.push(`${pagePath}: missing immediate action label`);
   if (html.includes("Связаться позже")) errors.push(`${pagePath}: callback label must not remain`);
   if (!html.includes("Выбрать мессенджер")) errors.push(`${pagePath}: nudge must lead to messenger choice`);
+  if (!html.includes('id="engagement-nudge-write" type="button" data-dialog-open')) errors.push(`${pagePath}: nudge action is not connected directly to messenger dialog`);
   if (!html.includes("data-mobile-contact-now") || !html.includes("data-dialog-open")) errors.push(`${pagePath}: immediate action is not connected to messenger dialog`);
   if (!html.includes("/assets/engagement-nudge.mjs")) errors.push(`${pagePath}: engagement module is not loaded`);
+  if (!html.includes("/assets/conversion-analytics.mjs")) errors.push(`${pagePath}: conversion analytics module is not loaded`);
   if (!html.includes('class="mobile-contact mobile-contact--single"')) errors.push(`${pagePath}: mobile panel must use the single-action layout`);
 }
 
@@ -67,12 +71,17 @@ for (const marker of [
   "dialog[open]",
   "[data-consent-banner]",
   "#engagement-nudge-write",
-  "[data-mobile-contact-now]",
+  "suppressForSession({ immediate: true })",
 ]) {
   if (!engagementScript.includes(marker)) errors.push(`engagement-nudge.mjs: missing ${marker}`);
 }
-for (const obsolete of ["data-callback-open", "data-price-quiz-open"]) {
+for (const obsolete of ["data-callback-open", "data-price-quiz-open", "[data-mobile-contact-now]"]) {
   if (engagementScript.includes(obsolete)) errors.push(`engagement-nudge.mjs: obsolete interaction remains: ${obsolete}`);
+}
+
+const conversionScript = await readFile(join(dist, "assets", "conversion-analytics.mjs"), "utf8");
+for (const marker of ["cta_view", "cta_click", "contact_conversion", "source_cta_placement"]) {
+  if (!conversionScript.includes(marker)) errors.push(`conversion-analytics.mjs: missing ${marker}`);
 }
 
 if (errors.length) {
@@ -80,4 +89,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Mobile action panel checks passed: ${pages.length} pages, one direct messenger CTA and centered one-session nudge`);
+console.log(`Mobile action panel checks passed: ${pages.length} pages, one direct messenger CTA, detailed conversion analytics and centered one-session nudge`);

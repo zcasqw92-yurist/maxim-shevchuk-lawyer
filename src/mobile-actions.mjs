@@ -11,6 +11,7 @@ const icon = (name) => {
 
 const base = site.basePath || "";
 const engagementScript = `${base}/assets/engagement-nudge.mjs`;
+const conversionAnalyticsScript = `${base}/assets/conversion-analytics.mjs`;
 
 const narrowLayoutStyles = `
   <style>
@@ -70,11 +71,11 @@ const mobileActionsMarkup = `
     <p>Откройте удобный мессенджер. Там будет готовый черновик — измените его при необходимости и отправьте напрямую юристу.</p>
     <div class="engagement-nudge__actions">
       <button class="engagement-nudge__dismiss" type="button">Не сейчас</button>
-      <button class="engagement-nudge__write" id="engagement-nudge-write" type="button">Выбрать мессенджер</button>
+      <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-analytics-topic="первичный ориентир по ситуации">Выбрать мессенджер</button>
     </div>
   </aside>
   <div class="mobile-contact mobile-contact--single" aria-label="Быстрое действие" data-mobile-contact>
-    <button class="mobile-contact__action mobile-contact__action--now" type="button" data-dialog-open data-mobile-contact-now>
+    <button class="mobile-contact__action mobile-contact__action--now" type="button" data-dialog-open data-mobile-contact-now data-analytics-topic="первичный разбор юридической ситуации">
       ${icon("dialog")}<span>Написать сейчас</span>
     </button>
   </div>
@@ -82,6 +83,7 @@ const mobileActionsMarkup = `
 
 export const injectMobileActions = (html, pathname) => {
   if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);
-  const withNarrowLayout = appendToBuildSlot(html, "head-assets", narrowLayoutStyles);
+  const withAnalytics = appendToBuildSlot(html, "head-assets", `  <script type="module" src="${conversionAnalyticsScript}"></script>\n`);
+  const withNarrowLayout = appendToBuildSlot(withAnalytics, "head-assets", narrowLayoutStyles);
   return fillBuildSlot(withNarrowLayout, "mobile-actions", mobileActionsMarkup);
 };

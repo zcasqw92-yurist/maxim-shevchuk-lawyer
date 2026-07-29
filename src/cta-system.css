@@ -1,0 +1,228 @@
+@layer base {
+  :root {
+    --cta-font-size: .875rem;
+    --cta-font-weight: 750;
+    --cta-line-height: 1.2;
+    --cta-height: 54px;
+    --cta-compact-height: 44px;
+    --cta-radius: 999px;
+    --cta-padding-inline: 24px;
+    --cta-primary-bg: var(--gold-bright);
+    --cta-primary-bg-hover: var(--gold);
+    --cta-primary-text: var(--ink-deep);
+    --cta-secondary-text: var(--ink);
+    --cta-secondary-border: rgba(16, 40, 61, .24);
+    --cta-secondary-bg-hover: rgba(255, 255, 255, .48);
+  }
+}
+
+@layer utilities {
+  .button,
+  .messenger-choice,
+  .mobile-contact__action,
+  .engagement-nudge__write,
+  .engagement-nudge__dismiss,
+  .text-link,
+  .card-link,
+  .hero__quick-choices button {
+    font-family: var(--sans);
+    font-size: var(--cta-font-size);
+    font-weight: var(--cta-font-weight);
+    line-height: var(--cta-line-height);
+    letter-spacing: .01em;
+  }
+
+  .button {
+    min-height: var(--cta-height);
+    gap: 14px;
+    padding-inline: var(--cta-padding-inline);
+    border-radius: var(--cta-radius);
+  }
+
+  .button--primary,
+  .button--gold {
+    color: var(--cta-primary-text);
+    border-color: var(--cta-primary-bg);
+    background: var(--cta-primary-bg);
+  }
+
+  .button--primary:hover,
+  .button--gold:hover {
+    color: var(--cta-primary-text);
+    border-color: var(--cta-primary-bg-hover);
+    background: var(--cta-primary-bg-hover);
+  }
+
+  .button--compact {
+    min-height: var(--cta-compact-height);
+    padding-inline: 20px;
+    font-size: var(--cta-font-size);
+  }
+
+  .button--secondary {
+    color: var(--cta-secondary-text);
+    border-color: var(--cta-secondary-border);
+    background: transparent;
+  }
+
+  .button--secondary:hover {
+    color: var(--cta-secondary-text);
+    border-color: var(--ink);
+    background: var(--cta-secondary-bg-hover);
+  }
+
+  :is(.section--dark, .section--closing-cta, .editorial-cta, .cta-panel, .cta-portrait) .button--secondary {
+    color: var(--gold-bright);
+    border-color: rgba(221, 185, 121, .62);
+    background: transparent;
+  }
+
+  :is(.section--dark, .section--closing-cta, .editorial-cta, .cta-panel, .cta-portrait) .button--secondary:hover {
+    color: var(--ink-deep);
+    border-color: var(--gold-bright);
+    background: var(--gold-bright);
+  }
+
+  .button__icon {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 17px;
+  }
+
+  .messenger-choice,
+  .messenger-choice--whatsapp,
+  .messenger-choice--telegram {
+    min-height: var(--cta-height);
+    padding: 12px var(--cta-padding-inline);
+    color: var(--cta-primary-text);
+    border: 1px solid var(--cta-primary-bg);
+    background: var(--cta-primary-bg);
+    border-radius: var(--cta-radius);
+  }
+
+  .messenger-choice:hover,
+  .messenger-choice--whatsapp:hover,
+  .messenger-choice--telegram:hover {
+    color: var(--cta-primary-text);
+    border-color: var(--cta-primary-bg-hover);
+    background: var(--cta-primary-bg-hover);
+    filter: none;
+  }
+
+  .messenger-choice svg {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+  }
+
+  .mobile-contact--single .mobile-contact__action,
+  .mobile-contact--single .mobile-contact__action--now,
+  .engagement-nudge__write {
+    min-height: var(--cta-height);
+    padding-inline: var(--cta-padding-inline);
+    color: var(--cta-primary-text);
+    border: 1px solid var(--cta-primary-bg);
+    background: var(--cta-primary-bg);
+    border-radius: var(--cta-radius);
+    font-size: var(--cta-font-size);
+  }
+
+  .mobile-contact--single .mobile-contact__action--now:hover,
+  .mobile-contact--single .mobile-contact__action--now:focus-visible,
+  .engagement-nudge__write:hover {
+    color: var(--cta-primary-text);
+    border-color: var(--cta-primary-bg-hover);
+    background: var(--cta-primary-bg-hover);
+  }
+
+  .engagement-nudge__dismiss {
+    min-height: var(--cta-compact-height);
+    padding-inline: 16px;
+    color: var(--muted);
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: var(--cta-radius);
+    font-size: var(--cta-font-size);
+  }
+
+  .engagement-nudge__dismiss:hover {
+    color: var(--ink);
+    border-color: var(--cta-secondary-border);
+  }
+
+  .contact-method {
+    color: var(--ink-deep);
+    border-color: var(--cta-secondary-border);
+    background: var(--white);
+  }
+
+  .contact-method:hover {
+    color: var(--ink-deep);
+    border-color: var(--gold);
+    background: #fff8e9;
+  }
+
+  .contact-method--whatsapp > svg:first-child,
+  .contact-method--telegram > svg:first-child {
+    color: var(--gold-text);
+  }
+
+  .contact-method small {
+    font-family: var(--sans);
+    font-size: .75rem;
+    font-weight: var(--cta-font-weight);
+  }
+
+  .contact-method strong {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: var(--cta-font-weight);
+    line-height: 1.3;
+  }
+
+  .text-link,
+  .card-link {
+    min-height: 44px;
+    gap: 9px;
+    align-items: center;
+    color: var(--ink);
+    font-size: var(--cta-font-size);
+  }
+
+  :is(.site-footer, .section--dark, .section--closing-cta) .text-link {
+    color: var(--gold-bright);
+  }
+
+  .hero__quick-choices button {
+    min-height: 38px;
+    padding-inline: 14px;
+    color: var(--ink);
+    border-color: var(--cta-secondary-border);
+    background: rgba(255, 255, 255, .42);
+    font-size: var(--cta-font-size);
+  }
+
+  .hero__quick-choices button:hover {
+    color: var(--ink-deep);
+    border-color: var(--gold);
+    background: #fff8e9;
+  }
+
+  @media (max-width: 680px) {
+    .button,
+    .messenger-choice,
+    .mobile-contact--single .mobile-contact__action,
+    .mobile-contact--single .mobile-contact__action--now,
+    .engagement-nudge__write,
+    .engagement-nudge__dismiss,
+    .text-link,
+    .card-link,
+    .hero__quick-choices button {
+      font-size: var(--cta-font-size);
+    }
+
+    .messenger-choice {
+      min-height: var(--cta-height);
+    }
+  }
+}

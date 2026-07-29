@@ -18,6 +18,7 @@ const styleModules = [
   "editorial",
   "editorial-publication",
   "editorial-cards",
+  "cta-system",
   "editorial-rhythm",
 ].map((id) => ({ id, path: join(root, "src", `${id}.css`) }));
 

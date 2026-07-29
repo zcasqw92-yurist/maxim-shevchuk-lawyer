@@ -118,7 +118,7 @@ const menuToggle = $("[data-menu-toggle]");
 const mobileMenu = $("[data-mobile-menu]");
 const menuBackdrop = $("[data-menu-backdrop]");
 const menuLabel = $("[data-menu-label]", menuToggle);
-const menuInertTargets = $$("main, .site-footer, [data-mobile-contact], [data-consent-banner], [data-header] .brand, [data-header] .desktop-nav, [data-header] .header__actions");
+const menuInertTargets = $$(`main, .site-footer, [data-mobile-contact], [data-consent-banner], [data-header] .brand, [data-header] .desktop-nav, [data-header] .header__actions`);
 let menuScrollY = 0;
 let menuBodyStyles = null;
 
@@ -229,7 +229,7 @@ const cleanTelegramBase = (href) => {
 };
 
 const cleanWhatsappBase = (href) => {
-  const url = new URL(href || "https://api.whatsapp.com/send?phone=79065297970", location.href);
+  const url = new URL(href || "https://api.whatsapp.com/send?phone=79806574199", location.href);
   url.searchParams.delete("text");
   return url.toString();
 };

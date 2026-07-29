@@ -178,7 +178,7 @@ try {
 
   const genericWhatsapp = await dialog.locator("[data-whatsapp-link]").getAttribute("href");
   const genericTelegram = await dialog.locator("[data-track='telegram']").getAttribute("href");
-  if (!genericWhatsapp?.startsWith("https://api.whatsapp.com/send?phone=79065297970&text=")) failures.push("interaction: WhatsApp draft is missing");
+  if (!genericWhatsapp?.startsWith("https://api.whatsapp.com/send?phone=79806574199&text=")) failures.push("interaction: WhatsApp draft is missing");
   if (!genericTelegram?.startsWith("https://t.me/lawrazbor?text=")) failures.push("interaction: Telegram draft is missing");
   if (!prefilledText(genericTelegram).includes("Хочу получить первичную оценку ситуации")) failures.push("interaction: generic prefilled text changed");
   await dialog.locator("[data-dialog-close]").click();

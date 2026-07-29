@@ -5,9 +5,13 @@ const MAX_TITLE_LENGTH = 65;
 const publicationTitleOverrides = {
   article: {
     "police-refusal-next-steps": "Отказ полиции: как обжаловать постановление",
+    "debt-receipt-order-or-claim": "Долг по расписке: приказ или иск",
+    "debt-third-party-card": "Долг на чужой карте: с кого взыскивать",
+    "debt-no-return-term": "Долг без срока возврата: что делать",
   },
   case: {
     "police-review": "Отмена отказа полиции: дополнительная проверка",
+    "debt-demand": "Претензия и расчёт по долгу",
   },
 };
 

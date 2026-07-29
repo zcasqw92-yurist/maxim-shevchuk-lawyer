@@ -80,19 +80,17 @@
   }
 
   /* Number labels use one sans-serif system and three deliberate visual tiers. */
-  :where(
-    .trust-strip__item > span,
-    .contact-path__steps > li > span,
-    .situation-card__index,
-    .service-card__number,
-    .position-steps > li > span,
-    .value-card > span,
-    .number-list > li > span,
-    .process-line > li > span,
-    .process-cards > li > span,
-    .process-guarantee > span,
-    .value-editorial__list > li > span
-  ) {
+  .trust-strip__item > span,
+  .contact-path__steps > li > span,
+  .situation-card__index,
+  .service-card__number,
+  .position-steps > li > span,
+  .value-card > span,
+  .number-list > li > span,
+  .process-line > li > span,
+  .process-cards > li > span,
+  .process-guarantee > span,
+  .value-editorial__list > li > span {
     font-family: var(--sans);
     font-weight: 700;
     font-variant-numeric: tabular-nums lining-nums;

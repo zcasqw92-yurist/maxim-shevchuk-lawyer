@@ -132,6 +132,23 @@
     h2 { font-size: clamp(1.875rem, 8vw, 2.5rem); }
     h3 { font-size: 1.25rem; }
     .hero h1 { font-size: clamp(2.35rem, 10.5vw, 3.15rem); }
+    .home .hero__grid,
+    .home .hero__content,
+    .home .hero__actions,
+    .home .hero__actions .button { min-width: 0; max-width: 100%; }
+    .home .hero__content { width: 100%; }
+    .home .hero h1 { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; text-wrap: wrap; }
+    .home .hero__quick-choices,
+    .home .hero__quick-choices > div { width: 100%; min-width: 0; max-width: 100%; }
+    .home .hero__quick-choices > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .home .hero__quick-choices button { width: 100%; min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+    .home .section--services { overflow-x: clip; }
+    .home .section--services,
+    .home .section--services .wrap,
+    .home .section--services .section-head,
+    .home .section--services .service-grid,
+    .home .section--services .service-card { min-width: 0; max-width: 100%; }
+    .home .section--services h2 { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; text-wrap: wrap; }
     .hero__lead, .service-hero h1 + p, .inner-hero h1 + p, .lead { font-size: 1.0625rem; line-height: 1.65; }
     .inner-hero h1, .service-hero h1, .about-hero h1, .contact-page__intro h1 { font-size: clamp(2.25rem, 10vw, 3rem); }
     .two-lists h2 { font-size: clamp(1.875rem, 8vw, 2.4rem); }

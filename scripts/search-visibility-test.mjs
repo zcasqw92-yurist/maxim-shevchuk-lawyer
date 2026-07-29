@@ -7,7 +7,7 @@ const dist = join(root, "dist");
 const errors = [];
 
 const servicePages = {
-  "dosudebnoe-uregulirovanie": "Когда нужна досудебная претензия и что проверяет юрист",
+  "dosudebnoe-uregulirovanie": "Что входит в досудебное урегулирование спора",
   "vozvrat-deneg": "Как юрист помогает вернуть деньги за товар, услугу, работу или по договору",
   "zhaloby-i-obrashcheniya": "Как подготовить жалобу на бездействие, отказ или нарушение прав",
   "iskovoe-zayavlenie": "Что входит в составление искового заявления в суд",
@@ -29,17 +29,22 @@ const officialHosts = [
 const home = await readFile(join(dist, "index.html"), "utf8");
 if (count(home, /data-search-visibility="home"/g) !== 0) errors.push("Главная: повторяющий каталог поисковый блок должен быть удалён");
 if (!home.includes('class="section section--services"')) errors.push("Главная: видимый каталог направлений должен сохраниться");
+if (!home.includes("Досудебное урегулирование споров — до обращения в суд")) errors.push("Главная: H1 не закрепляет основную специализацию");
+if (!home.includes("Основная специализация — досудебное урегулирование")) errors.push("Главная: первый экран не объясняет специализацию");
+if (!home.includes("Досудебное урегулирование и связанные направления")) errors.push("Главная: каталог не показывает иерархию практики");
 
 for (const slug of Object.keys(servicePages)) {
   if (!home.includes(`href="/uslugi/${slug}/"`)) errors.push(`Главная: отсутствует внутренняя ссылка на ${slug}`);
 }
 const homeMain = home.match(/<main[^>]*>[\s\S]*?<\/main>/i)?.[0] || "";
-const homePhraseCount = count(homeMain.toLocaleLowerCase("ru"), /юрист по гражданским делам/g);
-if (homePhraseCount > 2) errors.push(`Главная: избыточное повторение ключевой фразы в видимом содержании (${homePhraseCount})`);
+const focusPhraseCount = count(homeMain.toLocaleLowerCase("ru"), /досудебн(?:ое|ого|ая|ую|ым|ой)\s+урегулирован/g);
+if (focusPhraseCount > 8) errors.push(`Главная: избыточное повторение специализации в видимом содержании (${focusPhraseCount})`);
 
 const directory = await readPage("uslugi");
 if (count(directory, /data-search-visibility="services"/g) !== 1) errors.push("Каталог услуг: нужен один экспертный поисковый блок");
-if (!directory.includes("Юридические услуги по гражданским, денежным и договорным спорам")) errors.push("Каталог услуг: отсутствует содержательный заголовок");
+if (!directory.includes("Досудебное урегулирование — основа практики")) errors.push("Каталог услуг: отсутствует иерархический заголовок");
+if (!directory.includes("Основная специализация</strong> — анализ спора")) errors.push("Каталог услуг: не объяснена роль основной специализации");
+if (!directory.includes("Исковое заявление</strong> является следующим этапом")) errors.push("Каталог услуг: не объяснена роль судебного этапа");
 
 for (const [slug, title] of Object.entries(servicePages)) {
   const html = await readPage(join("uslugi", slug));
@@ -64,6 +69,17 @@ for (const [slug, title] of Object.entries(servicePages)) {
   if (words < 140) errors.push(`${slug}: недостаточно полезного уникального текста (${words} слов)`);
 }
 
+const pretrial = await readPage(join("uslugi", "dosudebnoe-uregulirovanie"));
+for (const marker of [
+  "Главная специализация",
+  "Досудебное урегулирование споров до обращения в суд",
+  "Досудебная работа не ограничивается одной претензией",
+  "Позиция, требования и план дальнейших действий",
+  "Как выстраивается досудебное урегулирование",
+]) {
+  if (!pretrial.includes(marker)) errors.push(`Досудебное урегулирование: отсутствует ключевой маркер ${marker}`);
+}
+
 const styles = await readFile(join(dist, "assets", "styles.css"), "utf8");
 for (const marker of [
   ".section--search-guide {",
@@ -80,7 +96,7 @@ for (const marker of [
   'google: env("GOOGLE_SITE_VERIFICATION")',
   'yandex: env("YANDEX_SITE_VERIFICATION")',
   'indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158"',
-  'defaultTitle: "Юрист по гражданским делам в Москве | Максим Шевчук"',
+  'defaultTitle: "Юрист по досудебному урегулированию | Максим Шевчук"',
   'publicLabel: "Офис в Химках · услуги по Москве и Московской области · онлайн по России"',
 ]) {
   if (!config.includes(marker)) errors.push(`site.config.mjs: отсутствует настройка ${marker}`);
@@ -116,4 +132,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: production indexing, geography and automatic IndexNow are configured");
+console.log("Search visibility checks passed: pretrial specialization, production indexing, geography and automatic IndexNow are configured");

@@ -75,7 +75,7 @@ for (const marker of [
 ]) {
   if (!engagementScript.includes(marker)) errors.push(`engagement-nudge.mjs: missing ${marker}`);
 }
-for (const obsolete of ["data-callback-open", "data-price-quiz-open", "[data-mobile-contact-now]") {
+for (const obsolete of ["data-callback-open", "data-price-quiz-open", "[data-mobile-contact-now]"]) {
   if (engagementScript.includes(obsolete)) errors.push(`engagement-nudge.mjs: obsolete interaction remains: ${obsolete}`);
 }
 

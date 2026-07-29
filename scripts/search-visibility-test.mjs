@@ -8,7 +8,8 @@ const errors = [];
 
 const servicePages = {
   "dosudebnoe-uregulirovanie": "Что входит в досудебное урегулирование спора",
-  "vozvrat-deneg": "Как юрист помогает вернуть деньги за товар, услугу, работу или по договору",
+  "vzyskanie-dolga": "Как выстраивается взыскание долга по расписке, договору или переписке",
+  "vozvrat-deneg": "Как юрист помогает вернуть оплату за товар, услугу или работу",
   "zhaloby-i-obrashcheniya": "Как подготовить жалобу на бездействие, отказ или нарушение прав",
   "iskovoe-zayavlenie": "Что входит в составление искового заявления в суд",
   "spory-biznesa": "Договорные споры и взыскание задолженности между ИП и организациями",
@@ -24,6 +25,7 @@ const officialHosts = [
   "26.rospotrebnadzor.ru",
   "epp.genproc.gov.ru",
   "fas.gov.ru",
+  "www.vsrf.ru",
 ];
 
 const home = await readFile(join(dist, "index.html"), "utf8");
@@ -80,6 +82,16 @@ for (const marker of [
   if (!pretrial.includes(marker)) errors.push(`Досудебное урегулирование: отсутствует ключевой маркер ${marker}`);
 }
 
+const debtRecovery = await readPage(join("uslugi", "vzyskanie-dolga"));
+for (const marker of [
+  "Взыскание долга по расписке, договору, переводу или переписке",
+  "Как выстраивается взыскание долга по расписке, договору или переписке",
+  "Долг без расписки",
+  "Приказ или иск",
+]) {
+  if (!debtRecovery.includes(marker)) errors.push(`Взыскание долга: отсутствует ключевой маркер ${marker}`);
+}
+
 const styles = await readFile(join(dist, "assets", "styles.css"), "utf8");
 for (const marker of [
   ".section--search-guide {",
@@ -132,4 +144,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: pretrial specialization, production indexing, geography and automatic IndexNow are configured");
+console.log("Search visibility checks passed: pretrial specialization, debt recovery cluster, production indexing, geography and automatic IndexNow are configured");

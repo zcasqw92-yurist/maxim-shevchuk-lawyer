@@ -68,6 +68,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
+          node --check scripts/live-all-publications-smoke.mjs
           npm run check 2>&1 | tee check.log
 
       - name: Upload diagnostics on failure
@@ -101,7 +102,9 @@ jobs:
         env:
           SITE_PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
           EXPECTED_BUILD_SHA: ${{ github.sha }}
-        run: npm run test:live
+        run: |
+          npm run test:live
+          node scripts/live-all-publications-smoke.mjs
 
       - name: Notify IndexNow about changed pages
         if: github.event_name != 'schedule'

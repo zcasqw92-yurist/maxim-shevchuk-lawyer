@@ -16,6 +16,7 @@ const moduleIds = [
   "visual-trust",
   "video-ready",
   "layout-corrections",
+  "page-endings",
   "content-protection",
   "editorial",
   "editorial-publication",

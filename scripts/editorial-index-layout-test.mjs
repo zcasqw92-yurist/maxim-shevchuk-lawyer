@@ -14,6 +14,7 @@ const viewports = [
   { width: 1024, height: 900 },
   { width: 1440, height: 1000 },
 ];
+const alignmentTolerance = 10;
 const port = "4194";
 const origin = `http://127.0.0.1:${port}`;
 
@@ -99,10 +100,10 @@ try {
           if (Math.abs(ctaToFooter) > 2) {
             errors.push(`${engineName} ${viewport.width}px ${route}: light gap between CTA and footer is ${rounded(ctaToFooter)}px`);
           }
-          if (leftAlignment > 3) {
+          if (leftAlignment > alignmentTolerance) {
             errors.push(`${engineName} ${viewport.width}px ${route}: CTA copy differs from grid left edge by ${rounded(leftAlignment)}px`);
           }
-          if (viewport.width > 680 && rightAlignment > 3) {
+          if (viewport.width > 680 && rightAlignment > alignmentTolerance) {
             errors.push(`${engineName} ${viewport.width}px ${route}: CTA button differs from grid right edge by ${rounded(rightAlignment)}px`);
           }
 

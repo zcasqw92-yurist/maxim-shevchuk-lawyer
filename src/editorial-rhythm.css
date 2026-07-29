@@ -99,7 +99,7 @@
   .editorial-index-page .editorial-cta {
     margin-bottom: 0;
     padding-block: clamp(50px, 5vw, 72px);
-    padding-inline: max(24px, calc((100% - 1220px) / 2));
+    padding-inline: calc((100% - 1220px) / 2);
   }
 
   .editorial-index-page .editorial-cta > div {
@@ -109,6 +109,12 @@
 }
 
 @layer responsive {
+  @media (max-width: 1268px) {
+    .editorial-index-page .editorial-cta {
+      padding-inline: 24px;
+    }
+  }
+
   @media (max-width: 760px) {
     .article-page,
     .case-page {

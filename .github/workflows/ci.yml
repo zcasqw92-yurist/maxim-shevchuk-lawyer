@@ -57,22 +57,33 @@ jobs:
       - name: Установить браузеры
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Сформировать обновлённый structural golden
+      - name: Сформировать structural golden и актуализировать production-документацию
+        shell: bash
         run: |
           npm run build
           UPDATE_GOLDEN=1 npm run test:composition-contract
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("docs/current-production-state.md")
+          text = path.read_text(encoding="utf-8")
+          old = "- 16 канонических содержательных URL: главная, каталог и шесть страниц услуг, раздел и две страницы юридических разборов, раздел и первый полный кейс практики, страница о юристе, контакты и политика конфиденциальности;"
+          new = "- 21 канонический содержательный URL: главная, каталог и семь страниц услуг, раздел и пять юридических разборов, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;"
+          if old not in text and new not in text:
+              raise SystemExit("Не найден утверждённый маркер количества канонических URL")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
 
-      - name: Зафиксировать осознанно обновлённый structural golden
+      - name: Зафиксировать осознанно обновлённые контракты
         shell: bash
         run: |
-          if git diff --quiet -- tests/golden-render-contract.json; then
-            echo "Structural golden уже актуален"
+          if git diff --quiet -- tests/golden-render-contract.json docs/current-production-state.md; then
+            echo "Structural golden и документация уже актуальны"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/golden-render-contract.json
-          git commit -m "Обновить structural golden долгового кластера"
+          git add tests/golden-render-contract.json docs/current-production-state.md
+          git commit -m "Обновить контракты долгового SEO-кластера"
           git push origin HEAD:${{ github.head_ref }}
 
       - name: Выполнить полную production-проверку

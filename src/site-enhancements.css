@@ -1,5 +1,12 @@
 /* Readable editorial type scale: restrained on desktop and compact on mobile. */
 @layer base {
+  :root {
+    --index-size-compact: .8125rem;
+    --index-size-card: .875rem;
+    --index-size-process: .9375rem;
+    --index-size-feature: 1rem;
+  }
+
   h1 { font-size: clamp(2.75rem, 5vw, 4.75rem); }
   h2 { font-size: clamp(2rem, 3.6vw, 3.5rem); }
   h3 { font-size: clamp(1.2rem, 1.7vw, 1.45rem); }
@@ -61,9 +68,6 @@
     display: block;
     margin-bottom: clamp(34px, 4vw, 58px);
     color: var(--gold-text);
-    font-size: 11px;
-    font-weight: 780;
-    letter-spacing: .14em;
   }
   .process-guarantee h3 { margin-bottom: 14px; font-size: clamp(1.2rem, 1.65vw, 1.45rem); }
   .process-guarantee p { color: var(--ink-soft); font-size: .9375rem; line-height: 1.65; }
@@ -74,6 +78,49 @@
     font-size: .8125rem;
     line-height: 1.6;
   }
+
+  /* Number labels use one sans-serif system and three deliberate visual tiers. */
+  :where(
+    .trust-strip__item > span,
+    .contact-path__steps > li > span,
+    .situation-card__index,
+    .service-card__number,
+    .position-steps > li > span,
+    .value-card > span,
+    .number-list > li > span,
+    .process-line > li > span,
+    .process-cards > li > span,
+    .process-guarantee > span,
+    .value-editorial__list > li > span
+  ) {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: .08em;
+    line-height: 1;
+  }
+
+  .trust-strip__item > span { font-size: var(--index-size-compact); }
+  .situation-card__index,
+  .service-card__number { font-size: var(--index-size-card); }
+  .contact-path__steps > li > span,
+  .process-line > li > span,
+  .process-cards > li > span,
+  .process-guarantee > span { font-size: var(--index-size-process); }
+  .position-steps > li > span,
+  .value-card > span,
+  .number-list > li > span,
+  .value-editorial__list > li > span { font-size: var(--index-size-feature); }
+
+  /* Supporting copy must not collapse beside large editorial headings. */
+  .trust-strip__item strong { font-size: .875rem; line-height: 1.4; }
+  .trust-strip__item small { font-size: .75rem; line-height: 1.5; }
+  .contact-path__steps p,
+  .situation-card small,
+  .position-steps p,
+  .value-card p,
+  .process-cards p,
+  .value-editorial__list p { font-size: .875rem; line-height: 1.6; }
 }
 
 @layer utilities {

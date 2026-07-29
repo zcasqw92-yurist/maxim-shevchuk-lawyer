@@ -230,12 +230,12 @@ export const renderArticlePage = (articleOrSlug) => {
             <section class="article-section" id="sources"><h2>Официальные источники</h2><ol class="editorial-sources">${article.sources.map((source) => `<li><a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a></li>`).join("")}</ol></section>
             <section class="article-section" id="faq"><h2>Частые вопросы</h2><div class="faq-list">${article.faq.map((item, index) => `<details class="faq-item"${index === 0 ? " open" : ""}><summary><span>${esc(item.question)}</span></summary><div class="faq-item__body"><p>${esc(item.answer)}</p></div></details>`).join("")}</div></section>
             ${linkedCases.length ? `<section class="article-section editorial-related"><h2>Похожая задача из практики</h2>${linkedCases.map(caseCard).join("")}</section>` : ""}
-            <section class="article-section editorial-related"><h2>Связанное направление</h2><p><a href="/uslugi/${article.serviceSlug}/">Жалобы и обращения: подготовка позиции и документа</a></p></section>
+            <section class="article-section editorial-related"><h2>Связанное направление</h2><p><a href="/uslugi/${article.serviceSlug}/">${esc(article.serviceLabel)}</a></p></section>
             ${authorCard()}
           </div>
         </div>
       </article>
-      <div class="wrap">${messengerCta(article.topic, "Не уверены, достаточно ли оснований для жалобы?")}</div>
+      <div class="wrap">${messengerCta(article.topic, article.ctaTitle)}</div>
     `,
   };
 };

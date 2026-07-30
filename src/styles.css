@@ -27,6 +27,41 @@
     --muted: #52636f;
     --success: #3f735f;
     --danger: #9c3737;
+
+    /* Semantic color roles. Component CSS must use these roles instead of local colors. */
+    --surface-page: var(--paper);
+    --surface-subtle: var(--paper-2);
+    --surface-card: var(--white);
+    --surface-soft: color-mix(in srgb, var(--paper) 70%, var(--white));
+    --surface-highlight: color-mix(in srgb, var(--gold-bright) 10%, var(--white));
+    --surface-accent-soft: color-mix(in srgb, var(--gold-bright) 24%, var(--paper));
+    --surface-disabled: rgba(16, 40, 61, .035);
+    --link-text: var(--ink);
+    --text-on-dark-strong: var(--white);
+    --text-on-dark: rgba(255, 255, 255, .82);
+    --text-on-dark-muted: rgba(255, 255, 255, .64);
+    --border-subtle: rgba(16, 40, 61, .14);
+    --border-control: rgba(16, 40, 61, .2);
+    --border-accent: rgba(195, 154, 93, .55);
+    --border-accent-soft: rgba(195, 154, 93, .42);
+
+    /* Functional exceptions: state and third-party messenger recognition only. */
+    --status-online: #41b86b;
+    --status-online-text: #416550;
+    --status-online-bg: #e5f5ea;
+    --status-offline: #9da4aa;
+    --status-offline-bg: #edf0f1;
+    --messenger-whatsapp: #21aa5a;
+    --messenger-telegram: #229ed9;
+
+    /* Restrained attention effect derived from the approved gold palette. */
+    --attention-glow-clear: rgba(195, 154, 93, 0);
+    --attention-ring-strong: rgba(221, 185, 121, .72);
+    --attention-glow-strong: rgba(195, 154, 93, .4);
+    --attention-ring-clear: rgba(221, 185, 121, 0);
+    --attention-glow-medium: rgba(195, 154, 93, .24);
+    --attention-ring-soft: rgba(221, 185, 121, .16);
+    --attention-glow-soft: rgba(195, 154, 93, .16);
     --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
     --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --wrap: min(1220px, calc(100% - 48px));
@@ -126,11 +161,11 @@
   .brand__home, .brand__text strong { color: inherit; font-family: var(--serif); font-size: 17px; font-weight: 600; }
   .brand__home:hover { color: inherit; }
   .brand__text small { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
-  .header__online { display: inline-flex; min-height: 32px; align-items: center; gap: 8px; margin: -3px -2px -7px; padding: 4px 2px; color: #416550; border: 0; background: transparent; border-radius: 999px; cursor: pointer; font: inherit; font-size: 10px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .header__online { display: inline-flex; min-height: 32px; align-items: center; gap: 8px; margin: -3px -2px -7px; padding: 4px 2px; color: var(--status-online-text); border: 0; background: transparent; border-radius: 999px; cursor: pointer; font: inherit; font-size: 10px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
   .header__online:hover span { text-decoration: underline; text-underline-offset: 3px; }
-  .header__online i { width: 8px; aspect-ratio: 1; flex: 0 0 auto; background: #41b86b; border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); animation: online-pulse 1.8s ease-out infinite; }
+  .header__online i { width: 8px; aspect-ratio: 1; flex: 0 0 auto; background: var(--status-online); border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); animation: online-pulse 1.8s ease-out infinite; }
   .header__online.is-offline { color: var(--muted); }
-  .header__online.is-offline i, .messenger-dialog__status.is-offline i { background: #9da4aa; box-shadow: 0 0 0 4px rgba(157,164,170,.12); animation: none; }
+  .header__online.is-offline i, .messenger-dialog__status.is-offline i { background: var(--status-offline); box-shadow: 0 0 0 4px rgba(157,164,170,.12); animation: none; }
   .desktop-nav { display: flex; align-items: center; gap: 28px; margin-left: auto; }
   .desktop-nav a { position: relative; padding: 30px 0 26px; font-size: 14px; font-weight: 560; }
   .desktop-nav a::after { position: absolute; bottom: 20px; left: 0; width: 100%; height: 1px; content: ""; background: var(--gold); transform: scaleX(0); transform-origin: right; transition: transform .25s ease; }
@@ -269,19 +304,19 @@
   .dialog__close:hover { color: var(--ink); opacity: .85; }
   .dialog__close svg { width: 17px; }
   .messenger-dialog__content { padding: 48px clamp(25px, 6vw, 52px) 34px; text-align: center; }
-  .messenger-dialog__status { display: inline-flex; align-items: center; gap: 9px; padding: 10px 14px; color: #416550; background: #e5f5ea; border-radius: 99px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-  .messenger-dialog__status i { width: 9px; aspect-ratio: 1; background: #41b86b; border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); }
-  .messenger-dialog__status.is-offline { color: var(--muted); background: #edf0f1; }
+  .messenger-dialog__status { display: inline-flex; align-items: center; gap: 9px; padding: 10px 14px; color: var(--status-online-text); background: var(--status-online-bg); border-radius: 99px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .messenger-dialog__status i { width: 9px; aspect-ratio: 1; background: var(--status-online); border-radius: 50%; box-shadow: 0 0 0 4px rgba(65,184,107,.14); }
+  .messenger-dialog__status.is-offline { color: var(--muted); background: var(--status-offline-bg); }
   .messenger-dialog__portrait { display: block; width: 112px; height: 112px; margin: 23px auto 20px; border: 4px solid var(--gold-bright); border-radius: 50%; object-fit: cover; object-position: center 22%; box-shadow: 0 14px 28px rgba(9,28,44,.14); }
   .messenger-dialog__content h2 { margin-bottom: 17px; font-size: clamp(2.3rem, 7vw, 3.4rem); }
   .messenger-dialog__content > p:not(.messenger-dialog__note):not(.messenger-dialog__privacy):not(.messenger-dialog__topic) { max-width: 430px; margin: 0 auto; color: var(--ink-soft); font-size: 16px; line-height: 1.6; }
-  .messenger-dialog__topic { display: inline-block; margin: -4px auto 14px !important; padding: 7px 11px; color: #76552e !important; background: #f4e5c7; border-radius: 99px; font-size: 11px !important; font-weight: 760; line-height: 1.35 !important; }
+  .messenger-dialog__topic { display: inline-block; margin: -4px auto 14px !important; padding: 7px 11px; color: var(--gold-text) !important; background: var(--surface-accent-soft); border-radius: 99px; font-size: 11px !important; font-weight: 760; line-height: 1.35 !important; }
   .messenger-choices { display: grid; gap: 12px; margin-top: 29px; }
   .messenger-choice { display: flex; min-height: 62px; align-items: center; justify-content: center; gap: 13px; padding: 12px 20px; color: var(--ink-deep); border-radius: 7px; font-size: 17px; font-weight: 760; transition: transform .2s ease, filter .2s ease; }
   .messenger-choice:hover { color: var(--ink-deep); filter: brightness(.94); transform: translateY(-2px); }
   .messenger-choice svg { width: 27px; }
-  .messenger-choice--whatsapp { background: #25d366; }
-  .messenger-choice--telegram { background: #229ed9; }
+  .messenger-choice--whatsapp { background: var(--gold-bright); }
+  .messenger-choice--telegram { background: var(--gold-bright); }
   .messenger-dialog__note { margin-top: 17px; color: var(--muted); font-size: 13px; }
   .messenger-dialog__privacy { display: flex; align-items: flex-start; justify-content: center; gap: 8px; margin-top: 28px; padding-top: 22px; color: var(--muted); border-top: 1px solid var(--line); font-size: 12px; line-height: 1.55; }
   .messenger-dialog__privacy svg { flex: 0 0 16px; width: 16px; color: var(--gold); }
@@ -293,12 +328,12 @@
   .price-quiz__head .eyebrow { justify-self: start; gap: 0; margin: 0; }
   .price-quiz__head .eyebrow::before { display: none; }
   .price-quiz__progress { color: var(--muted); font-size: 11px; font-weight: 750; white-space: nowrap; }
-  .price-quiz__progress-line { grid-column: 1 / -1; height: 3px; overflow: hidden; background: #e5dfd2; border-radius: 99px; }
+  .price-quiz__progress-line { grid-column: 1 / -1; height: 3px; overflow: hidden; background: var(--surface-subtle); border-radius: 99px; }
   .price-quiz__progress-line i { display: block; width: 20%; height: 100%; background: var(--gold); border-radius: inherit; transition: width .25s ease; }
   .price-quiz__step h2, .price-quiz__result h2 { max-width: 500px; margin-bottom: 13px; font-size: clamp(2.15rem, 5vw, 3.35rem); }
   .price-quiz__step > p, .price-quiz__result > p { max-width: 540px; color: var(--ink-soft); font-size: 16px; line-height: 1.6; }
   .price-quiz__options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 27px; }
-  .price-quiz__options button { min-height: 60px; padding: 13px 17px; color: var(--ink); border: 1px solid var(--line); background: #faf8f3; border-radius: 7px; cursor: pointer; font: inherit; font-size: 14px; font-weight: 720; line-height: 1.35; text-align: left; transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease; }
+  .price-quiz__options button { min-height: 60px; padding: 13px 17px; color: var(--ink); border: 1px solid var(--line); background: var(--surface-soft); border-radius: 7px; cursor: pointer; font: inherit; font-size: 14px; font-weight: 720; line-height: 1.35; text-align: left; transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease; }
   .price-quiz__options button:hover { border-color: var(--gold); transform: translateY(-1px); }
   .price-quiz__options button[aria-pressed="true"] { color: var(--white); border-color: var(--ink); background: var(--ink); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
   .price-quiz__controls { display: flex; align-items: center; margin-top: 22px; }
@@ -352,7 +387,7 @@
   .hero__content { position: relative; z-index: 2; padding-bottom: 30px; }
   .hero__kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 10px; font-weight: 780; letter-spacing: .14em; text-transform: uppercase; }
   .hero h1 { max-width: 750px; }
-  .hero h1 em { color: #9e7848; font-weight: inherit; }
+  .hero h1 em { color: var(--gold-text); font-weight: inherit; }
   .hero h1 [data-hero-rotator] { display: inline-block; transition: opacity .17s ease; }
   .hero h1 [data-hero-rotator].is-changing { opacity: 0; }
   .hero__lead { max-width: 650px; margin-top: 32px; color: var(--ink-soft); font-size: clamp(17px, 1.7vw, 21px); line-height: 1.65; }
@@ -440,7 +475,7 @@
   .about-preview { display: grid; grid-template-columns: 1fr .78fr; align-items: center; gap: clamp(55px, 10vw, 150px); }
   .about-preview__copy { max-width: 660px; }
   .about-preview__lead { margin-top: 28px; color: var(--ink-soft); font-size: 20px; }
-  .about-preview blockquote { margin-top: 34px; padding-left: 24px; color: #4b5f6e; border-left: 2px solid var(--gold); font-family: var(--serif); font-size: clamp(20px, 2vw, 27px); font-style: italic; line-height: 1.45; }
+  .about-preview blockquote { margin-top: 34px; padding-left: 24px; color: var(--ink-soft); border-left: 2px solid var(--gold); font-family: var(--serif); font-size: clamp(20px, 2vw, 27px); font-style: italic; line-height: 1.45; }
   .about-preview__visual { position: relative; }
   .about-preview__visual::before { position: absolute; z-index: 0; top: -80px; right: -80px; width: 330px; aspect-ratio: 1; content: ""; border: 1px solid rgba(195,154,93,.35); border-radius: 50%; }
   .about-preview__visual img { position: relative; z-index: 1; width: 100%; max-height: 740px; object-fit: cover; object-position: center top; box-shadow: var(--shadow); }
@@ -544,8 +579,8 @@
   .contact-method span { display: grid; gap: 2px; }
   .contact-method small { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
   .contact-method strong { font-size: 18px; }
-  .contact-method--whatsapp > svg:first-child { color: #21aa5a; }
-  .contact-method--telegram > svg:first-child { color: #229ed9; }
+  .contact-method--whatsapp > svg:first-child { color: var(--messenger-whatsapp); }
+  .contact-method--telegram > svg:first-child { color: var(--messenger-telegram); }
   .contact-page__guide { padding: clamp(30px, 4vw, 48px); color: rgba(255,255,255,.75); background: var(--ink-deep); box-shadow: var(--shadow); }
   .contact-page__person { display: flex; align-items: center; gap: 14px; padding-bottom: 25px; border-bottom: 1px solid var(--line-light); color: var(--white); font-family: var(--serif); font-size: 18px; line-height: 1.25; }
   .contact-page__person img { width: 58px; height: 58px; border: 2px solid var(--gold-bright); border-radius: 50%; object-fit: cover; object-position: center 22%; }

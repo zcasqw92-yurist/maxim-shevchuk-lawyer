@@ -15,7 +15,7 @@
     height: 100%;
     padding: clamp(24px, 2.8vw, 34px);
     overflow: hidden;
-    border-color: rgba(16, 40, 61, .14);
+    border-color: var(--border-subtle);
     box-shadow: 0 14px 38px rgba(16, 40, 61, .07);
     transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease;
   }

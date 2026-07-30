@@ -78,14 +78,14 @@
 .consent-banner__actions [data-consent-accept] {
   order: 2;
   color: var(--ink-deep);
-  border: 2px solid #f4d89e;
+  border: 2px solid var(--gold-bright);
   background: var(--gold-bright);
   box-shadow: 0 0 0 1px rgba(9,28,44,.2), 0 10px 28px rgba(0,0,0,.2);
 }
 .consent-banner__actions [data-consent-accept]:hover {
   color: var(--ink-deep);
   border-color: var(--white);
-  background: #e8c88d;
+  background: var(--gold);
   transform: translateY(-2px);
 }
 

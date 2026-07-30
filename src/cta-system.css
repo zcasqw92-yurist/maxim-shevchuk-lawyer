@@ -159,7 +159,7 @@
   .contact-method:hover {
     color: var(--ink-deep);
     border-color: var(--gold);
-    background: #fff8e9;
+    background: var(--surface-highlight);
   }
 
   .contact-method--whatsapp > svg:first-child,
@@ -205,7 +205,7 @@
   .hero__quick-choices button:hover {
     color: var(--ink-deep);
     border-color: var(--gold);
-    background: #fff8e9;
+    background: var(--surface-highlight);
   }
 
   @media (max-width: 680px) {

@@ -102,7 +102,7 @@
     background: var(--gold-bright);
   }
 
-  .engagement-nudge__write:hover { border-color: var(--gold-text); background: #e7c785; }
+  .engagement-nudge__write:hover { border-color: var(--gold-text); background: var(--gold); }
 
   /* Keep all published sections discoverable without crowding medium desktop widths. */
   .desktop-nav a { white-space: nowrap; }
@@ -120,22 +120,22 @@
 
   @keyframes mobile-contact-soft-attention {
     0%, 12%, 100% {
-      box-shadow: 0 0 0 0 rgba(255, 218, 137, 0);
+      box-shadow: 0 0 0 0 var(--attention-glow-clear);
       filter: brightness(1);
       transform: scale(1);
     }
     2% {
-      box-shadow: 0 0 0 2px rgba(255, 239, 194, .92), 0 0 24px 5px rgba(255, 206, 96, .54);
+      box-shadow: 0 0 0 2px var(--attention-ring-strong), 0 0 24px 5px var(--attention-glow-strong);
       filter: brightness(1.1);
       transform: scale(1.008);
     }
     5% {
-      box-shadow: 0 0 0 11px rgba(255, 224, 151, 0), 0 0 36px 10px rgba(255, 205, 91, .3);
+      box-shadow: 0 0 0 11px var(--attention-ring-clear), 0 0 36px 10px var(--attention-glow-medium);
       filter: brightness(1.22);
       transform: scale(1.02);
     }
     8% {
-      box-shadow: 0 0 0 4px rgba(255, 235, 181, .2), 0 0 22px 5px rgba(255, 210, 105, .2);
+      box-shadow: 0 0 0 4px var(--attention-ring-soft), 0 0 22px 5px var(--attention-glow-soft);
       filter: brightness(1.08);
       transform: scale(1.006);
     }

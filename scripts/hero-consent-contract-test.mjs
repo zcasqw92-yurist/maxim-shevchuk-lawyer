@@ -18,7 +18,7 @@ for (const marker of [
   ".consent-banner__actions [data-consent-reject]",
   "border: 0",
   ".consent-banner__actions [data-consent-accept]",
-  "border: 2px solid #f4d89e",
+  "border: 2px solid var(--gold-bright)",
   ".home .hero__visual::before",
   ".home .hero__image-wrap",
   "border-radius: 0",

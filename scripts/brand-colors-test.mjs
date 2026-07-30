@@ -42,6 +42,8 @@ for (const role of [
 
 const editorial = await readFile(new URL("../src/editorial.css", import.meta.url), "utf8");
 if (!editorial.includes("color: var(--link-text);")) throw new Error("Редакционные ссылки не используют --link-text");
+if (!editorial.includes(".editorial-sources a:hover")) throw new Error("Нет фирменного hover для ссылок на источники");
+if (!editorial.includes(".editorial-related a:focus-visible")) throw new Error("Нет фирменного focus для связанных материалов");
 if (!editorial.includes("background: var(--surface-page);")) throw new Error("Редакция не использует --surface-page");
 if (!editorial.includes("background: var(--surface-card);")) throw new Error("Карточки не используют --surface-card");
 const mobile = await readFile(new URL("../src/mobile-actions.css", import.meta.url), "utf8");

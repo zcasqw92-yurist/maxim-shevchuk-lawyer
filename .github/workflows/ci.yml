@@ -35,10 +35,14 @@ jobs:
       SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
       INDEXNOW_KEY: ci-indexnow-key
       CROSS_BROWSER_REQUIRED: 'true'
+      # Проверяем весь PR относительно его базовой ветки, а не только последний коммит.
+      CONTENT_GOVERNANCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
 
     steps:
       - name: Получить код
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Установить дату автоматической проверки
         run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"

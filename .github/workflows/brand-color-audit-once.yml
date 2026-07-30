@@ -1,0 +1,51 @@
+name: Аудит брендовых цветов (разовый)
+
+on:
+  push:
+    branches:
+      - design/brand-color-system
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Собрать перечень локальных цветов
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          from collections import defaultdict
+
+          colors = defaultdict(list)
+          pattern = re.compile(r"#[0-9a-fA-F]{3,8}\b")
+          for path in sorted(Path("src").glob("*.css")):
+              for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                  for match in pattern.finditer(line):
+                      colors[match.group(0).lower()].append(f"{path}:{line_no}: {line.strip()}")
+
+          lines = []
+          for color in sorted(colors):
+              lines.append(f"## {color} ({len(colors[color])})")
+              lines.extend(colors[color])
+              lines.append("")
+          Path("brand-color-report.txt").write_text("\n".join(lines), encoding="utf-8")
+          PY
+      - name: Сохранить отчёт в ветке
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add brand-color-report.txt
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Собрать аудит локальных цветов"
+          git push

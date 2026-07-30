@@ -20,7 +20,6 @@ const [
   workflow,
   conversionAnalytics,
   privacyImplementation,
-  trafficAttribution,
 ] = await Promise.all([
   read("docs/current-production-state.md"),
   read("docs/PUBLISHING.md"),
@@ -34,7 +33,6 @@ const [
   read(".github/workflows/pages.yml"),
   read("docs/conversion-analytics.md"),
   read("docs/privacy-implementation-note.md"),
-  read("docs/traffic-attribution-standard.md"),
 ]);
 
 const canonicalCount = services.length + articles.length + practiceCases.length + 7;
@@ -91,12 +89,8 @@ for (const marker of [
   "cta_click",
   "cta_view",
   "source_cta_placement",
-  "traffic_attribution_ready",
-  "traffic_utm_source",
-  "traffic_journey_tail",
   "Текст подготовленного сообщения",
   "111050150",
-  "docs/traffic-attribution-standard.md",
 ]) {
   if (!conversionAnalytics.includes(marker)) errors.push(`docs/conversion-analytics.md: отсутствует маркер «${marker}»`);
 }
@@ -104,25 +98,9 @@ for (const marker of [
 for (const marker of [
   "аналитика только после отдельного согласия пользователя",
   "Текст черновика, содержание сообщения, документы",
-  "Локальная first-touch атрибуция",
-  "значения `yclid`, `gclid`, `fbclid`",
   "npm run test:conversion-analytics",
 ]) {
   if (!privacyImplementation.includes(marker)) errors.push(`docs/privacy-implementation-note.md: отсутствует маркер «${marker}»`);
-}
-
-for (const marker of [
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "?utm_source=avito&utm_medium=classified&utm_campaign=vzyskanie_dolga&utm_content=ad_01",
-  "?utm_source=telegram&utm_medium=messenger&utm_campaign=vzyskanie_dolga&utm_content=channel_post_01",
-  "?utm_source=yandex_business&utm_medium=organic_profile&utm_campaign=legal_services&utm_content=profile_link",
-  "Автоматический `yclid` не добавляется вручную",
-  "По запросу в чате «дай UTM-хвост»",
-]) {
-  if (!trafficAttribution.includes(marker)) errors.push(`docs/traffic-attribution-standard.md: отсутствует маркер «${marker}»`);
 }
 
 if (!readme.includes("docs/current-production-state.md")) errors.push("README.md: нет ссылки на текущий источник истины");
@@ -162,7 +140,6 @@ for (const relativePath of [
   "docs/PUBLISHING.md",
   "docs/conversion-analytics.md",
   "docs/privacy-implementation-note.md",
-  "docs/traffic-attribution-standard.md",
   "tests/golden-render-contract.json",
   "docs/manual-device-qa.md",
   "INDEXING_POLICY.md",
@@ -182,4 +159,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, traffic attribution standard, conversion analytics, publication pipeline, open indexing and automatic IndexNow are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, conversion analytics, publication pipeline, open indexing and automatic IndexNow are current`);

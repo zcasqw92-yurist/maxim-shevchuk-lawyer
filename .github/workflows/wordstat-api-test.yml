@@ -2,6 +2,11 @@ name: Test Yandex Wordstat API
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - test/wordstat-api-connection
+    paths:
+      - '.github/workflows/wordstat-api-test.yml'
   pull_request:
     branches: [main]
     paths:

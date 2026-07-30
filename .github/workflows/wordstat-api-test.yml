@@ -37,8 +37,8 @@ jobs:
       - name: Query Wordstat safely
         shell: bash
         run: |
-          node <<'NODE'
-          const fs = require('node:fs');
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
 
           const apiKey = String(process.env.YANDEX_SEARCH_API_KEY || '').trim();
           const folderId = String(process.env.YANDEX_CLOUD_FOLDER_ID || '').trim();
@@ -52,8 +52,10 @@ jobs:
             process.exit(1);
           }
 
-          // GitHub masks secrets automatically; this is a second explicit safeguard.
+          // GitHub masks secrets automatically; these commands add another safeguard
+          // for all output produced after the script starts.
           console.log(`::add-mask::${apiKey}`);
+          console.log(`::add-mask::${folderId}`);
 
           const endpoint = 'https://searchapi.api.cloud.yandex.net/v2/wordstat/topRequests';
           const requestBody = {
@@ -136,7 +138,7 @@ jobs:
               ...topResults.map((line) => `- ${line}`),
               ...(topAssociations.length ? ['', '## Associations', ...topAssociations.map((line) => `- ${line}`)] : []),
               '',
-              '_Secrets, authorization headers, folder identifiers, and raw API responses were not printed._',
+              '_The API key, authorization header, and raw API response were not printed._',
               '',
             ].join('\n');
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary, 'utf8');

@@ -41,6 +41,8 @@ jobs:
       SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
       INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
       CROSS_BROWSER_REQUIRED: 'true'
+      # Базовый SHA нужен контентному шлюзу, чтобы проверить весь набор коммитов одной сессии.
+      CONTENT_GOVERNANCE_BASE_SHA: ${{ github.event.before }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -49,6 +51,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set automated review date
         run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"

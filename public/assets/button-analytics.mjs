@@ -9,6 +9,13 @@ const BUTTON_SELECTOR = [
   "[data-dialog-open]",
   "[data-track]",
 ].join(", ");
+const REQUIRED_BUTTON_METADATA = Object.freeze([
+  "button_id",
+  "button_label",
+  "button_kind",
+  "button_placement",
+  "button_destination",
+]);
 
 const analyticsEnabled = document.body.dataset.analyticsEnabled === "true";
 const analyticsRequiresConsent = document.body.dataset.analyticsRequiresConsent === "true";
@@ -201,7 +208,8 @@ const destinationFor = (element) => {
   if (!element.matches("a[href]")) return "none";
   try {
     const url = new URL(element.href, location.origin);
-    return url.origin === location.origin ? safePath(url.pathname) : cleanText(url.hostname, 100);
+    if (url.origin === location.origin) return safePath(url.pathname);
+    return cleanText(url.hostname || url.protocol.replace(":", "") || "external", 100);
   } catch {
     return "invalid";
   }
@@ -290,4 +298,5 @@ window.__buttonAnalyticsContract = Object.freeze({
   version: 1,
   selector: BUTTON_SELECTOR,
   event: "button_action",
+  requiredMetadata: REQUIRED_BUTTON_METADATA,
 });

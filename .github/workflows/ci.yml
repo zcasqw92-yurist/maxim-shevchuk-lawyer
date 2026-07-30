@@ -109,3 +109,41 @@ jobs:
             metrica-audit.log
           if-no-files-found: warn
           retention-days: 7
+
+  metrica-sync:
+    if: github.event_name == 'pull_request' && github.head_ref == 'analytics/metrica-goal-audit' && needs.check.result == 'success' && needs.metrica-audit.result == 'success'
+    needs:
+      - check
+      - metrica-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      YANDEX_METRICA_ID: '111050150'
+      YANDEX_METRICA_OAUTH_TOKEN: ${{ secrets.YANDEX_METRICA_OAUTH_TOKEN }}
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Синхронизировать цели и воронки
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/metrica-goal-sync.mjs 2>&1 | tee metrica-sync.log
+
+      - name: Сохранить снимки до и после
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrica-sync-${{ github.run_id }}
+          path: |
+            reports/metrica-sync.json
+            reports/metrica-sync.md
+            metrica-sync.log
+          if-no-files-found: warn
+          retention-days: 14

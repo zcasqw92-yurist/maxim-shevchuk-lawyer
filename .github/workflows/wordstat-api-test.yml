@@ -27,7 +27,6 @@ jobs:
     timeout-minutes: 5
     env:
       YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
-      YANDEX_CLOUD_FOLDER_ID: ${{ vars.YANDEX_CLOUD_FOLDER_ID }}
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,21 +40,13 @@ jobs:
           import fs from 'node:fs';
 
           const apiKey = String(process.env.YANDEX_SEARCH_API_KEY || '').trim();
-          const folderId = String(process.env.YANDEX_CLOUD_FOLDER_ID || '').trim();
-
           if (!apiKey) {
             console.error('Wordstat test failed: environment secret YANDEX_SEARCH_API_KEY is missing.');
             process.exit(1);
           }
-          if (!folderId) {
-            console.error('Wordstat test failed: environment variable YANDEX_CLOUD_FOLDER_ID is missing.');
-            process.exit(1);
-          }
 
-          // GitHub masks secrets automatically; these commands add another safeguard
-          // for all output produced after the script starts.
+          // GitHub masks secrets automatically; this is a second explicit safeguard.
           console.log(`::add-mask::${apiKey}`);
-          console.log(`::add-mask::${folderId}`);
 
           const endpoint = 'https://searchapi.api.cloud.yandex.net/v2/wordstat/topRequests';
           const requestBody = {
@@ -63,12 +54,10 @@ jobs:
             numPhrases: 10,
             regions: ['213'],
             devices: ['DEVICE_ALL'],
-            folderId,
           };
 
           const sanitize = (value) => String(value ?? '')
             .replaceAll(apiKey, '[masked]')
-            .replaceAll(folderId, '[folder]')
             .replace(/[\r\n\t]+/g, ' ')
             .slice(0, 300);
 

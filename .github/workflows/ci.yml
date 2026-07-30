@@ -135,6 +135,7 @@ jobs:
         run: |
           set -o pipefail
           node scripts/metrica-finalize.mjs 2>&1 | tee metrica-sync.log
+          node scripts/metrica-state-test.mjs 2>&1 | tee metrica-state.log
 
       - name: Сохранить снимки до и после
         if: always()
@@ -144,6 +145,8 @@ jobs:
           path: |
             reports/metrica-sync.json
             reports/metrica-sync.md
+            reports/metrica-state.json
             metrica-sync.log
+            metrica-state.log
           if-no-files-found: warn
           retention-days: 14

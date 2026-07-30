@@ -70,9 +70,21 @@ for (const marker of [
   if (!styles.includes(marker)) errors.push(`styles.css: отсутствует адаптивный маркер ${marker}`);
 }
 
+const sectionPalette = styles.match(/\.section--process-guarantees\s*\{([\s\S]*?)\}/)?.[1] || "";
+const cardPalette = styles.match(/\.process-guarantee\s*\{([\s\S]*?)\}/)?.[1] || "";
+if (!sectionPalette.includes("background: var(--paper);")) {
+  errors.push("styles.css: фон блока условий должен использовать основной кремовый тон --paper");
+}
+if (!cardPalette.includes("background: rgba(235,230,220,.52);")) {
+  errors.push("styles.css: карточки условий должны использовать тёплый оттенок палитры --paper-2");
+}
+if (sectionPalette.includes("background: var(--white);")) {
+  errors.push("styles.css: почти белый фон снова выбивает блок условий из фирменной палитры");
+}
+
 if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
 
-console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; the catalog follows the approved narrative sequence and detail pages keep their personal CTA`);
+console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; the catalog follows the approved narrative sequence, the palette is consistent, and detail pages keep their personal CTA`);

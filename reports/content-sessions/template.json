@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "sessionId": "YYYYMMDD-HHMM-topic",
+  "reviewedAt": "2026-07-30T19:00:00.000Z",
+  "spreadsheet": {
+    "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
+    "modifiedTime": "2026-07-30T18:48:31.577Z",
+    "metadataTabCount": 24,
+    "discoveredTabs": [
+      "00_Старт",
+      "01_БПЮ",
+      "02_ЮрДоки",
+      "03_Оплаты",
+      "04_Дашборд",
+      "05_Контроль",
+      "06_Импорт",
+      "_Справочники",
+      "_Журнал",
+      "07_Диалоги_исследование",
+      "08_Банк_реплик",
+      "09_Паттерны_аудитории",
+      "10_Контентные_возможности",
+      "11_Кейсы_для_публикации",
+      "12_Эффективные_ответы",
+      "13_Статистика_контента",
+      "14_Контент_дашборд",
+      "15_Обращения_с_контента",
+      "_Реестр_диалогов",
+      "_Ситуации_и_связи",
+      "_События_воронки",
+      "_Версии_контента",
+      "16_Контроль_данных",
+      "_Импорт_ЮД_151_200"
+    ]
+  },
+  "reviewedTabs": [
+    { "name": "00_Старт", "range": "A1:H45", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["project rules", "SEO gate"] },
+    { "name": "01_БПЮ", "range": "A1:AC1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["demand", "client language"] },
+    { "name": "02_ЮрДоки", "range": "A1:AA1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["paid work", "practice"] },
+    { "name": "03_Оплаты", "range": "A1:M1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed payments only"] },
+    { "name": "04_Дашборд", "range": "A1:Z1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["operational context"] },
+    { "name": "05_Контроль", "range": "A1:Z1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["data gaps"] },
+    { "name": "06_Импорт", "range": "A1:U1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source coverage"] },
+    { "name": "_Справочники", "range": "A1:I1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["classification"] },
+    { "name": "_Журнал", "range": "A1:K1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["provenance"] },
+    { "name": "07_Диалоги_исследование", "range": "A1:AK1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience research"] },
+    { "name": "08_Банк_реплик", "range": "A1:V1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["verbatim language", "search hypotheses"] },
+    { "name": "09_Паттерны_аудитории", "range": "A1:X1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience patterns"] },
+    { "name": "10_Контентные_возможности", "range": "A1:AP1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content brief", "intent map"] },
+    { "name": "11_Кейсы_для_публикации", "range": "A1:AF1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["case evidence", "anonymization"] },
+    { "name": "12_Эффективные_ответы", "range": "A1:V1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["communication patterns"] },
+    { "name": "13_Статистика_контента", "range": "A1:AB2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["performance data"] },
+    { "name": "14_Контент_дашборд", "range": "A1:R1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content priorities"] },
+    { "name": "15_Обращения_с_контента", "range": "A1:AG2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["lead language", "attribution"] },
+    { "name": "_Реестр_диалогов", "range": "A1:Q2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source registry"] },
+    { "name": "_Ситуации_и_связи", "range": "A1:T2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["cross-source links", "result levels"] },
+    { "name": "_События_воронки", "range": "A1:J5000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed funnel events"] },
+    { "name": "_Версии_контента", "range": "A1:L1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content versions"] },
+    { "name": "16_Контроль_данных", "range": "A1:J1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["critical data errors"] },
+    { "name": "_Импорт_ЮД_151_200", "range": "A1:T1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["historical source verification"] }
+  ],
+  "sourceTrace": {
+    "dialogIds": [],
+    "situationIds": [],
+    "workIds": [],
+    "contentIds": [],
+    "caseIds": [],
+    "notes": "Only internal IDs; no personal data or full dialog text."
+  },
+  "seoReview": {
+    "status": "completed",
+    "checkedAt": "2026-07-30T19:00:00.000Z",
+    "region": "Russia / relevant service region",
+    "primaryIntent": "replace with the verified primary intent",
+    "verifiedCluster": ["replace with externally verified queries"],
+    "intentMap": [
+      { "intent": "replace", "target": "H1/lead/short answer" },
+      { "intent": "replace", "target": "H2 or FAQ" }
+    ],
+    "cannibalizationChecked": true,
+    "overOptimizationRisk": "low"
+  },
+  "editorialChecks": {
+    "factsSeparatedFromHypotheses": true,
+    "paidWorkSeparatedFromPaymentDetails": true,
+    "workProcedureAndCaseResultsSeparated": true,
+    "legalSourcesVerified": true,
+    "anonymizationVerified": true,
+    "criticalSourceErrorsResolved": true
+  },
+  "contentChanges": [
+    {
+      "path": "src/editorial-data.mjs",
+      "kind": "article",
+      "contentId": "replace",
+      "action": "created or updated",
+      "expectedUrl": "https://yuristshevchuk.com/replace/"
+    }
+  ],
+  "plannedChecks": [
+    "npm run check",
+    "npm run test:live",
+    "node scripts/live-all-publications-smoke.mjs"
+  ],
+  "publication": {
+    "expectedUrls": ["https://yuristshevchuk.com/replace/"],
+    "notes": "CI, deployment and live results are reported in chat after publication."
+  }
+}

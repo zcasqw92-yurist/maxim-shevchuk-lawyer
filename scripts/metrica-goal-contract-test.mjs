@@ -14,7 +14,7 @@ const sources = {
   app: await readFile(join(root, "src", "app.js"), "utf8"),
   conversion: await readFile(join(root, "public", "assets", "conversion-analytics.mjs"), "utf8"),
   channel: await readFile(join(root, "public", "assets", "channel-analytics.mjs"), "utf8"),
-  button: await readFile(join(root, "public", "assets", "button-analytics.mjs"),
+  button: await readFile(join(root, "public", "assets", "button-analytics.mjs"), "utf8"),
   editorial: await readFile(join(root, "public", "assets", "editorial-analytics.mjs"), "utf8"),
 };
 

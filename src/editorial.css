@@ -1,6 +1,6 @@
 @layer components {
   .editorial-page {
-    background: #f6f3ec;
+    background: var(--surface-page);
   }
 
   .editorial-index-hero {
@@ -15,8 +15,8 @@
     display: flex;
     min-width: 0;
     flex-direction: column;
-    border: 1px solid rgba(16, 40, 61, .13);
-    background: #fffefa;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-card);
   }
 
   .editorial-card__category {
@@ -137,8 +137,8 @@
 
   .editorial-answer {
     padding: 28px;
-    border: 1px solid rgba(195, 154, 93, .55);
-    background: #fffaf0;
+    border: 1px solid var(--border-accent);
+    background: var(--surface-highlight);
   }
 
   .editorial-answer strong {
@@ -187,7 +187,7 @@
   .editorial-options article {
     padding: 22px;
     border-left: 3px solid var(--gold);
-    background: #fffefa;
+    background: var(--surface-card);
   }
 
   .editorial-options p {
@@ -197,7 +197,7 @@
 
   .editorial-note {
     padding: 22px;
-    color: #f8f3e8;
+    color: var(--text-on-dark-strong);
     background: var(--ink-deep);
   }
 
@@ -220,7 +220,14 @@
 
   .editorial-sources a,
   .editorial-related a {
-    color: #274f73;
+    color: var(--link-text);
+  }
+
+  .editorial-sources a:hover,
+  .editorial-sources a:focus-visible,
+  .editorial-related a:hover,
+  .editorial-related a:focus-visible {
+    color: var(--gold-text);
   }
 
   .editorial-author {
@@ -228,8 +235,8 @@
     grid-template-columns: 92px minmax(0, 1fr);
     gap: 20px;
     padding: 24px;
-    border: 1px solid rgba(16, 40, 61, .13);
-    background: #fffefa;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-card);
   }
 
   .editorial-author img {
@@ -271,13 +278,13 @@
     gap: 30px;
     margin: 0 0 clamp(42px, 7vw, 88px);
     padding: clamp(28px, 5vw, 48px);
-    color: #fff;
+    color: var(--text-on-dark-strong);
     background: var(--ink-deep);
   }
 
   .editorial-cta h2 {
     margin: 8px 0 10px;
-    color: #fff;
+    color: var(--text-on-dark-strong);
     font-size: clamp(1.7rem, 3vw, 2.65rem);
   }
 
@@ -300,8 +307,8 @@
     position: sticky;
     top: 104px;
     padding: 24px;
-    border: 1px solid rgba(16, 40, 61, .13);
-    background: #fffefa;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-card);
   }
 
   .editorial-case-aside strong {
@@ -319,7 +326,7 @@
   .editorial-status {
     padding: 24px;
     border-left: 3px solid var(--gold);
-    background: #fffefa;
+    background: var(--surface-card);
   }
 }
 

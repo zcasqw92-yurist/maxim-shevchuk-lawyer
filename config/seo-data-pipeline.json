@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "cache_ttl_days": 30,
+  "max_api_calls_per_cluster": 3,
+  "max_primary_calls": 1,
+  "max_refinement_calls": 2,
+  "default_region": "213",
+  "default_device": "DEVICE_ALL",
+  "wordstat": {
+    "endpoint": "https://searchapi.api.cloud.yandex.net/v2/wordstat/topRequests",
+    "num_phrases": 20
+  },
+  "webmaster": {
+    "api_base": "https://api.webmaster.yandex.net/v4",
+    "target_host": "yuristshevchuk.com",
+    "popular_queries_limit": 100
+  },
+  "metrica": {
+    "counter_id": "111050150",
+    "management_api_base": "https://api-metrika.yandex.net/management/v1",
+    "reporting_api_base": "https://api-metrika.yandex.net/stat/v1",
+    "lookback_days": 30,
+    "goal_events": [
+      "publication_view",
+      "publication_scroll_50",
+      "publication_scroll_90",
+      "publication_active_60s",
+      "publication_faq_open",
+      "publication_related_click",
+      "publication_messenger_intent",
+      "contact_conversion",
+      "contact_telegram",
+      "contact_whatsapp"
+    ]
+  },
+  "stop_rules": [
+    "Основной интент определён",
+    "Тип страницы определён",
+    "Главный запрос и поддерживающие формулировки определены",
+    "Карта H2 и FAQ покрывает запросы",
+    "Риск каннибализации проверен"
+  ],
+  "blacklist_patterns": [
+    "образец бесплатно",
+    "скачать бесплатно",
+    "реферат",
+    "курсовая",
+    "ответы на экзамен"
+  ],
+  "hypotheses": [
+    {
+      "content_id": "C-001",
+      "publication_id": "debt-without-receipt",
+      "path": "/razbory/vernut-dolg-bez-raspiski/",
+      "phrase": "вернуть долг без расписки",
+      "region": "213",
+      "device": "DEVICE_ALL",
+      "reason": "Подтвердить масштаб поискового спроса по кластеру, уже обоснованному обращениями БПЮ и оплаченной практикой.",
+      "status": "verified",
+      "last_checked_at": "2026-07-30",
+      "next_check_not_before": "2026-08-29",
+      "refinements": []
+    }
+  ]
+}

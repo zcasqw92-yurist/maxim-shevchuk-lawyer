@@ -1,0 +1,115 @@
+name: SEO data feedback
+
+on:
+  schedule:
+    - cron: '25 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Режим: feedback не расходует Wordstat; wordstat проверяет выбранную гипотезу'
+        required: true
+        default: feedback
+        type: choice
+        options:
+          - feedback
+          - wordstat
+          - all
+      hypothesis_id:
+        description: 'Контент ID гипотезы, например C-001. Пусто — только ожидающие проверки.'
+        required: false
+        type: string
+      force_wordstat:
+        description: 'Игнорировать свежий кеш Wordstat'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo-data-feedback
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    name: Collect normalized SEO feedback
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PIPELINE_MODE: ${{ github.event_name == 'schedule' && 'feedback' || inputs.mode }}
+      SEO_HYPOTHESIS_ID: ${{ inputs.hypothesis_id || '' }}
+      SEO_FORCE_WORDSTAT: ${{ inputs.force_wordstat || 'false' }}
+      YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+      YANDEX_WEBMASTER_TOKEN: ${{ secrets.YANDEX_WEBMASTER_TOKEN }}
+      YANDEX_METRICA_OAUTH_TOKEN: ${{ secrets.YANDEX_METRICA_OAUTH_TOKEN }}
+      YANDEX_METRICA_ID: '111050150'
+
+    steps:
+      - name: Checkout pipeline code
+        uses: actions/checkout@v4
+
+      - name: Checkout persistent SEO state
+        uses: actions/checkout@v4
+        with:
+          ref: seo-data
+          path: .seo-state
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Run contract test
+        run: node scripts/seo-data-pipeline-test.mjs
+
+      - name: Collect feedback without unnecessary Wordstat calls
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=("--mode=${PIPELINE_MODE}")
+          if [[ -n "${SEO_HYPOTHESIS_ID}" ]]; then
+            args+=("--hypothesis=${SEO_HYPOTHESIS_ID}")
+          fi
+          if [[ "${SEO_FORCE_WORDSTAT}" == "true" ]]; then
+            args+=("--force=true")
+          fi
+          SEO_STATE_DIR="${GITHUB_WORKSPACE}/.seo-state/reports/seo-data" \
+            node scripts/seo-data-pipeline.mjs "${args[@]}"
+
+      - name: Save normalized state to seo-data branch
+        shell: bash
+        working-directory: .seo-state
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/seo-data
+          if git diff --cached --quiet; then
+            echo "SEO state has not changed"
+            exit 0
+          fi
+          git commit -m "Обновить SEO-статистику ${GITHUB_RUN_ID}"
+          git push origin HEAD:seo-data
+
+      - name: Upload sheet-ready reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-data-${{ github.run_id }}
+          path: .seo-state/reports/seo-data
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Write summary
+        shell: bash
+        run: |
+          if [[ -f .seo-state/reports/seo-data/summary.md ]]; then
+            cat .seo-state/reports/seo-data/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "# SEO data pipeline" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Mode: ${PIPELINE_MODE}" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Wordstat is protected by a 30-day cache and a 1+2 call limit." >> "$GITHUB_STEP_SUMMARY"
+          fi

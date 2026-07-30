@@ -30,7 +30,7 @@ for (const marker of [
   "EXPECTED_BUILD_SHA: ${{ github.sha }}",
   "node scripts/verify-custom-domain-sha.mjs",
   "custom-domain-sha-diagnostics-${{ github.run_id }}",
-  "if: success() && github.event_name != 'schedule'",
+  "if: github.event_name != 'schedule'",
 ]) {
   assert(workflow.includes(marker), `Pages workflow is missing ${marker}`);
 }

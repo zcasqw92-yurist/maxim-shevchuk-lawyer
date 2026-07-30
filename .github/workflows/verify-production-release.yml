@@ -1,0 +1,40 @@
+name: Проверка опубликованного production
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SITE_PUBLIC_URL: 'https://yuristshevchuk.com'
+      SITE_CANONICAL_URL: 'https://yuristshevchuk.com'
+      EXPECTED_BUILD_SHA: '36bcacd3c5331795a858a18c79ca27e09a106391'
+      LIVE_SMOKE_ATTEMPTS: '120'
+      LIVE_SMOKE_DELAY_MS: '5000'
+    steps:
+      - name: Получить проверяющий код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Установить браузеры live-проверки
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Проверить опубликованный SHA и весь сайт
+        run: |
+          npm run test:live
+          node scripts/live-all-publications-smoke.mjs

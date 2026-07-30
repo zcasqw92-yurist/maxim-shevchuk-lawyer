@@ -74,3 +74,38 @@ jobs:
             *.log
           if-no-files-found: ignore
           retention-days: 7
+
+  metrica-audit:
+    if: github.event_name == 'pull_request' && github.head_ref == 'analytics/metrica-goal-audit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      YANDEX_METRICA_ID: '111050150'
+      YANDEX_METRICA_OAUTH_TOKEN: ${{ secrets.YANDEX_METRICA_OAUTH_TOKEN }}
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Провести аудит счётчика без изменений
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/metrica-management-audit.mjs 2>&1 | tee metrica-audit.log
+
+      - name: Сохранить снимок целей
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrica-audit-${{ github.run_id }}
+          path: |
+            reports/metrica-audit.json
+            reports/metrica-audit.md
+            metrica-audit.log
+          if-no-files-found: warn
+          retention-days: 7

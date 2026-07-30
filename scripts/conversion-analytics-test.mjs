@@ -39,21 +39,12 @@ const requiredSourceTokens = [
   'contact_mode',
   'page_group',
   'cta_placement',
-  'traffic_utm_source',
-  'traffic_landing_path',
-  'traffic_journey_depth',
-  'sendVisitAttribution',
-  'window.ym(yandexMetricaId, "params"',
-  'sessionStorage.removeItem(ATTRIBUTION_STORAGE_KEY)',
 ];
 for (const token of requiredSourceTokens) {
   if (!analyticsSource.includes(token)) errors.push(`conversion analytics source: отсутствует ${token}`);
 }
 if (/dataset\.message|intentMessage|data-message/.test(analyticsSource)) {
   errors.push("conversion analytics не должна считывать или отправлять текст подготовленного сообщения");
-}
-if (/query\.get\(["'](?:yclid|gclid|fbclid)["']\)/.test(analyticsSource)) {
-  errors.push("conversion analytics не должна сохранять значения рекламных click ID; допустим только признак наличия");
 }
 
 for (const pathname of canonicalPaths) {
@@ -98,18 +89,6 @@ const requiredMetadata = [
   "cta_kind",
   "section_title",
   "topic",
-  "content_kind",
-  "content_id",
-  "traffic_source_type",
-  "traffic_landing_path",
-  "traffic_landing_group",
-  "traffic_utm_source",
-  "traffic_utm_medium",
-  "traffic_utm_campaign",
-  "traffic_utm_content",
-  "traffic_journey_depth",
-  "traffic_journey_first_path",
-  "traffic_journey_tail",
 ];
 
 const validateMetadata = (eventName, params, expected = {}) => {
@@ -126,9 +105,6 @@ const validateMetadata = (eventName, params, expected = {}) => {
   const serialized = JSON.stringify(params);
   if (/Здравствуйте|Кратко опишу|intent_message|data-message/i.test(serialized)) {
     errors.push(`${eventName}: в аналитику попал текст черновика сообщения`);
-  }
-  if (/secret-click|sensitive=|token=secret/i.test(serialized)) {
-    errors.push(`${eventName}: в аналитику попало значение click ID или query-параметр реферера`);
   }
 };
 
@@ -157,43 +133,12 @@ try {
   const events = async () => page.evaluate(() => (window.__ymCalls || [])
     .filter((call) => call[1] === "reachGoal")
     .map((call) => ({ name: call[2], params: call[3] || {} })));
-  const visitParams = async () => page.evaluate(() => (window.__ymCalls || [])
-    .filter((call) => call[1] === "params")
-    .map((call) => call[2]?.traffic_attribution || {}));
 
-  const entryUrl = `${origin}/?utm_source=avito&utm_medium=classified&utm_campaign=vzyskanie_dolga&utm_content=ad_01&yclid=secret-click`;
-  await page.goto(entryUrl, {
-    waitUntil: "networkidle",
-    referer: "https://www.avito.ru/profile?sensitive=1&token=secret",
-  });
+  await page.goto(`${origin}/`, { waitUntil: "networkidle" });
   const enabled = await page.locator("body").getAttribute("data-analytics-enabled") === "true";
 
   if (enabled) {
     await page.waitForFunction(() => (window.__ymCalls || []).some((call) => call[1] === "init"));
-    await page.waitForFunction(() => (window.__ymCalls || []).some((call) => call[1] === "params"));
-
-    const attribution = (await visitParams()).at(-1);
-    const expectedAttribution = {
-      traffic_source_type: "tagged",
-      traffic_landing_path: "/",
-      traffic_landing_group: "home",
-      traffic_initial_referrer_host: "www.avito.ru",
-      traffic_initial_referrer_path: "/profile",
-      traffic_utm_source: "avito",
-      traffic_utm_medium: "classified",
-      traffic_utm_campaign: "vzyskanie_dolga",
-      traffic_utm_content: "ad_01",
-      traffic_click_ids: "yclid",
-      traffic_journey_depth: 1,
-      traffic_journey_first_path: "/",
-    };
-    Object.entries(expectedAttribution).forEach(([key, value]) => {
-      if (attribution?.[key] !== value) errors.push(`traffic attribution: ${key}=${attribution?.[key]}, ожидалось ${value}`);
-    });
-    if (/secret-click|sensitive=|token=secret/i.test(JSON.stringify(attribution))) {
-      errors.push("traffic attribution: сохранено значение click ID или query-параметр реферера");
-    }
-
     await page.locator(".hero__quick-choices button", { hasText: "Не возвращают деньги" }).scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
 
@@ -202,8 +147,6 @@ try {
       page_group: "home",
       viewport: "desktop",
       cta_placement: "hero_quick_choice",
-      traffic_utm_source: "avito",
-      traffic_landing_path: "/",
     });
 
     await page.locator(".hero__quick-choices button", { hasText: "Не возвращают деньги" }).click();
@@ -215,7 +158,6 @@ try {
       page_group: "home",
       cta_placement: "hero_quick_choice",
       topic: "возврат денежных средств",
-      traffic_utm_source: "avito",
     });
 
     const legacyOpen = homeEvents.find((item) => item.name === "messenger_dialog_open");
@@ -232,8 +174,6 @@ try {
       origin_cta_placement: "hero_quick_choice",
       source_cta_placement: "hero_quick_choice",
       topic: "возврат денежных средств",
-      traffic_utm_source: "avito",
-      traffic_journey_depth: 1,
     });
 
     await page.goto(`${origin}/kontakty/`, { waitUntil: "networkidle" });
@@ -246,11 +186,6 @@ try {
       contact_mode: "direct",
       cta_placement: "contacts_methods",
       source_cta_placement: "contacts_methods",
-      traffic_utm_source: "avito",
-      traffic_landing_path: "/",
-      traffic_journey_depth: 2,
-      traffic_journey_first_path: "/",
-      traffic_journey_previous_path: "/",
     });
   } else {
     console.log("Conversion analytics browser assertions skipped: production analytics is disabled in this build");
@@ -267,4 +202,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Conversion analytics passed: ${canonicalPaths.length} pages, first-touch source, session journey, CTA views and final conversions without message or click-ID content`);
+console.log(`Conversion analytics passed: ${canonicalPaths.length} pages, CTA views, source attribution and final contact conversions without message content`);

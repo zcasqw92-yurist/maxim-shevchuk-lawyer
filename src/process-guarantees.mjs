@@ -1,4 +1,4 @@
-import { fillBuildSlot } from "./html-slots.mjs";
+import { buildSlot, fillBuildSlot } from "./html-slots.mjs";
 
 const guaranteeItems = [
   {
@@ -50,6 +50,32 @@ export const processGuaranteesBlock = () => `
     </div>
   </section>`;
 
+const arrangeServicesPage = (html, block, pathname) => {
+  const guaranteesSlot = buildSlot("services-guarantees");
+  const guideSlot = buildSlot("services-guide");
+  const temporaryGuideSlot = "<!-- build-slot:services-guide-reordered -->";
+
+  if (!html.includes(guaranteesSlot) || !html.includes(guideSlot)) {
+    throw new Error(`Не найдены слоты смысловой последовательности каталога услуг: ${pathname}`);
+  }
+
+  let result = html
+    .replace(guaranteesSlot, temporaryGuideSlot)
+    .replace(guideSlot, block)
+    .replace(temporaryGuideSlot, guideSlot);
+
+  const guideIndex = result.indexOf(guideSlot);
+  const servicesIndex = result.indexOf('<section class="section section--services">');
+  const guaranteesIndex = result.indexOf('class="section section--process-guarantees"');
+  const pricesIndex = result.indexOf('class="section section--prices"');
+
+  if (!(guideIndex >= 0 && guideIndex < servicesIndex && servicesIndex < guaranteesIndex && guaranteesIndex < pricesIndex)) {
+    throw new Error(`Нарушена смысловая последовательность каталога услуг: ${pathname}`);
+  }
+
+  return result;
+};
+
 export const injectProcessGuarantees = (html, pathname) => {
   // На главной эти условия уже кратко представлены в полосе доверия.
   if (pathname === "/") return html;
@@ -60,8 +86,8 @@ export const injectProcessGuarantees = (html, pathname) => {
 
   const block = processGuaranteesBlock();
   if (pathname === "/uslugi") {
-    const withGuarantees = fillBuildSlot(html, "services-guarantees", block);
-    return removeRedundantCatalogCta(withGuarantees, pathname);
+    const arranged = arrangeServicesPage(html, block, pathname);
+    return removeRedundantCatalogCta(arranged, pathname);
   }
   if (/^\/uslugi\/[^/]+$/.test(pathname)) {
     return fillBuildSlot(html, "service-guarantees", block);

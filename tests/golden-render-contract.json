@@ -97,17 +97,17 @@
     "title": "Юридические услуги в Москве | Максим Шевчук",
     "sections": [
       "inner-hero",
-      "section section--process-guarantees",
-      "section section--services",
       "section section--search-guide section--search-guide-compact",
+      "section section--services",
+      "section section--process-guarantees",
       "section section--prices",
       "section section--dark compact-dark",
       "footer__map footer__map--static"
     ],
     "headings": [
       "h1:Досудебное урегулирование — основа юридической работы",
-      "h2:Условия понятны до начала подготовки",
       "h2:Досудебное урегулирование — основа практики",
+      "h2:Условия понятны до начала подготовки",
       "h2:Понятно, с чего начинается работа",
       "h2:Описать факты полезнее, чем самостоятельно выбирать документ",
       "h2:Направления",

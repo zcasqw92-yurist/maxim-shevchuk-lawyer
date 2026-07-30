@@ -1,0 +1,27 @@
+name: Восстановление атрибуции трафика (разовое)
+
+on:
+  push:
+    branches:
+      - restore/traffic-attribution
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: restore/traffic-attribution
+      - name: Вернуть отменённую first-touch атрибуцию
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git revert --no-edit a506e993f4895b85719012d069240706e89aa0a3
+          rm .github/workflows/restore-traffic-attribution-once.yml
+          git add -A
+          git commit --amend --no-edit
+          git push origin HEAD:restore/traffic-attribution

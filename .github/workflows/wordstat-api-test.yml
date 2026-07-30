@@ -1,0 +1,143 @@
+name: Test Yandex Wordstat API
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/wordstat-api-test.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordstat-api-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  wordstat-test:
+    name: Safe Wordstat connection test
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+      YANDEX_CLOUD_FOLDER_ID: ${{ vars.YANDEX_CLOUD_FOLDER_ID }}
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Query Wordstat safely
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const apiKey = String(process.env.YANDEX_SEARCH_API_KEY || '').trim();
+          const folderId = String(process.env.YANDEX_CLOUD_FOLDER_ID || '').trim();
+
+          if (!apiKey) {
+            console.error('Wordstat test failed: environment secret YANDEX_SEARCH_API_KEY is missing.');
+            process.exit(1);
+          }
+          if (!folderId) {
+            console.error('Wordstat test failed: environment variable YANDEX_CLOUD_FOLDER_ID is missing.');
+            process.exit(1);
+          }
+
+          // GitHub masks secrets automatically; this is a second explicit safeguard.
+          console.log(`::add-mask::${apiKey}`);
+
+          const endpoint = 'https://searchapi.api.cloud.yandex.net/v2/wordstat/topRequests';
+          const requestBody = {
+            phrase: 'вернуть долг без расписки',
+            numPhrases: 10,
+            regions: ['213'],
+            devices: ['DEVICE_ALL'],
+            folderId,
+          };
+
+          const sanitize = (value) => String(value ?? '')
+            .replaceAll(apiKey, '[masked]')
+            .replaceAll(folderId, '[folder]')
+            .replace(/[\r\n\t]+/g, ' ')
+            .slice(0, 300);
+
+          try {
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                Authorization: `Api-Key ${apiKey}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+              signal: AbortSignal.timeout(30000),
+            });
+
+            const responseText = await response.text();
+            let payload = {};
+            try {
+              payload = responseText ? JSON.parse(responseText) : {};
+            } catch {
+              payload = {};
+            }
+
+            if (!response.ok) {
+              const code = payload?.code || payload?.error?.code || 'unknown';
+              const message = payload?.message || payload?.error?.message || 'Yandex API rejected the request';
+              console.error(`Wordstat test failed: HTTP ${response.status}; code=${sanitize(code)}; message=${sanitize(message)}`);
+              process.exit(1);
+            }
+
+            const results = Array.isArray(payload.results) ? payload.results : [];
+            const associations = Array.isArray(payload.associations) ? payload.associations : [];
+            if (!Object.hasOwn(payload, 'totalCount') || results.length === 0) {
+              console.error('Wordstat test failed: API returned an unexpected response structure.');
+              process.exit(1);
+            }
+
+            const topResults = results.slice(0, 10).map((item, index) =>
+              `${index + 1}. ${sanitize(item.phrase)} — ${sanitize(item.count)}`
+            );
+            const topAssociations = associations.slice(0, 5).map((item, index) =>
+              `${index + 1}. ${sanitize(item.phrase)} — ${sanitize(item.count)}`
+            );
+
+            console.log('Wordstat API connection: OK');
+            console.log(`Phrase: ${requestBody.phrase}`);
+            console.log('Region: Moscow (213)');
+            console.log(`Total count: ${sanitize(payload.totalCount)}`);
+            console.log(`Results returned: ${results.length}`);
+            console.log('Top results:');
+            for (const line of topResults) console.log(line);
+            if (topAssociations.length) {
+              console.log('Associations:');
+              for (const line of topAssociations) console.log(line);
+            }
+
+            const summary = [
+              '# Wordstat API test',
+              '',
+              '- Connection: **OK**',
+              `- Phrase: ${requestBody.phrase}`,
+              '- Region: Moscow (213)',
+              `- Total count: ${sanitize(payload.totalCount)}`,
+              `- Results returned: ${results.length}`,
+              '',
+              '## Top results',
+              ...topResults.map((line) => `- ${line}`),
+              ...(topAssociations.length ? ['', '## Associations', ...topAssociations.map((line) => `- ${line}`)] : []),
+              '',
+              '_Secrets, authorization headers, folder identifiers, and raw API responses were not printed._',
+              '',
+            ].join('\n');
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary, 'utf8');
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.error(`Wordstat test failed: network or runtime error; message=${sanitize(message)}`);
+            process.exit(1);
+          }
+          NODE

@@ -38,7 +38,7 @@
     padding-block: clamp(70px, 8vw, 112px);
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
-    background: var(--white);
+    background: var(--paper);
   }
   .process-guarantees__head {
     display: grid;
@@ -62,7 +62,7 @@
     padding: clamp(24px, 2.6vw, 34px);
     border-right: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
-    background: rgba(244,241,234,.34);
+    background: rgba(235,230,220,.52);
   }
   .process-guarantee > span {
     display: block;

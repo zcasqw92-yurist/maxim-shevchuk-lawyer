@@ -1,6 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { services } from "../src/data.mjs";
+import { articles, practiceCases } from "../src/editorial-data.mjs";
+import { applyPublicationLinkingToDist } from "../src/publication-linking.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const bundlePath = join(root, "dist", "assets", "styles.css");
@@ -23,6 +26,7 @@ const styleModules = [
 ].map((id) => ({ id, path: join(root, "src", `${id}.css`) }));
 
 await import("./build.mjs");
+await applyPublicationLinkingToDist({ root, services, articles, practiceCases });
 
 const modules = await Promise.all(styleModules.map(async (module) => ({
   ...module,

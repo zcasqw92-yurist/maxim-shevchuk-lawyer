@@ -38,10 +38,10 @@ for (const token of [
   '"button_kind"',
   '"button_placement"',
   '"button_destination"',
-  'ATTRIBUTION_STORAGE_KEY',
-  'JOURNEY_STORAGE_KEY',
-  'data-price-quiz-option',
-  'data-consent-reject',
+  "ATTRIBUTION_STORAGE_KEY",
+  "JOURNEY_STORAGE_KEY",
+  "data-price-quiz-option",
+  "data-consent-reject",
 ]) {
   if (!source.includes(token)) errors.push(`button analytics source: отсутствует ${token}`);
 }
@@ -122,50 +122,55 @@ try {
     }, { capture: true });
   });
 
-  const page = await context.newPage();
-  await page.route("https://mc.yandex.ru/**", (route) => route.abort());
-  await page.route("https://www.googletagmanager.com/**", (route) => route.abort());
-
   for (const pathname of canonicalPaths) {
-    await page.goto(`${origin}${pathname}`, { waitUntil: "networkidle" });
-    await page.waitForFunction(() => Boolean(window.__buttonAnalyticsContract));
+    const page = await context.newPage();
+    await page.route("https://mc.yandex.ru/**", (route) => route.abort());
+    await page.route("https://www.googletagmanager.com/**", (route) => route.abort());
 
-    const audit = await page.evaluate(async () => {
-      const selector = window.__buttonAnalyticsContract.selector;
-      const controls = [...document.querySelectorAll(selector)];
-      const results = [];
+    let audit = [];
+    try {
+      await page.goto(`${origin}${pathname}`, { waitUntil: "networkidle" });
+      await page.waitForFunction(() => Boolean(window.__buttonAnalyticsContract));
 
-      for (let index = 0; index < controls.length; index += 1) {
-        const control = controls[index];
-        localStorage.setItem("analytics_consent", "granted");
-        window.dataLayer = [];
-        window.__ymCalls = [];
+      audit = await page.evaluate(async () => {
+        const selector = window.__buttonAnalyticsContract.selector;
+        const controls = [...document.querySelectorAll(selector)];
+        const results = [];
 
-        const info = {
-          index,
-          tag: control.tagName.toLowerCase(),
-          text: (control.getAttribute("aria-label") || control.textContent || "").replace(/\s+/g, " ").trim().slice(0, 100),
-          track: control.dataset.track || "",
-          dialogOpen: control.hasAttribute("data-dialog-open"),
-          consentReject: control.hasAttribute("data-consent-reject"),
-          quizOption: control.hasAttribute("data-price-quiz-option"),
-        };
+        for (let index = 0; index < controls.length; index += 1) {
+          const control = controls[index];
+          localStorage.setItem("analytics_consent", "granted");
+          window.dataLayer = [];
+          window.__ymCalls = [];
 
-        control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
-        await new Promise((resolve) => setTimeout(resolve, 0));
+          const info = {
+            index,
+            tag: control.tagName.toLowerCase(),
+            text: (control.getAttribute("aria-label") || control.textContent || "").replace(/\s+/g, " ").trim().slice(0, 100),
+            track: control.dataset.track || "",
+            dialogOpen: control.hasAttribute("data-dialog-open"),
+            consentReject: control.hasAttribute("data-consent-reject"),
+            quizOption: control.hasAttribute("data-price-quiz-option"),
+          };
 
-        const events = (window.dataLayer || []).filter((item) => item && typeof item === "object");
-        results.push({
-          info,
-          buttonAction: events.find((item) => item.event === "button_action") || null,
-          ctaClick: events.find((item) => item.event === "cta_click") || null,
-          contactConversion: events.find((item) => item.event === "contact_conversion") || null,
-          contactAction: events.find((item) => item.event === "contact_action") || null,
-        });
-      }
+          control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+          await new Promise((resolve) => setTimeout(resolve, 0));
 
-      return results;
-    });
+          const events = (window.dataLayer || []).filter((item) => item && typeof item === "object");
+          results.push({
+            info,
+            buttonAction: events.find((item) => item.event === "button_action") || null,
+            ctaClick: events.find((item) => item.event === "cta_click") || null,
+            contactConversion: events.find((item) => item.event === "contact_conversion") || null,
+            contactAction: events.find((item) => item.event === "contact_action") || null,
+          });
+        }
+
+        return results;
+      });
+    } finally {
+      await page.close().catch(() => {});
+    }
 
     totalControls += audit.length;
     if (!audit.length) errors.push(`${pathname}: не найдено ни одного кнопочного действия`);
@@ -200,9 +205,7 @@ try {
 
       ids.push(params.button_id);
 
-      if (item.info.dialogOpen && !item.ctaClick) {
-        errors.push(`${marker}: кнопка открытия диалога не передала cta_click`);
-      }
+      if (item.info.dialogOpen && !item.ctaClick) errors.push(`${marker}: кнопка открытия диалога не передала cta_click`);
       if (item.info.track) {
         if (!item.ctaClick) errors.push(`${marker}: контактная кнопка не передала cta_click`);
         const primary = ["phone", "email", "telegram", "whatsapp"].includes(item.info.track);

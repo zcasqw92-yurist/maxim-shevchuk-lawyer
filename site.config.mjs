@@ -90,6 +90,8 @@ export const site = {
   // не является секретом. Переменная окружения может заменить его при переносе домена.
   indexNowKey: env("INDEXNOW_KEY") || "f5b271bbe6a4c4f4f18fe9a6a3f67158",
   legacyRedirects: {
+    "/blog/": "/razbory/",
+    "/услуги/": "/uslugi/",
     "/dosudebnaya-pretenziya/": "/uslugi/dosudebnoe-uregulirovanie/",
     "/политика-конфиденциальности/": "/politika-konfidencialnosti/",
   },

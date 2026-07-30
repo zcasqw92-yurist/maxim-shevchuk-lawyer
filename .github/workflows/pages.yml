@@ -74,6 +74,7 @@ jobs:
         run: |
           set -o pipefail
           node --check scripts/live-all-publications-smoke.mjs
+          node --check scripts/verify-custom-domain-sha.mjs
           npm run check 2>&1 | tee check.log
 
       - name: Verify Yandex Metrica goals and funnels
@@ -117,6 +118,23 @@ jobs:
         run: |
           npm run test:live
           node scripts/live-all-publications-smoke.mjs
+
+      - name: Verify SHA through custom domain
+        env:
+          SITE_CUSTOM_DOMAIN_URL: ${{ env.SITE_URL }}
+          EXPECTED_BUILD_SHA: ${{ github.sha }}
+          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '30'
+          CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Upload custom-domain SHA diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: custom-domain-sha-diagnostics-${{ github.run_id }}
+          path: reports/custom-domain-sha-verification.json
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Notify IndexNow about changed pages
         if: github.event_name != 'schedule'

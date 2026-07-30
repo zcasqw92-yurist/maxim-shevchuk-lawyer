@@ -14,6 +14,16 @@ export const caseStudies = {
     work: "Подготовлены досудебные требования, обращение в Роспотребнадзор и иск с расчётом остатка, процентов и иных применимых требований.",
     next: "После частичной выплаты требования уточнены по фактически невозвращённой сумме. Судебное рассмотрение продолжается.",
   },
+  debtDemand: {
+    id: "debt-demand",
+    category: "Взыскание долга · досудебная работа",
+    title: "Претензия и расчёт по долгу, оформленному договором или распиской",
+    situation: "Клиент поручил подготовить досудебное требование о возврате долга, подтверждённого договором или распиской.",
+    materials: "Документы об основании долга, сведения для расчёта процентов и приложения, подтверждающие заявляемые требования.",
+    work: "Подготовлены досудебная претензия, расчёт процентов и комплект приложений для направления должнику.",
+    next: "Работа по документу завершена. Факт направления требования и фактическое взыскание денег в исходных материалах не подтверждены, поэтому кейс не содержит утверждения о возврате долга.",
+    detailPath: "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske/",
+  },
   policeReview: {
     id: "police-review",
     category: "Жалоба на отказ полиции",
@@ -36,16 +46,18 @@ export const caseStudies = {
 };
 
 export const pageCaseIds = {
-  "/": ["autoclub", "policeReview", "land"],
-  "/uslugi/dosudebnoe-uregulirovanie": ["autoclub"],
+  "/": ["autoclub", "debtDemand", "policeReview"],
+  "/uslugi/dosudebnoe-uregulirovanie": ["autoclub", "debtDemand"],
+  "/uslugi/vzyskanie-dolga": ["debtDemand"],
   "/uslugi/vozvrat-deneg": ["autoclub"],
   "/uslugi/zhaloby-i-obrashcheniya": ["policeReview"],
-  "/uslugi/iskovoe-zayavlenie": ["autoclub", "land"],
+  "/uslugi/iskovoe-zayavlenie": ["debtDemand", "autoclub", "land"],
 };
 
 const pageTopics = {
   "/": "похожая юридическая ситуация",
   "/uslugi/dosudebnoe-uregulirovanie": "досудебное урегулирование похожего спора",
+  "/uslugi/vzyskanie-dolga": "взыскание долга по расписке, договору или переписке",
   "/uslugi/vozvrat-deneg": "возврат денег в похожей ситуации",
   "/uslugi/zhaloby-i-obrashcheniya": "жалоба на отказ или бездействие государственного органа",
   "/uslugi/iskovoe-zayavlenie": "подготовка позиции для суда в похожей ситуации",

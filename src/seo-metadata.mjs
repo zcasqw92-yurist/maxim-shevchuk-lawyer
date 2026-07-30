@@ -5,9 +5,20 @@ const MAX_TITLE_LENGTH = 65;
 const publicationTitleOverrides = {
   article: {
     "police-refusal-next-steps": "Отказ полиции: как обжаловать постановление",
+    "debt-receipt-order-or-claim": "Долг по расписке: приказ или иск",
+    "debt-third-party-card": "Долг на чужой карте: с кого взыскивать",
+    "debt-no-return-term": "Долг без срока возврата: что делать",
   },
   case: {
     "police-review": "Отмена отказа полиции: дополнительная проверка",
+    "debt-demand": "Претензия и расчёт по долгу",
+  },
+};
+
+const publicationDescriptionOverrides = {
+  article: {},
+  case: {
+    "debt-demand": "Оплаченная юридическая работа по долгу: подготовлены досудебная претензия, расчёт процентов и комплект приложений без заявления неподтверждённого результата взыскания.",
   },
 };
 
@@ -31,7 +42,7 @@ export const publicationSeoMetadata = ({ article = null, practiceCase = null } =
     const titleBase = publicationTitleOverrides.article[article.id] || article.seoTitle || article.title;
     return assertMetadata({
       title: brandedTitle(titleBase),
-      description: article.description,
+      description: publicationDescriptionOverrides.article[article.id] || article.description,
       openGraphType: "article",
       publishedTime: article.publishedAt,
       modifiedTime: article.modifiedAt,
@@ -44,7 +55,7 @@ export const publicationSeoMetadata = ({ article = null, practiceCase = null } =
     const titleBase = publicationTitleOverrides.case[practiceCase.id] || practiceCase.seoTitle || practiceCase.title;
     return assertMetadata({
       title: brandedTitle(titleBase),
-      description: practiceCase.description,
+      description: publicationDescriptionOverrides.case[practiceCase.id] || practiceCase.description,
       openGraphType: "article",
       publishedTime: practiceCase.publishedAt,
       modifiedTime: practiceCase.modifiedAt,

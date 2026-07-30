@@ -7,7 +7,7 @@ const dist = join(root, "dist");
 const errors = [];
 
 const expectedPages = [
-  ["услуги", join("uslugi", "index.html"), "before-services"],
+  ["услуги", join("uslugi", "index.html"), "catalog-sequence"],
   ...services.map((service) => [service.slug, join("uslugi", service.slug, "index.html"), "after-contact"]),
 ];
 
@@ -36,9 +36,13 @@ for (const [label, pagePath, placement] of expectedPages) {
     if (contactIndex < 0 || guaranteeIndex < contactIndex) errors.push(`${label}: блок должен идти после сценария первого обращения`);
     if (finalCtaCount !== 1) errors.push(`${label}: на странице услуги должен остаться один персональный финальный CTA, найдено ${finalCtaCount}`);
   }
-  if (placement === "before-services") {
+  if (placement === "catalog-sequence") {
+    const guideIndex = html.indexOf('class="section section--search-guide section--search-guide-compact"');
     const servicesIndex = html.indexOf('class="section section--services"');
-    if (servicesIndex < 0 || guaranteeIndex > servicesIndex) errors.push(`${label}: блок должен идти перед каталогом услуг`);
+    const pricesIndex = html.indexOf('class="section section--prices"');
+    if (!(guideIndex >= 0 && guideIndex < servicesIndex && servicesIndex < guaranteeIndex && guaranteeIndex < pricesIndex)) {
+      errors.push(`${label}: ожидается последовательность «основа практики → направления → условия → стоимость»`);
+    }
     if (finalCtaCount !== 0) errors.push(`${label}: общий финальный CTA дублирует блок «Не нашли точного совпадения?»`);
     if (!html.includes('class="section section--dark compact-dark"') || !html.includes("Описать факты полезнее, чем самостоятельно выбирать документ")) {
       errors.push(`${label}: должен остаться один предметный финальный блок каталога`);
@@ -71,4 +75,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; the catalog has one closing CTA and detail pages keep their personal CTA`);
+console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; the catalog follows the approved narrative sequence and detail pages keep their personal CTA`);

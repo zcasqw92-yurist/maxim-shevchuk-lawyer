@@ -1,4 +1,5 @@
 import { chromium, webkit } from "playwright";
+import { caseStudies, pageCaseIds } from "../src/case-studies.mjs";
 
 const publicUrl = String(process.env.SITE_PUBLIC_URL || "").trim();
 const canonicalUrl = String(process.env.SITE_CANONICAL_URL || publicUrl).trim();
@@ -14,6 +15,11 @@ const base = new URL(publicUrl.endsWith("/") ? publicUrl : `${publicUrl}/`);
 const canonicalBase = new URL(canonicalUrl.endsWith("/") ? canonicalUrl : `${canonicalUrl}/`);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const expectedHomeCaseMarkers = (pageCaseIds["/"] || []).map((id) => {
+  const item = caseStudies[id];
+  if (!item) throw new Error(`Unknown configured home case: ${id}`);
+  return `id="case-${item.id}"`;
+});
 const noCacheUrl = (pathname) => {
   const url = new URL(pathname, base);
   url.searchParams.set("deployment_check", `${Date.now()}-${Math.random().toString(16).slice(2)}`);
@@ -137,11 +143,12 @@ const verifyPublishedFiles = async () => {
 
   const home = await fetchText("");
   verifyMetadata(home, { label: "home", canonical: canonicalFor("/") });
+  const homeCaseCount = (home.match(/<article class="case-study reveal"/g) || []).length;
+  assert(homeCaseCount === expectedHomeCaseMarkers.length, `home page has ${homeCaseCount} case cards, expected ${expectedHomeCaseMarkers.length}`);
   for (const marker of [
     "trust-strip__grid", "section--value-editorial", "section--cta-portrait", "messenger-choices--dialog",
-    "data-mobile-contact-now", "mobile-contact--single", "section--case-studies", 'id="case-autoclub"',
-    'id="case-police-review"', 'id="case-land"', "Кейсы обезличены", 'href="/razbory/"',
-    'href="/praktika/"', 'rel="alternate" type="application/rss+xml"',
+    "data-mobile-contact-now", "mobile-contact--single", "section--case-studies", ...expectedHomeCaseMarkers,
+    "Кейсы обезличены", 'href="/razbory/"', 'href="/praktika/"', 'rel="alternate" type="application/rss+xml"',
   ]) assert(home.includes(marker), `home page is missing ${marker}`);
   for (const marker of [
     "<form", "<input", "<select", "<textarea", "data-callback", "callback-dialog", "data-price-quiz",

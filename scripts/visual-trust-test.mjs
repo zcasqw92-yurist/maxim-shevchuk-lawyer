@@ -18,8 +18,8 @@ for (const marker of [
   "section--cta-portrait",
   "section--case-studies",
   'id="case-autoclub"',
+  'id="case-debt-demand"',
   'id="case-police-review"',
-  'id="case-land"',
   "assets/visual-trust.js",
 ]) assert(home.includes(marker), `Главная страница не содержит обязательный маркер: ${marker}`);
 

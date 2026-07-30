@@ -1,4 +1,5 @@
 import { caseStudies } from "./case-studies.mjs";
+import { debtClusterArticles, debtPracticeCase } from "./debt-cluster-data.mjs";
 
 const articleSources = {
   article148: { title: "Статья 148 УПК РФ — отказ в возбуждении уголовного дела", url: "https://www.consultant.ru/document/cons_doc_LAW_34481/2dee6703cab2cabdbb193fde2ecb6baf1f69ac2e/" },
@@ -63,8 +64,8 @@ export const articles = [
     modifiedAt: "2026-07-29",
     legalReviewedAt: "2026-07-29",
     readingMinutes: 10,
-    serviceSlug: "vozvrat-deneg",
-    serviceLabel: "Возврат денежных средств: оценка доказательств и подготовка требований",
+    serviceSlug: "vzyskanie-dolga",
+    serviceLabel: "Взыскание долга: оценка доказательств, расчёт и требование",
     topic: "возврат долга без расписки",
     ctaTitle: "Нужно понять, доказывает ли ваша переписка долг?",
     sections: [
@@ -86,21 +87,25 @@ export const articles = [
       { question: "Можно ли использовать свидетелей?", answer: "Если письменная форма займа была обязательна и не соблюдена, свидетельские показания не заменяют письменные и другие доказательства сделки и её условий. Основу позиции лучше строить на переписке, платежах и иных объективных материалах." },
     ],
     sources: [articleSources.article807, articleSources.article808, articleSources.article810, articleSources.article162, articleSources.article395, articleSources.article56Gpk, articleSources.article67Gpk],
-    relatedCaseIds: [],
+    relatedCaseIds: ["debt-demand"],
   },
+  ...debtClusterArticles,
 ];
 
-export const practiceCases = [{
-  ...caseStudies.policeReview,
-  slug: "otmena-otkazov-policii-i-dopolnitelnaya-proverka",
-  status: "published",
-  description: "Обезличенный пример работы по жалобам на неполную проверку сообщения о причинении вреда: отмена отказных постановлений и возвращение материала на дополнительную проверку.",
-  publishedAt: "2026-07-28",
-  modifiedAt: "2026-07-28",
-  serviceSlug: "zhaloby-i-obrashcheniya",
-  relatedArticleSlugs: ["chto-delat-posle-otkaza-policii"],
-  lessons: ["Медицинские документы и иные доказательства важно не просто приложить, а показать, какие обстоятельства они подтверждают.", "В жалобе необходимо перечислять конкретные непроведённые действия и необоснованные выводы, а не ограничиваться несогласием с отказом.", "Отмена отказа является промежуточным результатом: после неё требуется контроль дополнительной проверки и нового процессуального решения."],
-}];
+export const practiceCases = [
+  {
+    ...caseStudies.policeReview,
+    slug: "otmena-otkazov-policii-i-dopolnitelnaya-proverka",
+    status: "published",
+    description: "Обезличенный пример работы по жалобам на неполную проверку сообщения о причинении вреда: отмена отказных постановлений и возвращение материала на дополнительную проверку.",
+    publishedAt: "2026-07-28",
+    modifiedAt: "2026-07-28",
+    serviceSlug: "zhaloby-i-obrashcheniya",
+    relatedArticleSlugs: ["chto-delat-posle-otkaza-policii"],
+    lessons: ["Медицинские документы и иные доказательства важно не просто приложить, а показать, какие обстоятельства они подтверждают.", "В жалобе необходимо перечислять конкретные непроведённые действия и необоснованные выводы, а не ограничиваться несогласием с отказом.", "Отмена отказа является промежуточным результатом: после неё требуется контроль дополнительной проверки и нового процессуального решения."],
+  },
+  debtPracticeCase,
+];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);
 export const findPracticeCaseBySlug = (slug) => practiceCases.find((item) => item.slug === slug);

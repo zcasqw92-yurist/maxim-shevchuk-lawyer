@@ -1,5 +1,9 @@
 const MAX_TEXT_LENGTH = 120;
+const ATTRIBUTION_STORAGE_KEY = "traffic_attribution_v1";
+const JOURNEY_STORAGE_KEY = "traffic_journey_v1";
 const PRIMARY_CONTACT_CHANNELS = new Set(["phone", "email", "telegram", "whatsapp"]);
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_referrer"];
+const CLICK_ID_KEYS = ["yclid", "gclid", "fbclid"];
 
 const analyticsEnabled = document.body.dataset.analyticsEnabled === "true";
 const analyticsRequiresConsent = document.body.dataset.analyticsRequiresConsent === "true";
@@ -23,6 +27,26 @@ const slugify = (value = "") => cleanText(value, 180)
   .replace(/^-+|-+$/g, "")
   .slice(0, 96) || "cta";
 
+const readSessionJson = (key, fallback) => {
+  try {
+    const value = sessionStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const writeSessionJson = (key, value) => {
+  try { sessionStorage.setItem(key, JSON.stringify(value)); } catch { /* session storage may be unavailable */ }
+};
+
+const clearAttributionStorage = () => {
+  try {
+    sessionStorage.removeItem(ATTRIBUTION_STORAGE_KEY);
+    sessionStorage.removeItem(JOURNEY_STORAGE_KEY);
+  } catch { /* session storage may be unavailable */ }
+};
+
 const viewportGroup = () => {
   if (matchMedia("(max-width: 680px)").matches) return "mobile";
   if (matchMedia("(max-width: 1024px)").matches) return "tablet";
@@ -42,6 +66,122 @@ const pageGroup = () => {
   if (path.startsWith("/kontakty")) return "contacts";
   if (path.startsWith("/politika-konfidencialnosti")) return "privacy";
   return "other";
+};
+
+const safePath = (value = "") => {
+  try {
+    const url = new URL(value, location.origin);
+    return cleanText(url.pathname || "/", 160);
+  } catch {
+    return cleanText(String(value).split(/[?#]/)[0] || "/", 160);
+  }
+};
+
+const externalReferrer = () => {
+  if (!document.referrer) return {};
+  try {
+    const referrer = new URL(document.referrer, location.href);
+    if (referrer.hostname === location.hostname) return {};
+    return {
+      referrer_host: cleanText(referrer.hostname, 100),
+      referrer_path: safePath(referrer.pathname),
+    };
+  } catch {
+    return {};
+  }
+};
+
+const safeUtmReferrer = (value = "") => {
+  const normalized = cleanText(value, 180);
+  if (!normalized) return "";
+  try {
+    const url = new URL(normalized, location.origin);
+    return cleanText(`${url.hostname}${url.pathname}`, 120);
+  } catch {
+    return normalized.slice(0, 120);
+  }
+};
+
+const captureFirstTouch = () => {
+  const stored = readSessionJson(ATTRIBUTION_STORAGE_KEY, null);
+  if (stored && typeof stored === "object" && stored.landing_path) return stored;
+
+  const query = new URLSearchParams(location.search);
+  const tags = Object.fromEntries(UTM_KEYS.map((key) => {
+    const rawValue = query.get(key) || "";
+    return [key, key === "utm_referrer" ? safeUtmReferrer(rawValue) : cleanText(rawValue, 100)];
+  }).filter(([, value]) => value));
+  const referrer = externalReferrer();
+  const clickIds = CLICK_ID_KEYS.filter((key) => query.has(key));
+  const captured = {
+    landing_path: safePath(location.pathname),
+    landing_group: pageGroup(),
+    source_type: tags.utm_source ? "tagged" : referrer.referrer_host ? "referral" : "direct",
+    ...referrer,
+    ...tags,
+    ...(clickIds.length ? { click_ids: clickIds.join(",") } : {}),
+  };
+
+  writeSessionJson(ATTRIBUTION_STORAGE_KEY, captured);
+  return captured;
+};
+
+const updateJourney = () => {
+  const stored = readSessionJson(JOURNEY_STORAGE_KEY, []);
+  const journey = Array.isArray(stored) ? stored.filter((item) => typeof item === "string").map(safePath) : [];
+  const currentPath = safePath(location.pathname);
+  if (journey.at(-1) !== currentPath) journey.push(currentPath);
+  const limited = journey.slice(-8);
+  writeSessionJson(JOURNEY_STORAGE_KEY, limited);
+  return limited;
+};
+
+const firstTouch = captureFirstTouch();
+const journey = updateJourney();
+
+const attributionFields = () => ({
+  traffic_source_type: firstTouch.source_type || "direct",
+  traffic_landing_path: firstTouch.landing_path || safePath(location.pathname),
+  traffic_landing_group: firstTouch.landing_group || pageGroup(),
+  traffic_initial_referrer_host: firstTouch.referrer_host || "none",
+  traffic_initial_referrer_path: firstTouch.referrer_path || "none",
+  traffic_utm_source: firstTouch.utm_source || "none",
+  traffic_utm_medium: firstTouch.utm_medium || "none",
+  traffic_utm_campaign: firstTouch.utm_campaign || "none",
+  traffic_utm_content: firstTouch.utm_content || "none",
+  traffic_utm_term: firstTouch.utm_term || "none",
+  traffic_utm_referrer: firstTouch.utm_referrer || "none",
+  traffic_click_ids: firstTouch.click_ids || "none",
+  traffic_journey_depth: journey.length,
+  traffic_journey_first_path: journey[0] || safePath(location.pathname),
+  traffic_journey_previous_path: journey.length > 1 ? journey.at(-2) : "none",
+  traffic_journey_tail: cleanText(journey.slice(-4).join(" > "), 120),
+});
+
+const contentFields = () => {
+  const publication = document.querySelector("[data-publication-kind]");
+  if (publication) {
+    return {
+      content_kind: cleanText(publication.dataset.publicationKind || "publication", 40),
+      content_id: cleanText(
+        publication.dataset.articleId
+        || publication.dataset.caseId
+        || publication.dataset.publicationId
+        || location.pathname.split("/").filter(Boolean).at(-1)
+        || "unknown",
+        96,
+      ),
+    };
+  }
+
+  if (location.pathname.startsWith("/uslugi/") && location.pathname !== "/uslugi/") {
+    return {
+      content_kind: "service",
+      content_id: cleanText(location.pathname.split("/").filter(Boolean).at(-1) || "unknown", 96),
+    };
+  }
+
+  return { content_kind: pageGroup(), content_id: "none" };
 };
 
 const placementRules = [
@@ -110,12 +250,28 @@ const metadataFor = (element, extra = {}) => {
     cta_kind: kind,
     section_title: sectionTitleFor(element),
     topic,
+    ...contentFields(),
+    ...attributionFields(),
     ...extra,
   };
 };
 
+let visitAttributionSent = false;
+const sendVisitAttribution = () => {
+  if (!mayTrack() || visitAttributionSent) return false;
+  const payload = attributionFields();
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "traffic_attribution_ready", ...payload });
+  if (yandexMetricaId && typeof window.ym === "function") {
+    window.ym(yandexMetricaId, "params", { traffic_attribution: payload });
+  }
+  visitAttributionSent = true;
+  return true;
+};
+
 const send = (eventName, params = {}) => {
   if (!mayTrack()) return false;
+  sendVisitAttribution();
   const normalized = Object.fromEntries(Object.entries(params)
     .filter(([, value]) => value !== undefined && value !== null && value !== "")
     .map(([key, value]) => [key, typeof value === "string" ? cleanText(value) : value]));
@@ -213,6 +369,14 @@ if ("IntersectionObserver" in window) {
   });
 }
 
+queueMicrotask(sendVisitAttribution);
+document.addEventListener("DOMContentLoaded", sendVisitAttribution, { once: true });
+
 document.querySelector("[data-consent-accept]")?.addEventListener("click", () => {
-  setTimeout(flushVisibleTargets, 0);
+  setTimeout(() => {
+    sendVisitAttribution();
+    flushVisibleTargets();
+  }, 0);
 });
+
+document.querySelector("[data-consent-reject]")?.addEventListener("click", clearAttributionStorage);

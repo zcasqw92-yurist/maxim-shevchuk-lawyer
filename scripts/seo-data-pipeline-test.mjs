@@ -9,6 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const config = JSON.parse(await readFile(join(root, "config", "seo-data-pipeline.json"), "utf8"));
 const cache = JSON.parse(await readFile(join(root, "data", "seo", "wordstat-cache.json"), "utf8"));
 const script = await readFile(join(root, "scripts", "seo-data-pipeline.mjs"), "utf8");
+const workflow = await readFile(join(root, ".github", "workflows", "seo-data-pipeline.yml"), "utf8");
 
 assert.equal(config.cache_ttl_days, 30, "Wordstat-кеш должен действовать 30 дней");
 assert.equal(config.max_api_calls_per_cluster, 3, "На кластер допускается не более трёх API-вызовов");
@@ -20,6 +21,10 @@ assert.ok(config.hypotheses.every((item) => item.reason && item.content_id && it
 assert.ok(script.includes("wordstat_not_called_on_feedback_schedule: true"), "Плановый сбор статистики не должен вызывать Wordstat");
 assert.ok(script.includes("raw_responses_saved: false"), "Сырые API-ответы не должны сохраняться");
 assert.ok(script.includes("secrets_saved: false") || script.includes("tokens_saved: false"), "Секреты не должны сохраняться в отчётах");
+assert.match(workflow, /schedule:[\s\S]*cron:\s*'25 4 \* \* 1'/, "Должен быть еженедельный сбор обратной связи");
+assert.match(workflow, /push:[\s\S]*branches:[\s\S]*- main/, "После изменения конвейера должен выполняться контрольный feedback-запуск");
+assert.match(workflow, /PIPELINE_MODE:\s*\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.mode \|\| 'feedback' \}\}/, "Все автоматические события должны использовать безопасный режим feedback");
+assert.match(workflow, /ref:\s*seo-data/, "История должна сохраняться в отдельной ветке seo-data");
 
 const cacheEntry = cache.entries["topRequests|вернуть долг без расписки|213|DEVICE_ALL"];
 assert.ok(cacheEntry, "Первый подтверждённый кластер должен находиться в кеше");
@@ -51,4 +56,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("SEO data pipeline contract passed: cache, call limits, stop rules and safe reporting are enforced");
+console.log("SEO data pipeline contract passed: cache, call limits, stop rules, scheduled feedback and safe reporting are enforced");

@@ -78,48 +78,23 @@ await new Promise((resolve, reject) => {
 });
 
 const requiredMetadata = [
-  "page_path",
-  "page_group",
-  "viewport",
-  "button_id",
-  "button_label",
-  "button_kind",
-  "button_placement",
-  "button_variant",
-  "button_destination",
-  "section_title",
-  "topic",
-  "content_kind",
-  "content_id",
-  "traffic_source_type",
-  "traffic_landing_path",
-  "traffic_landing_group",
-  "traffic_utm_source",
-  "traffic_utm_medium",
-  "traffic_utm_campaign",
-  "traffic_utm_content",
-  "traffic_journey_depth",
-  "traffic_journey_first_path",
-  "traffic_journey_tail",
+  "page_path", "page_group", "viewport", "button_id", "button_label",
+  "button_kind", "button_placement", "button_variant", "button_destination",
+  "section_title", "topic", "content_kind", "content_id", "traffic_source_type",
+  "traffic_landing_path", "traffic_landing_group", "traffic_utm_source",
+  "traffic_utm_medium", "traffic_utm_campaign", "traffic_utm_content",
+  "traffic_journey_depth", "traffic_journey_first_path", "traffic_journey_tail",
 ];
 
 let browser;
 let totalControls = 0;
 try {
   browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
-  const context = await browser.newContext({
-    viewport: { width: 1440, height: 1000 },
-    locale: "ru-RU",
-    reducedMotion: "reduce",
-  });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: "ru-RU", reducedMotion: "reduce" });
   await context.addInitScript(() => {
     localStorage.setItem("analytics_consent", "granted");
     window.__ymCalls = [];
     window.ym = (...args) => window.__ymCalls.push(args);
-    document.addEventListener("click", (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      if (target?.closest("a[href]")) event.preventDefault();
-    }, { capture: true });
   });
 
   for (const pathname of canonicalPaths) {
@@ -131,11 +106,19 @@ try {
     try {
       await page.goto(`${origin}${pathname}`, { waitUntil: "networkidle" });
       await page.waitForFunction(() => Boolean(window.__buttonAnalyticsContract));
-
       audit = await page.evaluate(async () => {
         const selector = window.__buttonAnalyticsContract.selector;
         const controls = [...document.querySelectorAll(selector)];
         const results = [];
+
+        // The contract audits analytics, not navigation. Neutralizing href prevents a
+        // synthetic click from destroying the execution context while preserving
+        // the element's label, role, placement and tracking attributes.
+        document.querySelectorAll("a[href]").forEach((anchor) => {
+          anchor.dataset.analyticsAuditHref = anchor.getAttribute("href") || "";
+          anchor.setAttribute("href", "#analytics-audit");
+          anchor.removeAttribute("target");
+        });
 
         for (let index = 0; index < controls.length; index += 1) {
           const control = controls[index];
@@ -153,7 +136,8 @@ try {
             quizOption: control.hasAttribute("data-price-quiz-option"),
           };
 
-          control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+          const cancelled = !control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+          if (!cancelled && control.matches("a[href]")) history.replaceState(null, "", location.pathname);
           await new Promise((resolve) => setTimeout(resolve, 0));
 
           const events = (window.dataLayer || []).filter((item) => item && typeof item === "object");
@@ -165,7 +149,6 @@ try {
             contactAction: events.find((item) => item.event === "contact_action") || null,
           });
         }
-
         return results;
       });
     } finally {
@@ -175,36 +158,28 @@ try {
     totalControls += audit.length;
     if (!audit.length) errors.push(`${pathname}: не найдено ни одного кнопочного действия`);
     const ids = [];
-
     for (const item of audit) {
       const marker = `${pathname} #${item.info.index + 1} ${item.info.tag} «${item.info.text || "без текста"}»`;
       if (item.info.consentReject) {
         if (item.buttonAction) errors.push(`${marker}: отказ от аналитики не должен отправляться во внешнюю аналитику`);
         continue;
       }
-
       const params = item.buttonAction;
       if (!params) {
         errors.push(`${marker}: отсутствует событие button_action`);
         continue;
       }
-
       for (const key of requiredMetadata) {
         if (params[key] === undefined || params[key] === "") errors.push(`${marker}: отсутствует метка ${key}`);
       }
       if (params.page_path !== pathname) errors.push(`${marker}: page_path=${params.page_path}, ожидалось ${pathname}`);
       if (params.button_destination?.includes("?")) errors.push(`${marker}: destination содержит query-параметры`);
-      if (item.info.quizOption && params.button_label !== "Выбор варианта квиза") {
-        errors.push(`${marker}: ответ квиза не должен передаваться как button_label`);
-      }
-
+      if (item.info.quizOption && params.button_label !== "Выбор варианта квиза") errors.push(`${marker}: ответ квиза не должен передаваться как button_label`);
       const serialized = JSON.stringify(params);
       if (/Здравствуйте|Кратко опишу|secret-click|sensitive=|token=secret|yclid=|gclid=|fbclid=/i.test(serialized)) {
         errors.push(`${marker}: в метки попали текст сообщения, click ID или query-параметры`);
       }
-
       ids.push(params.button_id);
-
       if (item.info.dialogOpen && !item.ctaClick) errors.push(`${marker}: кнопка открытия диалога не передала cta_click`);
       if (item.info.track) {
         if (!item.ctaClick) errors.push(`${marker}: контактная кнопка не передала cta_click`);
@@ -213,11 +188,9 @@ try {
         if (!primary && !item.contactAction) errors.push(`${marker}: вспомогательная кнопка не передала contact_action`);
       }
     }
-
     const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
     if (duplicates.length) errors.push(`${pathname}: повторяются button_id: ${[...new Set(duplicates)].join(", ")}`);
   }
-
   await context.close();
 } finally {
   await browser?.close().catch(() => {});
@@ -228,5 +201,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-
 console.log(`Button analytics contract passed: ${canonicalPaths.length} pages, ${totalControls} controls, complete action labels, conversion events and privacy-safe metadata`);

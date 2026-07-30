@@ -1,0 +1,197 @@
+name: Test Yandex Webmaster API
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test/yandex-webmaster-api-connection-use-this
+    paths:
+      - '.github/workflows/webmaster-api-test.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/webmaster-api-test.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: webmaster-api-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  webmaster-test:
+    name: Safe Webmaster connection test
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      YANDEX_WEBMASTER_TOKEN: ${{ secrets.YANDEX_WEBMASTER_TOKEN }}
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Query Webmaster safely
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const token = String(process.env.YANDEX_WEBMASTER_TOKEN || '').trim();
+          const targetHost = 'yuristshevchuk.com';
+
+          if (!token) {
+            console.error('Webmaster test failed: environment secret YANDEX_WEBMASTER_TOKEN is missing.');
+            process.exit(1);
+          }
+
+          console.log(`::add-mask::${token}`);
+
+          const baseUrl = 'https://api.webmaster.yandex.net/v4';
+          const safeText = (value) => String(value ?? '')
+            .replaceAll(token, '[masked]')
+            .replace(/[\r\n\t]+/g, ' ')
+            .slice(0, 240);
+
+          const apiGet = async (path, { allowKnownQueryState = false } = {}) => {
+            const response = await fetch(`${baseUrl}${path}`, {
+              headers: {
+                Authorization: `OAuth ${token}`,
+                Accept: 'application/json',
+              },
+              signal: AbortSignal.timeout(30000),
+            });
+
+            const text = await response.text();
+            let payload = {};
+            try {
+              payload = text ? JSON.parse(text) : {};
+            } catch {
+              payload = {};
+            }
+
+            if (!response.ok) {
+              const code = safeText(payload?.error_code || payload?.code || 'unknown');
+              const knownQueryStates = new Set(['HOST_NOT_INDEXED', 'HOST_NOT_LOADED']);
+              if (allowKnownQueryState && knownQueryStates.has(code)) {
+                return { ok: false, knownState: code, payload: {} };
+              }
+              console.error(`Webmaster test failed: HTTP ${response.status}; code=${code}`);
+              process.exit(1);
+            }
+
+            return { ok: true, payload };
+          };
+
+          const normalizeHostname = (urlValue) => {
+            try {
+              return new URL(String(urlValue || '')).hostname.replace(/^www\./i, '').toLowerCase();
+            } catch {
+              return '';
+            }
+          };
+
+          try {
+            const userResponse = await apiGet('/user');
+            const userId = userResponse.payload?.user_id;
+            if (!userId) {
+              console.error('Webmaster test failed: user ID was not returned.');
+              process.exit(1);
+            }
+
+            const hostsResponse = await apiGet(`/user/${encodeURIComponent(userId)}/hosts`);
+            const hosts = Array.isArray(hostsResponse.payload?.hosts) ? hostsResponse.payload.hosts : [];
+            const host = hosts.find((item) =>
+              normalizeHostname(item?.ascii_host_url) === targetHost ||
+              normalizeHostname(item?.unicode_host_url) === targetHost
+            );
+
+            if (!host) {
+              console.error(`Webmaster test failed: ${targetHost} was not found among accessible sites.`);
+              process.exit(1);
+            }
+
+            const hostId = String(host.host_id || '');
+            if (!hostId) {
+              console.error('Webmaster test failed: the matching site has no host ID.');
+              process.exit(1);
+            }
+
+            const hostInfoResponse = await apiGet(
+              `/user/${encodeURIComponent(userId)}/hosts/${encodeURIComponent(hostId)}`,
+            );
+            const hostInfo = hostInfoResponse.payload || {};
+            const verified = Boolean(hostInfo.verified ?? host.verified);
+            const hostDataStatus = safeText(hostInfo.host_data_status || 'UNKNOWN');
+
+            const params = new URLSearchParams();
+            params.set('order_by', 'TOTAL_SHOWS');
+            params.append('query_indicator', 'TOTAL_SHOWS');
+            params.append('query_indicator', 'TOTAL_CLICKS');
+            params.append('query_indicator', 'AVG_SHOW_POSITION');
+            params.set('device_type_indicator', 'ALL');
+            params.set('limit', '10');
+
+            const queriesResponse = await apiGet(
+              `/user/${encodeURIComponent(userId)}/hosts/${encodeURIComponent(hostId)}/search-queries/popular?${params.toString()}`,
+              { allowKnownQueryState: true },
+            );
+
+            const queries = queriesResponse.ok && Array.isArray(queriesResponse.payload?.queries)
+              ? queriesResponse.payload.queries
+              : [];
+            const queryCount = queriesResponse.ok
+              ? Number(queriesResponse.payload?.count || queries.length || 0)
+              : 0;
+
+            const topQueries = queries.slice(0, 10).map((item, index) => {
+              const indicators = item?.indicators || {};
+              const shows = indicators.TOTAL_SHOWS ?? 0;
+              const clicks = indicators.TOTAL_CLICKS ?? 0;
+              const position = indicators.AVG_SHOW_POSITION ?? '—';
+              return `${index + 1}. ${safeText(item?.query_text)} — показы: ${safeText(shows)}, клики: ${safeText(clicks)}, позиция: ${safeText(position)}`;
+            });
+
+            console.log('Yandex Webmaster API connection: OK');
+            console.log(`Accessible sites: ${hosts.length}`);
+            console.log(`Target site found: ${targetHost}`);
+            console.log(`Verified: ${verified ? 'yes' : 'no'}`);
+            console.log(`Indexing status: ${hostDataStatus}`);
+
+            if (queriesResponse.ok) {
+              console.log(`Available popular queries: ${queryCount}`);
+              console.log(`Queries returned: ${queries.length}`);
+              if (topQueries.length) {
+                console.log('Top queries:');
+                for (const line of topQueries) console.log(line);
+              }
+            } else {
+              console.log(`Popular queries are not available yet: ${queriesResponse.knownState}`);
+            }
+
+            const summary = [
+              '# Yandex Webmaster API test',
+              '',
+              '- Connection: **OK**',
+              `- Target site: ${targetHost}`,
+              `- Site verified: ${verified ? 'yes' : 'no'}`,
+              `- Indexing status: ${hostDataStatus}`,
+              `- Accessible sites: ${hosts.length}`,
+              ...(queriesResponse.ok
+                ? [`- Available popular queries: ${queryCount}`, `- Queries returned: ${queries.length}`]
+                : [`- Popular queries state: ${queriesResponse.knownState}`]),
+              ...(topQueries.length ? ['', '## Top queries', ...topQueries.map((line) => `- ${line}`)] : []),
+              '',
+              '_The OAuth token, authorization header, user ID, host ID, and raw API responses were not printed._',
+              '',
+            ].join('\n');
+
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary, 'utf8');
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.error(`Webmaster test failed: network or runtime error; message=${safeText(message)}`);
+            process.exit(1);
+          }
+          NODE

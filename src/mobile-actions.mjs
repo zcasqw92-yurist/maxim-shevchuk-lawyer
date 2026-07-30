@@ -12,6 +12,7 @@ const icon = (name) => {
 const base = site.basePath || "";
 const engagementScript = `${base}/assets/engagement-nudge.mjs`;
 const conversionAnalyticsScript = `${base}/assets/conversion-analytics.mjs`;
+const buttonAnalyticsScript = `${base}/assets/button-analytics.mjs`;
 
 const narrowLayoutStyles = `
   <style>
@@ -84,6 +85,7 @@ const mobileActionsMarkup = `
 export const injectMobileActions = (html, pathname) => {
   if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);
   const withAnalytics = appendToBuildSlot(html, "head-assets", `  <script type="module" src="${conversionAnalyticsScript}"></script>\n`);
-  const withNarrowLayout = appendToBuildSlot(withAnalytics, "head-assets", narrowLayoutStyles);
+  const withButtonAnalytics = appendToBuildSlot(withAnalytics, "head-assets", `  <script type="module" src="${buttonAnalyticsScript}"></script>\n`);
+  const withNarrowLayout = appendToBuildSlot(withButtonAnalytics, "head-assets", narrowLayoutStyles);
   return fillBuildSlot(withNarrowLayout, "mobile-actions", mobileActionsMarkup);
 };

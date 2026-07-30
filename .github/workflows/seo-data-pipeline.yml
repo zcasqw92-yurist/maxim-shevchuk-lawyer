@@ -3,6 +3,16 @@ name: SEO data feedback
 on:
   schedule:
     - cron: '25 4 * * 1'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/seo-data-pipeline.yml'
+      - 'config/seo-data-pipeline.json'
+      - 'data/seo/wordstat-cache.json'
+      - 'scripts/seo-data-pipeline.mjs'
+      - 'scripts/seo-data-pipeline-test.mjs'
+      - 'src/metrica-goals.mjs'
   workflow_dispatch:
     inputs:
       mode:
@@ -38,9 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      PIPELINE_MODE: ${{ github.event_name == 'schedule' && 'feedback' || inputs.mode }}
-      SEO_HYPOTHESIS_ID: ${{ inputs.hypothesis_id || '' }}
-      SEO_FORCE_WORDSTAT: ${{ inputs.force_wordstat || 'false' }}
+      PIPELINE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'feedback' }}
+      SEO_HYPOTHESIS_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.hypothesis_id || '' }}
+      SEO_FORCE_WORDSTAT: ${{ github.event_name == 'workflow_dispatch' && inputs.force_wordstat || 'false' }}
       YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
       YANDEX_WEBMASTER_TOKEN: ${{ secrets.YANDEX_WEBMASTER_TOKEN }}
       YANDEX_METRICA_OAUTH_TOKEN: ${{ secrets.YANDEX_METRICA_OAUTH_TOKEN }}

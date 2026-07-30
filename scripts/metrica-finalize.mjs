@@ -50,6 +50,13 @@ const actionBody = (definition, id) => ({ goal: {
   is_favorite: favorite(definition.favorite),
   conditions: [{ type: "exact", url: definition.event }],
 } });
+const archiveActionBody = (goal, archiveName) => ({ goal: {
+  id: goal.id,
+  name: archiveName,
+  type: "action",
+  is_favorite: 0,
+  conditions: goal.conditions || [],
+} });
 const funnelBody = (definition, id) => ({ goal: {
   ...(id ? { id } : {}), name: definition.name, type: "step",
   is_favorite: favorite(definition.favorite),
@@ -88,15 +95,28 @@ for (const obsolete of metricaObsoleteGoals) {
   const goals = await listGoals();
   const current = goals.find((goal) => Number(goal.id) === Number(obsolete.id))
     || goals.find((goal) => obsolete.event && actionEvent(goal) === obsolete.event)
-    || goals.find((goal) => goal.name === obsolete.name);
+    || goals.find((goal) => goal.name === obsolete.name)
+    || goals.find((goal) => obsolete.archiveName && goal.name === obsolete.archiveName);
   if (!current) {
     operations.push({ operation: "obsolete_absent", id: obsolete.id, name: obsolete.name });
     continue;
   }
-  if (protectedIds.has(Number(current.id))) throw new Error(`Защищённая цель попала в удаление: ${current.id}`);
+  if (protectedIds.has(Number(current.id))) throw new Error(`Защищённая цель попала в обработку: ${current.id}`);
   const history = await goalHistory(current.id, startDate);
   if (!history.known || history.reaches > 0 || history.visits > 0) {
-    operations.push({ operation: "obsolete_retained", id: current.id, name: current.name, history });
+    if (current.type !== "action" || current.goal_source === "auto" || !obsolete.archiveName) {
+      operations.push({ operation: "obsolete_retained", id: current.id, name: current.name, history });
+      continue;
+    }
+    if (current.name !== obsolete.archiveName || Boolean(current.is_favorite)) {
+      await management(`/counter/${counterId}/goal/${current.id}`, {
+        method: "PUT",
+        body: archiveActionBody(current, obsolete.archiveName),
+      });
+      operations.push({ operation: "obsolete_archived", id: current.id, before_name: current.name, after_name: obsolete.archiveName, history });
+    } else {
+      operations.push({ operation: "obsolete_archive_unchanged", id: current.id, name: current.name, history });
+    }
     continue;
   }
   await management(`/counter/${counterId}/goal/${current.id}`, { method: "DELETE" });
@@ -147,6 +167,12 @@ for (const definition of metricaCompositeGoals) {
   const goal = after.find((item) => item.type === "step" && item.name === definition.name);
   if (!goal) errors.push(`Не создана воронка «${definition.name}»`);
   else if (JSON.stringify(stepEvents(goal)) !== JSON.stringify(definition.steps)) errors.push(`Неверные шаги воронки «${definition.name}»`);
+}
+for (const obsolete of metricaObsoleteGoals) {
+  const goal = after.find((item) => Number(item.id) === Number(obsolete.id));
+  if (goal && obsolete.archiveName && goal.goal_source !== "auto") {
+    if (goal.name !== obsolete.archiveName || Boolean(goal.is_favorite)) errors.push(`Устаревшая цель ${obsolete.id} не переведена в архив`);
+  }
 }
 for (const protectedGoal of metricaProtectedGoals) {
   if (!after.some((goal) => Number(goal.id) === Number(protectedGoal.id))) errors.push(`Удалена защищённая цель ${protectedGoal.id}`);

@@ -14,7 +14,7 @@ const sources = {
   app: await readFile(join(root, "src", "app.js"), "utf8"),
   conversion: await readFile(join(root, "public", "assets", "conversion-analytics.mjs"), "utf8"),
   channel: await readFile(join(root, "public", "assets", "channel-analytics.mjs"), "utf8"),
-  button: await readFile(join(root, "public", "assets", "button-analytics.mjs"), "utf8"),
+  button: await readFile(join(root, "public", "assets", "button-analytics.mjs"),
   editorial: await readFile(join(root, "public", "assets", "editorial-analytics.mjs"), "utf8"),
 };
 
@@ -33,6 +33,23 @@ const eventSources = new Map([
   ["contact_map", ["channel"]],
 ]);
 
+const editorialEventImplemented = (event) => {
+  if (sources.editorial.includes(event)) return true;
+  const scroll = event.match(/^publication_scroll_(25|50|75|90|100)$/);
+  if (scroll) {
+    return sources.editorial.includes("`publication_scroll_${threshold}`")
+      && sources.editorial.includes("[25, 50, 75, 90, 100]")
+      && sources.editorial.includes(scroll[1]);
+  }
+  const active = event.match(/^publication_active_(30|60|120)s$/);
+  if (active) {
+    return sources.editorial.includes("`publication_active_${threshold}s`")
+      && sources.editorial.includes("[30, 60, 120]")
+      && sources.editorial.includes(active[1]);
+  }
+  return false;
+};
+
 for (const goal of metricaActionGoals) {
   if (!goal.event || !goal.name || typeof goal.favorite !== "boolean" || !goal.role) {
     errors.push(`Некорректное описание action-цели: ${JSON.stringify(goal)}`);
@@ -44,9 +61,10 @@ for (const goal of metricaActionGoals) {
     errors.push(`${goal.event}: не определён источник события`);
     continue;
   }
-  if (!expectedSources.some((source) => sources[source].includes(goal.event))) {
-    errors.push(`${goal.event}: событие отсутствует в ожидаемом клиентском модуле ${expectedSources.join(", ")}`);
-  }
+  const implemented = goal.event.startsWith("publication_")
+    ? editorialEventImplemented(goal.event)
+    : expectedSources.some((source) => sources[source].includes(goal.event));
+  if (!implemented) errors.push(`${goal.event}: событие отсутствует в ожидаемом клиентском модуле ${expectedSources.join(", ")}`);
 }
 
 const actionEvents = new Set(metricaActionGoals.map((goal) => goal.event));

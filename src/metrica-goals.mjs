@@ -48,10 +48,34 @@ export const metricaCompositeGoals = Object.freeze([
 ]);
 
 export const metricaObsoleteGoals = Object.freeze([
-  { id: 589225251, event: "price_quiz_complete", name: "Квиз пройден до конца", reason: "квиз удалён из действующей модели обращения" },
-  { id: 589225287, event: "callback_request_whatsapp", name: "Запрос связаться позже — WhatsApp", reason: "обратный звонок и сценарий «связаться позже» удалены" },
-  { id: 589225338, event: "callback_request_telegram", name: "Запрос связаться позже — Telegram", reason: "обратный звонок и сценарий «связаться позже» удалены" },
-  { id: 589230193, event: "", name: "Автоцель: отправка формы", reason: "на сайте отсутствуют формы" },
+  {
+    id: 589225251,
+    event: "price_quiz_complete",
+    name: "Квиз пройден до конца",
+    archiveName: "Архив — квиз пройден до конца",
+    reason: "квиз удалён из действующей модели обращения",
+  },
+  {
+    id: 589225287,
+    event: "callback_request_whatsapp",
+    name: "Запрос связаться позже — WhatsApp",
+    archiveName: "Архив — связаться позже через WhatsApp",
+    reason: "обратный звонок и сценарий «связаться позже» удалены",
+  },
+  {
+    id: 589225338,
+    event: "callback_request_telegram",
+    name: "Запрос связаться позже — Telegram",
+    archiveName: "Архив — связаться позже через Telegram",
+    reason: "обратный звонок и сценарий «связаться позже» удалены",
+  },
+  {
+    id: 589230193,
+    event: "",
+    name: "Автоцель: отправка формы",
+    archiveName: "Архив — отправка формы",
+    reason: "на сайте отсутствуют формы",
+  },
 ]);
 
 export const metricaProtectedGoals = Object.freeze([

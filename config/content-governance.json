@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "ruleId": "google-sheet-content-standard",
+  "priority": "highest-project-content-rule",
+  "spreadsheet": {
+    "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
+    "title": "Юридическая воронка — БПЮ и Юр. доки",
+    "canonicalUrl": "https://docs.google.com/spreadsheets/d/1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24/edit?gid=83276506#gid=83276506",
+    "entryGid": "83276506",
+    "readMode": "live-before-every-content-session",
+    "requireAllTabs": true,
+    "discoverTabsDynamically": true,
+    "reviewNonEmptyCells": true,
+    "reviewNotesAndComments": true,
+    "baselineSnapshot": {
+      "modifiedTime": "2026-07-30T18:48:31.577Z",
+      "tabCount": 24,
+      "tabs": [
+        "00_Старт",
+        "01_БПЮ",
+        "02_ЮрДоки",
+        "03_Оплаты",
+        "04_Дашборд",
+        "05_Контроль",
+        "06_Импорт",
+        "_Справочники",
+        "_Журнал",
+        "07_Диалоги_исследование",
+        "08_Банк_реплик",
+        "09_Паттерны_аудитории",
+        "10_Контентные_возможности",
+        "11_Кейсы_для_публикации",
+        "12_Эффективные_ответы",
+        "13_Статистика_контента",
+        "14_Контент_дашборд",
+        "15_Обращения_с_контента",
+        "_Реестр_диалогов",
+        "_Ситуации_и_связи",
+        "_События_воронки",
+        "_Версии_контента",
+        "16_Контроль_данных",
+        "_Импорт_ЮД_151_200"
+      ]
+    }
+  },
+  "governedContentPaths": [
+    "site.config.mjs",
+    "src/data.mjs",
+    "src/service-content.mjs",
+    "src/debt-cluster-data.mjs",
+    "src/debt-cluster-data-legacy.mjs",
+    "src/editorial-data.mjs",
+    "src/case-studies.mjs",
+    "src/privacy-policy.mjs",
+    "src/process-guarantees.mjs",
+    "src/geography.mjs",
+    "src/search-visibility.mjs",
+    "src/content-dates.mjs",
+    "content/**",
+    "public/**/*.html",
+    "public/**/*.md"
+  ],
+  "generatedPaths": [
+    "dist/**"
+  ],
+  "sessionManifest": {
+    "path": "reports/content-sessions/latest.json",
+    "template": "reports/content-sessions/template.json",
+    "requiredWhenGovernedContentChanges": true,
+    "mustChangeWithGovernedContent": true,
+    "mustListEveryDiscoveredTab": true,
+    "mustNotContainPersonalData": true
+  },
+  "publication": {
+    "localFullSiteCheck": "npm run check",
+    "liveChecks": [
+      "npm run test:live",
+      "node scripts/live-all-publications-smoke.mjs"
+    ],
+    "chatReportRequired": true,
+    "chatReportFields": [
+      "spreadsheet snapshot and reviewed tabs",
+      "created or updated content",
+      "changed repository files",
+      "published public URLs",
+      "commit SHA",
+      "local check result",
+      "CI and deployment result",
+      "live full-site check result",
+      "unpublished items and reasons"
+    ]
+  }
+}

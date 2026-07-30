@@ -134,7 +134,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          node scripts/metrica-goal-sync.mjs 2>&1 | tee metrica-sync.log
+          node scripts/metrica-goal-sync-v2.mjs 2>&1 | tee metrica-sync.log
 
       - name: Сохранить снимки до и после
         if: always()

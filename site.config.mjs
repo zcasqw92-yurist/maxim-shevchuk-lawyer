@@ -33,6 +33,7 @@ export const site = {
     "/razbory/dolg-po-raspiske-prikaz-ili-isk": "2026-07-29",
     "/razbory/dengi-v-dolg-na-chuzhuyu-kartu": "2026-07-29",
     "/razbory/srok-vozvrata-dolga-ne-ukazan": "2026-07-29",
+    "/razbory/prodavets-propal-posle-perevoda": "2026-07-30",
     "/praktika": "2026-07-29",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-07-28",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-07-29",

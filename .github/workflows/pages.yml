@@ -31,6 +31,7 @@ jobs:
       SITE_ANALYTICS_ENABLED: 'true'
       GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
       YANDEX_METRICA_ID: '111050150'
+      YANDEX_METRICA_OAUTH_TOKEN: ${{ secrets.YANDEX_METRICA_OAUTH_TOKEN }}
       SITE_VIDEO_ENABLED: ${{ vars.SITE_VIDEO_ENABLED || 'false' }}
       SITE_VIDEO_TITLE: ${{ vars.SITE_VIDEO_TITLE }}
       SITE_VIDEO_DURATION: ${{ vars.SITE_VIDEO_DURATION }}
@@ -71,6 +72,12 @@ jobs:
           node --check scripts/live-all-publications-smoke.mjs
           npm run check 2>&1 | tee check.log
 
+      - name: Verify Yandex Metrica goals and funnels
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/metrica-state-test.mjs 2>&1 | tee metrica-state.log
+
       - name: Upload diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -78,6 +85,7 @@ jobs:
           name: deploy-check-diagnostics-${{ github.run_id }}
           path: |
             check.log
+            metrica-state.log
             reports
             test-results
             *.log

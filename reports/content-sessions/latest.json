@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260731-2025-refund-voluntary-service-cancellation",
-  "reviewedAt": "2026-07-31T18:25:00.000Z",
+  "sessionId": "20260731-public-article-copy-audit",
+  "reviewedAt": "2026-07-31T20:52:33.003Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-07-31T17:51:10.786Z",
+    "modifiedTime": "2026-07-31T20:40:38.970Z",
     "metadataTabCount": 25,
     "discoveredTabs": [
       "00_Старт",
@@ -35,45 +35,259 @@
     ]
   },
   "reviewedTabs": [
-    { "name": "00_Старт", "range": "A1:H45", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["project rules", "SEO gate"] },
-    { "name": "01_БПЮ", "range": "A1:AC1004", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["demand", "client language"] },
-    { "name": "02_ЮрДоки", "range": "A1:AA1004", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["paid work", "practice"] },
-    { "name": "03_Оплаты", "range": "A1:M13", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed payment details only"] },
-    { "name": "04_Дашборд", "range": "A1:Y87", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["operational context"] },
-    { "name": "05_Контроль", "range": "A1:K18", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["data gaps"] },
-    { "name": "06_Импорт", "range": "A1:U100", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source coverage"] },
-    { "name": "_Справочники", "range": "A1:I24", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["classification"] },
-    { "name": "_Журнал", "range": "A1:K35", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["provenance"] },
-    { "name": "07_Диалоги_исследование", "range": "A1:AK357", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience research", "context verification"] },
-    { "name": "08_Банк_реплик", "range": "A1:V711", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["client language", "search hypothesis"] },
-    { "name": "09_Паттерны_аудитории", "range": "A1:X81", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience patterns", "qualification risks"] },
-    { "name": "10_Контентные_возможности", "range": "A1:AP169", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content brief", "intent map"] },
-    { "name": "11_Кейсы_для_публикации", "range": "A1:AF105", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["case evidence", "result verification"] },
-    { "name": "12_Эффективные_ответы", "range": "A1:V147", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["qualification questions", "CTA wording"] },
-    { "name": "13_Статистика_контента", "range": "A1:AB12", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["existing content performance"] },
-    { "name": "14_Контент_дашборд", "range": "A1:N179", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content priorities"] },
-    { "name": "15_Обращения_с_контента", "range": "A1:AG4", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["lead attribution"] },
-    { "name": "_Реестр_диалогов", "range": "A1:Q357", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source registry"] },
-    { "name": "_Ситуации_и_связи", "range": "A1:T359", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["cross-source links", "paid-work separation"] },
-    { "name": "_События_воронки", "range": "A1:J738", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed events"] },
-    { "name": "_Версии_контента", "range": "A1:L13", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content versions"] },
-    { "name": "16_Контроль_данных", "range": "A1:J17", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["critical source errors"] },
-    { "name": "_Импорт_ЮД_151_200", "range": "A1:T51", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["historical paid-work verification"] },
-    { "name": "Статьи_HARANT", "range": "A1:P2", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["additional article registry"] }
+    {
+      "name": "00_Старт",
+      "range": "A1:H45",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "project rules",
+        "SEO gate"
+      ]
+    },
+    {
+      "name": "01_БПЮ",
+      "range": "A1:AC1004",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "demand",
+        "client language"
+      ]
+    },
+    {
+      "name": "02_ЮрДоки",
+      "range": "A1:AA1004",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "paid work",
+        "practice"
+      ]
+    },
+    {
+      "name": "03_Оплаты",
+      "range": "A1:M13",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "confirmed payment details only"
+      ]
+    },
+    {
+      "name": "04_Дашборд",
+      "range": "A1:Y87",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "operational context"
+      ]
+    },
+    {
+      "name": "05_Контроль",
+      "range": "A1:K18",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "data gaps"
+      ]
+    },
+    {
+      "name": "06_Импорт",
+      "range": "A1:U100",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "source coverage"
+      ]
+    },
+    {
+      "name": "_Справочники",
+      "range": "A1:I24",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "classification"
+      ]
+    },
+    {
+      "name": "_Журнал",
+      "range": "A1:K35",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "provenance"
+      ]
+    },
+    {
+      "name": "07_Диалоги_исследование",
+      "range": "A1:AK357",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "audience research",
+        "context verification"
+      ]
+    },
+    {
+      "name": "08_Банк_реплик",
+      "range": "A1:V711",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "client language",
+        "search hypothesis"
+      ]
+    },
+    {
+      "name": "09_Паттерны_аудитории",
+      "range": "A1:X81",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "audience patterns",
+        "qualification risks"
+      ]
+    },
+    {
+      "name": "10_Контентные_возможности",
+      "range": "A1:AP169",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content brief",
+        "intent map"
+      ]
+    },
+    {
+      "name": "11_Кейсы_для_публикации",
+      "range": "A1:AF105",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "case evidence",
+        "result verification"
+      ]
+    },
+    {
+      "name": "12_Эффективные_ответы",
+      "range": "A1:V147",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "qualification questions",
+        "CTA wording"
+      ]
+    },
+    {
+      "name": "13_Статистика_контента",
+      "range": "A1:AB12",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "existing content performance"
+      ]
+    },
+    {
+      "name": "14_Контент_дашборд",
+      "range": "A1:N179",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content priorities"
+      ]
+    },
+    {
+      "name": "15_Обращения_с_контента",
+      "range": "A1:AG4",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "lead attribution"
+      ]
+    },
+    {
+      "name": "_Реестр_диалогов",
+      "range": "A1:Q357",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "source registry"
+      ]
+    },
+    {
+      "name": "_Ситуации_и_связи",
+      "range": "A1:T359",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "cross-source links",
+        "paid-work separation"
+      ]
+    },
+    {
+      "name": "_События_воронки",
+      "range": "A1:J738",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "confirmed events"
+      ]
+    },
+    {
+      "name": "_Версии_контента",
+      "range": "A1:L17",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content versions"
+      ]
+    },
+    {
+      "name": "16_Контроль_данных",
+      "range": "A1:J17",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "critical source errors"
+      ]
+    },
+    {
+      "name": "_Импорт_ЮД_151_200",
+      "range": "A1:T51",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "historical paid-work verification"
+      ]
+    },
+    {
+      "name": "Статьи_HARANT",
+      "range": "A1:P2",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "additional article registry"
+      ]
+    }
   ],
   "sourceTrace": {
-    "dialogIds": ["690cbee1-dc58-832d-91eb-fdd2d62a4a26"],
+    "dialogIds": [],
     "situationIds": [],
-    "workIds": ["ЮД-ИМП-100"],
-    "contentIds": ["C-012", "C-071"],
+    "workIds": [],
+    "contentIds": [
+      "C-002",
+      "C-012",
+      "C-071"
+    ],
     "caseIds": [],
-    "notes": "Internal non-personal identifiers only. ЮрДоки confirms paid legal work, not a positive result or exact payment details."
+    "notes": "Public copy audit only. Internal research remains in the editorial system and is not rendered for visitors."
   },
   "seoReview": {
     "status": "completed",
     "checkedAt": "2026-07-31T18:20:00.000Z",
     "region": "Москва, Россия",
-    "primaryIntent": "отказ от договора оказания услуг вернуть деньги",
+    "primaryIntent": "ревизия публичных юридических разборов без изменения поискового интента",
     "verifiedCluster": [
       "юрист по возврату денег за услуги",
       "как вернуть деньги за неоказанную услугу",
@@ -83,10 +297,18 @@
       "срок возврата денег после претензии за услугу"
     ],
     "intentMap": [
-      { "intent": "отказ от договора оказания услуг вернуть деньги", "target": "H1, lead and short answer" },
-      { "intent": "фактически понесенные расходы исполнителя", "target": "H2 matrix of lawful and unsupported deductions" },
-      { "intent": "вернуть деньги за фитнес абонемент", "target": "H2 on subscriptions and long programmes" },
-      { "intent": "срок возврата при добровольном отказе", "target": "H2 and FAQ distinguishing Article 32 from Articles 28, 29 and 31" }
+      {
+        "intent": "отказ от договора оказания услуг вернуть деньги",
+        "target": "Existing owner; public copy cleanup only"
+      },
+      {
+        "intent": "как вернуть деньги за неоказанную услугу",
+        "target": "Existing owner; public copy cleanup only"
+      },
+      {
+        "intent": "продавец получил деньги и пропал",
+        "target": "Existing related analysis; evidence-chain section updated"
+      }
     ],
     "intentOwnership": [
       {
@@ -110,8 +332,32 @@
           "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
           "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
         ],
-        "decision": "new-owner",
-        "reason": "The customer voluntarily ends a service that the provider was ready to continue. This is legally and behaviorally distinct from non-performance, defects, imposed services and commercial legal-help intent."
+        "decision": "update-owner",
+        "reason": "The page keeps the same intent and legal structure; only internal editorial commentary is removed from public copy."
+      },
+      {
+        "intent": "как вернуть деньги за неоказанную услугу",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+        "ownerType": "article",
+        "supportingUrls": [
+          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
+        ],
+        "supportingCaseIds": [],
+        "excludedQueries": [
+          "отказ от договора оказания услуг вернуть деньги",
+          "возврат денег за навязанную услугу",
+          "продавец получил деньги и пропал",
+          "услуга оказана некачественно",
+          "юрист по возврату денег за услуги"
+        ],
+        "existingCompetingUrlsReviewed": [
+          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+          "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
+          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
+        ],
+        "decision": "update-owner",
+        "reason": "The page remains the owner of non-performance queries. The change removes internal editorial language without broadening or changing the intent."
       }
     ],
     "serpSnapshots": [
@@ -129,9 +375,17 @@
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
             "dominantIntent": "informational guidance on unilateral cancellation and refund calculation",
-            "resultTypes": ["legal articles", "consumer guidance", "official legal sources"],
+            "resultTypes": [
+              "legal articles",
+              "consumer guidance",
+              "official legal sources"
+            ],
             "localPack": false,
-            "snippetPatterns": ["right to cancel at any time", "actual expenses", "refund after notice"],
+            "snippetPatterns": [
+              "right to cancel at any time",
+              "actual expenses",
+              "refund after notice"
+            ],
             "competitorCoverageGaps": [
               "notice of unilateral refusal is often confused with a request for mutual termination",
               "actual expenses are described abstractly without a document-by-document matrix",
@@ -148,9 +402,17 @@
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
             "dominantIntent": "informational explanation of cancellation, deductions and refund steps",
-            "resultTypes": ["legal explainers", "consumer articles", "official sources"],
+            "resultTypes": [
+              "legal explainers",
+              "consumer articles",
+              "official sources"
+            ],
             "localPack": false,
-            "snippetPatterns": ["Article 32", "documented expenses", "written cancellation"],
+            "snippetPatterns": [
+              "Article 32",
+              "documented expenses",
+              "written cancellation"
+            ],
             "competitorCoverageGaps": [
               "weak separation between voluntary cancellation and provider breach",
               "fixed percentages are criticized without a usable verification method",
@@ -161,6 +423,70 @@
         ],
         "pageTypeDecision": "article",
         "decisionReason": "Organic results primarily answer how a consumer should cancel a service and calculate a refund; a focused practical article is more appropriate than another commercial page.",
+        "canProvideBetterAnswer": true
+      },
+      {
+        "intent": "как вернуть деньги за неоказанную услугу",
+        "checkedAt": "2026-07-31T12:30:00.000Z",
+        "region": "Москва, Россия",
+        "engines": [
+          {
+            "engine": "Yandex",
+            "query": "как вернуть деньги за неоказанную услугу",
+            "organicResultsReviewed": 20,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "informational step-by-step recovery guidance",
+            "resultTypes": [
+              "bank guides",
+              "legal articles",
+              "consumer guidance"
+            ],
+            "localPack": false,
+            "snippetPatterns": [
+              "service not performed",
+              "refund demand",
+              "consumer rights"
+            ],
+            "competitorCoverageGaps": [
+              "weak separation of non-performance and voluntary cancellation",
+              "partial performance calculations are often abstract",
+              "evidence chains are rarely shown as a usable matrix"
+            ],
+            "staleOrWeakResults": []
+          },
+          {
+            "engine": "Google",
+            "query": "как вернуть деньги за неоказанную услугу",
+            "organicResultsReviewed": 9,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "informational guidance on evidence, demand and recovery",
+            "resultTypes": [
+              "legal explainers",
+              "consumer articles",
+              "official sources"
+            ],
+            "localPack": false,
+            "snippetPatterns": [
+              "refund for service",
+              "written demand",
+              "deadline breach"
+            ],
+            "competitorCoverageGaps": [
+              "non-performance is often mixed with defects",
+              "accepted partial results are not clearly separated",
+              "consumer-facing calculations lack document checks"
+            ],
+            "staleOrWeakResults": []
+          }
+        ],
+        "pageTypeDecision": "article",
+        "decisionReason": "The existing article remains the correct owner. This session only removes non-client editorial language.",
         "canProvideBetterAnswer": true
       }
     ],
@@ -173,8 +499,42 @@
         "userValue": "Helps the reader verify each deduction and calculate the refundable balance instead of accepting a fixed percentage from the offer.",
         "competitorGap": "Cached organic results state the actual-expense rule but rarely connect each category of deduction to the evidence the provider must produce.",
         "sourceBasis": "paid-practice-and-audience-research",
-        "sourceIds": ["690cbee1-dc58-832d-91eb-fdd2d62a4a26", "R-0159", "P-047", "ЮД-ИМП-100", "C-071"],
+        "sourceIds": [
+          "690cbee1-dc58-832d-91eb-fdd2d62a4a26",
+          "R-0159",
+          "P-047",
+          "ЮД-ИМП-100",
+          "C-071"
+        ],
         "placement": "Central H2 after the cancellation-notice section, followed by subscription calculation and contract-clause review.",
+        "verifiedAgainstSerp": true
+      },
+      {
+        "contentId": "refund-non-rendered-service",
+        "targetUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+        "type": "decision-tree",
+        "title": "Матрица: неоказание, частичное исполнение, недостатки или добровольный отказ",
+        "userValue": "Helps the reader select the correct legal basis and calculate the recoverable amount.",
+        "competitorGap": "Many results mix different legal grounds and do not show how accepted work affects the calculation.",
+        "sourceBasis": "existing-approved-cluster-research",
+        "sourceIds": [
+          "C-012"
+        ],
+        "placement": "First substantive H2 and calculation sections; internal source commentary removed from public rendering.",
+        "verifiedAgainstSerp": true
+      },
+      {
+        "contentId": "seller-disappeared-after-payment",
+        "targetUrl": "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
+        "type": "procedure-timeline",
+        "title": "Проверяемая хронология предложения, оплаты, срока и прекращения связи",
+        "userValue": "Helps the reader connect each event to a document and separate civil recovery from a possible fraud report.",
+        "competitorGap": "Generic guidance often lists documents but does not show how to connect them into an evidence chain.",
+        "sourceBasis": "existing-approved-content-card",
+        "sourceIds": [
+          "C-002"
+        ],
+        "placement": "Replaces the internal practice narrative with a client-facing evidence-chain section.",
         "verifiedAgainstSerp": true
       }
     ],
@@ -191,24 +551,24 @@
   },
   "contentChanges": [
     {
-      "path": "src/refund-voluntary-service-cancellation.mjs",
-      "kind": "article-source",
-      "contentId": "refund-voluntary-service-cancellation",
-      "action": "created",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/"
+      "path": "src/debt-cluster-data.mjs",
+      "kind": "article-copy-audit",
+      "contentId": "seller-disappeared-after-payment",
+      "action": "updated-public-copy",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
     },
     {
       "path": "src/refund-services-cluster-data.mjs",
-      "kind": "article-registration",
-      "contentId": "refund-voluntary-service-cancellation",
-      "action": "registered",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/"
+      "kind": "article-copy-audit",
+      "contentId": "refund-non-rendered-service",
+      "action": "updated-public-copy",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
     },
     {
-      "path": "site.config.mjs",
-      "kind": "article-date",
+      "path": "src/refund-voluntary-service-cancellation.mjs",
+      "kind": "article-copy-audit",
       "contentId": "refund-voluntary-service-cancellation",
-      "action": "registered-content-date",
+      "action": "updated-public-copy",
       "expectedUrl": "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/"
     }
   ],
@@ -218,7 +578,11 @@
     "node scripts/live-all-publications-smoke.mjs"
   ],
   "publication": {
-    "expectedUrls": ["https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/"],
-    "notes": "Reused cached Yandex and Google snapshots from the approved cluster research. No new Google, Yandex Search API, Wordstat or SerpApi requests were made."
+    "expectedUrls": [
+      "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
+      "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+      "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/"
+    ],
+    "notes": "All eight published analyses were reviewed. Reused approved cached Yandex and Google snapshots; no new search API, Wordstat or SERP requests were made."
   }
 }

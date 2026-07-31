@@ -197,6 +197,7 @@
     display: grid;
     gap: 0;
     margin-bottom: 22px;
+    list-style: none;
   }
 
   .service-guide__checklist li {
@@ -217,6 +218,11 @@
     height: 6px;
     border-radius: 50%;
     background: var(--gold);
+  }
+
+  .service-card:hover .card-link,
+  .service-card:focus-within .card-link {
+    color: var(--gold-bright);
   }
 
   .service-guide__layout > .search-guide__author {

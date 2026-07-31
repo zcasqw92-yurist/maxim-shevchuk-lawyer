@@ -99,6 +99,33 @@
       "requireSerpVerification": true
     }
   },
+  "publicCopyControl": {
+    "prePublication": {
+      "required": true,
+      "command": "npm run test:public-copy",
+      "scope": "new-or-changed-article-and-all-current-article-sources",
+      "blockPublicationOnFinding": true
+    },
+    "postPublicationRegression": {
+      "required": true,
+      "command": "node scripts/live-public-copy-regression-test.mjs",
+      "scope": "all-published-articles",
+      "runAfterVerifiedProductionSha": true,
+      "blockPublicationCompletionOnFinding": true,
+      "diagnosticReport": "reports/public-copy-regression.json"
+    },
+    "userChatDisclosure": {
+      "required": true,
+      "reportCleanResult": true,
+      "alwaysReportDetectedFindings": true,
+      "findingFields": [
+        "article URL",
+        "detected phrase or block",
+        "action taken",
+        "verification result"
+      ]
+    }
+  },
   "governedContentPaths": [
     "site.config.mjs",
     "src/data.mjs",
@@ -134,7 +161,8 @@
     "localFullSiteCheck": "npm run check",
     "liveChecks": [
       "npm run test:live",
-      "node scripts/live-all-publications-smoke.mjs"
+      "node scripts/live-all-publications-smoke.mjs",
+      "node scripts/live-public-copy-regression-test.mjs"
     ],
     "chatReportRequired": true,
     "chatReportFields": [
@@ -144,6 +172,9 @@
       "Yandex and Google organic SERP snapshot",
       "sponsored SERP placements recorded separately",
       "original practical element and source basis",
+      "pre-publication public-copy review result",
+      "post-publication regression result for all earlier articles",
+      "detected public-copy findings, fixes and verification result",
       "changed repository files",
       "published public URLs",
       "commit SHA",

@@ -1,0 +1,22 @@
+name: Verify public-copy regression script
+
+on:
+  push:
+    branches: [verify/public-copy-rule-v3]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+      - name: Check every published article on the verified production build
+        env:
+          SITE_PUBLIC_URL: https://yuristshevchuk.com
+          EXPECTED_BUILD_SHA: 47ee9b84d439156f0c491b05f97a1854c7e6e8c8
+        run: node scripts/live-public-copy-regression-test.mjs

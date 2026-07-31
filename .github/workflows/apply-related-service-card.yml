@@ -1,0 +1,249 @@
+name: Apply related service card
+
+on:
+  push:
+    branches:
+      - agent/highlight-related-service
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply shared related-service card
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          render = Path('src/editorial-render.mjs')
+          text = render.read_text(encoding='utf-8')
+          old = '''            <section class="article-section editorial-related"><h2>Связанное направление</h2><p><a href="/uslugi/${article.serviceSlug}/">${esc(article.serviceLabel)}</a></p></section>'''
+          new = '''            <section class="article-section editorial-related editorial-service-direction"><h2>Связанное направление</h2><a class="editorial-service-link" href="/uslugi/${article.serviceSlug}/" aria-label="Перейти к услуге: ${esc(article.serviceLabel)}"><span class="editorial-service-link__eyebrow">Услуга по теме</span><span class="editorial-service-link__label">${esc(article.serviceLabel)}</span><span class="editorial-service-link__action" aria-hidden="true">Перейти к услуге <span>→</span></span></a></section>'''
+          if old not in text:
+              raise SystemExit('Related service markup marker not found')
+          render.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          css = Path('src/editorial-publication.css')
+          text = css.read_text(encoding='utf-8')
+          marker = '/* Branded related service card */'
+          if marker in text:
+              raise SystemExit('Related service styles already exist')
+          text += r'''
+
+/* Branded related service card */
+@layer components {
+  .editorial-service-link {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 24px;
+    align-items: center;
+    overflow: hidden;
+    padding: clamp(21px, 3vw, 28px);
+    color: var(--ink-deep);
+    border: 1px solid var(--border-accent-soft);
+    background: linear-gradient(135deg, var(--surface-highlight), var(--surface-card));
+    box-shadow: 0 14px 34px rgba(16, 40, 61, .06);
+    text-decoration: none;
+    transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+
+  .editorial-service-link::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    content: "";
+    background: var(--gold);
+    transform: scaleX(.22);
+    transform-origin: left;
+    transition: transform .24s ease;
+  }
+
+  .editorial-service-link__eyebrow {
+    grid-column: 1 / -1;
+    color: var(--gold-text);
+    font-family: var(--sans);
+    font-size: .6875rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .editorial-service-link__label {
+    min-width: 0;
+    color: var(--ink-deep);
+    font-family: var(--serif);
+    font-size: clamp(1.18rem, 2.1vw, 1.55rem);
+    font-weight: 500;
+    letter-spacing: -.025em;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .editorial-service-link__action {
+    display: inline-flex;
+    align-items: center;
+    justify-self: end;
+    gap: 8px;
+    color: var(--gold-text);
+    font-family: var(--sans);
+    font-size: .8125rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .editorial-service-link__action span {
+    display: inline-block;
+    font-size: 1rem;
+    transition: transform .2s ease;
+  }
+
+  .editorial-page .editorial-service-link:hover,
+  .editorial-page .editorial-service-link:focus-visible {
+    color: var(--ink-deep);
+    border-color: var(--gold);
+    background: var(--surface-card);
+    box-shadow: 0 18px 42px rgba(16, 40, 61, .11);
+    transform: translateY(-2px);
+  }
+
+  .editorial-service-link:hover::before,
+  .editorial-service-link:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .editorial-service-link:hover .editorial-service-link__action span,
+  .editorial-service-link:focus-visible .editorial-service-link__action span {
+    transform: translateX(4px);
+  }
+
+  .editorial-service-link:focus-visible {
+    outline: 2px solid var(--gold-text);
+    outline-offset: 3px;
+  }
+}
+
+@layer responsive {
+  @media (max-width: 520px) {
+    .editorial-service-link {
+      grid-template-columns: 1fr;
+      gap: 7px;
+      padding: 20px;
+    }
+
+    .editorial-service-link__action {
+      justify-self: start;
+      margin-top: 5px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .editorial-service-link,
+    .editorial-service-link::before,
+    .editorial-service-link__action span {
+      transition: none;
+    }
+
+    .editorial-page .editorial-service-link:hover,
+    .editorial-page .editorial-service-link:focus-visible {
+      transform: none;
+    }
+  }
+}
+'''
+          css.write_text(text, encoding='utf-8')
+
+          linking = Path('scripts/publication-linking-test.mjs')
+          text = linking.read_text(encoding='utf-8')
+          old = '''  if (!service || !hasHref(html, servicePath(service))) errors.push(`${article.slug}: отсутствует ссылка на связанную услугу`);'''
+          new = '''  if (!service || !hasHref(html, servicePath(service))) errors.push(`${article.slug}: отсутствует ссылка на связанную услугу`);
+  if (!html.includes('class="article-section editorial-related editorial-service-direction"')) errors.push(`${article.slug}: отсутствует общий блок связанного направления`);
+  if (!html.includes('class="editorial-service-link"')) errors.push(`${article.slug}: связанная услуга не оформлена кликабельной карточкой`);
+  if (!html.includes('class="editorial-service-link__label"')) errors.push(`${article.slug}: в карточке связанной услуги отсутствует видимое название`);
+  if (!html.includes('aria-label="Перейти к услуге:')) errors.push(`${article.slug}: карточка связанной услуги не имеет понятной доступной подписи`);'''
+          if old not in text:
+              raise SystemExit('Publication linking service marker not found')
+          linking.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          ui = Path('scripts/editorial-ui-consistency-test.mjs')
+          text = ui.read_text(encoding='utf-8')
+          old = '''        const details = page.locator("#faq .faq-item").first();
+        const summary = details.locator("summary");'''
+          new = '''        const serviceLink = page.locator(".editorial-service-link").first();
+        if (!(await serviceLink.isVisible())) errors.push(`${engineName} ${viewport.width}px: related service card is not visible`);
+        const serviceHref = await serviceLink.getAttribute("href");
+        if (serviceHref !== `/uslugi/${articles[0].serviceSlug}/`) errors.push(`${engineName} ${viewport.width}px: related service card points to ${serviceHref}`);
+        const serviceStyle = await serviceLink.evaluate((element) => {
+          const style = getComputedStyle(element);
+          const before = getComputedStyle(element, "::before");
+          const rect = element.getBoundingClientRect();
+          return {
+            display: style.display,
+            borderStyle: style.borderStyle,
+            borderColor: style.borderTopColor,
+            backgroundImage: style.backgroundImage,
+            width: rect.width,
+            beforeHeight: before.height,
+            beforeColor: before.backgroundColor,
+          };
+        });
+        if (serviceStyle.display !== "grid") errors.push(`${engineName} ${viewport.width}px: related service card is not a grid ${JSON.stringify(serviceStyle)}`);
+        if (serviceStyle.borderStyle !== "solid") errors.push(`${engineName} ${viewport.width}px: related service card has no solid border`);
+        if (serviceStyle.backgroundImage === "none") errors.push(`${engineName} ${viewport.width}px: related service card has no branded surface`);
+        if (serviceStyle.width < 240) errors.push(`${engineName} ${viewport.width}px: related service card is too narrow (${serviceStyle.width}px)`);
+        if (Number.parseFloat(serviceStyle.beforeHeight) < 2) errors.push(`${engineName} ${viewport.width}px: related service card accent is missing`);
+        if (engineName === "Chromium" && viewport.width >= 1000) await serviceLink.hover();
+        else await serviceLink.focus();
+        await page.waitForFunction(
+          ({ selector, color }) => getComputedStyle(document.querySelector(selector)).borderTopColor === color,
+          { selector: ".editorial-service-link", color: expectedGold },
+        );
+        const activeServiceBorder = await serviceLink.evaluate((element) => getComputedStyle(element).borderTopColor);
+        if (activeServiceBorder !== expectedGold) errors.push(`${engineName} ${viewport.width}px: related service hover/focus border is ${activeServiceBorder}, expected ${expectedGold}`);
+        if (activeServiceBorder === serviceStyle.borderColor) errors.push(`${engineName} ${viewport.width}px: related service hover/focus does not change the border`);
+
+        const details = page.locator("#faq .faq-item").first();
+        const summary = details.locator("summary");'''
+          if old not in text:
+              raise SystemExit('Editorial UI article marker not found')
+          text = text.replace(old, new, 1)
+          text = text.replace(
+              'console.log("Editorial UI consistency passed: checklist markers, FAQ interactions and branded typography in Chromium and WebKit");',
+              'console.log("Editorial UI consistency passed: checklist markers, FAQ interactions, related service cards and branded typography in Chromium and WebKit");',
+              1,
+          )
+          ui.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate generated linking
+        run: |
+          npm run build
+          npm run test:publication-linking
+
+      - name: Commit permanent changes
+        run: |
+          rm .github/workflows/apply-related-service-card.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/editorial-render.mjs src/editorial-publication.css scripts/publication-linking-test.mjs scripts/editorial-ui-consistency-test.mjs .github/workflows/apply-related-service-card.yml
+          git commit -m "Выделить связанные услуги в юридических разборах"
+          git push origin HEAD

@@ -12,6 +12,8 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   snapshot:
@@ -35,6 +37,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Снять выдачу Яндекса и Google
+        id: serp
+        continue-on-error: true
         env:
           YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
           YANDEX_CLOUD_FOLDER_ID: ${{ secrets.YANDEX_CLOUD_FOLDER_ID }}
@@ -48,3 +52,60 @@ jobs:
           path: reports/serp-snapshots/refund-services/
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Записать результат в pull request
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = 'reports/serp-snapshots/refund-services/latest.json';
+            let report = null;
+            try {
+              report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            } catch (error) {
+              core.warning(`SERP report unavailable: ${error.message}`);
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:${context.ref.replace('refs/heads/', '')}`;
+            const { data: pulls } = await github.rest.pulls.list({ owner, repo, head, state: 'open' });
+            if (!pulls.length) {
+              core.warning(`No open pull request found for ${head}`);
+              return;
+            }
+
+            const lines = [
+              '## Автоматический SERP-снимок',
+              '',
+              report ? `Шлюз пройден: **${report.gatePassed ? 'да' : 'нет'}**` : 'Отчёт не сформирован.',
+              '',
+              '| Гипотеза | Яндекс: органика / реклама | Google: органика / реклама |',
+              '|---|---:|---:|',
+            ];
+
+            for (const item of report?.queries || []) {
+              lines.push(`| ${item.query} | ${item.yandex?.organicResultsReviewed ?? 0} / ${item.yandex?.sponsoredResultsObserved ?? 0} (${item.yandex?.status || 'нет'}) | ${item.google?.organicResultsReviewed ?? 0} / ${item.google?.sponsoredResultsObserved ?? 0} (${item.google?.status || 'нет'}) |`);
+            }
+
+            const errors = [];
+            for (const item of report?.queries || []) {
+              if (item.yandex?.status !== 'ok') errors.push(`Яндекс — ${item.query}: ${item.yandex?.diagnostics?.reason || 'неизвестная ошибка'}`);
+              if (item.google?.status !== 'ok') errors.push(`Google — ${item.query}: ${item.google?.diagnostics?.reason || 'неизвестная ошибка'}`);
+            }
+            if (errors.length) {
+              lines.push('', '### Диагностика', ...errors.slice(0, 12).map((value) => `- ${value}`));
+            }
+            lines.push('', `Workflow commit: \`${context.sha}\``);
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pulls[0].number,
+              body: lines.join('\n'),
+            });
+
+      - name: Заблокировать неполный снимок
+        if: steps.serp.outcome != 'success'
+        run: exit 1

@@ -1,0 +1,121 @@
+name: Google SERP — без Яндекса
+
+on:
+  push:
+    branches:
+      - 'agent/refund-services-serp-snapshot'
+    paths:
+      - '.github/workflows/google-serp-only.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  google-serp:
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Проверить только Google через Serper
+        id: google
+        continue-on-error: true
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+        run: node scripts/google-serp-api.mjs
+
+      - name: Сохранить Google-отчёт
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: refund-services-google-serp-only
+          path: reports/serp-snapshots/refund-services/google-api.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Записать Google-результат в pull request
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            let report = null;
+            try {
+              report = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/google-api.json', 'utf8'));
+            } catch (error) {
+              core.setFailed(`Google report unavailable: ${error.message}`);
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:${context.ref.replace('refs/heads/', '')}`;
+            const { data: pulls } = await github.rest.pulls.list({ owner, repo, head, state: 'open' });
+            if (!pulls.length) {
+              core.warning(`No open pull request found for ${head}`);
+              return;
+            }
+
+            const lines = [
+              '## Google SERP — отдельная проверка без Яндекса',
+              '',
+              `Google-шлюз пройден: **${report.gatePassed ? 'да' : 'нет'}**`,
+              '',
+              `Источник: ${report.source || 'не определён'}`,
+              '',
+              '| Гипотеза | Органика | Реклама | Статус |',
+              '|---|---:|---:|---|',
+            ];
+
+            for (const item of report.queries || []) {
+              lines.push(`| ${item.query} | ${item.organicResultsReviewed ?? 0} | ${item.sponsoredResultsObserved ?? 0} | ${item.status || 'нет'} |`);
+            }
+
+            const errors = (report.queries || []).filter((item) => !item.minimumMet);
+            if (errors.length) {
+              lines.push('', '### Диагностика');
+              for (const item of errors) {
+                lines.push(`- ${item.query}: ${item.diagnostics?.reason || 'не получено пять органических результатов'}`);
+              }
+            }
+
+            lines.push('', '### Первые пять органических результатов');
+            for (const item of report.queries || []) {
+              lines.push('', `**${item.query}**`);
+              if (item.minimumMet) {
+                lines.push(item.organicResults.slice(0, 5).map((entry, index) => `${index + 1}. ${entry.domain} — ${entry.title}`).join('\n'));
+              } else {
+                lines.push('Органические результаты не подтверждены.');
+              }
+            }
+
+            lines.push('', '> В этом workflow Yandex Search API не вызывается.', '', `Workflow commit: \`${context.sha}\``);
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pulls[0].number,
+              body: lines.join('\n'),
+            });
+
+      - name: Проверить Google-шлюз
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/google-api.json', 'utf8'));
+          console.log(`Google-only gate passed: ${Boolean(report.gatePassed)}`);
+          if (!report.gatePassed) process.exit(1);
+          NODE

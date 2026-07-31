@@ -70,7 +70,7 @@
     "test:live-indexing-lock": "node scripts/live-indexing-lock.mjs",
     "submit:indexnow": "node scripts/submit-indexnow.mjs",
     "test:brand-colors": "node scripts/brand-colors-test.mjs",
-    "test:public-copy": "node scripts/public-copy-guard-test.mjs"
+    "test:public-copy": "node scripts/public-copy-guard-test.mjs && node scripts/public-copy-control-contract-test.mjs"
   },
   "devDependencies": {
     "@sparticuz/chromium": "^149.0.0",

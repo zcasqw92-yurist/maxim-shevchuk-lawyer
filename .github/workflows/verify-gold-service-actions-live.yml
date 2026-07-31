@@ -1,0 +1,102 @@
+name: Live-проверка золотых кнопок услуг
+
+on:
+  push:
+    branches:
+      - agent/verify-gold-service-actions-live
+    paths:
+      - .github/workflows/verify-gold-service-actions-live.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Установить Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Проверить реальную заливку на основном домене
+        env:
+          EXPECTED_SHA: 9c4a449a8bbd5568ce174dfd554cb87ef47678e5
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+
+          const expected = process.env.EXPECTED_SHA;
+          const site = "https://yuristshevchuk.com";
+          let published = "";
+
+          for (let attempt = 1; attempt <= 36; attempt += 1) {
+            const response = await fetch(`${site}/build-info.json?verify=${Date.now()}-${attempt}`, {
+              cache: "no-store",
+              headers: { "cache-control": "no-cache" },
+            });
+            if (response.ok) {
+              const info = await response.json();
+              published = String(info.sha || "");
+              if (published === expected) break;
+            }
+            console.log(`Попытка ${attempt}: опубликован ${published || "не определён"}`);
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+          }
+
+          if (published !== expected) {
+            throw new Error(`Основной домен не опубликовал ${expected}; получен ${published || "пустой SHA"}`);
+          }
+
+          const browser = await chromium.launch({ headless: true });
+          try {
+            const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+            await page.goto(`${site}/uslugi/?verify=${Date.now()}`, { waitUntil: "networkidle" });
+
+            const card = page.locator(".service-card").first();
+            const action = card.locator(".card-link");
+            await card.hover();
+            await page.waitForFunction(() => {
+              const node = document.querySelector(".service-card .card-link");
+              return node && getComputedStyle(node).backgroundColor === "rgb(221, 185, 121)";
+            }, null, { timeout: 3000 });
+
+            const state = await action.evaluate((node) => {
+              const style = getComputedStyle(node);
+              return {
+                backgroundColor: style.backgroundColor,
+                color: style.color,
+                borderColor: style.borderTopColor,
+                borderRadius: style.borderTopLeftRadius,
+                text: node.textContent?.trim() || "",
+              };
+            });
+            console.log(JSON.stringify({ published, state }, null, 2));
+
+            if (state.backgroundColor !== "rgb(221, 185, 121)") {
+              throw new Error(`Нет золотой заливки: ${state.backgroundColor}`);
+            }
+            if (state.color !== "rgb(9, 28, 44)") {
+              throw new Error(`Неверный цвет текста: ${state.color}`);
+            }
+            if (state.borderColor !== "rgb(221, 185, 121)") {
+              throw new Error(`Неверная рамка: ${state.borderColor}`);
+            }
+            if (Number.parseFloat(state.borderRadius) < 20) {
+              throw new Error(`Кнопка не получила pill-форму: ${state.borderRadius}`);
+            }
+          } finally {
+            await browser.close();
+          }
+          NODE

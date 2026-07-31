@@ -1,15 +1,26 @@
-name: Google SERP — без Яндекса
+name: Google SERP — экономный ручной запуск
 
 on:
-  push:
-    branches:
-      - 'agent/refund-services-serp-snapshot'
-    paths:
-      - '.github/workflows/google-serp-only.yml'
   workflow_dispatch:
+    inputs:
+      allow_paid_requests:
+        description: 'Разрешить новые платные запросы SerpApi для отсутствующего кеша'
+        required: true
+        default: false
+        type: boolean
+      force_refresh:
+        description: 'Принудительно обновить выбранные кешированные запросы'
+        required: true
+        default: false
+        type: boolean
+      query_ids:
+        description: 'Явно одобренные ID через запятую; максимум 3 новых запроса за запуск'
+        required: false
+        default: ''
+        type: string
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
 
@@ -28,13 +39,31 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Проверить только Google через SerpApi
+      - name: Проверить Google через кеш и лимит
         id: google
         continue-on-error: true
         env:
+          SERP_ENGINE: google
+          SERP_ALLOW_PAID_REQUESTS: ${{ inputs.allow_paid_requests && '1' || '0' }}
+          SERP_FORCE_REFRESH: ${{ inputs.force_refresh && '1' || '0' }}
+          SERP_QUERY_IDS: ${{ inputs.query_ids }}
           SERPER_API_KEY: ''
           SERPAPI_API_KEY: ${{ secrets.SERPER_API_KEY }}
-        run: node scripts/google-serp-api.mjs
+        run: node scripts/run-serp-budgeted.mjs
+
+      - name: Зафиксировать кеш и журнал расхода
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/serp-cache/refund-services.json reports/serp-usage/api-usage.json
+          if git diff --cached --quiet; then
+            echo 'Кеш и расход не изменились: новых API-запросов не было.'
+          else
+            git commit -m 'Обновить кеш и расход Google SERP [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
       - name: Сохранить Google-отчёт
         if: always()
@@ -69,39 +98,32 @@ jobs:
             }
 
             const lines = [
-              '## Google SERP — отдельная проверка без Яндекса',
+              '## Google SERP — экономная проверка без Яндекса',
               '',
               `Google-шлюз пройден: **${report.gatePassed ? 'да' : 'нет'}**`,
               '',
               `Источник: ${report.source || 'не определён'}`,
+              `Новых запросов SerpApi в этом запуске: **${report.cachePolicy?.paidRequestsThisRun ?? 0}**`,
+              `Попаданий в кеш: **${report.cachePolicy?.cacheHits ?? 0}**`,
+              `Учтённый расход SerpApi: **${report.budget?.knownUsed ?? '?'} / ${report.budget?.limit ?? 250}**`,
               '',
-              '| Гипотеза | Органика | Реклама | Статус |',
-              '|---|---:|---:|---|',
+              '| Гипотеза | Органика | Кеш | Статус |',
+              '|---|---:|---|---|',
             ];
 
             for (const item of report.queries || []) {
-              lines.push(`| ${item.query} | ${item.organicResultsReviewed ?? 0} | ${item.sponsoredResultsObserved ?? 0} | ${item.status || 'нет'} |`);
+              lines.push(`| ${item.query} | ${item.organicResultsReviewed ?? 0} | ${item.cache?.status || 'нет'} | ${item.status || 'нет'} |`);
             }
 
             const errors = (report.queries || []).filter((item) => !item.minimumMet);
             if (errors.length) {
               lines.push('', '### Диагностика');
               for (const item of errors) {
-                lines.push(`- ${item.query}: ${item.diagnostics?.reason || 'не получено пять органических результатов'}`);
+                lines.push(`- ${item.query}: ${item.diagnostics?.reason || 'не получено пять свежих органических результатов'}`);
               }
             }
 
-            lines.push('', '### Первые пять органических результатов');
-            for (const item of report.queries || []) {
-              lines.push('', `**${item.query}**`);
-              if (item.minimumMet) {
-                lines.push(item.organicResults.slice(0, 5).map((entry, index) => `${index + 1}. ${entry.domain} — ${entry.title}`).join('\n'));
-              } else {
-                lines.push('Органические результаты не подтверждены.');
-              }
-            }
-
-            lines.push('', '> В этом workflow Yandex Search API не вызывается.', '', `Workflow commit: \`${context.sha}\``);
+            lines.push('', '> Yandex Search API в этом workflow отсутствует. Повторные Google-запросы автоматически не выполняются.', '', `Workflow commit: \`${context.sha}\``);
 
             await github.rest.issues.createComment({
               owner,
@@ -117,5 +139,6 @@ jobs:
           const fs = require('node:fs');
           const report = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/google-api.json', 'utf8'));
           console.log(`Google-only gate passed: ${Boolean(report.gatePassed)}`);
+          console.log(`Paid requests this run: ${report.cachePolicy?.paidRequestsThisRun ?? 0}`);
           if (!report.gatePassed) process.exit(1);
           NODE

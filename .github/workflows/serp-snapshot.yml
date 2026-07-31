@@ -8,7 +8,6 @@ on:
       - 'config/refund-services-serp.json'
       - 'scripts/yandex-search-api-serp.mjs'
       - 'scripts/google-serp-api.mjs'
-      - 'scripts/google-public-serp.mjs'
       - '.github/workflows/serp-snapshot.yml'
   workflow_dispatch:
 
@@ -21,7 +20,7 @@ jobs:
   snapshot:
     environment: seo-api
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
       - name: Получить код
@@ -51,16 +50,6 @@ jobs:
           SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
         run: node scripts/google-serp-api.mjs
 
-      - name: Установить Chromium для резервного Google
-        if: steps.google_api.outcome != 'success'
-        run: npx playwright install --with-deps chromium
-
-      - name: Снять Google через официальные домены
-        id: google_public
-        if: steps.google_api.outcome != 'success'
-        continue-on-error: true
-        run: node scripts/google-public-serp.mjs
-
       - name: Сохранить отчёт и диагностику
         if: always()
         uses: actions/upload-artifact@v4
@@ -81,20 +70,12 @@ jobs:
               catch (error) { core.warning(`${path} unavailable: ${error.message}`); return null; }
             };
             const yandexReport = readJson('reports/serp-snapshots/refund-services/yandex-api.json');
-            const googleApiReport = readJson('reports/serp-snapshots/refund-services/google-api.json');
-            const googlePublicReport = readJson('reports/serp-snapshots/refund-services/google-public.json');
+            const googleReport = readJson('reports/serp-snapshots/refund-services/google-api.json');
             const yandexById = new Map((yandexReport?.queries || []).map((item) => [item.id, item]));
-            const googleApiById = new Map((googleApiReport?.queries || []).map((item) => [item.id, item]));
-            const googlePublicById = new Map((googlePublicReport?.queries || []).map((item) => [item.id, item]));
-            const pickGoogle = (id) => googleApiById.get(id)?.minimumMet
-              ? googleApiById.get(id)
-              : (googlePublicById.get(id)?.minimumMet
-                ? googlePublicById.get(id)
-                : (googleApiById.get(id) || googlePublicById.get(id) || {}));
+            const googleById = new Map((googleReport?.queries || []).map((item) => [item.id, item]));
             const queryIds = [...new Set([
               ...(yandexReport?.queries || []).map((item) => item.id),
-              ...(googleApiReport?.queries || []).map((item) => item.id),
-              ...(googlePublicReport?.queries || []).map((item) => item.id),
+              ...(googleReport?.queries || []).map((item) => item.id),
             ])];
 
             const owner = context.repo.owner;
@@ -107,7 +88,7 @@ jobs:
             }
 
             const combinedGate = Boolean(queryIds.length && queryIds.every((id) =>
-              yandexById.get(id)?.minimumMet && pickGoogle(id).minimumMet
+              yandexById.get(id)?.minimumMet && googleById.get(id)?.minimumMet
             ));
             const lines = [
               '## Автоматический SERP-снимок',
@@ -120,7 +101,7 @@ jobs:
 
             for (const id of queryIds) {
               const yandex = yandexById.get(id) || {};
-              const google = pickGoogle(id);
+              const google = googleById.get(id) || {};
               const query = yandex.query || google.query || id;
               lines.push(`| ${query} | ${yandex.organicResultsReviewed ?? 0} / ${yandex.sponsoredResultsObserved ?? 0} (${yandex.status || 'нет'}) | ${google.organicResultsReviewed ?? 0} / ${google.sponsoredResultsObserved ?? 0} (${google.status || 'нет'}) |`);
             }
@@ -128,7 +109,7 @@ jobs:
             const errors = [];
             for (const id of queryIds) {
               const yandex = yandexById.get(id) || {};
-              const google = pickGoogle(id);
+              const google = googleById.get(id) || {};
               const query = yandex.query || google.query || id;
               if (!yandex.minimumMet) errors.push(`Яндекс — ${query}: ${yandex.diagnostics?.reason || 'не получено пять органических результатов'}`);
               if (!google.minimumMet) errors.push(`Google — ${query}: ${google.diagnostics?.reason || 'не получено пять органических результатов'}`);
@@ -138,7 +119,7 @@ jobs:
             lines.push('', '### Проверенные органические результаты');
             for (const id of queryIds) {
               const yandex = yandexById.get(id) || {};
-              const google = pickGoogle(id);
+              const google = googleById.get(id) || {};
               const query = yandex.query || google.query || id;
               lines.push('', `**${query}**`);
               if (yandex.minimumMet) {
@@ -148,7 +129,7 @@ jobs:
                 lines.push(`- Google: ${google.organicResults.slice(0, 5).map((entry, index) => `${index + 1}) ${entry.domain} — ${entry.title}`).join('; ')}`);
               }
             }
-            lines.push('', `Google source: ${googleApiReport?.gatePassed ? googleApiReport.source : 'public browser fallback'}`);
+            lines.push('', `Google source: ${googleReport?.source || 'Google SERP API'}`);
             lines.push('', `Workflow commit: \`${context.sha}\``);
 
             await github.rest.issues.createComment({
@@ -169,22 +150,16 @@ jobs:
             catch { return null; }
           };
           const yandex = read('reports/serp-snapshots/refund-services/yandex-api.json');
-          const googleApi = read('reports/serp-snapshots/refund-services/google-api.json');
-          const googlePublic = read('reports/serp-snapshots/refund-services/google-public.json');
+          const google = read('reports/serp-snapshots/refund-services/google-api.json');
           const yandexById = new Map((yandex?.queries || []).map((item) => [item.id, item]));
-          const googleApiById = new Map((googleApi?.queries || []).map((item) => [item.id, item]));
-          const googlePublicById = new Map((googlePublic?.queries || []).map((item) => [item.id, item]));
-          const pickGoogle = (id) => googleApiById.get(id)?.minimumMet
-            ? googleApiById.get(id)
-            : googlePublicById.get(id);
           const passed = Boolean(
             yandex?.queries?.length &&
-            yandex.queries.every((item) => item.minimumMet && pickGoogle(item.id)?.minimumMet)
+            google?.queries?.length &&
+            google.queries.every((item) => item.minimumMet && yandexById.get(item.id)?.minimumMet)
           );
           console.log(`Combined SERP gate passed: ${passed}`);
           if (!passed) process.exit(1);
           NODE
 
-# API-слой Google готов принимать SERPER_API_KEY или SERPAPI_API_KEY.
-# Повторный запуск после добавления SERPER_API_KEY: 2026-07-31T13:37:00+02:00
-# Браузерный резерв запускается только при ошибке Google SERP API.
+# После подключения SERP API браузерный Google не используется: он стабильно блокирует серверный IP.
+# Повторный запуск проверки ключа: 2026-07-31T13:49:00+02:00

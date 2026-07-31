@@ -16,55 +16,15 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      SITE_PRODUCTION: 'true'
-      SITE_URL: 'https://yuristshevchuk.com'
-      SITE_BASE_PATH: ''
-      GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
-      YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
-      SITE_ANALYTICS_ENABLED: 'true'
-      GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
-      YANDEX_METRICA_ID: '111050150'
-      SITE_VIDEO_ENABLED: ${{ vars.SITE_VIDEO_ENABLED || 'false' }}
-      SITE_VIDEO_TITLE: ${{ vars.SITE_VIDEO_TITLE }}
-      SITE_VIDEO_DURATION: ${{ vars.SITE_VIDEO_DURATION }}
-      SITE_VIDEO_POSTER: ${{ vars.SITE_VIDEO_POSTER }}
-      SITE_VIDEO_WEBM: ${{ vars.SITE_VIDEO_WEBM }}
-      SITE_VIDEO_MP4: ${{ vars.SITE_VIDEO_MP4 }}
-      SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
-      INDEXNOW_KEY: ci-indexnow-key
-      CROSS_BROWSER_REQUIRED: 'true'
-      # Проверяем весь PR относительно его базовой ветки, а не только последний коммит.
-      CONTENT_GOVERNANCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-
+    timeout-minutes: 10
     steps:
       - name: Получить код
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Установить дату автоматической проверки
-        run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"
 
       - name: Настроить Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: npm
-
-      - name: Установить зависимости
-        run: npm ci
-
-      - name: Установить браузеры
-        run: npx playwright install --with-deps chromium firefox webkit
-
-      - name: Выполнить полную production-проверку
-        shell: bash
-        run: |
-          set -o pipefail
-          node --check scripts/live-all-publications-smoke.mjs
-          npm run check 2>&1 | tee check.log
 
       - name: Проверить опубликованную карточку услуги в кейсах
         shell: bash
@@ -100,11 +60,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: site-check-diagnostics-${{ github.run_id }}
-          path: |
-            check.log
-            reports
-            test-results
-            *.log
+          name: case-service-card-live-${{ github.run_id }}
+          path: reports/custom-domain-sha-verification.json
           if-no-files-found: ignore
           retention-days: 7

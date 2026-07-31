@@ -62,4 +62,6 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Service page checks passed: ${services.length} individual pages, responsive type scale and gold-filled service actions`);
+await import("./live-service-card-action-test.mjs");
+
+console.log(`Service page checks passed: ${services.length} individual pages, responsive type scale, gold-filled service actions and live Chromium verification`);

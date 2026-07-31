@@ -1,0 +1,67 @@
+name: Live-проверка визуальных правок услуг
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/live-service-visual-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Проверить production SHA и CSS
+        env:
+          SITE_URL: https://yuristshevchuk.com
+          EXPECTED_SHA: 6eaf857276f735ad5ee33dbf9cabbd84a94c6cde
+        run: |
+          node --input-type=module <<'NODE'
+          const siteUrl = process.env.SITE_URL;
+          const expectedSha = process.env.EXPECTED_SHA;
+          const attempts = 60;
+          const delayMs = 10_000;
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+          for (let attempt = 1; attempt <= attempts; attempt += 1) {
+            const nonce = `${Date.now()}-${attempt}`;
+            try {
+              const buildResponse = await fetch(`${siteUrl}/build-info.json?live_service_visual=${nonce}`, {
+                headers: { "cache-control": "no-cache, no-store, max-age=0", pragma: "no-cache" },
+                cache: "no-store",
+                redirect: "follow",
+              });
+              const build = buildResponse.ok ? await buildResponse.json() : null;
+              const actualSha = String(build?.sha || "");
+
+              if (actualSha === expectedSha) {
+                const cssResponse = await fetch(`${siteUrl}/assets/styles.css?live_service_visual=${nonce}`, {
+                  headers: { "cache-control": "no-cache, no-store, max-age=0", pragma: "no-cache" },
+                  cache: "no-store",
+                  redirect: "follow",
+                });
+                if (!cssResponse.ok) throw new Error(`styles.css returned ${cssResponse.status}`);
+                const css = await cssResponse.text();
+                const checklistRule = /\.service-guide__checklist ul\s*\{[^}]*list-style:\s*none;/s;
+                const serviceLinkRule = /\.service-card:hover \.card-link,\s*\.service-card:focus-within \.card-link\s*\{[^}]*color:\s*var\(--gold-bright\);/s;
+                if (!checklistRule.test(css)) throw new Error("Checklist list-style rule is missing");
+                if (!serviceLinkRule.test(css)) throw new Error("Service card gold link rule is missing");
+                console.log(`Production verified: ${actualSha}`);
+                console.log("Checklist uses only the custom gold marker");
+                console.log("Service card link becomes gold on hover and focus");
+                process.exit(0);
+              }
+
+              console.log(`Attempt ${attempt}/${attempts}: production SHA ${actualSha || "unavailable"}`);
+            } catch (error) {
+              console.log(`Attempt ${attempt}/${attempts}: ${error instanceof Error ? error.message : String(error)}`);
+            }
+            if (attempt < attempts) await sleep(delayMs);
+          }
+
+          throw new Error(`Production did not reach ${expectedSha} within the verification window`);
+          NODE

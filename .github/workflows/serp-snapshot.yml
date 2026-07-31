@@ -1,14 +1,6 @@
-name: Слепок органической выдачи
+name: SERP-шлюз — только сохранённый кеш
 
 on:
-  push:
-    branches:
-      - 'agent/refund-services-serp-snapshot'
-    paths:
-      - 'config/refund-services-serp.json'
-      - 'scripts/yandex-search-api-serp.mjs'
-      - 'scripts/google-serp-api.mjs'
-      - '.github/workflows/serp-snapshot.yml'
   workflow_dispatch:
 
 permissions:
@@ -18,9 +10,8 @@ permissions:
 
 jobs:
   snapshot:
-    environment: seo-api
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
       - name: Получить код
@@ -30,33 +21,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: npm
 
-      - name: Установить зависимости
-        run: npm ci
-
-      - name: Снять Яндекс через Search API
-        id: yandex_api
+      - name: Проверить Яндекс без новых API-запросов
+        id: yandex
         continue-on-error: true
         env:
-          YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
-        run: node scripts/yandex-search-api-serp.mjs
+          SERP_ENGINE: yandex
+          SERP_ALLOW_PAID_REQUESTS: '0'
+          SERP_FORCE_REFRESH: '0'
+          SERP_QUERY_IDS: ''
+        run: node scripts/run-serp-budgeted.mjs
 
-      - name: Снять Google через SERP API
-        id: google_api
+      - name: Проверить Google без новых API-запросов
+        id: google
         continue-on-error: true
         env:
-          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
-        run: node scripts/google-serp-api.mjs
+          SERP_ENGINE: google
+          SERP_ALLOW_PAID_REQUESTS: '0'
+          SERP_FORCE_REFRESH: '0'
+          SERP_QUERY_IDS: ''
+        run: node scripts/run-serp-budgeted.mjs
 
-      - name: Сохранить отчёт и диагностику
+      - name: Сохранить отчёты
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: refund-services-serp-snapshot
+          name: refund-services-serp-cache-snapshot
           path: reports/serp-snapshots/refund-services/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14
 
       - name: Записать результат в pull request
@@ -91,11 +83,15 @@ jobs:
               yandexById.get(id)?.minimumMet && googleById.get(id)?.minimumMet
             ));
             const lines = [
-              '## Автоматический SERP-снимок',
+              '## SERP-шлюз по сохранённому кешу',
               '',
               `Объединённый шлюз пройден: **${combinedGate ? 'да' : 'нет'}**`,
               '',
-              '| Гипотеза | Яндекс: органика / реклама | Google: органика / реклама |',
+              `Новых запросов Яндекса: **${yandexReport?.cachePolicy?.paidRequestsThisRun ?? 0}**`,
+              `Новых запросов SerpApi: **${googleReport?.cachePolicy?.paidRequestsThisRun ?? 0}**`,
+              `Учтённый лимит SerpApi: **${googleReport?.budget?.knownUsed ?? '?'} / ${googleReport?.budget?.limit ?? 250}**`,
+              '',
+              '| Гипотеза | Яндекс | Google |',
               '|---|---:|---:|',
             ];
 
@@ -103,7 +99,7 @@ jobs:
               const yandex = yandexById.get(id) || {};
               const google = googleById.get(id) || {};
               const query = yandex.query || google.query || id;
-              lines.push(`| ${query} | ${yandex.organicResultsReviewed ?? 0} / ${yandex.sponsoredResultsObserved ?? 0} (${yandex.status || 'нет'}) | ${google.organicResultsReviewed ?? 0} / ${google.sponsoredResultsObserved ?? 0} (${google.status || 'нет'}) |`);
+              lines.push(`| ${query} | ${yandex.organicResultsReviewed ?? 0} (${yandex.cache?.status || yandex.status || 'нет'}) | ${google.organicResultsReviewed ?? 0} (${google.cache?.status || google.status || 'нет'}) |`);
             }
 
             const errors = [];
@@ -111,26 +107,12 @@ jobs:
               const yandex = yandexById.get(id) || {};
               const google = googleById.get(id) || {};
               const query = yandex.query || google.query || id;
-              if (!yandex.minimumMet) errors.push(`Яндекс — ${query}: ${yandex.diagnostics?.reason || 'не получено пять органических результатов'}`);
-              if (!google.minimumMet) errors.push(`Google — ${query}: ${google.diagnostics?.reason || 'не получено пять органических результатов'}`);
+              if (!yandex.minimumMet) errors.push(`Яндекс — ${query}: ${yandex.diagnostics?.reason || 'нет свежего кеша'}`);
+              if (!google.minimumMet) errors.push(`Google — ${query}: ${google.diagnostics?.reason || 'нет свежего кеша'}`);
             }
             if (errors.length) lines.push('', '### Диагностика', ...errors.slice(0, 12).map((value) => `- ${value}`));
 
-            lines.push('', '### Проверенные органические результаты');
-            for (const id of queryIds) {
-              const yandex = yandexById.get(id) || {};
-              const google = googleById.get(id) || {};
-              const query = yandex.query || google.query || id;
-              lines.push('', `**${query}**`);
-              if (yandex.minimumMet) {
-                lines.push(`- Яндекс: ${yandex.organicResults.slice(0, 5).map((entry, index) => `${index + 1}) ${entry.domain} — ${entry.title}`).join('; ')}`);
-              }
-              if (google.minimumMet) {
-                lines.push(`- Google: ${google.organicResults.slice(0, 5).map((entry, index) => `${index + 1}) ${entry.domain} — ${entry.title}`).join('; ')}`);
-              }
-            }
-            lines.push('', `Google source: ${googleReport?.source || 'Google SERP API'}`);
-            lines.push('', `Workflow commit: \`${context.sha}\``);
+            lines.push('', '> Этот объединённый workflow никогда не обращается к платным SERP API. Новые запросы разрешаются только в отдельных ручных workflow.', '', `Workflow commit: \`${context.sha}\``);
 
             await github.rest.issues.createComment({
               owner,
@@ -141,25 +123,15 @@ jobs:
 
       - name: Проверить объединённый шлюз
         if: always()
-        shell: bash
         run: |
           node <<'NODE'
           const fs = require('node:fs');
-          const read = (path) => {
-            try { return JSON.parse(fs.readFileSync(path, 'utf8')); }
-            catch { return null; }
-          };
-          const yandex = read('reports/serp-snapshots/refund-services/yandex-api.json');
-          const google = read('reports/serp-snapshots/refund-services/google-api.json');
-          const yandexById = new Map((yandex?.queries || []).map((item) => [item.id, item]));
-          const passed = Boolean(
-            yandex?.queries?.length &&
-            google?.queries?.length &&
-            google.queries.every((item) => item.minimumMet && yandexById.get(item.id)?.minimumMet)
-          );
-          console.log(`Combined SERP gate passed: ${passed}`);
+          const yandex = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/yandex-api.json', 'utf8'));
+          const google = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/google-api.json', 'utf8'));
+          const yandexById = new Map((yandex.queries || []).map((item) => [item.id, item]));
+          const passed = Boolean(google.queries?.length && google.queries.every((item) => item.minimumMet && yandexById.get(item.id)?.minimumMet));
+          console.log(`Combined cached SERP gate passed: ${passed}`);
+          console.log(`Paid Yandex requests: ${yandex.cachePolicy?.paidRequestsThisRun ?? 0}`);
+          console.log(`Paid Google requests: ${google.cachePolicy?.paidRequestsThisRun ?? 0}`);
           if (!passed) process.exit(1);
           NODE
-
-# После подключения SERP API браузерный Google не используется: он стабильно блокирует серверный IP.
-# Повторный запуск проверки ключа: 2026-07-31T13:49:00+02:00

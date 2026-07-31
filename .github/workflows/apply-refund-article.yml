@@ -1,0 +1,53 @@
+name: Временно подключить статью о неоказанной услуге
+
+on:
+  push:
+    branches:
+      - content/refund-non-rendered-service
+    paths:
+      - .github/workflows/apply-refund-article.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить ветку
+        uses: actions/checkout@v4
+        with:
+          ref: content/refund-non-rendered-service
+          fetch-depth: 0
+
+      - name: Подключить модуль статьи
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'src/editorial-data.mjs';
+          let source = fs.readFileSync(path, 'utf8');
+
+          const importLine = 'import { refundServicesClusterArticles } from "./refund-services-cluster-data.mjs";';
+          if (!source.includes(importLine)) {
+            const anchor = 'import { debtClusterArticles, debtPracticeCase } from "./debt-cluster-data.mjs";';
+            if (!source.includes(anchor)) throw new Error('Import anchor not found');
+            source = source.replace(anchor, `${anchor}\n${importLine}`);
+          }
+
+          if (!source.includes('  ...refundServicesClusterArticles,')) {
+            const anchor = '  ...debtClusterArticles,\n];';
+            if (!source.includes(anchor)) throw new Error('Article array anchor not found');
+            source = source.replace(anchor, '  ...debtClusterArticles,\n  ...refundServicesClusterArticles,\n];');
+          }
+
+          fs.writeFileSync(path, source, 'utf8');
+          NODE
+
+      - name: Зафиксировать правку
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/editorial-data.mjs
+          git diff --cached --exit-code && exit 0
+          git commit -m "Подключить разбор о неоказанной услуге"
+          git push origin HEAD:content/refund-non-rendered-service

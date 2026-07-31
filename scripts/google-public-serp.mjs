@@ -42,8 +42,6 @@ const attemptDefinitions = (queryText) => {
     { url: `https://www.google.co.uk/search?${params({ client: "firefox-b-d" })}`, mobile: false },
     { url: `https://www.google.de/search?${params({ udm: "14" })}`, mobile: false },
     { url: `https://www.google.pl/search?${params({ gbv: "1" })}`, mobile: true },
-    { url: `https://www.google.ca/search?${params({ client: "firefox-b-d" })}`, mobile: false },
-    { url: `https://www.google.nl/search?${params({ client: "ms-android-google" })}`, mobile: true },
   ];
 };
 
@@ -59,8 +57,8 @@ const acceptConsent = async (page) => {
     const button = page.locator(selector).first();
     if (await button.isVisible().catch(() => false)) {
       await Promise.all([
-        page.waitForLoadState("domcontentloaded", { timeout: 15000 }).catch(() => {}),
-        button.click({ timeout: 5000 }).catch(() => {}),
+        page.waitForLoadState("domcontentloaded", { timeout: 5000 }).catch(() => {}),
+        button.click({ timeout: 3000 }).catch(() => {}),
       ]);
       return true;
     }
@@ -152,10 +150,10 @@ const collectQuery = async (browser, queryItem) => {
     }]).catch(() => {});
     const page = await context.newPage();
     try {
-      const response = await page.goto(attempt.url, { waitUntil: "domcontentloaded", timeout: 45000 });
-      await page.waitForTimeout(800);
+      const response = await page.goto(attempt.url, { waitUntil: "domcontentloaded", timeout: 10000 });
+      await page.waitForTimeout(300);
       await acceptConsent(page);
-      await page.waitForTimeout(700);
+      await page.waitForTimeout(300);
       const bodyText = clean(await page.locator("body").innerText().catch(() => ""));
       const blocked = /unusual traffic|необычный трафик|not a robot|не робот|captcha|наши системы обнаружили|automated queries/i.test(`${page.url()} ${bodyText}`);
       const extracted = blocked ? { organic: [], sponsored: [], diagnostics: {} } : await extractResults(page);

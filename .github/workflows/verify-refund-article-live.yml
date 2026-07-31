@@ -19,67 +19,76 @@ jobs:
     steps:
       - name: Проверить SHA и статью
         id: verify
+        continue-on-error: true
         env:
           EXPECTED_SHA: 12f38959cbb1c076113690d3d535690a1eaebad7
           SITE_URL: https://yuristshevchuk.com
           ARTICLE_PATH: /razbory/vernut-dengi-za-neokazannuyu-uslugu/
         run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const expected = process.env.EXPECTED_SHA;
-          const base = process.env.SITE_URL;
-          const articlePath = process.env.ARTICLE_PATH;
-          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-          const diagnostics = [];
-          let success = null;
+          set +e
+          : > live-attempts.log
+          success=false
+          build_status=0
+          article_status=0
+          received_sha=""
+          h1=false
+          canonical=false
+          matrix=false
+          faq=false
+          article_jsonld=false
+          attempts=0
 
-          for (let attempt = 1; attempt <= 30; attempt += 1) {
-            const nonce = `${Date.now()}-${attempt}`;
-            try {
-              const headers = { 'cache-control': 'no-cache', pragma: 'no-cache' };
-              const infoResponse = await fetch(`${base}/build-info.json?nonce=${nonce}`, { headers, cache: 'no-store', redirect: 'follow', signal: AbortSignal.timeout(15000) });
-              const infoText = await infoResponse.text();
-              let info = {};
-              try { info = JSON.parse(infoText); } catch {}
-              const articleResponse = await fetch(`${base}${articlePath}?nonce=${nonce}`, { headers, cache: 'no-store', redirect: 'follow', signal: AbortSignal.timeout(15000) });
-              const html = await articleResponse.text();
-              const canonical = `${base}${articlePath}`;
-              const checks = {
-                buildStatus: infoResponse.status,
-                articleStatus: articleResponse.status,
-                sha: info.sha || info.buildSha || '',
-                finalBuildUrl: infoResponse.url,
-                finalArticleUrl: articleResponse.url,
-                h1: html.includes('Как вернуть деньги за неоказанную услугу'),
-                canonical: html.includes(`rel="canonical" href="${canonical}"`) || html.includes(`href="${canonical}" rel="canonical"`),
-                matrix: html.includes('Сначала определите, что произошло с услугой'),
-                faq: html.includes('Можно ли вернуть всю сумму, если услуга оказана частично?'),
-                articleJsonLd: html.includes('"@type":"Article"') || html.includes('"@type": "Article"'),
-              };
-              diagnostics.push({ attempt, ...checks });
-              if (
-                checks.buildStatus === 200 &&
-                checks.articleStatus === 200 &&
-                checks.sha === expected &&
-                checks.h1 && checks.canonical && checks.matrix && checks.faq && checks.articleJsonLd
-              ) {
-                success = checks;
-                break;
-              }
-            } catch (error) {
-              diagnostics.push({ attempt, error: String(error?.message || error) });
-            }
-            await sleep(10000);
-          }
+          for attempt in $(seq 1 30); do
+            attempts="$attempt"
+            nonce="$(date +%s)-$attempt"
+            rm -f build-info.json article.html
 
-          const report = { expectedSha: expected, articlePath, success, diagnostics };
-          fs.writeFileSync('live-verification.json', `${JSON.stringify(report, null, 2)}\n`);
-          if (!success) {
-            console.error(JSON.stringify(report, null, 2));
-            process.exit(1);
-          }
-          console.log(JSON.stringify(report, null, 2));
-          NODE
+            build_status=$(curl -sS -L --max-time 15 \
+              -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              -o build-info.json -w '%{http_code}' \
+              "$SITE_URL/build-info.json?nonce=$nonce")
+            build_exit=$?
+
+            article_status=$(curl -sS -L --max-time 15 \
+              -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              -o article.html -w '%{http_code}' \
+              "$SITE_URL$ARTICLE_PATH?nonce=$nonce")
+            article_exit=$?
+
+            received_sha=$(node -e "try{const x=require('./build-info.json');process.stdout.write(String(x.sha||x.buildSha||''))}catch{}")
+            grep -Fq 'Как вернуть деньги за неоказанную услугу' article.html 2>/dev/null && h1=true || h1=false
+            grep -Eq 'rel="canonical"[^>]*href="https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"|href="https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"[^>]*rel="canonical"' article.html 2>/dev/null && canonical=true || canonical=false
+            grep -Fq 'Сначала определите, что произошло с услугой' article.html 2>/dev/null && matrix=true || matrix=false
+            grep -Fq 'Можно ли вернуть всю сумму, если услуга оказана частично?' article.html 2>/dev/null && faq=true || faq=false
+            grep -Eq '"@type"[[:space:]]*:[[:space:]]*"Article"' article.html 2>/dev/null && article_jsonld=true || article_jsonld=false
+
+            echo "attempt=$attempt build_exit=$build_exit build_status=$build_status article_exit=$article_exit article_status=$article_status sha=$received_sha h1=$h1 canonical=$canonical matrix=$matrix faq=$faq article_jsonld=$article_jsonld" | tee -a live-attempts.log
+
+            if [ "$build_status" = "200" ] && [ "$article_status" = "200" ] && \
+               [ "$received_sha" = "$EXPECTED_SHA" ] && [ "$h1" = "true" ] && \
+               [ "$canonical" = "true" ] && [ "$matrix" = "true" ] && \
+               [ "$faq" = "true" ] && [ "$article_jsonld" = "true" ]; then
+              success=true
+              break
+            fi
+            sleep 10
+          done
+
+          cat > live-verification.env <<EOF
+          success=$success
+          expected_sha=$EXPECTED_SHA
+          received_sha=$received_sha
+          build_status=$build_status
+          article_status=$article_status
+          h1=$h1
+          canonical=$canonical
+          matrix=$matrix
+          faq=$faq
+          article_jsonld=$article_jsonld
+          attempts=$attempts
+          EOF
+
+          [ "$success" = "true" ]
 
       - name: Оставить результат в PR 93
         if: always()
@@ -87,25 +96,36 @@ jobs:
         with:
           script: |
             const fs = require('node:fs');
-            let report = null;
-            try { report = JSON.parse(fs.readFileSync('live-verification.json', 'utf8')); } catch {}
-            const ok = Boolean(report?.success);
-            const last = report?.success || report?.diagnostics?.at(-1) || {};
+            const values = {};
+            try {
+              for (const line of fs.readFileSync('live-verification.env', 'utf8').split(/\r?\n/)) {
+                const index = line.indexOf('=');
+                if (index > 0) values[line.slice(0, index)] = line.slice(index + 1);
+              }
+            } catch {}
+            const ok = values.success === 'true';
             const body = [
               '## Независимая live-проверка статьи',
               '',
               `Результат: **${ok ? 'успешно' : 'ошибка'}**`,
-              `Ожидаемый SHA: \`${report?.expectedSha || 'нет'}\``,
-              `Полученный SHA: \`${last.sha || 'не получен'}\``,
-              `Статья HTTP: **${last.articleStatus ?? 'нет'}**`,
-              `H1: **${last.h1 ? 'да' : 'нет'}**`,
-              `canonical: **${last.canonical ? 'да' : 'нет'}**`,
-              `практическая матрица: **${last.matrix ? 'да' : 'нет'}**`,
-              `FAQ: **${last.faq ? 'да' : 'нет'}**`,
-              `Article JSON-LD: **${last.articleJsonLd ? 'да' : 'нет'}**`,
+              `Ожидаемый SHA: \`${values.expected_sha || 'не записан'}\``,
+              `Полученный SHA: \`${values.received_sha || 'не получен'}\``,
+              `build-info HTTP: **${values.build_status || 'нет'}**`,
+              `Статья HTTP: **${values.article_status || 'нет'}**`,
+              `H1: **${values.h1 === 'true' ? 'да' : 'нет'}**`,
+              `canonical: **${values.canonical === 'true' ? 'да' : 'нет'}**`,
+              `практическая матрица: **${values.matrix === 'true' ? 'да' : 'нет'}**`,
+              `FAQ: **${values.faq === 'true' ? 'да' : 'нет'}**`,
+              `Article JSON-LD: **${values.article_jsonld === 'true' ? 'да' : 'нет'}**`,
               '',
-              `Попыток: **${report?.diagnostics?.length || 0}**`,
+              `Попыток: **${values.attempts || 0}**`,
               '',
               '> Проверка не вызывает Yandex Search API, Wordstat или SerpApi.',
             ].join('\n');
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 93, body });
+
+      - name: Завершить с правильным статусом
+        if: always()
+        run: |
+          test -f live-verification.env
+          grep -q '^success=true$' live-verification.env

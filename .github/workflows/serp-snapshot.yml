@@ -52,10 +52,12 @@ jobs:
         run: node scripts/google-serp-api.mjs
 
       - name: Установить Chromium для резервного Google
+        if: steps.google_api.outcome != 'success'
         run: npx playwright install --with-deps chromium
 
       - name: Снять Google через официальные домены
         id: google_public
+        if: steps.google_api.outcome != 'success'
         continue-on-error: true
         run: node scripts/google-public-serp.mjs
 
@@ -185,3 +187,4 @@ jobs:
 
 # API-слой Google готов принимать SERPER_API_KEY или SERPAPI_API_KEY.
 # Повторный запуск после добавления SERPER_API_KEY: 2026-07-31T13:37:00+02:00
+# Браузерный резерв запускается только при ошибке Google SERP API.

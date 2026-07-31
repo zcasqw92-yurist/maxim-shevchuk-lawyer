@@ -35,8 +35,8 @@ jobs:
       SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
       INDEXNOW_KEY: ci-indexnow-key
       CROSS_BROWSER_REQUIRED: 'true'
-      # Проверяем весь PR относительно его базовой ветки, а не только последний коммит.
       CONTENT_GOVERNANCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      EXPECTED_PRODUCTION_SHA: 'ce2941c78d63d3e8b1d2599ee45ca3e83fdefee0'
 
     steps:
       - name: Получить код
@@ -65,6 +65,36 @@ jobs:
           set -o pipefail
           node --check scripts/live-all-publications-smoke.mjs
           npm run check 2>&1 | tee check.log
+
+      - name: Одноразово проверить основной домен и новое оформление
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            nonce="${GITHUB_RUN_ID}-${attempt}-$(date +%s)"
+            build_file=$(mktemp)
+            article_file=$(mktemp)
+            css_file=$(mktemp)
+            build_status=$(curl -L --silent --show-error --max-time 20 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$build_file" "$SITE_URL/build-info.json?nonce=$nonce")
+            article_status=$(curl -L --silent --show-error --max-time 20 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$article_file" "$SITE_URL/razbory/vernut-dengi-za-neokazannuyu-uslugu/?nonce=$nonce")
+            css_status=$(curl -L --silent --show-error --max-time 20 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$css_file" "$SITE_URL/assets/styles.css?nonce=$nonce")
+            actual_sha=$(node -e "try{const x=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));process.stdout.write(String(x.sha||''))}catch{}" "$build_file")
+            article_ok=0
+            css_label_ok=0
+            css_action_ok=0
+            grep -q 'Связанное направление' "$article_file" && article_ok=1
+            grep -q 'Услуга по теме' "$css_file" && css_label_ok=1
+            grep -q 'Перейти к услуге' "$css_file" && css_action_ok=1
+            echo "attempt=$attempt build=$build_status article=$article_status css=$css_status sha=$actual_sha article_marker=$article_ok css_label=$css_label_ok css_action=$css_action_ok"
+            rm -f "$build_file" "$article_file" "$css_file"
+            if [[ "$build_status" == "200" && "$article_status" == "200" && "$css_status" == "200" && "$actual_sha" == "$EXPECTED_PRODUCTION_SHA" && "$article_ok" == "1" && "$css_label_ok" == "1" && "$css_action_ok" == "1" ]]; then
+              echo "Основной домен отдаёт ожидаемый SHA и новое оформление связанной услуги"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Основной домен не подтвердил ожидаемую публикацию" >&2
+          exit 1
 
       - name: Сохранить диагностику при ошибке
         if: failure()

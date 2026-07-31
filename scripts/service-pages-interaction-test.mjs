@@ -115,6 +115,40 @@ try {
       if (!shownTopic.includes(expected.topic)) errors.push(`${profile.name}/${slug}: dialog topic is incorrect`);
       await dialog.locator("[data-dialog-close]").click();
     }
+
+    await page.goto("http://127.0.0.1:4177/uslugi/", { waitUntil: "networkidle" });
+    const firstCard = page.locator(".service-card").first();
+    const firstCardAction = firstCard.locator(".card-link");
+    if (profile.name === "desktop") await firstCard.hover();
+    else await firstCardAction.focus();
+
+    await page.waitForFunction(() => {
+      const link = document.querySelector(".service-card .card-link");
+      return link && getComputedStyle(link).backgroundColor === "rgb(221, 185, 121)";
+    }, null, { timeout: 2000 }).catch(() => {});
+
+    const actionState = await firstCardAction.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+        borderTopColor: style.borderTopColor,
+        borderRadius: Number.parseFloat(style.borderTopLeftRadius),
+      };
+    });
+    if (actionState.backgroundColor !== "rgb(221, 185, 121)") {
+      errors.push(`${profile.name}/services: action background is ${actionState.backgroundColor}, expected gold fill`);
+    }
+    if (actionState.color !== "rgb(9, 28, 44)") {
+      errors.push(`${profile.name}/services: action text is ${actionState.color}, expected dark text`);
+    }
+    if (actionState.borderTopColor !== "rgb(221, 185, 121)") {
+      errors.push(`${profile.name}/services: action border is ${actionState.borderTopColor}, expected gold border`);
+    }
+    if (actionState.borderRadius < 20) {
+      errors.push(`${profile.name}/services: action is not rendered as a pill (${actionState.borderRadius}px)`);
+    }
+
     await context.close();
   }
 } finally {
@@ -129,4 +163,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Service page interaction test passed: individual messages and readable typography on desktop and mobile");
+console.log("Service page interaction test passed: individual messages, readable typography and gold-filled service actions on desktop and mobile");

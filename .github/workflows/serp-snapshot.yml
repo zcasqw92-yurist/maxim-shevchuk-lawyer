@@ -7,6 +7,7 @@ on:
     paths:
       - 'config/refund-services-serp.json'
       - 'scripts/yandex-search-api-serp.mjs'
+      - 'scripts/google-serp-api.mjs'
       - 'scripts/google-public-serp.mjs'
       - '.github/workflows/serp-snapshot.yml'
   workflow_dispatch:
@@ -35,15 +36,23 @@ jobs:
       - name: Установить зависимости
         run: npm ci
 
-      - name: Установить Chromium
-        run: npx playwright install --with-deps chromium
-
       - name: Снять Яндекс через Search API
         id: yandex_api
         continue-on-error: true
         env:
           YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
         run: node scripts/yandex-search-api-serp.mjs
+
+      - name: Снять Google через SERP API
+        id: google_api
+        continue-on-error: true
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+        run: node scripts/google-serp-api.mjs
+
+      - name: Установить Chromium для резервного Google
+        run: npx playwright install --with-deps chromium
 
       - name: Снять Google через официальные домены
         id: google_public
@@ -70,12 +79,20 @@ jobs:
               catch (error) { core.warning(`${path} unavailable: ${error.message}`); return null; }
             };
             const yandexReport = readJson('reports/serp-snapshots/refund-services/yandex-api.json');
-            const googleReport = readJson('reports/serp-snapshots/refund-services/google-public.json');
+            const googleApiReport = readJson('reports/serp-snapshots/refund-services/google-api.json');
+            const googlePublicReport = readJson('reports/serp-snapshots/refund-services/google-public.json');
             const yandexById = new Map((yandexReport?.queries || []).map((item) => [item.id, item]));
-            const googleById = new Map((googleReport?.queries || []).map((item) => [item.id, item]));
+            const googleApiById = new Map((googleApiReport?.queries || []).map((item) => [item.id, item]));
+            const googlePublicById = new Map((googlePublicReport?.queries || []).map((item) => [item.id, item]));
+            const pickGoogle = (id) => googleApiById.get(id)?.minimumMet
+              ? googleApiById.get(id)
+              : (googlePublicById.get(id)?.minimumMet
+                ? googlePublicById.get(id)
+                : (googleApiById.get(id) || googlePublicById.get(id) || {}));
             const queryIds = [...new Set([
               ...(yandexReport?.queries || []).map((item) => item.id),
-              ...(googleReport?.queries || []).map((item) => item.id),
+              ...(googleApiReport?.queries || []).map((item) => item.id),
+              ...(googlePublicReport?.queries || []).map((item) => item.id),
             ])];
 
             const owner = context.repo.owner;
@@ -88,10 +105,10 @@ jobs:
             }
 
             const combinedGate = Boolean(queryIds.length && queryIds.every((id) =>
-              yandexById.get(id)?.minimumMet && googleById.get(id)?.minimumMet
+              yandexById.get(id)?.minimumMet && pickGoogle(id).minimumMet
             ));
             const lines = [
-              '## Автоматический SERP-снимок после пополнения баланса',
+              '## Автоматический SERP-снимок',
               '',
               `Объединённый шлюз пройден: **${combinedGate ? 'да' : 'нет'}**`,
               '',
@@ -101,7 +118,7 @@ jobs:
 
             for (const id of queryIds) {
               const yandex = yandexById.get(id) || {};
-              const google = googleById.get(id) || {};
+              const google = pickGoogle(id);
               const query = yandex.query || google.query || id;
               lines.push(`| ${query} | ${yandex.organicResultsReviewed ?? 0} / ${yandex.sponsoredResultsObserved ?? 0} (${yandex.status || 'нет'}) | ${google.organicResultsReviewed ?? 0} / ${google.sponsoredResultsObserved ?? 0} (${google.status || 'нет'}) |`);
             }
@@ -109,7 +126,7 @@ jobs:
             const errors = [];
             for (const id of queryIds) {
               const yandex = yandexById.get(id) || {};
-              const google = googleById.get(id) || {};
+              const google = pickGoogle(id);
               const query = yandex.query || google.query || id;
               if (!yandex.minimumMet) errors.push(`Яндекс — ${query}: ${yandex.diagnostics?.reason || 'не получено пять органических результатов'}`);
               if (!google.minimumMet) errors.push(`Google — ${query}: ${google.diagnostics?.reason || 'не получено пять органических результатов'}`);
@@ -119,7 +136,7 @@ jobs:
             lines.push('', '### Проверенные органические результаты');
             for (const id of queryIds) {
               const yandex = yandexById.get(id) || {};
-              const google = googleById.get(id) || {};
+              const google = pickGoogle(id);
               const query = yandex.query || google.query || id;
               lines.push('', `**${query}**`);
               if (yandex.minimumMet) {
@@ -129,6 +146,7 @@ jobs:
                 lines.push(`- Google: ${google.organicResults.slice(0, 5).map((entry, index) => `${index + 1}) ${entry.domain} — ${entry.title}`).join('; ')}`);
               }
             }
+            lines.push('', `Google source: ${googleApiReport?.gatePassed ? googleApiReport.source : 'public browser fallback'}`);
             lines.push('', `Workflow commit: \`${context.sha}\``);
 
             await github.rest.issues.createComment({
@@ -149,15 +167,20 @@ jobs:
             catch { return null; }
           };
           const yandex = read('reports/serp-snapshots/refund-services/yandex-api.json');
-          const google = read('reports/serp-snapshots/refund-services/google-public.json');
+          const googleApi = read('reports/serp-snapshots/refund-services/google-api.json');
+          const googlePublic = read('reports/serp-snapshots/refund-services/google-public.json');
           const yandexById = new Map((yandex?.queries || []).map((item) => [item.id, item]));
+          const googleApiById = new Map((googleApi?.queries || []).map((item) => [item.id, item]));
+          const googlePublicById = new Map((googlePublic?.queries || []).map((item) => [item.id, item]));
+          const pickGoogle = (id) => googleApiById.get(id)?.minimumMet
+            ? googleApiById.get(id)
+            : googlePublicById.get(id);
           const passed = Boolean(
             yandex?.queries?.length &&
-            google?.queries?.length &&
-            google.queries.every((item) => item.minimumMet && yandexById.get(item.id)?.minimumMet)
+            yandex.queries.every((item) => item.minimumMet && pickGoogle(item.id)?.minimumMet)
           );
           console.log(`Combined SERP gate passed: ${passed}`);
           if (!passed) process.exit(1);
           NODE
 
-# Быстрый повторный запуск после восстановления баланса: 2026-07-31T12:33:00+02:00
+# API-слой Google готов принимать SERPER_API_KEY или SERPAPI_API_KEY.

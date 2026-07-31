@@ -7,6 +7,7 @@ on:
     paths:
       - 'config/refund-services-serp.json'
       - 'scripts/serp-snapshot.mjs'
+      - 'scripts/yandex-public-serp.mjs'
       - '.github/workflows/serp-snapshot.yml'
   workflow_dispatch:
 
@@ -37,12 +38,16 @@ jobs:
       - name: Установить Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Снять выдачу Яндекса и Google
+      - name: Снять публичную выдачу Яндекса
+        id: yandex_public
+        continue-on-error: true
+        run: node scripts/yandex-public-serp.mjs
+
+      - name: Проверить Search API и снять Google
         id: serp
         continue-on-error: true
         env:
           YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
-          YANDEX_CLOUD_FOLDER_ID: ${{ secrets.YANDEX_CLOUD_FOLDER_ID }}
         run: node scripts/serp-snapshot.mjs
 
       - name: Сохранить отчёт и диагностику
@@ -60,13 +65,13 @@ jobs:
         with:
           script: |
             const fs = require('node:fs');
-            const path = 'reports/serp-snapshots/refund-services/latest.json';
-            let report = null;
-            try {
-              report = JSON.parse(fs.readFileSync(path, 'utf8'));
-            } catch (error) {
-              core.warning(`SERP report unavailable: ${error.message}`);
-            }
+            const readJson = (path) => {
+              try { return JSON.parse(fs.readFileSync(path, 'utf8')); }
+              catch (error) { core.warning(`${path} unavailable: ${error.message}`); return null; }
+            };
+            const report = readJson('reports/serp-snapshots/refund-services/latest.json');
+            const yandexPublic = readJson('reports/serp-snapshots/refund-services/yandex-public.json');
+            const yandexById = new Map((yandexPublic?.queries || []).map((item) => [item.id, item]));
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -77,26 +82,33 @@ jobs:
               return;
             }
 
+            const combinedGate = Boolean(
+              report?.queries?.length &&
+              report.queries.every((item) => yandexById.get(item.id)?.minimumMet && item.google?.minimumMet)
+            );
             const lines = [
               '## Автоматический SERP-снимок',
               '',
-              report ? `Шлюз пройден: **${report.gatePassed ? 'да' : 'нет'}**` : 'Отчёт не сформирован.',
+              `Объединённый шлюз пройден: **${combinedGate ? 'да' : 'нет'}**`,
               '',
               '| Гипотеза | Яндекс: органика / реклама | Google: органика / реклама |',
               '|---|---:|---:|',
             ];
 
             for (const item of report?.queries || []) {
-              lines.push(`| ${item.query} | ${item.yandex?.organicResultsReviewed ?? 0} / ${item.yandex?.sponsoredResultsObserved ?? 0} (${item.yandex?.status || 'нет'}) | ${item.google?.organicResultsReviewed ?? 0} / ${item.google?.sponsoredResultsObserved ?? 0} (${item.google?.status || 'нет'}) |`);
+              const yandex = yandexById.get(item.id) || item.yandex || {};
+              lines.push(`| ${item.query} | ${yandex.organicResultsReviewed ?? 0} / ${yandex.sponsoredResultsObserved ?? 0} (${yandex.status || 'нет'}) | ${item.google?.organicResultsReviewed ?? 0} / ${item.google?.sponsoredResultsObserved ?? 0} (${item.google?.status || 'нет'}) |`);
             }
 
             const errors = [];
             for (const item of report?.queries || []) {
-              if (item.yandex?.status !== 'ok') errors.push(`Яндекс — ${item.query}: ${item.yandex?.diagnostics?.reason || 'неизвестная ошибка'}`);
+              const yandex = yandexById.get(item.id) || item.yandex || {};
+              if (yandex.status !== 'ok') errors.push(`Яндекс — ${item.query}: ${yandex.diagnostics?.reason || 'неизвестная ошибка'}`);
               if (item.google?.status !== 'ok') errors.push(`Google — ${item.query}: ${item.google?.diagnostics?.reason || 'неизвестная ошибка'}`);
             }
-            if (errors.length) {
-              lines.push('', '### Диагностика', ...errors.slice(0, 12).map((value) => `- ${value}`));
+            if (errors.length) lines.push('', '### Диагностика', ...errors.slice(0, 12).map((value) => `- ${value}`));
+            if (report?.queries?.some((item) => item.yandex?.status === 'error')) {
+              lines.push('', 'Search API Яндекса оставлен в диагностике; для шлюза используется публичная выдача с отдельной классификацией рекламы.');
             }
             lines.push('', `Workflow commit: \`${context.sha}\``);
 
@@ -108,5 +120,5 @@ jobs:
             });
 
       - name: Заблокировать неполный снимок
-        if: steps.serp.outcome != 'success'
+        if: steps.yandex_public.outcome != 'success' || steps.serp.outcome != 'success'
         run: exit 1

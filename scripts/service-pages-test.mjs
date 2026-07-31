@@ -45,8 +45,10 @@ for (const marker of [
   ".service-hero h1 + p { font-size: 1.125rem; line-height: 1.65; }",
   "@media (max-width: 680px)",
   ".inner-hero h1, .service-hero h1, .about-hero h1, .contact-page__intro h1 { font-size: clamp(2.25rem, 10vw, 3rem); }",
+  ".service-guide__checklist ul {\n    display: grid;\n    gap: 0;\n    margin-bottom: 22px;\n    list-style: none;",
+  ".service-card:hover .card-link,\n  .service-card:focus-within .card-link {\n    color: var(--gold-bright);",
 ]) {
-  if (!styles.includes(marker)) errors.push(`styles.css: отсутствует маркер типографики ${marker}`);
+  if (!styles.includes(marker)) errors.push(`styles.css: отсутствует маркер типографики или оформления ${marker}`);
 }
 
 const app = await readFile(join(dist, "assets", "app.js"), "utf8");
@@ -59,4 +61,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Service page checks passed: ${services.length} individual pages and responsive type scale`);
+console.log(`Service page checks passed: ${services.length} individual pages, responsive type scale and service card states`);

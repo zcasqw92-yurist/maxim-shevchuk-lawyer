@@ -189,6 +189,24 @@
     font-size: var(--cta-font-size);
   }
 
+  .service-card .card-link {
+    margin-top: auto;
+    padding: 10px 17px;
+    color: var(--ink);
+    border: 1px solid transparent;
+    border-radius: var(--cta-radius);
+    background: transparent;
+    transition: color .2s ease, border-color .2s ease, background-color .2s ease, transform .2s ease;
+  }
+
+  .service-card:hover .card-link,
+  .service-card:focus-within .card-link {
+    color: var(--cta-primary-text);
+    border-color: var(--cta-primary-bg);
+    background: var(--cta-primary-bg);
+    transform: translateY(-1px);
+  }
+
   :is(.site-footer, .section--dark, .section--closing-cta) .text-link {
     color: var(--gold-bright);
   }

@@ -46,7 +46,8 @@ for (const marker of [
   "@media (max-width: 680px)",
   ".inner-hero h1, .service-hero h1, .about-hero h1, .contact-page__intro h1 { font-size: clamp(2.25rem, 10vw, 3rem); }",
   ".service-guide__checklist ul {\n    display: grid;\n    gap: 0;\n    margin-bottom: 22px;\n    list-style: none;",
-  ".service-card:hover .card-link,\n  .service-card:focus-within .card-link {\n    color: var(--gold-bright);",
+  ".service-card .card-link {\n    margin-top: auto;\n    padding: 10px 17px;",
+  ".service-card:hover .card-link,\n  .service-card:focus-within .card-link {\n    color: var(--cta-primary-text);\n    border-color: var(--cta-primary-bg);\n    background: var(--cta-primary-bg);",
 ]) {
   if (!styles.includes(marker)) errors.push(`styles.css: отсутствует маркер типографики или оформления ${marker}`);
 }
@@ -61,4 +62,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Service page checks passed: ${services.length} individual pages, responsive type scale and service card states`);
+console.log(`Service page checks passed: ${services.length} individual pages, responsive type scale and gold-filled service actions`);

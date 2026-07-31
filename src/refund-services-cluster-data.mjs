@@ -1,3 +1,5 @@
+import { voluntaryServiceCancellationArticle } from "./refund-voluntary-service-cancellation.mjs";
+
 const refundServiceSources = {
   article13: {
     title: "Статья 13 Закона о защите прав потребителей — ответственность исполнителя",
@@ -262,4 +264,7 @@ const nonRenderedServiceArticle = {
   relatedCaseIds: [],
 };
 
-export const refundServicesClusterArticles = [nonRenderedServiceArticle];
+export const refundServicesClusterArticles = [
+  nonRenderedServiceArticle,
+  voluntaryServiceCancellationArticle,
+];

@@ -22,6 +22,20 @@ const sameMembers = (left, right) => {
   return a.length === b.length && a.every((value, index) => value === b[index]);
 };
 const validDate = (value) => typeof value === "string" && Number.isFinite(Date.parse(value));
+const nonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
+const nonEmptyArray = (value) => Array.isArray(value) && value.length > 0;
+const normalizeIntent = (value) => String(value || "").trim().toLocaleLowerCase("ru-RU").replace(/\s+/g, " ");
+const placeholderPattern = /(^|\b)(replace|example|placeholder)(\b|$)|замен(ить|ите)|укаж(ите|и)|yyyy/i;
+const hasPlaceholder = (value) => nonEmptyString(value) && placeholderPattern.test(value);
+const validUrl = (value) => {
+  if (!nonEmptyString(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+};
 const globToRegExp = (pattern) => {
   const token = "__DOUBLE_STAR__";
   const escaped = pattern
@@ -34,11 +48,12 @@ const globToRegExp = (pattern) => {
 const matchesAny = (path, patterns) => patterns.some((pattern) => globToRegExp(pattern).test(path));
 const git = (args) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
 
-const [configText, agents, governanceDoc, publishingDoc, templateText, packageText, workflow, ciWorkflow] = await Promise.all([
+const [configText, agents, governanceDoc, publishingDoc, prTemplate, templateText, packageText, workflow, ciWorkflow] = await Promise.all([
   read("config/content-governance.json"),
   read("AGENTS.md"),
   read("docs/content-governance.md"),
   read("docs/PUBLISHING.md"),
+  read(".github/pull_request_template.md"),
   read("reports/content-sessions/template.json"),
   read("package.json"),
   read(".github/workflows/pages.yml"),
@@ -53,7 +68,9 @@ try { template = JSON.parse(templateText); } catch (error) { errors.push(`report
 try { packageJson = JSON.parse(packageText); } catch (error) { errors.push(`package.json: invalid JSON: ${error.message}`); }
 
 const sheetId = "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24";
+const requiredClusterGates = ["intentOwnership", "serpSnapshot", "originalPracticalElement"];
 if (config) {
+  if (config.schemaVersion !== 2) errors.push("content governance: schemaVersion must be 2");
   if (config.priority !== "highest-project-content-rule") errors.push("content governance: project priority is not fixed");
   if (config.spreadsheet?.id !== sheetId) errors.push("content governance: wrong canonical spreadsheet ID");
   if (config.spreadsheet?.requireAllTabs !== true) errors.push("content governance: all-tabs requirement must be true");
@@ -64,12 +81,27 @@ if (config) {
   for (const required of ["00_Старт", "10_Контентные_возможности", "11_Кейсы_для_публикации", "16_Контроль_данных", "_События_воронки"]) {
     if (!baselineTabs.includes(required)) errors.push(`content governance: baseline tab is missing: ${required}`);
   }
+
+  const cluster = config.clusterPreparation;
+  if (!cluster || !sameMembers(cluster.requiredGates || [], requiredClusterGates)) errors.push("content governance: all three cluster preparation gates must be required");
+  if (cluster?.intentOwnership?.requireSingleOwnerPerIntent !== true) errors.push("content governance: single intent owner must be required");
+  if (cluster?.intentOwnership?.requireExcludedQueries !== true) errors.push("content governance: excluded queries must be required");
+  if (cluster?.intentOwnership?.requireExistingPagesReview !== true) errors.push("content governance: existing page review must be required");
+  if (cluster?.intentOwnership?.requireEveryChangedUrlMapped !== true) errors.push("content governance: every changed URL must be mapped to an intent owner");
+  if (!sameMembers(cluster?.serpSnapshot?.requiredEngines || [], ["Yandex", "Google"])) errors.push("content governance: Yandex and Google SERP snapshots must both be required");
+  if ((cluster?.serpSnapshot?.minimumTopResultsReviewedPerEngine || 0) < 5) errors.push("content governance: at least five SERP results per engine must be reviewed");
+  if ((cluster?.serpSnapshot?.maxAgeDaysAtReview || 0) > 14) errors.push("content governance: SERP snapshot may not be older than 14 days");
+  if (cluster?.serpSnapshot?.requireBetterAnswerDecision !== true) errors.push("content governance: better-answer decision must be required");
+  if ((cluster?.originalPracticalElement?.minimumPerChangedMaterial || 0) < 1) errors.push("content governance: every changed material needs a practical element");
+  if (!nonEmptyArray(cluster?.originalPracticalElement?.allowedTypes)) errors.push("content governance: practical element types are missing");
+  if (config.sessionManifest?.mustPassAllClusterGates !== true) errors.push("content governance: session manifest must pass all cluster gates");
 }
 
 for (const [name, text, markers] of [
-  ["AGENTS.md", agents, [sheetId, "каждую", "npm run check", "live-all-publications-smoke.mjs", "reports/content-sessions/latest.json"]],
-  ["docs/content-governance.md", governanceDoc, [sheetId, "00_Старт", "_Импорт_ЮД_151_200", "SEO-шлюз", "Обязательный отчёт в чате"]],
-  ["docs/PUBLISHING.md", publishingDoc, [sheetId, "reports/content-sessions/latest.json", "npm run test:content-governance"]],
+  ["AGENTS.md", agents, [sheetId, "каждую", "npm run check", "live-all-publications-smoke.mjs", "reports/content-sessions/latest.json", "владелец интента", "слепок выдачи", "оригинальный практический элемент"]],
+  ["docs/content-governance.md", governanceDoc, [sheetId, "00_Старт", "_Импорт_ЮД_151_200", "Три обязательных шлюза", "Шлюз владельца интента", "Шлюз слепка выдачи", "Шлюз оригинального практического элемента", "Обязательный отчёт в чате"]],
+  ["docs/PUBLISHING.md", publishingDoc, [sheetId, "reports/content-sessions/latest.json", "npm run test:content-governance", "Три шлюза до создания страницы", "Слепок выдачи", "Оригинальный практический элемент"]],
+  [".github/pull_request_template.md", prTemplate, ["единственная страница-владелец", "слепок Яндекса и Google", "оригинальный практический элемент"]],
 ]) {
   for (const marker of markers) if (!text.includes(marker)) errors.push(`${name}: missing marker: ${marker}`);
 }
@@ -78,6 +110,7 @@ if (template && config) {
   const discovered = template.spreadsheet?.discoveredTabs || [];
   const reviewed = (template.reviewedTabs || []).map((tab) => tab.name);
   const baseline = config.spreadsheet?.baselineSnapshot?.tabs || [];
+  if (template.schemaVersion !== 2) errors.push("content session template: schemaVersion must be 2");
   if (template.spreadsheet?.id !== sheetId) errors.push("content session template: wrong spreadsheet ID");
   if (template.spreadsheet?.metadataTabCount !== discovered.length) errors.push("content session template: metadataTabCount does not match discovered tabs");
   if (!sameMembers(discovered, reviewed)) errors.push("content session template: every discovered tab must be reviewed exactly once");
@@ -85,6 +118,11 @@ if (template && config) {
   for (const tab of template.reviewedTabs || []) {
     if (!tab.range || tab.reviewedNonEmptyCells !== true || tab.notesReviewed !== true) errors.push(`content session template: incomplete review contract for ${tab.name || "unknown tab"}`);
   }
+  if (!nonEmptyArray(template.seoReview?.intentOwnership)) errors.push("content session template: intent ownership gate is missing");
+  if (!nonEmptyArray(template.seoReview?.serpSnapshots)) errors.push("content session template: SERP snapshot gate is missing");
+  if (!nonEmptyArray(template.seoReview?.practicalElements)) errors.push("content session template: practical element gate is missing");
+  const templateEngines = template.seoReview?.serpSnapshots?.[0]?.engines?.map((item) => item.engine) || [];
+  if (!sameMembers(templateEngines, config.clusterPreparation?.serpSnapshot?.requiredEngines || [])) errors.push("content session template: Yandex and Google examples are required");
 }
 
 if (!packageJson?.scripts?.["test:content-governance"]) errors.push("package.json: test:content-governance is missing");
@@ -130,6 +168,7 @@ if (config) {
         const reviewedTabs = manifest.reviewedTabs || [];
         const reviewedNames = reviewedTabs.map((tab) => tab.name);
         const baseline = config.spreadsheet?.baselineSnapshot?.tabs || [];
+        if (manifest.schemaVersion !== 2) errors.push(`${manifestPath}: schemaVersion must be 2`);
         if (manifest.spreadsheet?.id !== sheetId) errors.push(`${manifestPath}: wrong spreadsheet ID`);
         if (!validDate(manifest.reviewedAt)) errors.push(`${manifestPath}: reviewedAt is missing or invalid`);
         if (!validDate(manifest.spreadsheet?.modifiedTime)) errors.push(`${manifestPath}: spreadsheet modifiedTime is missing or invalid`);
@@ -146,18 +185,100 @@ if (config) {
         for (const field of ["factsSeparatedFromHypotheses", "paidWorkSeparatedFromPaymentDetails", "workProcedureAndCaseResultsSeparated", "legalSourcesVerified", "anonymizationVerified", "criticalSourceErrorsResolved"]) {
           if (manifest.editorialChecks?.[field] !== true) errors.push(`${manifestPath}: editorial check is not complete: ${field}`);
         }
-        if (manifest.seoReview?.status !== "completed") errors.push(`${manifestPath}: SEO review must be completed`);
-        if (!manifest.seoReview?.primaryIntent) errors.push(`${manifestPath}: primary intent is missing`);
-        if (!Array.isArray(manifest.seoReview?.intentMap) || manifest.seoReview.intentMap.length === 0) errors.push(`${manifestPath}: intent map is missing`);
-        const sourcePaths = new Set((manifest.contentChanges || []).map((item) => item.path));
+
+        const seo = manifest.seoReview;
+        if (seo?.status !== "completed") errors.push(`${manifestPath}: SEO review must be completed`);
+        if (!validDate(seo?.checkedAt)) errors.push(`${manifestPath}: SEO checkedAt is missing or invalid`);
+        if (!nonEmptyString(seo?.primaryIntent) || hasPlaceholder(seo.primaryIntent)) errors.push(`${manifestPath}: primary intent is missing or still contains a placeholder`);
+        if (!nonEmptyArray(seo?.intentMap)) errors.push(`${manifestPath}: intent map is missing`);
+        if (seo?.cannibalizationChecked !== true) errors.push(`${manifestPath}: cannibalization check must be completed`);
+
+        const ownership = seo?.intentOwnership || [];
+        if (!nonEmptyArray(ownership)) errors.push(`${manifestPath}: intent ownership gate is missing`);
+        const ownershipIntents = ownership.map((item) => normalizeIntent(item.intent));
+        if (unique(ownershipIntents).length !== ownershipIntents.length) errors.push(`${manifestPath}: an intent has more than one owner record`);
+        const ownerTypes = new Set(["service", "article", "case", "page"]);
+        const ownershipDecisions = new Set(["new-owner", "update-owner", "support-owner", "no-new-page"]);
+        for (const item of ownership) {
+          if (!nonEmptyString(item.intent) || hasPlaceholder(item.intent)) errors.push(`${manifestPath}: intent ownership has an invalid intent`);
+          if (!validUrl(item.ownerUrl) || hasPlaceholder(item.ownerUrl)) errors.push(`${manifestPath}: intent owner URL is missing or invalid for ${item.intent || "unknown intent"}`);
+          if (!ownerTypes.has(item.ownerType)) errors.push(`${manifestPath}: invalid ownerType for ${item.intent || "unknown intent"}`);
+          if (!Array.isArray(item.supportingUrls) || item.supportingUrls.some((url) => !validUrl(url))) errors.push(`${manifestPath}: supportingUrls must contain valid URLs for ${item.intent || "unknown intent"}`);
+          if (!Array.isArray(item.supportingCaseIds)) errors.push(`${manifestPath}: supportingCaseIds must be an array for ${item.intent || "unknown intent"}`);
+          if (!nonEmptyArray(item.excludedQueries) || item.excludedQueries.some((query) => !nonEmptyString(query) || hasPlaceholder(query))) errors.push(`${manifestPath}: excluded queries are missing for ${item.intent || "unknown intent"}`);
+          if (!nonEmptyArray(item.existingCompetingUrlsReviewed) || item.existingCompetingUrlsReviewed.some((url) => !validUrl(url) || hasPlaceholder(url))) errors.push(`${manifestPath}: existing competing URLs were not reviewed for ${item.intent || "unknown intent"}`);
+          if (!ownershipDecisions.has(item.decision)) errors.push(`${manifestPath}: invalid ownership decision for ${item.intent || "unknown intent"}`);
+          if (!nonEmptyString(item.reason) || hasPlaceholder(item.reason)) errors.push(`${manifestPath}: ownership reason is missing for ${item.intent || "unknown intent"}`);
+        }
+
+        const snapshots = seo?.serpSnapshots || [];
+        if (!nonEmptyArray(snapshots)) errors.push(`${manifestPath}: SERP snapshot gate is missing`);
+        const requiredEngines = config.clusterPreparation?.serpSnapshot?.requiredEngines || [];
+        const minimumResults = config.clusterPreparation?.serpSnapshot?.minimumTopResultsReviewedPerEngine || 5;
+        const maxAgeMs = (config.clusterPreparation?.serpSnapshot?.maxAgeDaysAtReview || 14) * 24 * 60 * 60 * 1000;
+        const snapshotIntentSet = new Set();
+        for (const snapshot of snapshots) {
+          const snapshotIntent = normalizeIntent(snapshot.intent);
+          snapshotIntentSet.add(snapshotIntent);
+          if (!snapshotIntent || hasPlaceholder(snapshot.intent)) errors.push(`${manifestPath}: SERP snapshot has an invalid intent`);
+          if (!ownershipIntents.includes(snapshotIntent)) errors.push(`${manifestPath}: SERP snapshot intent has no owner: ${snapshot.intent || "unknown"}`);
+          if (!validDate(snapshot.checkedAt)) errors.push(`${manifestPath}: SERP snapshot checkedAt is missing for ${snapshot.intent || "unknown intent"}`);
+          if (validDate(snapshot.checkedAt) && validDate(manifest.reviewedAt)) {
+            const age = Date.parse(manifest.reviewedAt) - Date.parse(snapshot.checkedAt);
+            if (age < -5 * 60 * 1000) errors.push(`${manifestPath}: SERP snapshot is dated after the content review for ${snapshot.intent || "unknown intent"}`);
+            if (age > maxAgeMs) errors.push(`${manifestPath}: SERP snapshot is older than ${config.clusterPreparation.serpSnapshot.maxAgeDaysAtReview} days for ${snapshot.intent || "unknown intent"}`);
+          }
+          const engines = snapshot.engines || [];
+          const engineNames = engines.map((item) => item.engine);
+          if (!sameMembers(engineNames, requiredEngines)) errors.push(`${manifestPath}: Yandex and Google snapshots are both required for ${snapshot.intent || "unknown intent"}`);
+          for (const engine of engines) {
+            if (!requiredEngines.includes(engine.engine)) errors.push(`${manifestPath}: unsupported SERP engine: ${engine.engine || "unknown"}`);
+            if (!nonEmptyString(engine.query) || hasPlaceholder(engine.query)) errors.push(`${manifestPath}: SERP query is missing for ${engine.engine || "unknown engine"}`);
+            if (!Number.isInteger(engine.topResultsReviewed) || engine.topResultsReviewed < minimumResults) errors.push(`${manifestPath}: review at least ${minimumResults} results in ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyString(engine.dominantIntent) || hasPlaceholder(engine.dominantIntent)) errors.push(`${manifestPath}: dominant SERP intent is missing for ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyArray(engine.resultTypes) || engine.resultTypes.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: SERP result types are missing for ${engine.engine || "unknown engine"}`);
+            if (typeof engine.localPack !== "boolean") errors.push(`${manifestPath}: localPack must be boolean for ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyArray(engine.snippetPatterns) || engine.snippetPatterns.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: snippet patterns are missing for ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyArray(engine.competitorCoverageGaps) || engine.competitorCoverageGaps.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: competitor coverage gaps are missing for ${engine.engine || "unknown engine"}`);
+            if (!Array.isArray(engine.staleOrWeakResults)) errors.push(`${manifestPath}: staleOrWeakResults must be an array for ${engine.engine || "unknown engine"}`);
+          }
+          if (!nonEmptyString(snapshot.pageTypeDecision) || hasPlaceholder(snapshot.pageTypeDecision)) errors.push(`${manifestPath}: page type decision is missing for ${snapshot.intent || "unknown intent"}`);
+          if (!nonEmptyString(snapshot.decisionReason) || hasPlaceholder(snapshot.decisionReason)) errors.push(`${manifestPath}: page type decision reason is missing for ${snapshot.intent || "unknown intent"}`);
+          if (snapshot.canProvideBetterAnswer !== true) errors.push(`${manifestPath}: new or changed page is not justified by a better practical answer for ${snapshot.intent || "unknown intent"}`);
+        }
+        for (const intent of ownershipIntents) if (!snapshotIntentSet.has(intent)) errors.push(`${manifestPath}: intent owner has no matching SERP snapshot: ${intent}`);
+
+        const practicalElements = seo?.practicalElements || [];
+        if (!nonEmptyArray(practicalElements)) errors.push(`${manifestPath}: original practical element gate is missing`);
+        const allowedTypes = new Set(config.clusterPreparation?.originalPracticalElement?.allowedTypes || []);
+        for (const element of practicalElements) {
+          if (!nonEmptyString(element.contentId) || hasPlaceholder(element.contentId)) errors.push(`${manifestPath}: practical element contentId is missing`);
+          if (!validUrl(element.targetUrl) || hasPlaceholder(element.targetUrl)) errors.push(`${manifestPath}: practical element targetUrl is missing or invalid`);
+          if (!allowedTypes.has(element.type)) errors.push(`${manifestPath}: unsupported practical element type: ${element.type || "unknown"}`);
+          for (const field of ["title", "userValue", "competitorGap", "sourceBasis", "placement"]) {
+            if (!nonEmptyString(element[field]) || hasPlaceholder(element[field])) errors.push(`${manifestPath}: practical element ${field} is missing for ${element.contentId || "unknown content"}`);
+          }
+          if (!nonEmptyArray(element.sourceIds) || element.sourceIds.some((id) => !nonEmptyString(id) || hasPlaceholder(id))) errors.push(`${manifestPath}: practical element sourceIds are missing for ${element.contentId || "unknown content"}`);
+          if (element.verifiedAgainstSerp !== true) errors.push(`${manifestPath}: practical element was not verified against SERP for ${element.contentId || "unknown content"}`);
+        }
+
+        const contentChanges = manifest.contentChanges || [];
+        const sourcePaths = new Set(contentChanges.map((item) => item.path));
         for (const path of governedChanges) if (!sourcePaths.has(path)) errors.push(`${manifestPath}: changed content path is not declared: ${path}`);
+        for (const change of contentChanges) {
+          if (!validUrl(change.expectedUrl) || hasPlaceholder(change.expectedUrl)) errors.push(`${manifestPath}: content change expectedUrl is missing or invalid for ${change.contentId || change.path || "unknown change"}`);
+          const mappedToIntent = ownership.some((item) => item.ownerUrl === change.expectedUrl || item.supportingUrls.includes(change.expectedUrl));
+          if (!mappedToIntent) errors.push(`${manifestPath}: changed URL is not mapped to an intent owner: ${change.expectedUrl || "unknown URL"}`);
+          const hasPracticalElement = practicalElements.some((element) => element.targetUrl === change.expectedUrl && element.contentId === change.contentId);
+          if (!hasPracticalElement) errors.push(`${manifestPath}: changed material has no original practical element: ${change.contentId || change.expectedUrl || "unknown"}`);
+        }
         if (!Array.isArray(manifest.publication?.expectedUrls)) errors.push(`${manifestPath}: expected public URLs are missing`);
       }
     }
   }
 
   if (!errors.length) {
-    console.log(`Content governance contract passed: ${config.spreadsheet.baselineSnapshot.tabCount} baseline tabs, ${changedFiles.length} changed files, ${governedChanges.length} governed content changes`);
+    console.log(`Content governance contract passed: ${config.spreadsheet.baselineSnapshot.tabCount} baseline tabs, ${changedFiles.length} changed files, ${governedChanges.length} governed content changes, 3 cluster gates`);
   }
 }
 

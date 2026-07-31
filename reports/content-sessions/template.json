@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "sessionId": "YYYYMMDD-HHMM-topic",
   "reviewedAt": "2026-07-30T19:00:00.000Z",
   "spreadsheet": {
@@ -76,6 +76,67 @@
     "intentMap": [
       { "intent": "replace", "target": "H1/lead/short answer" },
       { "intent": "replace", "target": "H2 or FAQ" }
+    ],
+    "intentOwnership": [
+      {
+        "intent": "replace with one independent user intent",
+        "ownerUrl": "https://yuristshevchuk.com/replace/",
+        "ownerType": "article",
+        "supportingUrls": [],
+        "supportingCaseIds": [],
+        "excludedQueries": ["replace with a query this page must not target"],
+        "existingCompetingUrlsReviewed": ["https://yuristshevchuk.com/replace-existing-page/"],
+        "decision": "new-owner",
+        "reason": "replace with why this intent needs this single owner"
+      }
+    ],
+    "serpSnapshots": [
+      {
+        "intent": "replace with the same independent user intent",
+        "checkedAt": "2026-07-30T19:00:00.000Z",
+        "region": "Russia / relevant service region",
+        "engines": [
+          {
+            "engine": "Yandex",
+            "query": "replace with the checked query",
+            "topResultsReviewed": 10,
+            "dominantIntent": "informational",
+            "resultTypes": ["articles", "official sources"],
+            "localPack": false,
+            "snippetPatterns": ["replace with a recurring snippet formulation"],
+            "competitorCoverageGaps": ["replace with a practical gap in current results"],
+            "staleOrWeakResults": []
+          },
+          {
+            "engine": "Google",
+            "query": "replace with the checked query",
+            "topResultsReviewed": 10,
+            "dominantIntent": "informational",
+            "resultTypes": ["articles", "official sources"],
+            "localPack": false,
+            "snippetPatterns": ["replace with a recurring snippet formulation"],
+            "competitorCoverageGaps": ["replace with a practical gap in current results"],
+            "staleOrWeakResults": []
+          }
+        ],
+        "pageTypeDecision": "article",
+        "decisionReason": "replace with why the SERP requires this page type",
+        "canProvideBetterAnswer": true
+      }
+    ],
+    "practicalElements": [
+      {
+        "contentId": "replace",
+        "targetUrl": "https://yuristshevchuk.com/replace/",
+        "type": "evidence-matrix",
+        "title": "replace with the practical element title",
+        "userValue": "replace with the decision or action this element helps the reader make",
+        "competitorGap": "replace with the SERP gap this element closes",
+        "sourceBasis": "paid-practice",
+        "sourceIds": ["replace with internal non-personal source ID"],
+        "placement": "replace with H2, table, checklist or case block location",
+        "verifiedAgainstSerp": true
+      }
     ],
     "cannibalizationChecked": true,
     "overOptimizationRisk": "low"

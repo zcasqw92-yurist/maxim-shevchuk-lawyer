@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "ruleId": "google-sheet-content-standard",
   "priority": "highest-project-content-rule",
   "spreadsheet": {
@@ -43,6 +43,53 @@
       ]
     }
   },
+  "clusterPreparation": {
+    "requiredGates": [
+      "intentOwnership",
+      "serpSnapshot",
+      "originalPracticalElement"
+    ],
+    "intentOwnership": {
+      "requireSingleOwnerPerIntent": true,
+      "requireExcludedQueries": true,
+      "requireExistingPagesReview": true,
+      "requireEveryChangedUrlMapped": true
+    },
+    "serpSnapshot": {
+      "requiredEngines": [
+        "Yandex",
+        "Google"
+      ],
+      "minimumTopResultsReviewedPerEngine": 5,
+      "maxAgeDaysAtReview": 14,
+      "requireDominantIntent": true,
+      "requireResultTypes": true,
+      "requireSnippetPatterns": true,
+      "requireCompetitorGaps": true,
+      "requirePageTypeDecision": true,
+      "requireBetterAnswerDecision": true
+    },
+    "originalPracticalElement": {
+      "minimumPerChangedMaterial": 1,
+      "allowedTypes": [
+        "evidence-matrix",
+        "decision-tree",
+        "legal-route-table",
+        "paid-practice-mini-case",
+        "legally-significant-phrases",
+        "claim-calculation",
+        "document-checklist",
+        "contract-review-block",
+        "procedure-timeline",
+        "risk-map",
+        "other-original-analysis"
+      ],
+      "requireSourceIds": true,
+      "requireCompetitorGap": true,
+      "requirePlacement": true,
+      "requireSerpVerification": true
+    }
+  },
   "governedContentPaths": [
     "site.config.mjs",
     "src/data.mjs",
@@ -69,7 +116,8 @@
     "requiredWhenGovernedContentChanges": true,
     "mustChangeWithGovernedContent": true,
     "mustListEveryDiscoveredTab": true,
-    "mustNotContainPersonalData": true
+    "mustNotContainPersonalData": true,
+    "mustPassAllClusterGates": true
   },
   "publication": {
     "localFullSiteCheck": "npm run check",
@@ -81,6 +129,9 @@
     "chatReportFields": [
       "spreadsheet snapshot and reviewed tabs",
       "created or updated content",
+      "intent owner and excluded queries",
+      "Yandex and Google SERP snapshot",
+      "original practical element and source basis",
       "changed repository files",
       "published public URLs",
       "commit SHA",

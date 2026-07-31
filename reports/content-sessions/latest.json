@@ -196,6 +196,13 @@
       "contentId": "refund-non-rendered-service",
       "action": "registered",
       "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
+    },
+    {
+      "path": "site.config.mjs",
+      "kind": "article-date",
+      "contentId": "refund-non-rendered-service",
+      "action": "registered-content-date",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
     }
   ],
   "plannedChecks": [

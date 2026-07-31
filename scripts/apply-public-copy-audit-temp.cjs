@@ -1,0 +1,288 @@
+const fs = require('node:fs');
+const { execFileSync } = require('node:child_process');
+
+const read = (path) => fs.readFileSync(path, 'utf8');
+const write = (path, content) => fs.writeFileSync(path, content);
+
+const replaceTextOnce = (path, before, after) => {
+  const content = read(path);
+  const count = content.split(before).length - 1;
+  if (count !== 1) throw new Error(`${path}: expected one exact match, found ${count}`);
+  write(path, content.replace(before, after));
+};
+
+const replaceRegexOnce = (path, pattern, after) => {
+  const content = read(path);
+  const matches = content.match(new RegExp(pattern.source, pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g')) || [];
+  if (matches.length !== 1) throw new Error(`${path}: expected one regex match, found ${matches.length}`);
+  write(path, content.replace(pattern, after));
+};
+
+replaceTextOnce(
+  'src/refund-voluntary-service-cancellation.mjs',
+  '      note: "Практический элемент основан на обращении о возврате предоплаты за годовую карту и оплаченной работе по проверке удержаний фитнес-клуба. Наличие работы подтверждает практику, но не используется как доказательство результата конкретного дела.",\n',
+  ''
+);
+
+replaceTextOnce(
+  'src/refund-services-cluster-data.mjs',
+  '      note: "Практическая матрица основана на повторяющейся проблеме из обращений и оплаченной практики: клиенты смешивают неоказание, недостатки и добровольный отказ, хотя последствия у них разные.",\n',
+  ''
+);
+
+replaceTextOnce(
+  'src/refund-services-cluster-data.mjs',
+  '      note: "Если исполнитель получил деньги и исчез, использовал чужие реквизиты или есть несколько одинаковых эпизодов, ситуация требует отдельной оценки возможного обмана. Это другой поисковый и юридический маршрут, который не заменяет расчёт гражданского требования.",',
+  '      note: "Если исполнитель получил деньги и исчез, использовал чужие реквизиты или есть несколько одинаковых эпизодов, отдельно оцените признаки возможного первоначального обмана. Заявление в полицию не заменяет расчёт и предъявление гражданского требования о возврате денег.",'
+);
+
+const sellerReplacement = `    {
+      id: "evidence-chain",
+      title: "Как собрать проверяемую хронологию и доказательства",
+      paragraphs: [
+        "Сильный материал связывает предложение, переписку, перевод, согласованный срок и последующее прекращение связи. Одного банковского чека недостаточно, если из остальных документов непонятно, какое обязательство принял продавец или исполнитель.",
+        "Расположите события по датам и для каждого укажите участника, обещанное действие и подтверждающий документ. Такая структура помогает отдельно оценить гражданское требование, признаки возможного обмана и роль владельца счёта.",
+      ],
+      checklist: [
+        "события от первого предложения до последнего ответа в хронологическом порядке;",
+        "ссылка каждого события на сообщение, документ, объявление или платёж;",
+        "отдельная таблица переводов с датой, суммой и получателем;",
+        "разделение подтверждённых фактов и предположений;",
+        "перечень конкретных действий, которых вы просите от адресата.",
+      ],
+    },`;
+replaceRegexOnce(
+  'src/debt-cluster-data.mjs',
+  /    \{\n      id: "practice",\n      title: "Что показывает оплаченная юридическая практика",[\s\S]*?      note: "Практический вывод: документ должен не просто сообщать о потере денег, а давать проверяемую хронологию, доказательства и перечень конкретных действий для адресата\.Х?",?\n    \},/,
+  sellerReplacement
+);
+
+const seller = read('src/debt-cluster-data.mjs');
+const sellerStart = seller.indexOf('const sellerDisappearedArticle = {');
+const sellerEnd = seller.indexOf('export const debtClusterArticles', sellerStart);
+if (sellerStart < 0 || sellerEnd < 0) throw new Error('seller article bounds not found');
+const sellerBlock = seller.slice(sellerStart, sellerEnd);
+if (!sellerBlock.includes('modifiedAt: "2026-07-30"')) throw new Error('seller modifiedAt marker not found');
+write(
+  'src/debt-cluster-data.mjs',
+  seller.slice(0, sellerStart) + sellerBlock.replace('modifiedAt: "2026-07-30"', 'modifiedAt: "2026-07-31"') + seller.slice(sellerEnd)
+);
+
+const guard = String.raw`import { articles } from "../src/editorial-data.mjs";
+
+const collectStrings = (value) => {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap(collectStrings);
+  if (value && typeof value === "object") return Object.values(value).flatMap(collectStrings);
+  return [];
+};
+
+const forbidden = [
+  { label: "SEO-терминология", pattern: /\bSEO\b|\bSERP\b|каннибализац|владелец\s+интента|контентн\w*\s+карточк|поисков\w*\s+(?:интент|маршрут)|(?:^|\s)кластер(?:а|ом|у|ы)?(?:\s|$)/iu },
+  { label: "внутреннее происхождение материала", pattern: /практическ\w*\s+элемент|оплаченн\w*\s+(?:юридическ\w*\s+)?(?:практик\w*|работ\w*)|подтвержда\w*\s+выполненн\w*\s+юридическ\w*\s+работ\w*|основан\w*\s+на\s+(?:обращени\w*|повторяющ\w*\s+проблем\w*)/iu },
+];
+
+const errors = [];
+for (const article of articles.filter((item) => item.status === "published")) {
+  for (const value of collectStrings(article)) {
+    for (const rule of forbidden) {
+      if (rule.pattern.test(value)) errors.push(article.slug + ": " + rule.label + ": " + value);
+    }
+  }
+}
+
+if (errors.length) {
+  console.error("Публичные разборы содержат внутреннюю редакционную терминологию:\n" + errors.map((item) => "- " + item).join("\n"));
+  process.exit(1);
+}
+
+console.log("Public copy guard passed: " + articles.filter((item) => item.status === "published").length + " published analyses checked");
+`;
+write('scripts/public-copy-guard-test.mjs', guard);
+
+const pkg = JSON.parse(read('package.json'));
+pkg.scripts['test:public-copy'] = 'node scripts/public-copy-guard-test.mjs';
+if (!pkg.scripts.check.includes('npm run test:public-copy')) {
+  pkg.scripts.check = pkg.scripts.check.replace(
+    'npm run test:content-governance',
+    'npm run test:content-governance && npm run test:public-copy'
+  );
+}
+write('package.json', JSON.stringify(pkg, null, 2) + '\n');
+
+const manifest = JSON.parse(read('reports/content-sessions/latest.json'));
+manifest.sessionId = '20260731-public-article-copy-audit';
+manifest.reviewedAt = new Date().toISOString();
+manifest.spreadsheet.modifiedTime = '2026-07-31T20:40:38.970Z';
+const versionsTab = manifest.reviewedTabs.find((tab) => tab.name === '_Версии_контента');
+if (versionsTab) versionsTab.range = 'A1:L17';
+manifest.sourceTrace = {
+  dialogIds: [],
+  situationIds: [],
+  workIds: [],
+  contentIds: ['C-002', 'C-012', 'C-071'],
+  caseIds: [],
+  notes: 'Public copy audit only. Internal research remains in the editorial system and is not rendered for visitors.'
+};
+manifest.seoReview.status = 'completed';
+manifest.seoReview.checkedAt = '2026-07-31T18:20:00.000Z';
+manifest.seoReview.primaryIntent = 'ревизия публичных юридических разборов без изменения поискового интента';
+manifest.seoReview.intentMap = [
+  { intent: 'отказ от договора оказания услуг вернуть деньги', target: 'Existing owner; public copy cleanup only' },
+  { intent: 'как вернуть деньги за неоказанную услугу', target: 'Existing owner; public copy cleanup only' },
+  { intent: 'продавец получил деньги и пропал', target: 'Existing related analysis; evidence-chain section updated' }
+];
+const voluntaryOwnership = manifest.seoReview.intentOwnership[0];
+voluntaryOwnership.decision = 'update-owner';
+voluntaryOwnership.reason = 'The page keeps the same intent and legal structure; only internal editorial commentary is removed from public copy.';
+manifest.seoReview.intentOwnership = [
+  voluntaryOwnership,
+  {
+    intent: 'как вернуть деньги за неоказанную услугу',
+    ownerUrl: 'https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/',
+    ownerType: 'article',
+    supportingUrls: [
+      'https://yuristshevchuk.com/uslugi/vozvrat-deneg/',
+      'https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/'
+    ],
+    supportingCaseIds: [],
+    excludedQueries: [
+      'отказ от договора оказания услуг вернуть деньги',
+      'возврат денег за навязанную услугу',
+      'продавец получил деньги и пропал',
+      'услуга оказана некачественно',
+      'юрист по возврату денег за услуги'
+    ],
+    existingCompetingUrlsReviewed: [
+      'https://yuristshevchuk.com/uslugi/vozvrat-deneg/',
+      'https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/',
+      'https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/'
+    ],
+    decision: 'update-owner',
+    reason: 'The page remains the owner of non-performance queries. The change removes internal editorial language without broadening or changing the intent.'
+  }
+];
+manifest.seoReview.serpSnapshots = [
+  manifest.seoReview.serpSnapshots[0],
+  {
+    intent: 'как вернуть деньги за неоказанную услугу',
+    checkedAt: '2026-07-31T12:30:00.000Z',
+    region: 'Москва, Россия',
+    engines: [
+      {
+        engine: 'Yandex',
+        query: 'как вернуть деньги за неоказанную услугу',
+        organicResultsReviewed: 20,
+        sponsoredResultsObserved: 0,
+        sponsoredResultLabels: [],
+        sponsoredAdvertiserTypes: [],
+        sponsoredOfferPatterns: [],
+        dominantIntent: 'informational step-by-step recovery guidance',
+        resultTypes: ['bank guides', 'legal articles', 'consumer guidance'],
+        localPack: false,
+        snippetPatterns: ['service not performed', 'refund demand', 'consumer rights'],
+        competitorCoverageGaps: [
+          'weak separation of non-performance and voluntary cancellation',
+          'partial performance calculations are often abstract',
+          'evidence chains are rarely shown as a usable matrix'
+        ],
+        staleOrWeakResults: []
+      },
+      {
+        engine: 'Google',
+        query: 'как вернуть деньги за неоказанную услугу',
+        organicResultsReviewed: 9,
+        sponsoredResultsObserved: 0,
+        sponsoredResultLabels: [],
+        sponsoredAdvertiserTypes: [],
+        sponsoredOfferPatterns: [],
+        dominantIntent: 'informational guidance on evidence, demand and recovery',
+        resultTypes: ['legal explainers', 'consumer articles', 'official sources'],
+        localPack: false,
+        snippetPatterns: ['refund for service', 'written demand', 'deadline breach'],
+        competitorCoverageGaps: [
+          'non-performance is often mixed with defects',
+          'accepted partial results are not clearly separated',
+          'consumer-facing calculations lack document checks'
+        ],
+        staleOrWeakResults: []
+      }
+    ],
+    pageTypeDecision: 'article',
+    decisionReason: 'The existing article remains the correct owner. This session only removes non-client editorial language.',
+    canProvideBetterAnswer: true
+  }
+];
+manifest.seoReview.practicalElements = [
+  manifest.seoReview.practicalElements[0],
+  {
+    contentId: 'refund-non-rendered-service',
+    targetUrl: 'https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/',
+    type: 'decision-tree',
+    title: 'Матрица: неоказание, частичное исполнение, недостатки или добровольный отказ',
+    userValue: 'Helps the reader select the correct legal basis and calculate the recoverable amount.',
+    competitorGap: 'Many results mix different legal grounds and do not show how accepted work affects the calculation.',
+    sourceBasis: 'existing-approved-cluster-research',
+    sourceIds: ['C-012'],
+    placement: 'First substantive H2 and calculation sections; internal source commentary removed from public rendering.',
+    verifiedAgainstSerp: true
+  },
+  {
+    contentId: 'seller-disappeared-after-payment',
+    targetUrl: 'https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/',
+    type: 'procedure-timeline',
+    title: 'Проверяемая хронология предложения, оплаты, срока и прекращения связи',
+    userValue: 'Helps the reader connect each event to a document and separate civil recovery from a possible fraud report.',
+    competitorGap: 'Generic guidance often lists documents but does not show how to connect them into an evidence chain.',
+    sourceBasis: 'existing-approved-content-card',
+    sourceIds: ['C-002'],
+    placement: 'Replaces the internal practice narrative with a client-facing evidence-chain section.',
+    verifiedAgainstSerp: true
+  }
+];
+manifest.seoReview.cannibalizationChecked = true;
+manifest.seoReview.overOptimizationRisk = 'low';
+manifest.contentChanges = [
+  {
+    path: 'src/debt-cluster-data.mjs',
+    kind: 'article-copy-audit',
+    contentId: 'seller-disappeared-after-payment',
+    action: 'updated-public-copy',
+    expectedUrl: 'https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/'
+  },
+  {
+    path: 'src/refund-services-cluster-data.mjs',
+    kind: 'article-copy-audit',
+    contentId: 'refund-non-rendered-service',
+    action: 'updated-public-copy',
+    expectedUrl: 'https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/'
+  },
+  {
+    path: 'src/refund-voluntary-service-cancellation.mjs',
+    kind: 'article-copy-audit',
+    contentId: 'refund-voluntary-service-cancellation',
+    action: 'updated-public-copy',
+    expectedUrl: 'https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/'
+  }
+];
+manifest.plannedChecks = ['npm run check', 'npm run test:live', 'node scripts/live-all-publications-smoke.mjs'];
+manifest.publication = {
+  expectedUrls: [
+    'https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/',
+    'https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/',
+    'https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/'
+  ],
+  notes: 'All eight published analyses were reviewed. Reused approved cached Yandex and Google snapshots; no new search API, Wordstat or SERP requests were made.'
+};
+write('reports/content-sessions/latest.json', JSON.stringify(manifest, null, 2) + '\n');
+
+execFileSync(process.execPath, ['scripts/public-copy-guard-test.mjs'], { stdio: 'inherit' });
+for (const file of [
+  'src/debt-cluster-data.mjs',
+  'src/refund-services-cluster-data.mjs',
+  'src/refund-voluntary-service-cancellation.mjs',
+  'scripts/public-copy-guard-test.mjs'
+]) {
+  execFileSync(process.execPath, ['--check', file], { stdio: 'inherit' });
+}
+console.log('Public article audit changes prepared successfully');

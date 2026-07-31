@@ -1,0 +1,49 @@
+name: Слепок органической выдачи
+
+on:
+  pull_request:
+    paths:
+      - 'config/refund-services-serp.json'
+      - 'scripts/serp-snapshot.mjs'
+      - '.github/workflows/serp-snapshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Установить Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Снять выдачу Яндекса и Google
+        env:
+          YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+          YANDEX_CLOUD_FOLDER_ID: ${{ secrets.YANDEX_CLOUD_FOLDER_ID }}
+        run: node scripts/serp-snapshot.mjs
+
+      - name: Сохранить отчёт и диагностику
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: refund-services-serp-snapshot
+          path: reports/serp-snapshots/refund-services/
+          if-no-files-found: warn
+          retention-days: 14

@@ -6,8 +6,35 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const config = JSON.parse(await readFile(join(root, "config", "refund-services-serp.json"), "utf8"));
 const outputDir = join(root, "reports", "serp-snapshots", "refund-services");
 const outputPath = join(outputDir, "google-api.json");
-const serperApiKey = String(process.env.SERPER_API_KEY || "").trim();
-const serpApiKey = String(process.env.SERPAPI_API_KEY || "").trim();
+
+const normalizeSecret = (value, variableName) => {
+  let normalized = String(value || "").trim();
+  const prefixes = [
+    `${variableName}=`,
+    "X-API-KEY:",
+    "X-API-KEY=",
+    "API-KEY:",
+    "API-KEY=",
+    "Bearer ",
+  ];
+  for (const prefix of prefixes) {
+    if (normalized.toLowerCase().startsWith(prefix.toLowerCase())) {
+      normalized = normalized.slice(prefix.length).trim();
+      break;
+    }
+  }
+  if (
+    normalized.length >= 2 &&
+    ((normalized.startsWith('"') && normalized.endsWith('"')) ||
+      (normalized.startsWith("'") && normalized.endsWith("'")))
+  ) {
+    normalized = normalized.slice(1, -1).trim();
+  }
+  return normalized;
+};
+
+const serperApiKey = normalizeSecret(process.env.SERPER_API_KEY, "SERPER_API_KEY");
+const serpApiKey = normalizeSecret(process.env.SERPAPI_API_KEY, "SERPAPI_API_KEY");
 
 const clean = (value) => String(value ?? "")
   .replace(/[\r\n\t]+/g, " ")

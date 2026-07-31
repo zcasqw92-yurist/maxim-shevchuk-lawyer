@@ -1,0 +1,46 @@
+name: Временно исправить проверку отказа от аналитики
+
+on:
+  push:
+    branches:
+      - fix/button-analytics-consent-navigation
+    paths:
+      - .github/workflows/patch-button-analytics-consent-test.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/button-analytics-consent-navigation
+          fetch-depth: 0
+      - name: Разделить обычные кнопки и отказ от аналитики
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'scripts/button-analytics-contract-test.mjs';
+          let source = fs.readFileSync(path, 'utf8');
+
+          const clickAnchor = `          const cancelled = !control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));\n          if (!cancelled && control.matches("a[href]")) history.replaceState(null, "", location.pathname);\n          await new Promise((resolve) => setTimeout(resolve, 0));`;
+          const clickReplacement = `          // The reject control is audited in a separate clean-consent context below.\n          // Clicking it after analytics has started intentionally reloads the real page,\n          // which would destroy this page-wide audit execution context.\n          if (info.consentReject) {\n            results.push({\n              info,\n              buttonAction: null,\n              ctaClick: null,\n              contactConversion: null,\n              contactAction: null,\n            });\n            continue;\n          }\n\n          const cancelled = !control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));\n          if (!cancelled && control.matches("a[href]")) history.replaceState(null, "", location.pathname);\n          await new Promise((resolve) => setTimeout(resolve, 0));`;
+          if (!source.includes(clickAnchor)) throw new Error('Main click anchor not found');
+          source = source.replace(clickAnchor, clickReplacement);
+
+          const closeAnchor = `  }\n  await context.close();\n} finally {`;
+          const closeReplacement = `  }\n\n  // Verify the real reject behavior before analytics starts. In this state the app\n  // must persist denial without reloading, and button analytics must emit nothing.\n  const rejectContext = await browser.newContext({\n    viewport: { width: 1440, height: 1000 },\n    locale: "ru-RU",\n    reducedMotion: "reduce",\n  });\n  await rejectContext.addInitScript(() => {\n    localStorage.removeItem("analytics_consent");\n    window.__ymCalls = [];\n    window.ym = (...args) => window.__ymCalls.push(args);\n  });\n  const rejectPage = await rejectContext.newPage();\n  await rejectPage.route("https://mc.yandex.ru/**", (route) => route.abort());\n  await rejectPage.route("https://www.googletagmanager.com/**", (route) => route.abort());\n  try {\n    await rejectPage.goto(\`\${origin}/\`, { waitUntil: "networkidle" });\n    await rejectPage.waitForFunction(() => Boolean(window.__buttonAnalyticsContract));\n    const rejectAudit = await rejectPage.evaluate(async () => {\n      const control = document.querySelector("[data-consent-reject]");\n      if (!control) return { missing: true };\n      window.dataLayer = [];\n      window.__ymCalls = [];\n      const beforeUrl = location.href;\n      control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));\n      await new Promise((resolve) => setTimeout(resolve, 0));\n      return {\n        missing: false,\n        consent: localStorage.getItem("analytics_consent"),\n        urlUnchanged: location.href === beforeUrl,\n        buttonActions: (window.dataLayer || []).filter((item) => item?.event === "button_action").length,\n        ymButtonActions: (window.__ymCalls || []).filter((args) => args?.[1] === "reachGoal" && args?.[2] === "button_action").length,\n      };\n    });\n    if (rejectAudit.missing) errors.push("Главная: не найдена кнопка отказа от аналитики");\n    if (rejectAudit.consent !== "denied") errors.push(\`Главная: отказ не сохранил analytics_consent=denied, получено \${rejectAudit.consent}\`);\n    if (!rejectAudit.urlUnchanged) errors.push("Главная: отказ до запуска аналитики не должен перезагружать страницу");\n    if (rejectAudit.buttonActions || rejectAudit.ymButtonActions) errors.push("Главная: отказ от аналитики отправил внешнее событие button_action");\n  } finally {\n    await rejectPage.close().catch(() => {});\n    await rejectContext.close().catch(() => {});\n  }\n\n  await context.close();\n} finally {`;
+          if (!source.includes(closeAnchor)) throw new Error('Context close anchor not found');
+          source = source.replace(closeAnchor, closeReplacement);
+
+          fs.writeFileSync(path, source, 'utf8');
+          NODE
+      - name: Зафиксировать исправление
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/button-analytics-contract-test.mjs
+          git commit -m "Стабилизировать проверку отказа от аналитики"
+          git push origin HEAD:fix/button-analytics-consent-navigation

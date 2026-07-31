@@ -8,6 +8,7 @@ on:
       - 'config/refund-services-serp.json'
       - 'scripts/serp-snapshot.mjs'
       - 'scripts/yandex-public-serp.mjs'
+      - 'scripts/google-public-serp.mjs'
       - '.github/workflows/serp-snapshot.yml'
   workflow_dispatch:
 
@@ -20,7 +21,7 @@ jobs:
   snapshot:
     environment: seo-api
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Получить код
@@ -43,12 +44,17 @@ jobs:
         continue-on-error: true
         run: node scripts/yandex-public-serp.mjs
 
-      - name: Проверить Search API и снять Google
+      - name: Снять Яндекс через Search API и основной Google
         id: serp
         continue-on-error: true
         env:
           YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
         run: node scripts/serp-snapshot.mjs
+
+      - name: Снять Google через резервные официальные домены
+        id: google_public
+        continue-on-error: true
+        run: node scripts/google-public-serp.mjs
 
       - name: Сохранить отчёт и диагностику
         if: always()
@@ -71,7 +77,15 @@ jobs:
             };
             const report = readJson('reports/serp-snapshots/refund-services/latest.json');
             const yandexPublic = readJson('reports/serp-snapshots/refund-services/yandex-public.json');
+            const googlePublic = readJson('reports/serp-snapshots/refund-services/google-public.json');
             const yandexById = new Map((yandexPublic?.queries || []).map((item) => [item.id, item]));
+            const googleById = new Map((googlePublic?.queries || []).map((item) => [item.id, item]));
+            const pickYandex = (item) => item.yandex?.minimumMet
+              ? item.yandex
+              : (yandexById.get(item.id)?.minimumMet ? yandexById.get(item.id) : (item.yandex || yandexById.get(item.id) || {}));
+            const pickGoogle = (item) => googleById.get(item.id)?.minimumMet
+              ? googleById.get(item.id)
+              : (item.google?.minimumMet ? item.google : (googleById.get(item.id) || item.google || {}));
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -84,7 +98,7 @@ jobs:
 
             const combinedGate = Boolean(
               report?.queries?.length &&
-              report.queries.every((item) => yandexById.get(item.id)?.minimumMet && item.google?.minimumMet)
+              report.queries.every((item) => pickYandex(item).minimumMet && pickGoogle(item).minimumMet)
             );
             const lines = [
               '## Автоматический SERP-снимок',
@@ -96,19 +110,33 @@ jobs:
             ];
 
             for (const item of report?.queries || []) {
-              const yandex = yandexById.get(item.id) || item.yandex || {};
-              lines.push(`| ${item.query} | ${yandex.organicResultsReviewed ?? 0} / ${yandex.sponsoredResultsObserved ?? 0} (${yandex.status || 'нет'}) | ${item.google?.organicResultsReviewed ?? 0} / ${item.google?.sponsoredResultsObserved ?? 0} (${item.google?.status || 'нет'}) |`);
+              const yandex = pickYandex(item);
+              const google = pickGoogle(item);
+              lines.push(`| ${item.query} | ${yandex.organicResultsReviewed ?? 0} / ${yandex.sponsoredResultsObserved ?? 0} (${yandex.status || 'нет'}) | ${google.organicResultsReviewed ?? 0} / ${google.sponsoredResultsObserved ?? 0} (${google.status || 'нет'}) |`);
             }
 
             const errors = [];
             for (const item of report?.queries || []) {
-              const yandex = yandexById.get(item.id) || item.yandex || {};
-              if (yandex.status !== 'ok') errors.push(`Яндекс — ${item.query}: ${yandex.diagnostics?.reason || 'неизвестная ошибка'}`);
-              if (item.google?.status !== 'ok') errors.push(`Google — ${item.query}: ${item.google?.diagnostics?.reason || 'неизвестная ошибка'}`);
+              const yandex = pickYandex(item);
+              const google = pickGoogle(item);
+              if (!yandex.minimumMet) errors.push(`Яндекс — ${item.query}: ${yandex.diagnostics?.reason || 'не получено пять органических результатов'}`);
+              if (!google.minimumMet) errors.push(`Google — ${item.query}: ${google.diagnostics?.reason || 'не получено пять органических результатов'}`);
             }
             if (errors.length) lines.push('', '### Диагностика', ...errors.slice(0, 12).map((value) => `- ${value}`));
-            if (report?.queries?.some((item) => item.yandex?.status === 'error')) {
-              lines.push('', 'Search API Яндекса оставлен в диагностике; для шлюза используется публичная выдача с отдельной классификацией рекламы.');
+
+            if (report?.queries?.some((item) => pickYandex(item).minimumMet || pickGoogle(item).minimumMet)) {
+              lines.push('', '### Проверенные органические результаты');
+              for (const item of report.queries) {
+                const yandex = pickYandex(item);
+                const google = pickGoogle(item);
+                lines.push('', `**${item.query}**`);
+                if (yandex.minimumMet) {
+                  lines.push(`- Яндекс: ${yandex.organicResults.slice(0, 5).map((entry, index) => `${index + 1}) ${entry.domain} — ${entry.title}`).join('; ')}`);
+                }
+                if (google.minimumMet) {
+                  lines.push(`- Google: ${google.organicResults.slice(0, 5).map((entry, index) => `${index + 1}) ${entry.domain} — ${entry.title}`).join('; ')}`);
+                }
+              }
             }
             lines.push('', `Workflow commit: \`${context.sha}\``);
 
@@ -119,8 +147,28 @@ jobs:
               body: lines.join('\n'),
             });
 
-      - name: Заблокировать неполный снимок
-        if: steps.yandex_public.outcome != 'success' || steps.serp.outcome != 'success'
-        run: exit 1
+      - name: Проверить объединённый шлюз
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const read = (path) => {
+            try { return JSON.parse(fs.readFileSync(path, 'utf8')); }
+            catch { return null; }
+          };
+          const report = read('reports/serp-snapshots/refund-services/latest.json');
+          const yandexPublic = read('reports/serp-snapshots/refund-services/yandex-public.json');
+          const googlePublic = read('reports/serp-snapshots/refund-services/google-public.json');
+          const yandexById = new Map((yandexPublic?.queries || []).map((item) => [item.id, item]));
+          const googleById = new Map((googlePublic?.queries || []).map((item) => [item.id, item]));
+          const passed = Boolean(report?.queries?.length && report.queries.every((item) => {
+            const yandex = item.yandex?.minimumMet ? item.yandex : yandexById.get(item.id);
+            const google = googleById.get(item.id)?.minimumMet ? googleById.get(item.id) : item.google;
+            return Boolean(yandex?.minimumMet && google?.minimumMet);
+          }));
+          console.log(`Combined SERP gate passed: ${passed}`);
+          if (!passed) process.exit(1);
+          NODE
 
-# Повторный запуск после пополнения баланса: 2026-07-31T12:33:00+02:00
+# Повторный запуск после пополнения баланса и исправления приоритета источников: 2026-07-31T12:33:00+02:00

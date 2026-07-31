@@ -28,12 +28,12 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Проверить только Google через Serper
+      - name: Проверить только Google через SerpApi
         id: google
         continue-on-error: true
         env:
-          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+          SERPER_API_KEY: ''
+          SERPAPI_API_KEY: ${{ secrets.SERPER_API_KEY }}
         run: node scripts/google-serp-api.mjs
 
       - name: Сохранить Google-отчёт

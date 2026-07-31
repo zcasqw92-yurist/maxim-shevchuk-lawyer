@@ -1,0 +1,40 @@
+name: Verify removed public SEO note
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Wait for production SHA and verify article
+        env:
+          EXPECTED_SHA: 6fb36a8c174ca3d5502bfeea9a681bf5b64dfb20
+          SITE_URL: https://yuristshevchuk.com
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 45); do
+            build_info="$(curl --fail --silent --show-error --location --max-time 20 "$SITE_URL/build-info.json?run=$GITHUB_RUN_ID" || true)"
+            echo "Attempt $attempt: $build_info"
+            if printf '%s' "$build_info" | grep -Fq "$EXPECTED_SHA"; then
+              article="$(curl --fail --silent --show-error --location --max-time 20 "$SITE_URL/razbory/otkaz-ot-dogovora-okazaniya-uslug/?run=$GITHUB_RUN_ID")"
+              if printf '%s' "$article" | grep -Fq 'Разграничение защищает от каннибализации'; then
+                echo 'Internal SEO note is still present on the live article.' >&2
+                exit 1
+              fi
+              if printf '%s' "$article" | grep -Fq 'Практический комментарий'; then
+                echo 'Public practical-comment block is still present on the live article.' >&2
+                exit 1
+              fi
+              echo 'Production SHA confirmed and internal SEO note is absent.'
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "Production did not reach expected SHA $EXPECTED_SHA in time." >&2
+          exit 1

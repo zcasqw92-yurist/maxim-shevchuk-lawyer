@@ -138,7 +138,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: post-deploy-diagnostics-${{ github.run_id }}
+          name: custom-domain-sha-diagnostics-${{ github.run_id }}
           path: |
             reports/custom-domain-sha-verification.json
             reports/public-copy-regression.json

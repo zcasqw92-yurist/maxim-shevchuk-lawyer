@@ -1,0 +1,111 @@
+name: Независимо проверить статью на основном домене
+
+on:
+  push:
+    branches:
+      - fix/button-analytics-consent-navigation
+    paths:
+      - .github/workflows/verify-refund-article-live.yml
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Проверить SHA и статью
+        id: verify
+        env:
+          EXPECTED_SHA: 12f38959cbb1c076113690d3d535690a1eaebad7
+          SITE_URL: https://yuristshevchuk.com
+          ARTICLE_PATH: /razbory/vernut-dengi-za-neokazannuyu-uslugu/
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const expected = process.env.EXPECTED_SHA;
+          const base = process.env.SITE_URL;
+          const articlePath = process.env.ARTICLE_PATH;
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const diagnostics = [];
+          let success = null;
+
+          for (let attempt = 1; attempt <= 30; attempt += 1) {
+            const nonce = `${Date.now()}-${attempt}`;
+            try {
+              const headers = { 'cache-control': 'no-cache', pragma: 'no-cache' };
+              const infoResponse = await fetch(`${base}/build-info.json?nonce=${nonce}`, { headers, cache: 'no-store', redirect: 'follow', signal: AbortSignal.timeout(15000) });
+              const infoText = await infoResponse.text();
+              let info = {};
+              try { info = JSON.parse(infoText); } catch {}
+              const articleResponse = await fetch(`${base}${articlePath}?nonce=${nonce}`, { headers, cache: 'no-store', redirect: 'follow', signal: AbortSignal.timeout(15000) });
+              const html = await articleResponse.text();
+              const canonical = `${base}${articlePath}`;
+              const checks = {
+                buildStatus: infoResponse.status,
+                articleStatus: articleResponse.status,
+                sha: info.sha || info.buildSha || '',
+                finalBuildUrl: infoResponse.url,
+                finalArticleUrl: articleResponse.url,
+                h1: html.includes('Как вернуть деньги за неоказанную услугу'),
+                canonical: html.includes(`rel="canonical" href="${canonical}"`) || html.includes(`href="${canonical}" rel="canonical"`),
+                matrix: html.includes('Сначала определите, что произошло с услугой'),
+                faq: html.includes('Можно ли вернуть всю сумму, если услуга оказана частично?'),
+                articleJsonLd: html.includes('"@type":"Article"') || html.includes('"@type": "Article"'),
+              };
+              diagnostics.push({ attempt, ...checks });
+              if (
+                checks.buildStatus === 200 &&
+                checks.articleStatus === 200 &&
+                checks.sha === expected &&
+                checks.h1 && checks.canonical && checks.matrix && checks.faq && checks.articleJsonLd
+              ) {
+                success = checks;
+                break;
+              }
+            } catch (error) {
+              diagnostics.push({ attempt, error: String(error?.message || error) });
+            }
+            await sleep(10000);
+          }
+
+          const report = { expectedSha: expected, articlePath, success, diagnostics };
+          fs.writeFileSync('live-verification.json', `${JSON.stringify(report, null, 2)}\n`);
+          if (!success) {
+            console.error(JSON.stringify(report, null, 2));
+            process.exit(1);
+          }
+          console.log(JSON.stringify(report, null, 2));
+          NODE
+
+      - name: Оставить результат в PR 93
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            let report = null;
+            try { report = JSON.parse(fs.readFileSync('live-verification.json', 'utf8')); } catch {}
+            const ok = Boolean(report?.success);
+            const last = report?.success || report?.diagnostics?.at(-1) || {};
+            const body = [
+              '## Независимая live-проверка статьи',
+              '',
+              `Результат: **${ok ? 'успешно' : 'ошибка'}**`,
+              `Ожидаемый SHA: \`${report?.expectedSha || 'нет'}\``,
+              `Полученный SHA: \`${last.sha || 'не получен'}\``,
+              `Статья HTTP: **${last.articleStatus ?? 'нет'}**`,
+              `H1: **${last.h1 ? 'да' : 'нет'}**`,
+              `canonical: **${last.canonical ? 'да' : 'нет'}**`,
+              `практическая матрица: **${last.matrix ? 'да' : 'нет'}**`,
+              `FAQ: **${last.faq ? 'да' : 'нет'}**`,
+              `Article JSON-LD: **${last.articleJsonLd ? 'да' : 'нет'}**`,
+              '',
+              `Попыток: **${report?.diagnostics?.length || 0}**`,
+              '',
+              '> Проверка не вызывает Yandex Search API, Wordstat или SerpApi.',
+            ].join('\n');
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 93, body });

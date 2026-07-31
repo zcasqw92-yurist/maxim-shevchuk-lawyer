@@ -1,5 +1,6 @@
 import { caseStudies } from "./case-studies.mjs";
 import { debtClusterArticles, debtPracticeCase } from "./debt-cluster-data.mjs";
+import { refundServicesClusterArticles } from "./refund-services-cluster-data.mjs";
 
 const articleSources = {
   article148: { title: "Статья 148 УПК РФ — отказ в возбуждении уголовного дела", url: "https://www.consultant.ru/document/cons_doc_LAW_34481/2dee6703cab2cabdbb193fde2ecb6baf1f69ac2e/" },
@@ -90,6 +91,7 @@ export const articles = [
     relatedCaseIds: ["debt-demand"],
   },
   ...debtClusterArticles,
+  ...refundServicesClusterArticles,
 ];
 
 export const practiceCases = [

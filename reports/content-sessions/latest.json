@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 3,
+  "sessionId": "20260731-1451-refund-non-rendered-service",
+  "reviewedAt": "2026-07-31T12:51:40.000Z",
+  "spreadsheet": {
+    "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
+    "modifiedTime": "2026-07-31T12:26:25.754Z",
+    "metadataTabCount": 24,
+    "discoveredTabs": [
+      "00_Старт",
+      "01_БПЮ",
+      "02_ЮрДоки",
+      "03_Оплаты",
+      "04_Дашборд",
+      "05_Контроль",
+      "06_Импорт",
+      "_Справочники",
+      "_Журнал",
+      "07_Диалоги_исследование",
+      "08_Банк_реплик",
+      "09_Паттерны_аудитории",
+      "10_Контентные_возможности",
+      "11_Кейсы_для_публикации",
+      "12_Эффективные_ответы",
+      "13_Статистика_контента",
+      "14_Контент_дашборд",
+      "15_Обращения_с_контента",
+      "_Реестр_диалогов",
+      "_Ситуации_и_связи",
+      "_События_воронки",
+      "_Версии_контента",
+      "16_Контроль_данных",
+      "_Импорт_ЮД_151_200"
+    ]
+  },
+  "reviewedTabs": [
+    { "name": "00_Старт", "range": "A1:H45", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["project rules", "SEO gate"] },
+    { "name": "01_БПЮ", "range": "A1:AC1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["demand", "client language"] },
+    { "name": "02_ЮрДоки", "range": "A1:AA1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["paid work", "practice"] },
+    { "name": "03_Оплаты", "range": "A1:M1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed payment details only"] },
+    { "name": "04_Дашборд", "range": "A1:Z1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["operational context"] },
+    { "name": "05_Контроль", "range": "A1:Z1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["data gaps"] },
+    { "name": "06_Импорт", "range": "A1:U1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source coverage"] },
+    { "name": "_Справочники", "range": "A1:I1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["classification"] },
+    { "name": "_Журнал", "range": "A1:K1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["provenance"] },
+    { "name": "07_Диалоги_исследование", "range": "A1:AK1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience research", "context verification"] },
+    { "name": "08_Банк_реплик", "range": "A1:V1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["client language", "proof questions"] },
+    { "name": "09_Паттерны_аудитории", "range": "A1:X1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience patterns", "qualification risks"] },
+    { "name": "10_Контентные_возможности", "range": "A1:AP1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content brief", "intent map"] },
+    { "name": "11_Кейсы_для_публикации", "range": "A1:AF1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["case evidence", "result verification"] },
+    { "name": "12_Эффективные_ответы", "range": "A1:V1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["qualification questions", "CTA wording"] },
+    { "name": "13_Статистика_контента", "range": "A1:AB2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["existing content performance"] },
+    { "name": "14_Контент_дашборд", "range": "A1:R1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content priorities"] },
+    { "name": "15_Обращения_с_контента", "range": "A1:AG2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["lead attribution"] },
+    { "name": "_Реестр_диалогов", "range": "A1:Q2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source registry"] },
+    { "name": "_Ситуации_и_связи", "range": "A1:T2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["cross-source links", "paid-work separation"] },
+    { "name": "_События_воронки", "range": "A1:J5000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed events"] },
+    { "name": "_Версии_контента", "range": "A1:L1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content versions"] },
+    { "name": "16_Контроль_данных", "range": "A1:J1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["critical source errors"] },
+    { "name": "_Импорт_ЮД_151_200", "range": "A1:T1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["historical paid-work source verification"] }
+  ],
+  "sourceTrace": {
+    "dialogIds": ["6a1939da-a3b0-83eb-9803-1776b759ea48"],
+    "situationIds": [],
+    "workIds": [],
+    "contentIds": ["C-009", "C-012", "C-014", "C-037", "C-072", "C-097", "C-141"],
+    "caseIds": [],
+    "notes": "Used only internal non-personal identifiers. ЮрДоки confirms paid legal work, not a positive result unless separately evidenced."
+  },
+  "seoReview": {
+    "status": "completed",
+    "checkedAt": "2026-07-31T12:40:00.000Z",
+    "region": "Москва, Россия",
+    "primaryIntent": "как вернуть деньги за неоказанную услугу",
+    "verifiedCluster": [
+      "юрист по возврату денег за услуги",
+      "как вернуть деньги за неоказанную услугу",
+      "отказ от договора оказания услуг вернуть деньги",
+      "как вернуть предоплату за услугу",
+      "возврат денег за навязанную услугу",
+      "срок возврата денег после претензии за услугу"
+    ],
+    "intentMap": [
+      { "intent": "как вернуть деньги за неоказанную услугу", "target": "H1, lead, short answer and qualification matrix" },
+      { "intent": "услуга оказана частично", "target": "H2 calculation of accepted and unperformed scope" },
+      { "intent": "вернуть предоплату за услугу", "target": "H2 and FAQ inside this owner, not a separate URL" },
+      { "intent": "срок возврата денег после требования", "target": "H2 and FAQ with Article 31 qualification" }
+    ],
+    "intentOwnership": [
+      {
+        "intent": "как вернуть деньги за неоказанную услугу",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+        "ownerType": "article",
+        "supportingUrls": ["https://yuristshevchuk.com/uslugi/vozvrat-deneg/"],
+        "supportingCaseIds": [],
+        "excludedQueries": [
+          "отказ от договора оказания услуг вернуть деньги",
+          "возврат денег за навязанную услугу",
+          "продавец получил деньги и пропал",
+          "юрист по возврату денег за услуги"
+        ],
+        "existingCompetingUrlsReviewed": [
+          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
+        ],
+        "decision": "new-owner",
+        "reason": "Both cached search engines show a distinct instructional intent about non-performance. The service page owns legal-help queries, while the existing disappearance article owns police-versus-civil recovery after the recipient vanishes."
+      }
+    ],
+    "serpSnapshots": [
+      {
+        "intent": "как вернуть деньги за неоказанную услугу",
+        "checkedAt": "2026-07-31T12:30:00.000Z",
+        "region": "Москва, Россия",
+        "engines": [
+          {
+            "engine": "Yandex",
+            "query": "как вернуть деньги за неоказанную услугу",
+            "organicResultsReviewed": 20,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "informational step-by-step recovery guidance",
+            "resultTypes": ["bank guides", "accounting and legal articles", "consumer guidance"],
+            "localPack": false,
+            "snippetPatterns": ["return procedure", "consumer rights", "claim and deadline"],
+            "competitorCoverageGaps": [
+              "weak separation of missed deadline, defects and voluntary cancellation",
+              "little practical calculation guidance for partially performed services",
+              "insufficient evidence matrix linking promised and performed scope"
+            ],
+            "staleOrWeakResults": []
+          },
+          {
+            "engine": "Google",
+            "query": "как вернуть деньги за неоказанную услугу",
+            "organicResultsReviewed": 9,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "informational explanation and action sequence",
+            "resultTypes": ["legal articles", "consumer guidance", "bank educational materials"],
+            "localPack": false,
+            "snippetPatterns": ["right to refund", "written demand", "service was not provided"],
+            "competitorCoverageGaps": [
+              "grounds under Articles 28, 29 and 32 are often blended",
+              "partial performance is described without a usable calculation model",
+              "payment proof is not clearly separated from proof of the promised service scope"
+            ],
+            "staleOrWeakResults": []
+          }
+        ],
+        "pageTypeDecision": "article",
+        "decisionReason": "The organic results primarily answer how a consumer should diagnose the breach, gather proof and demand a refund; a focused practical article is more appropriate than a commercial landing page.",
+        "canProvideBetterAnswer": true
+      }
+    ],
+    "practicalElements": [
+      {
+        "contentId": "refund-non-rendered-service",
+        "targetUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+        "type": "evidence-matrix",
+        "title": "Матрица: неоказание, частичное исполнение, недостатки или добровольный отказ",
+        "userValue": "Helps the reader select the correct legal ground before calculating and sending a demand.",
+        "competitorGap": "Organic results commonly mix Articles 28, 29 and 32 and do not explain how accepted partial performance changes the amount claimed.",
+        "sourceBasis": "paid-practice-and-audience-research",
+        "sourceIds": ["C-012", "P-047", "P-059", "R-0015", "R-0016", "R-0476", "R-0549", "R-0606"],
+        "placement": "First substantive H2 as a four-option qualification matrix, followed by evidence and calculation sections.",
+        "verifiedAgainstSerp": true
+      }
+    ],
+    "cannibalizationChecked": true,
+    "overOptimizationRisk": "low"
+  },
+  "editorialChecks": {
+    "factsSeparatedFromHypotheses": true,
+    "paidWorkSeparatedFromPaymentDetails": true,
+    "workProcedureAndCaseResultsSeparated": true,
+    "legalSourcesVerified": true,
+    "anonymizationVerified": true,
+    "criticalSourceErrorsResolved": true
+  },
+  "contentChanges": [
+    {
+      "path": "src/refund-services-cluster-data.mjs",
+      "kind": "article",
+      "contentId": "refund-non-rendered-service",
+      "action": "created",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
+    },
+    {
+      "path": "src/editorial-data.mjs",
+      "kind": "article",
+      "contentId": "refund-non-rendered-service",
+      "action": "registered",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
+    },
+    {
+      "path": "site.config.mjs",
+      "kind": "article-date",
+      "contentId": "refund-non-rendered-service",
+      "action": "registered-content-date",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
+    }
+  ],
+  "plannedChecks": [
+    "npm run check",
+    "npm run test:live",
+    "node scripts/live-all-publications-smoke.mjs"
+  ],
+  "publication": {
+    "expectedUrls": ["https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"],
+    "notes": "No paid SERP calls were made during article preparation; cached Yandex and Google snapshots were reused."
+  }
+}

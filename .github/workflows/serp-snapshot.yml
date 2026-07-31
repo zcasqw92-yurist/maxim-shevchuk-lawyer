@@ -122,3 +122,5 @@ jobs:
       - name: Заблокировать неполный снимок
         if: steps.yandex_public.outcome != 'success' || steps.serp.outcome != 'success'
         run: exit 1
+
+# Повторный запуск после пополнения баланса: 2026-07-31T12:33:00+02:00

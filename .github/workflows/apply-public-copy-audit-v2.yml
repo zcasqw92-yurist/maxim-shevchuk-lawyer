@@ -1,0 +1,39 @@
+name: Apply public article copy audit v2
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply reviewed public-copy changes
+        run: node scripts/apply-public-copy-audit-temp.cjs
+
+      - name: Remove temporary files and commit
+        shell: bash
+        run: |
+          rm -f .github/workflows/apply-public-copy-audit-main.yml
+          rm -f .github/workflows/apply-public-copy-audit-v2.yml
+          rm -f scripts/apply-public-copy-audit-temp.cjs
+          rm -f .public-copy-audit-trigger
+          rm -f .public-copy-audit-trigger-v2
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Очистить публичные разборы от служебной терминологии"
+          git push origin HEAD:main

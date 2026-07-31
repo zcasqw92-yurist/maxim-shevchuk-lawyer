@@ -66,6 +66,36 @@ jobs:
           node --check scripts/live-all-publications-smoke.mjs
           npm run check 2>&1 | tee check.log
 
+      - name: Проверить опубликованную карточку услуги в кейсах
+        shell: bash
+        env:
+          SITE_CUSTOM_DOMAIN_URL: https://yuristshevchuk.com
+          EXPECTED_BUILD_SHA: f85386c921a807cc617ec5a5c7b81ad075fe339a
+          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '30'
+          CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+        run: |
+          node scripts/verify-custom-domain-sha.mjs
+          node --input-type=module <<'NODE'
+          const url = new URL('/assets/styles.css', process.env.SITE_CUSTOM_DOMAIN_URL);
+          url.searchParams.set('case_service_card_check', `${process.env.EXPECTED_BUILD_SHA.slice(0, 12)}-${Date.now()}`);
+          const response = await fetch(url, {
+            headers: { 'cache-control': 'no-cache, no-store, max-age=0', pragma: 'no-cache' },
+            cache: 'no-store',
+            redirect: 'follow',
+          });
+          if (!response.ok) throw new Error(`styles.css returned ${response.status}`);
+          const css = await response.text();
+          const required = [
+            '.case-page .editorial-case-aside > a[href^="/uslugi/"]',
+            'content: "Услуга по теме"',
+            'content: "Перейти к услуге  →"',
+          ];
+          for (const marker of required) {
+            if (!css.includes(marker)) throw new Error(`Published styles are missing: ${marker}`);
+          }
+          console.log(`Published case service card verified in ${response.url}`);
+          NODE
+
       - name: Сохранить диагностику при ошибке
         if: failure()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,31 @@
+name: Verify public copy audit live
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Wait for audited production build
+        env:
+          SITE_CUSTOM_DOMAIN_URL: https://yuristshevchuk.com
+          EXPECTED_BUILD_SHA: 47ee9b84d439156f0c491b05f97a1854c7e6e8c8
+          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: 60
+          CUSTOM_DOMAIN_VERIFY_DELAY_MS: 10000
+          CUSTOM_DOMAIN_VERIFY_TIMEOUT_MS: 20000
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Check all published analyses
+        run: node scripts/verify-public-copy-audit-live-temp.mjs

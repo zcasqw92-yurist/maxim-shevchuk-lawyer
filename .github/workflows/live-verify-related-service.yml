@@ -1,0 +1,56 @@
+name: Live verify related service card
+
+on:
+  push:
+    branches:
+      - agent/live-verify-related-service
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_SHA: ce2941c78d63d3e8b1d2599ee45ca3e83fdefee0
+      SITE_URL: https://yuristshevchuk.com
+    steps:
+      - name: Verify production domain and comment result
+        shell: bash
+        run: |
+          set +e
+          success=0
+          details=""
+          for attempt in $(seq 1 30); do
+            nonce="${GITHUB_RUN_ID}-${attempt}-$(date +%s)"
+            build_file=$(mktemp)
+            article_file=$(mktemp)
+            css_file=$(mktemp)
+            build_status=$(curl -L --silent --show-error --max-time 20 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$build_file" "$SITE_URL/build-info.json?nonce=$nonce")
+            article_status=$(curl -L --silent --show-error --max-time 20 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$article_file" "$SITE_URL/razbory/vernut-dengi-za-neokazannuyu-uslugu/?nonce=$nonce")
+            css_status=$(curl -L --silent --show-error --max-time 20 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$css_file" "$SITE_URL/assets/styles.css?nonce=$nonce")
+            actual_sha=$(node -e "try{const x=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));process.stdout.write(String(x.sha||''))}catch{}" "$build_file")
+            article_ok=0
+            css_label_ok=0
+            css_action_ok=0
+            grep -q 'Связанное направление' "$article_file" && article_ok=1
+            grep -q 'Услуга по теме' "$css_file" && css_label_ok=1
+            grep -q 'Перейти к услуге' "$css_file" && css_action_ok=1
+            details="attempt=$attempt build=$build_status article=$article_status css=$css_status sha=$actual_sha article_marker=$article_ok css_label=$css_label_ok css_action=$css_action_ok"
+            rm -f "$build_file" "$article_file" "$css_file"
+            if [[ "$build_status" == "200" && "$article_status" == "200" && "$css_status" == "200" && "$actual_sha" == "$EXPECTED_SHA" && "$article_ok" == "1" && "$css_label_ok" == "1" && "$css_action_ok" == "1" ]]; then
+              success=1
+              break
+            fi
+            sleep 10
+          done
+
+          if [[ "$success" == "1" ]]; then
+            gh pr comment 95 --repo zcasqw92-yurist/maxim-shevchuk-lawyer --body "✅ Live-проверка пройдена. Основной домен отдаёт SHA \`$EXPECTED_SHA\`; статья, опубликованный CSS, подписи «Услуга по теме» и «Перейти к услуге» подтверждены. Последняя попытка: \`$details\`."
+            exit 0
+          fi
+
+          gh pr comment 95 --repo zcasqw92-yurist/maxim-shevchuk-lawyer --body "❌ Live-проверка не пройдена после 30 попыток. Последнее состояние: \`$details\`."
+          exit 1

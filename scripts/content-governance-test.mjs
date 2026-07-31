@@ -70,7 +70,7 @@ try { packageJson = JSON.parse(packageText); } catch (error) { errors.push(`pack
 const sheetId = "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24";
 const requiredClusterGates = ["intentOwnership", "serpSnapshot", "originalPracticalElement"];
 if (config) {
-  if (config.schemaVersion !== 2) errors.push("content governance: schemaVersion must be 2");
+  if (config.schemaVersion !== 3) errors.push("content governance: schemaVersion must be 3");
   if (config.priority !== "highest-project-content-rule") errors.push("content governance: project priority is not fixed");
   if (config.spreadsheet?.id !== sheetId) errors.push("content governance: wrong canonical spreadsheet ID");
   if (config.spreadsheet?.requireAllTabs !== true) errors.push("content governance: all-tabs requirement must be true");
@@ -89,7 +89,10 @@ if (config) {
   if (cluster?.intentOwnership?.requireExistingPagesReview !== true) errors.push("content governance: existing page review must be required");
   if (cluster?.intentOwnership?.requireEveryChangedUrlMapped !== true) errors.push("content governance: every changed URL must be mapped to an intent owner");
   if (!sameMembers(cluster?.serpSnapshot?.requiredEngines || [], ["Yandex", "Google"])) errors.push("content governance: Yandex and Google SERP snapshots must both be required");
-  if ((cluster?.serpSnapshot?.minimumTopResultsReviewedPerEngine || 0) < 5) errors.push("content governance: at least five SERP results per engine must be reviewed");
+  if ((cluster?.serpSnapshot?.minimumOrganicResultsReviewedPerEngine || 0) < 5) errors.push("content governance: at least five organic SERP results per engine must be reviewed");
+  if (cluster?.serpSnapshot?.organicResultsOnlyForMinimum !== true) errors.push("content governance: sponsored results must not count toward the organic SERP minimum");
+  if (cluster?.serpSnapshot?.requireSponsoredResultsRecordedSeparately !== true) errors.push("content governance: sponsored SERP placements must be recorded separately");
+  if (!nonEmptyArray(cluster?.serpSnapshot?.sponsoredResultLabels)) errors.push("content governance: sponsored result labels are missing");
   if ((cluster?.serpSnapshot?.maxAgeDaysAtReview || 0) > 14) errors.push("content governance: SERP snapshot may not be older than 14 days");
   if (cluster?.serpSnapshot?.requireBetterAnswerDecision !== true) errors.push("content governance: better-answer decision must be required");
   if ((cluster?.originalPracticalElement?.minimumPerChangedMaterial || 0) < 1) errors.push("content governance: every changed material needs a practical element");
@@ -98,10 +101,10 @@ if (config) {
 }
 
 for (const [name, text, markers] of [
-  ["AGENTS.md", agents, [sheetId, "каждую", "npm run check", "live-all-publications-smoke.mjs", "reports/content-sessions/latest.json", "владелец интента", "слепок выдачи", "оригинальный практический элемент"]],
-  ["docs/content-governance.md", governanceDoc, [sheetId, "00_Старт", "_Импорт_ЮД_151_200", "Три обязательных шлюза", "Шлюз владельца интента", "Шлюз слепка выдачи", "Шлюз оригинального практического элемента", "Обязательный отчёт в чате"]],
-  ["docs/PUBLISHING.md", publishingDoc, [sheetId, "reports/content-sessions/latest.json", "npm run test:content-governance", "Три шлюза до создания страницы", "Слепок выдачи", "Оригинальный практический элемент"]],
-  [".github/pull_request_template.md", prTemplate, ["единственная страница-владелец", "слепок Яндекса и Google", "оригинальный практический элемент"]],
+  ["AGENTS.md", agents, [sheetId, "каждую", "npm run check", "live-all-publications-smoke.mjs", "reports/content-sessions/latest.json", "владелец интента", "слепок выдачи", "органических результатов", "Рекламные размещения", "оригинальный практический элемент"]],
+  ["docs/content-governance.md", governanceDoc, [sheetId, "00_Старт", "_Импорт_ЮД_151_200", "Три обязательных шлюза", "Шлюз владельца интента", "Шлюз слепка выдачи", "органических результатов", "Рекламные размещения", "Шлюз оригинального практического элемента", "Обязательный отчёт в чате"]],
+  ["docs/PUBLISHING.md", publishingDoc, [sheetId, "reports/content-sessions/latest.json", "npm run test:content-governance", "Три шлюза до создания страницы", "Слепок выдачи", "органических результатов", "Рекламные размещения", "Оригинальный практический элемент"]],
+  [".github/pull_request_template.md", prTemplate, ["единственная страница-владелец", "слепок Яндекса и Google", "органических результатов", "Рекламные размещения", "оригинальный практический элемент"]],
 ]) {
   for (const marker of markers) if (!text.includes(marker)) errors.push(`${name}: missing marker: ${marker}`);
 }
@@ -110,7 +113,7 @@ if (template && config) {
   const discovered = template.spreadsheet?.discoveredTabs || [];
   const reviewed = (template.reviewedTabs || []).map((tab) => tab.name);
   const baseline = config.spreadsheet?.baselineSnapshot?.tabs || [];
-  if (template.schemaVersion !== 2) errors.push("content session template: schemaVersion must be 2");
+  if (template.schemaVersion !== 3) errors.push("content session template: schemaVersion must be 3");
   if (template.spreadsheet?.id !== sheetId) errors.push("content session template: wrong spreadsheet ID");
   if (template.spreadsheet?.metadataTabCount !== discovered.length) errors.push("content session template: metadataTabCount does not match discovered tabs");
   if (!sameMembers(discovered, reviewed)) errors.push("content session template: every discovered tab must be reviewed exactly once");
@@ -123,6 +126,12 @@ if (template && config) {
   if (!nonEmptyArray(template.seoReview?.practicalElements)) errors.push("content session template: practical element gate is missing");
   const templateEngines = template.seoReview?.serpSnapshots?.[0]?.engines?.map((item) => item.engine) || [];
   if (!sameMembers(templateEngines, config.clusterPreparation?.serpSnapshot?.requiredEngines || [])) errors.push("content session template: Yandex and Google examples are required");
+  for (const engine of template.seoReview?.serpSnapshots?.[0]?.engines || []) {
+    if (!Number.isInteger(engine.organicResultsReviewed) || engine.organicResultsReviewed < config.clusterPreparation.serpSnapshot.minimumOrganicResultsReviewedPerEngine) errors.push(`content session template: organic SERP count example is invalid for ${engine.engine || "unknown engine"}`);
+    if (!Number.isInteger(engine.sponsoredResultsObserved) || engine.sponsoredResultsObserved < 0) errors.push(`content session template: sponsored SERP count example is invalid for ${engine.engine || "unknown engine"}`);
+    if (!Array.isArray(engine.sponsoredResultLabels) || !Array.isArray(engine.sponsoredAdvertiserTypes) || !Array.isArray(engine.sponsoredOfferPatterns)) errors.push(`content session template: sponsored SERP fields are missing for ${engine.engine || "unknown engine"}`);
+    if (Object.hasOwn(engine, "topResultsReviewed")) errors.push(`content session template: topResultsReviewed is deprecated for ${engine.engine || "unknown engine"}`);
+  }
 }
 
 if (!packageJson?.scripts?.["test:content-governance"]) errors.push("package.json: test:content-governance is missing");
@@ -168,7 +177,7 @@ if (config) {
         const reviewedTabs = manifest.reviewedTabs || [];
         const reviewedNames = reviewedTabs.map((tab) => tab.name);
         const baseline = config.spreadsheet?.baselineSnapshot?.tabs || [];
-        if (manifest.schemaVersion !== 2) errors.push(`${manifestPath}: schemaVersion must be 2`);
+        if (manifest.schemaVersion !== 3) errors.push(`${manifestPath}: schemaVersion must be 3`);
         if (manifest.spreadsheet?.id !== sheetId) errors.push(`${manifestPath}: wrong spreadsheet ID`);
         if (!validDate(manifest.reviewedAt)) errors.push(`${manifestPath}: reviewedAt is missing or invalid`);
         if (!validDate(manifest.spreadsheet?.modifiedTime)) errors.push(`${manifestPath}: spreadsheet modifiedTime is missing or invalid`);
@@ -214,7 +223,7 @@ if (config) {
         const snapshots = seo?.serpSnapshots || [];
         if (!nonEmptyArray(snapshots)) errors.push(`${manifestPath}: SERP snapshot gate is missing`);
         const requiredEngines = config.clusterPreparation?.serpSnapshot?.requiredEngines || [];
-        const minimumResults = config.clusterPreparation?.serpSnapshot?.minimumTopResultsReviewedPerEngine || 5;
+        const minimumResults = config.clusterPreparation?.serpSnapshot?.minimumOrganicResultsReviewedPerEngine || 5;
         const maxAgeMs = (config.clusterPreparation?.serpSnapshot?.maxAgeDaysAtReview || 14) * 24 * 60 * 60 * 1000;
         const snapshotIntentSet = new Set();
         for (const snapshot of snapshots) {
@@ -234,12 +243,22 @@ if (config) {
           for (const engine of engines) {
             if (!requiredEngines.includes(engine.engine)) errors.push(`${manifestPath}: unsupported SERP engine: ${engine.engine || "unknown"}`);
             if (!nonEmptyString(engine.query) || hasPlaceholder(engine.query)) errors.push(`${manifestPath}: SERP query is missing for ${engine.engine || "unknown engine"}`);
-            if (!Number.isInteger(engine.topResultsReviewed) || engine.topResultsReviewed < minimumResults) errors.push(`${manifestPath}: review at least ${minimumResults} results in ${engine.engine || "unknown engine"}`);
-            if (!nonEmptyString(engine.dominantIntent) || hasPlaceholder(engine.dominantIntent)) errors.push(`${manifestPath}: dominant SERP intent is missing for ${engine.engine || "unknown engine"}`);
-            if (!nonEmptyArray(engine.resultTypes) || engine.resultTypes.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: SERP result types are missing for ${engine.engine || "unknown engine"}`);
+            if (Object.hasOwn(engine, "topResultsReviewed")) errors.push(`${manifestPath}: topResultsReviewed is deprecated; record organicResultsReviewed for ${engine.engine || "unknown engine"}`);
+            if (!Number.isInteger(engine.organicResultsReviewed) || engine.organicResultsReviewed < minimumResults) errors.push(`${manifestPath}: review at least ${minimumResults} organic results in ${engine.engine || "unknown engine"}; sponsored placements do not count`);
+            if (!Number.isInteger(engine.sponsoredResultsObserved) || engine.sponsoredResultsObserved < 0) errors.push(`${manifestPath}: sponsoredResultsObserved must be a non-negative integer for ${engine.engine || "unknown engine"}`);
+            for (const field of ["sponsoredResultLabels", "sponsoredAdvertiserTypes", "sponsoredOfferPatterns"]) {
+              if (!Array.isArray(engine[field])) errors.push(`${manifestPath}: ${field} must be an array for ${engine.engine || "unknown engine"}`);
+            }
+            if (engine.sponsoredResultsObserved > 0) {
+              for (const field of ["sponsoredResultLabels", "sponsoredAdvertiserTypes", "sponsoredOfferPatterns"]) {
+                if (!nonEmptyArray(engine[field]) || engine[field].some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: ${field} must describe observed paid placements for ${engine.engine || "unknown engine"}`);
+              }
+            }
+            if (!nonEmptyString(engine.dominantIntent) || hasPlaceholder(engine.dominantIntent)) errors.push(`${manifestPath}: dominant organic SERP intent is missing for ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyArray(engine.resultTypes) || engine.resultTypes.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: organic SERP result types are missing for ${engine.engine || "unknown engine"}`);
             if (typeof engine.localPack !== "boolean") errors.push(`${manifestPath}: localPack must be boolean for ${engine.engine || "unknown engine"}`);
-            if (!nonEmptyArray(engine.snippetPatterns) || engine.snippetPatterns.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: snippet patterns are missing for ${engine.engine || "unknown engine"}`);
-            if (!nonEmptyArray(engine.competitorCoverageGaps) || engine.competitorCoverageGaps.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: competitor coverage gaps are missing for ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyArray(engine.snippetPatterns) || engine.snippetPatterns.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: organic snippet patterns are missing for ${engine.engine || "unknown engine"}`);
+            if (!nonEmptyArray(engine.competitorCoverageGaps) || engine.competitorCoverageGaps.some((value) => !nonEmptyString(value) || hasPlaceholder(value))) errors.push(`${manifestPath}: organic competitor coverage gaps are missing for ${engine.engine || "unknown engine"}`);
             if (!Array.isArray(engine.staleOrWeakResults)) errors.push(`${manifestPath}: staleOrWeakResults must be an array for ${engine.engine || "unknown engine"}`);
           }
           if (!nonEmptyString(snapshot.pageTypeDecision) || hasPlaceholder(snapshot.pageTypeDecision)) errors.push(`${manifestPath}: page type decision is missing for ${snapshot.intent || "unknown intent"}`);
@@ -278,7 +297,7 @@ if (config) {
   }
 
   if (!errors.length) {
-    console.log(`Content governance contract passed: ${config.spreadsheet.baselineSnapshot.tabCount} baseline tabs, ${changedFiles.length} changed files, ${governedChanges.length} governed content changes, 3 cluster gates`);
+    console.log(`Content governance contract passed: ${config.spreadsheet.baselineSnapshot.tabCount} baseline tabs, ${changedFiles.length} changed files, ${governedChanges.length} governed content changes, 3 cluster gates, organic SERP minimum enforced`);
   }
 }
 

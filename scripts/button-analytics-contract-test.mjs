@@ -136,6 +136,20 @@ try {
             quizOption: control.hasAttribute("data-price-quiz-option"),
           };
 
+          // The reject control is audited in a separate clean-consent context below.
+          // Clicking it after analytics has started intentionally reloads the real page,
+          // which would destroy this page-wide audit execution context.
+          if (info.consentReject) {
+            results.push({
+              info,
+              buttonAction: null,
+              ctaClick: null,
+              contactConversion: null,
+              contactAction: null,
+            });
+            continue;
+          }
+
           const cancelled = !control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
           if (!cancelled && control.matches("a[href]")) history.replaceState(null, "", location.pathname);
           await new Promise((resolve) => setTimeout(resolve, 0));
@@ -191,6 +205,50 @@ try {
     const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
     if (duplicates.length) errors.push(`${pathname}: повторяются button_id: ${[...new Set(duplicates)].join(", ")}`);
   }
+
+  // Verify the real reject behavior before analytics starts. In this state the app
+  // must persist denial without reloading, and button analytics must emit nothing.
+  const rejectContext = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    locale: "ru-RU",
+    reducedMotion: "reduce",
+  });
+  await rejectContext.addInitScript(() => {
+    localStorage.removeItem("analytics_consent");
+    window.__ymCalls = [];
+    window.ym = (...args) => window.__ymCalls.push(args);
+  });
+  const rejectPage = await rejectContext.newPage();
+  await rejectPage.route("https://mc.yandex.ru/**", (route) => route.abort());
+  await rejectPage.route("https://www.googletagmanager.com/**", (route) => route.abort());
+  try {
+    await rejectPage.goto(`${origin}/`, { waitUntil: "networkidle" });
+    await rejectPage.waitForFunction(() => Boolean(window.__buttonAnalyticsContract));
+    const rejectAudit = await rejectPage.evaluate(async () => {
+      const control = document.querySelector("[data-consent-reject]");
+      if (!control) return { missing: true };
+      window.dataLayer = [];
+      window.__ymCalls = [];
+      const beforeUrl = location.href;
+      control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      return {
+        missing: false,
+        consent: localStorage.getItem("analytics_consent"),
+        urlUnchanged: location.href === beforeUrl,
+        buttonActions: (window.dataLayer || []).filter((item) => item?.event === "button_action").length,
+        ymButtonActions: (window.__ymCalls || []).filter((args) => args?.[1] === "reachGoal" && args?.[2] === "button_action").length,
+      };
+    });
+    if (rejectAudit.missing) errors.push("Главная: не найдена кнопка отказа от аналитики");
+    if (rejectAudit.consent !== "denied") errors.push(`Главная: отказ не сохранил analytics_consent=denied, получено ${rejectAudit.consent}`);
+    if (!rejectAudit.urlUnchanged) errors.push("Главная: отказ до запуска аналитики не должен перезагружать страницу");
+    if (rejectAudit.buttonActions || rejectAudit.ymButtonActions) errors.push("Главная: отказ от аналитики отправил внешнее событие button_action");
+  } finally {
+    await rejectPage.close().catch(() => {});
+    await rejectContext.close().catch(() => {});
+  }
+
   await context.close();
 } finally {
   await browser?.close().catch(() => {});

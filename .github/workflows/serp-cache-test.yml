@@ -1,0 +1,56 @@
+name: Проверка SERP-кеша без расходов
+
+on:
+  push:
+    branches:
+      - 'agent/refund-services-serp-snapshot'
+    paths:
+      - 'config/serp-api-budget.json'
+      - 'reports/serp-cache/refund-services.json'
+      - 'reports/serp-usage/api-usage.json'
+      - 'scripts/run-serp-budgeted.mjs'
+      - '.github/workflows/serp-cache-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cache-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Проверить Google только из кеша
+        env:
+          SERP_ENGINE: google
+          SERP_ALLOW_PAID_REQUESTS: '0'
+          SERP_FORCE_REFRESH: '0'
+          SERP_QUERY_IDS: ''
+          SERPER_API_KEY: ''
+          SERPAPI_API_KEY: ''
+        run: node scripts/run-serp-budgeted.mjs
+      - name: Проверить Яндекс только из кеша
+        env:
+          SERP_ENGINE: yandex
+          SERP_ALLOW_PAID_REQUESTS: '0'
+          SERP_FORCE_REFRESH: '0'
+          SERP_QUERY_IDS: ''
+          YANDEX_SEARCH_API_KEY: ''
+        run: node scripts/run-serp-budgeted.mjs
+      - name: Подтвердить нулевой расход
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const google = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/google-api.json', 'utf8'));
+          const yandex = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/yandex-api.json', 'utf8'));
+          if (google.cachePolicy?.paidRequestsThisRun !== 0) throw new Error('Google cache test attempted a paid request');
+          if (yandex.cachePolicy?.paidRequestsThisRun !== 0) throw new Error('Yandex cache test attempted a paid request');
+          if (google.cachePolicy?.cacheHits !== 6) throw new Error(`Expected 6 Google cache hits, got ${google.cachePolicy?.cacheHits}`);
+          if (yandex.cachePolicy?.cacheHits !== 6) throw new Error(`Expected 6 Yandex cache hits, got ${yandex.cachePolicy?.cacheHits}`);
+          if (!google.gatePassed || !yandex.gatePassed) throw new Error('Cached SERP gate did not pass');
+          console.log('SERP cache verified: Google 6/6, Yandex 6/6, paid requests 0.');
+          NODE

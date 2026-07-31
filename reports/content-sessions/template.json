@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "sessionId": "YYYYMMDD-HHMM-topic",
   "reviewedAt": "2026-07-30T19:00:00.000Z",
   "spreadsheet": {
@@ -99,28 +99,36 @@
           {
             "engine": "Yandex",
             "query": "replace with the checked query",
-            "topResultsReviewed": 10,
+            "organicResultsReviewed": 5,
+            "sponsoredResultsObserved": 2,
+            "sponsoredResultLabels": ["Реклама"],
+            "sponsoredAdvertiserTypes": ["legal aggregators"],
+            "sponsoredOfferPatterns": ["replace with a recurring paid offer"],
             "dominantIntent": "informational",
             "resultTypes": ["articles", "official sources"],
             "localPack": false,
-            "snippetPatterns": ["replace with a recurring snippet formulation"],
-            "competitorCoverageGaps": ["replace with a practical gap in current results"],
+            "snippetPatterns": ["replace with a recurring organic snippet formulation"],
+            "competitorCoverageGaps": ["replace with a practical gap in organic results"],
             "staleOrWeakResults": []
           },
           {
             "engine": "Google",
             "query": "replace with the checked query",
-            "topResultsReviewed": 10,
+            "organicResultsReviewed": 5,
+            "sponsoredResultsObserved": 1,
+            "sponsoredResultLabels": ["Sponsored"],
+            "sponsoredAdvertiserTypes": ["law firms"],
+            "sponsoredOfferPatterns": ["replace with a recurring paid offer"],
             "dominantIntent": "informational",
             "resultTypes": ["articles", "official sources"],
             "localPack": false,
-            "snippetPatterns": ["replace with a recurring snippet formulation"],
-            "competitorCoverageGaps": ["replace with a practical gap in current results"],
+            "snippetPatterns": ["replace with a recurring organic snippet formulation"],
+            "competitorCoverageGaps": ["replace with a practical gap in organic results"],
             "staleOrWeakResults": []
           }
         ],
         "pageTypeDecision": "article",
-        "decisionReason": "replace with why the SERP requires this page type",
+        "decisionReason": "replace with why the organic SERP requires this page type",
         "canProvideBetterAnswer": true
       }
     ],
@@ -131,7 +139,7 @@
         "type": "evidence-matrix",
         "title": "replace with the practical element title",
         "userValue": "replace with the decision or action this element helps the reader make",
-        "competitorGap": "replace with the SERP gap this element closes",
+        "competitorGap": "replace with the organic SERP gap this element closes",
         "sourceBasis": "paid-practice",
         "sourceIds": ["replace with internal non-personal source ID"],
         "placement": "replace with H2, table, checklist or case block location",

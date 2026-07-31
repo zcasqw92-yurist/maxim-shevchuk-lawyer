@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "ruleId": "google-sheet-content-standard",
   "priority": "highest-project-content-rule",
   "spreadsheet": {
@@ -60,7 +60,16 @@
         "Yandex",
         "Google"
       ],
-      "minimumTopResultsReviewedPerEngine": 5,
+      "minimumOrganicResultsReviewedPerEngine": 5,
+      "organicResultsOnlyForMinimum": true,
+      "requireSponsoredResultsRecordedSeparately": true,
+      "sponsoredResultLabels": [
+        "Реклама",
+        "Промо",
+        "Спонсировано",
+        "Sponsored",
+        "Ad"
+      ],
       "maxAgeDaysAtReview": 14,
       "requireDominantIntent": true,
       "requireResultTypes": true,
@@ -130,7 +139,8 @@
       "spreadsheet snapshot and reviewed tabs",
       "created or updated content",
       "intent owner and excluded queries",
-      "Yandex and Google SERP snapshot",
+      "Yandex and Google organic SERP snapshot",
+      "sponsored SERP placements recorded separately",
       "original practical element and source basis",
       "changed repository files",
       "published public URLs",

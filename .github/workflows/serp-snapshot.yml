@@ -184,3 +184,4 @@ jobs:
           NODE
 
 # API-слой Google готов принимать SERPER_API_KEY или SERPAPI_API_KEY.
+# Повторный запуск после добавления SERPER_API_KEY: 2026-07-31T13:37:00+02:00

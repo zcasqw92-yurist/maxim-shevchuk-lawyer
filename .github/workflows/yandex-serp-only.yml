@@ -1,0 +1,121 @@
+name: Яндекс SERP — экономный ручной запуск
+
+on:
+  workflow_dispatch:
+    inputs:
+      allow_paid_requests:
+        description: 'Разрешить новые запросы Yandex Search API для отсутствующего кеша'
+        required: true
+        default: false
+        type: boolean
+      force_refresh:
+        description: 'Принудительно обновить выбранные кешированные запросы'
+        required: true
+        default: false
+        type: boolean
+      query_ids:
+        description: 'Явно одобренные ID через запятую; максимум 3 новых запроса за запуск'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  yandex-serp:
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Проверить Яндекс через кеш и лимит
+        id: yandex
+        continue-on-error: true
+        env:
+          SERP_ENGINE: yandex
+          SERP_ALLOW_PAID_REQUESTS: ${{ inputs.allow_paid_requests && '1' || '0' }}
+          SERP_FORCE_REFRESH: ${{ inputs.force_refresh && '1' || '0' }}
+          SERP_QUERY_IDS: ${{ inputs.query_ids }}
+          YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+        run: node scripts/run-serp-budgeted.mjs
+
+      - name: Зафиксировать кеш и журнал расхода
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/serp-cache/refund-services.json reports/serp-usage/api-usage.json
+          if git diff --cached --quiet; then
+            echo 'Кеш и расход не изменились: новых API-запросов не было.'
+          else
+            git commit -m 'Обновить кеш и расход Яндекс SERP [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Сохранить Яндекс-отчёт
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: refund-services-yandex-serp-only
+          path: reports/serp-snapshots/refund-services/yandex-api.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Записать результат в pull request
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            let report = null;
+            try {
+              report = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/yandex-api.json', 'utf8'));
+            } catch (error) {
+              core.setFailed(`Yandex report unavailable: ${error.message}`);
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:${context.ref.replace('refs/heads/', '')}`;
+            const { data: pulls } = await github.rest.pulls.list({ owner, repo, head, state: 'open' });
+            if (!pulls.length) return;
+
+            const lines = [
+              '## Яндекс SERP — экономная отдельная проверка',
+              '',
+              `Яндекс-шлюз пройден: **${report.gatePassed ? 'да' : 'нет'}**`,
+              `Новых запросов в этом запуске: **${report.cachePolicy?.paidRequestsThisRun ?? 0}**`,
+              `Попаданий в кеш: **${report.cachePolicy?.cacheHits ?? 0}**`,
+              '',
+              '| Гипотеза | Органика | Кеш | Статус |',
+              '|---|---:|---|---|',
+            ];
+            for (const item of report.queries || []) {
+              lines.push(`| ${item.query} | ${item.organicResultsReviewed ?? 0} | ${item.cache?.status || 'нет'} | ${item.status || 'нет'} |`);
+            }
+            lines.push('', '> Повторные запросы автоматически не выполняются. Обновление возможно только по явно указанным ID.', '', `Workflow commit: \`${context.sha}\``);
+            await github.rest.issues.createComment({ owner, repo, issue_number: pulls[0].number, body: lines.join('\n') });
+
+      - name: Проверить Яндекс-шлюз
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/yandex-api.json', 'utf8'));
+          console.log(`Yandex-only gate passed: ${Boolean(report.gatePassed)}`);
+          console.log(`Paid requests this run: ${report.cachePolicy?.paidRequestsThisRun ?? 0}`);
+          if (!report.gatePassed) process.exit(1);
+          NODE

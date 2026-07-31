@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - name: Получить код
         uses: actions/checkout@v4
@@ -30,8 +30,8 @@ jobs:
         shell: bash
         env:
           SITE_CUSTOM_DOMAIN_URL: https://yuristshevchuk.com
-          EXPECTED_BUILD_SHA: f85386c921a807cc617ec5a5c7b81ad075fe339a
-          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '30'
+          EXPECTED_BUILD_SHA: 1443c8ca0008ecea9ef61e824646ffc6b8022886
+          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '150'
           CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
         run: |
           node scripts/verify-custom-domain-sha.mjs

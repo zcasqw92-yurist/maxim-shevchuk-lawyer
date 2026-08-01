@@ -7,6 +7,7 @@ const stateDir = resolve(String(process.env.SEO_STATE_DIR || join(root, "reports
 const reportPath = join(stateDir, "feedback-latest.json");
 const report = JSON.parse(await readFile(reportPath, "utf8"));
 const clusters = Array.isArray(report.clusters) ? report.clusters : [];
+const publications = Array.isArray(report.publications) ? report.publications : [];
 
 const totals = clusters.reduce((result, cluster) => {
   const current = cluster?.totals || {};
@@ -35,7 +36,7 @@ const lines = [
   "",
   `- Период Метрики: ${report?.period?.date1 || ""}—${report?.period?.date2 || ""}`,
   `- Запросы Вебмастера по страницам: ${report?.webmaster?.query_period || ""}`,
-  `- Страниц в общем отчёте: ${report?.statistics?.length || report?.pages?.length || 0}`,
+  `- Страниц в общем отчёте: ${publications.length}`,
   `- Контрольных кластеров: ${clusters.length}`,
   `- Страниц в контрольных кластерах: ${totals.pages}`,
   `- Страниц кластеров в поиске: ${totals.pagesInSearch}`,

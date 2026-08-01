@@ -60,7 +60,22 @@ const intakeAssets = () => {
     #contact-dialog [data-dialog-close],#contact-dialog [data-intake-reset]{min-width:46px!important;min-height:46px!important;transform:none!important}
     #contact-dialog .messenger-choices--dialog{display:grid!important;visibility:visible!important;opacity:1!important;position:relative!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;margin-top:18px!important}
     #contact-dialog .messenger-choices--dialog::before{content:"Или напишите сразу без заполнения";display:block;grid-column:1/-1;margin:0 0 8px;font-size:.82rem;font-weight:700;color:var(--navy-soft)}
-  </style>\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>\n`;
+  </style>\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>
+  <script type="module">
+    const placeDirectChoices = () => {
+      const dialog = document.querySelector("#contact-dialog");
+      const assistant = dialog?.querySelector("[data-intake-assistant]");
+      const choices = dialog?.querySelector(".messenger-choices--dialog");
+      if (assistant && choices && assistant.nextElementSibling !== choices) assistant.insertAdjacentElement("afterend", choices);
+    };
+    const startPlacement = () => {
+      placeDirectChoices();
+      const dialog = document.querySelector("#contact-dialog");
+      if (dialog) new MutationObserver(placeDirectChoices).observe(dialog, { childList: true, subtree: true });
+    };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startPlacement, { once: true });
+    else startPlacement();
+  </script>\n`;
 };
 
 export const finalizeBuildSlots = (html, pathname) => {

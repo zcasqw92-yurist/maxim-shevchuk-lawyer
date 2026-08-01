@@ -236,7 +236,10 @@
     cursor: default;
   }
 
-  .legal-assistant__summary pre {
+  .legal-assistant [data-view="summary"] pre {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
     max-height: 330px;
     overflow: auto;
     margin: 22px 0 0;
@@ -250,6 +253,7 @@
     line-height: 1.55;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .legal-assistant__long-note {

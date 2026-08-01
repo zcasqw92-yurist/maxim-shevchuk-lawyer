@@ -172,6 +172,13 @@
       "contentId": "refund-imposed-service",
       "action": "updated",
       "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/"
+    },
+    {
+      "path": "site.config.mjs",
+      "kind": "content-date-registry",
+      "contentId": "refund-imposed-service",
+      "action": "updated",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/"
     }
   ],
   "plannedChecks": [

@@ -191,7 +191,7 @@
   }
 
   .legal-assistant__error {
-    color: #8b2e2e !important;
+    color: var(--gold-text) !important;
     font-size: .86rem;
     font-weight: 700;
   }

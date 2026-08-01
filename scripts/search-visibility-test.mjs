@@ -9,7 +9,7 @@ const errors = [];
 const servicePages = {
   "dosudebnoe-uregulirovanie": "Что входит в досудебное урегулирование спора",
   "vzyskanie-dolga": "Как выстраивается взыскание долга по расписке, договору или переписке",
-  "vozvrat-deneg": "Как юрист помогает вернуть оплату за товар, услугу или работу",
+  "vozvrat-deneg": "Выберите ситуацию: основания возврата денег различаются",
   "zhaloby-i-obrashcheniya": "Как подготовить жалобу на бездействие, отказ или нарушение прав",
   "iskovoe-zayavlenie": "Что входит в составление искового заявления в суд",
   "spory-biznesa": "Договорные споры и взыскание задолженности между ИП и организациями",
@@ -25,6 +25,7 @@ const officialHosts = [
   "26.rospotrebnadzor.ru",
   "epp.genproc.gov.ru",
   "fas.gov.ru",
+  "cbr.ru",
   "www.vsrf.ru",
 ];
 

@@ -13,8 +13,8 @@
     "reviewNonEmptyCells": true,
     "reviewNotesAndComments": true,
     "baselineSnapshot": {
-      "modifiedTime": "2026-07-30T18:48:31.577Z",
-      "tabCount": 24,
+      "modifiedTime": "2026-08-01T09:54:13.798Z",
+      "tabCount": 25,
       "tabs": [
         "00_Старт",
         "01_БПЮ",
@@ -39,7 +39,8 @@
         "_События_воронки",
         "_Версии_контента",
         "16_Контроль_данных",
-        "_Импорт_ЮД_151_200"
+        "_Импорт_ЮД_151_200",
+        "Статьи_HARANT"
       ]
     }
   },

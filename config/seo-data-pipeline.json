@@ -1,5 +1,7 @@
 {
   "schema_version": 1,
+  "last_manual_feedback_request_at": "2026-08-01T14:56:00.000Z",
+  "last_manual_feedback_reason": "Контрольный слепок после отката помощника",
   "cache_ttl_days": 30,
   "max_api_calls_per_cluster": 3,
   "max_primary_calls": 1,

@@ -5,7 +5,7 @@
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
     "modifiedTime": "2026-07-30T18:48:31.577Z",
-    "metadataTabCount": 24,
+    "metadataTabCount": 25,
     "discoveredTabs": [
       "00_Старт",
       "01_БПЮ",
@@ -30,34 +30,244 @@
       "_События_воронки",
       "_Версии_контента",
       "16_Контроль_данных",
-      "_Импорт_ЮД_151_200"
+      "_Импорт_ЮД_151_200",
+      "Статьи_HARANT"
     ]
   },
   "reviewedTabs": [
-    { "name": "00_Старт", "range": "A1:H45", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["project rules", "SEO gate"] },
-    { "name": "01_БПЮ", "range": "A1:AC1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["demand", "client language"] },
-    { "name": "02_ЮрДоки", "range": "A1:AA1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["paid work", "practice"] },
-    { "name": "03_Оплаты", "range": "A1:M1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed payments only"] },
-    { "name": "04_Дашборд", "range": "A1:Z1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["operational context"] },
-    { "name": "05_Контроль", "range": "A1:Z1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["data gaps"] },
-    { "name": "06_Импорт", "range": "A1:U1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source coverage"] },
-    { "name": "_Справочники", "range": "A1:I1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["classification"] },
-    { "name": "_Журнал", "range": "A1:K1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["provenance"] },
-    { "name": "07_Диалоги_исследование", "range": "A1:AK1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience research"] },
-    { "name": "08_Банк_реплик", "range": "A1:V1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["verbatim language", "search hypotheses"] },
-    { "name": "09_Паттерны_аудитории", "range": "A1:X1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience patterns"] },
-    { "name": "10_Контентные_возможности", "range": "A1:AP1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content brief", "intent map"] },
-    { "name": "11_Кейсы_для_публикации", "range": "A1:AF1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["case evidence", "anonymization"] },
-    { "name": "12_Эффективные_ответы", "range": "A1:V1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["communication patterns"] },
-    { "name": "13_Статистика_контента", "range": "A1:AB2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["performance data"] },
-    { "name": "14_Контент_дашборд", "range": "A1:R1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content priorities"] },
-    { "name": "15_Обращения_с_контента", "range": "A1:AG2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["lead language", "attribution"] },
-    { "name": "_Реестр_диалогов", "range": "A1:Q2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source registry"] },
-    { "name": "_Ситуации_и_связи", "range": "A1:T2000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["cross-source links", "result levels"] },
-    { "name": "_События_воронки", "range": "A1:J5000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed funnel events"] },
-    { "name": "_Версии_контента", "range": "A1:L1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content versions"] },
-    { "name": "16_Контроль_данных", "range": "A1:J1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["critical data errors"] },
-    { "name": "_Импорт_ЮД_151_200", "range": "A1:T1000", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["historical source verification"] }
+    {
+      "name": "00_Старт",
+      "range": "A1:H45",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "project rules",
+        "SEO gate"
+      ]
+    },
+    {
+      "name": "01_БПЮ",
+      "range": "A1:AC1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "demand",
+        "client language"
+      ]
+    },
+    {
+      "name": "02_ЮрДоки",
+      "range": "A1:AA1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "paid work",
+        "practice"
+      ]
+    },
+    {
+      "name": "03_Оплаты",
+      "range": "A1:M1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "confirmed payments only"
+      ]
+    },
+    {
+      "name": "04_Дашборд",
+      "range": "A1:Z1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "operational context"
+      ]
+    },
+    {
+      "name": "05_Контроль",
+      "range": "A1:Z1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "data gaps"
+      ]
+    },
+    {
+      "name": "06_Импорт",
+      "range": "A1:U1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "source coverage"
+      ]
+    },
+    {
+      "name": "_Справочники",
+      "range": "A1:I1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "classification"
+      ]
+    },
+    {
+      "name": "_Журнал",
+      "range": "A1:K1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "provenance"
+      ]
+    },
+    {
+      "name": "07_Диалоги_исследование",
+      "range": "A1:AK1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "audience research"
+      ]
+    },
+    {
+      "name": "08_Банк_реплик",
+      "range": "A1:V1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "verbatim language",
+        "search hypotheses"
+      ]
+    },
+    {
+      "name": "09_Паттерны_аудитории",
+      "range": "A1:X1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "audience patterns"
+      ]
+    },
+    {
+      "name": "10_Контентные_возможности",
+      "range": "A1:AP1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content brief",
+        "intent map"
+      ]
+    },
+    {
+      "name": "11_Кейсы_для_публикации",
+      "range": "A1:AF1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "case evidence",
+        "anonymization"
+      ]
+    },
+    {
+      "name": "12_Эффективные_ответы",
+      "range": "A1:V1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "communication patterns"
+      ]
+    },
+    {
+      "name": "13_Статистика_контента",
+      "range": "A1:AB2000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "performance data"
+      ]
+    },
+    {
+      "name": "14_Контент_дашборд",
+      "range": "A1:R1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content priorities"
+      ]
+    },
+    {
+      "name": "15_Обращения_с_контента",
+      "range": "A1:AG2000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "lead language",
+        "attribution"
+      ]
+    },
+    {
+      "name": "_Реестр_диалогов",
+      "range": "A1:Q2000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "source registry"
+      ]
+    },
+    {
+      "name": "_Ситуации_и_связи",
+      "range": "A1:T2000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "cross-source links",
+        "result levels"
+      ]
+    },
+    {
+      "name": "_События_воронки",
+      "range": "A1:J5000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "confirmed funnel events"
+      ]
+    },
+    {
+      "name": "_Версии_контента",
+      "range": "A1:L1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content versions"
+      ]
+    },
+    {
+      "name": "16_Контроль_данных",
+      "range": "A1:J1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "critical data errors"
+      ]
+    },
+    {
+      "name": "_Импорт_ЮД_151_200",
+      "range": "A1:T1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "historical source verification"
+      ]
+    },
+    {
+      "name": "Статьи_HARANT",
+      "range": "A1:P1000",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "external publication overlap check"
+      ]
+    }
   ],
   "sourceTrace": {
     "dialogIds": [],
@@ -72,10 +282,18 @@
     "checkedAt": "2026-07-30T19:00:00.000Z",
     "region": "Russia / relevant service region",
     "primaryIntent": "replace with the verified primary intent",
-    "verifiedCluster": ["replace with externally verified queries"],
+    "verifiedCluster": [
+      "replace with externally verified queries"
+    ],
     "intentMap": [
-      { "intent": "replace", "target": "H1/lead/short answer" },
-      { "intent": "replace", "target": "H2 or FAQ" }
+      {
+        "intent": "replace",
+        "target": "H1/lead/short answer"
+      },
+      {
+        "intent": "replace",
+        "target": "H2 or FAQ"
+      }
     ],
     "intentOwnership": [
       {
@@ -84,8 +302,12 @@
         "ownerType": "article",
         "supportingUrls": [],
         "supportingCaseIds": [],
-        "excludedQueries": ["replace with a query this page must not target"],
-        "existingCompetingUrlsReviewed": ["https://yuristshevchuk.com/replace-existing-page/"],
+        "excludedQueries": [
+          "replace with a query this page must not target"
+        ],
+        "existingCompetingUrlsReviewed": [
+          "https://yuristshevchuk.com/replace-existing-page/"
+        ],
         "decision": "new-owner",
         "reason": "replace with why this intent needs this single owner"
       }
@@ -101,14 +323,27 @@
             "query": "replace with the checked query",
             "organicResultsReviewed": 5,
             "sponsoredResultsObserved": 2,
-            "sponsoredResultLabels": ["Реклама"],
-            "sponsoredAdvertiserTypes": ["legal aggregators"],
-            "sponsoredOfferPatterns": ["replace with a recurring paid offer"],
+            "sponsoredResultLabels": [
+              "Реклама"
+            ],
+            "sponsoredAdvertiserTypes": [
+              "legal aggregators"
+            ],
+            "sponsoredOfferPatterns": [
+              "replace with a recurring paid offer"
+            ],
             "dominantIntent": "informational",
-            "resultTypes": ["articles", "official sources"],
+            "resultTypes": [
+              "articles",
+              "official sources"
+            ],
             "localPack": false,
-            "snippetPatterns": ["replace with a recurring organic snippet formulation"],
-            "competitorCoverageGaps": ["replace with a practical gap in organic results"],
+            "snippetPatterns": [
+              "replace with a recurring organic snippet formulation"
+            ],
+            "competitorCoverageGaps": [
+              "replace with a practical gap in organic results"
+            ],
             "staleOrWeakResults": []
           },
           {
@@ -116,14 +351,27 @@
             "query": "replace with the checked query",
             "organicResultsReviewed": 5,
             "sponsoredResultsObserved": 1,
-            "sponsoredResultLabels": ["Sponsored"],
-            "sponsoredAdvertiserTypes": ["law firms"],
-            "sponsoredOfferPatterns": ["replace with a recurring paid offer"],
+            "sponsoredResultLabels": [
+              "Sponsored"
+            ],
+            "sponsoredAdvertiserTypes": [
+              "law firms"
+            ],
+            "sponsoredOfferPatterns": [
+              "replace with a recurring paid offer"
+            ],
             "dominantIntent": "informational",
-            "resultTypes": ["articles", "official sources"],
+            "resultTypes": [
+              "articles",
+              "official sources"
+            ],
             "localPack": false,
-            "snippetPatterns": ["replace with a recurring organic snippet formulation"],
-            "competitorCoverageGaps": ["replace with a practical gap in organic results"],
+            "snippetPatterns": [
+              "replace with a recurring organic snippet formulation"
+            ],
+            "competitorCoverageGaps": [
+              "replace with a practical gap in organic results"
+            ],
             "staleOrWeakResults": []
           }
         ],
@@ -141,7 +389,9 @@
         "userValue": "replace with the decision or action this element helps the reader make",
         "competitorGap": "replace with the organic SERP gap this element closes",
         "sourceBasis": "paid-practice",
-        "sourceIds": ["replace with internal non-personal source ID"],
+        "sourceIds": [
+          "replace with internal non-personal source ID"
+        ],
         "placement": "replace with H2, table, checklist or case block location",
         "verifiedAgainstSerp": true
       }
@@ -172,7 +422,9 @@
     "node scripts/live-all-publications-smoke.mjs"
   ],
   "publication": {
-    "expectedUrls": ["https://yuristshevchuk.com/replace/"],
+    "expectedUrls": [
+      "https://yuristshevchuk.com/replace/"
+    ],
     "notes": "CI, deployment and live results are reported in chat after publication."
   }
 }

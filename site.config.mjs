@@ -22,7 +22,7 @@ export const site = {
     "/uslugi": "2026-07-29",
     "/uslugi/dosudebnoe-uregulirovanie": "2026-07-29",
     "/uslugi/vzyskanie-dolga": "2026-07-29",
-    "/uslugi/vozvrat-deneg": "2026-07-29",
+    "/uslugi/vozvrat-deneg": "2026-08-01",
     "/uslugi/zhaloby-i-obrashcheniya": "2026-07-29",
     "/uslugi/iskovoe-zayavlenie": "2026-07-29",
     "/uslugi/spory-biznesa": "2026-07-29",

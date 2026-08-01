@@ -36,7 +36,8 @@
   }
 
   .article-page .editorial-intake + .editorial-message-guide,
-  .article-page .editorial-related + .editorial-related {
+  .article-page .editorial-related + .editorial-related,
+  .case-page .editorial-related + .editorial-related {
     margin-top: var(--editorial-flow-md);
   }
 

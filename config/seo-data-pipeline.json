@@ -60,6 +60,19 @@
       "last_checked_at": "2026-07-30",
       "next_check_not_before": "2026-08-29",
       "refinements": []
+    },
+    {
+      "content_id": "C-006",
+      "publication_id": "police-no-response",
+      "path": "/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+      "phrase": "полиция не отвечает на заявление",
+      "region": "213",
+      "device": "DEVICE_ALL",
+      "reason": "После подтверждения самостоятельного информационного интента в Яндексе и Google определить основную разговорную формулировку и поддерживающие запросы для статьи без создания лишних URL.",
+      "status": "pending",
+      "last_checked_at": "",
+      "next_check_not_before": "",
+      "refinements": []
     }
   ]
 }

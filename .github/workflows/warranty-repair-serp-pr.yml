@@ -29,7 +29,7 @@ jobs:
           node-version: '24'
 
       - name: Снять органическую выдачу Яндекса и Google
-        run: node .github/scripts/warranty-serp.mjs
+        run: node .github/scripts/warranty-serp.mjs || node .github/scripts/warranty-google-direct.mjs
 
       - name: Сохранить снимок выдачи
         if: always()

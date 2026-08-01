@@ -145,11 +145,10 @@ const serviceGuides = {
       ["Получатель денег перестал отвечать", "/razbory/prodavets-propal-posle-perevoda/"]
     ],
     sources: [
-      ["Статья 16 Закона о защите прав потребителей", "КонсультантПлюс", "https://www.consultant.ru/document/cons_doc_LAW_305/9eb0f127ead4dc57e7d0a9d4954cf264c4b3cea8/"],
-      ["Статья 28 Закона о защите прав потребителей", "КонсультантПлюс", "https://www.consultant.ru/document/cons_doc_LAW_305/f190d8f6c0d4f03af399cc0efcc722d87a0f83a6/"],
-      ["Статья 31 Закона о защите прав потребителей", "КонсультантПлюс", "https://www.consultant.ru/document/cons_doc_LAW_305/30aa7e1b7d9fe18928b8e9bce991ec6ba0d284e2/"],
-      ["Статья 32 Закона о защите прав потребителей", "КонсультантПлюс", "https://www.consultant.ru/document/cons_doc_LAW_305/758e2cfdf136a621c8f66dcb3372b772c7b5e6e8/"],
-      ["Банк России — дополнительные услуги при потребительском кредите", "Банк России", "https://www.cbr.ru/faq/bank_s/kredity/"]
+      ["Роспотребнадзор — недопустимость навязывания дополнительных товаров, работ и услуг", "Роспотребнадзор", "https://zpp.rospotrebnadzor.ru/news/federal/575369"],
+      ["Роспотребнадзор — отказ от договора услуг и подтверждение фактических расходов", "Роспотребнадзор", "https://zpp.rospotrebnadzor.ru/news/federal/487957"],
+      ["Роспотребнадзор — десятидневный срок требований при оказании услуг", "Роспотребнадзор", "https://zpp.rospotrebnadzor.ru/Forum/Appeals/Details/54518"],
+      ["Банк России — дополнительные услуги при потребительском кредите", "Банк России", "https://cbr.ru/faq/bank_s/kredity/"]
     ],
   },
   "zhaloby-i-obrashcheniya": {

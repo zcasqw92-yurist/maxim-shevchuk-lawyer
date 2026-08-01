@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - config/refund-services-serp.json
+      - scripts/run-serp-budgeted.mjs
       - .github/workflows/police-serp-auto.yml
   push:
     branches:
       - research/police-inactivity-cluster-20260801
     paths:
       - config/refund-services-serp.json
+      - scripts/run-serp-budgeted.mjs
       - .github/workflows/police-serp-auto.yml
 
 permissions:

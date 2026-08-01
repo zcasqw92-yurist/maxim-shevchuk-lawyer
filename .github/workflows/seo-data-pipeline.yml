@@ -77,7 +77,7 @@ jobs:
       - name: Run contract test
         run: node scripts/seo-data-pipeline-test.mjs
 
-      - name: Collect feedback without unnecessary Wordstat calls
+      - name: Collect full SEO feedback without Wordstat spending
         shell: bash
         run: |
           set -euo pipefail

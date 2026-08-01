@@ -1,0 +1,61 @@
+name: Полицейский кластер — один Wordstat-запрос
+
+on:
+  push:
+    branches:
+      - research/police-inactivity-cluster-20260801
+    paths:
+      - config/seo-data-pipeline.json
+      - .github/workflows/police-wordstat-auto.yml
+
+permissions:
+  contents: read
+
+jobs:
+  wordstat:
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Проверить одну гипотезу Wordstat
+        env:
+          SEO_STATE_DIR: ${{ runner.temp }}/police-wordstat
+          YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+        run: node scripts/seo-data-pipeline.mjs --mode=wordstat --hypothesis=C-006
+
+      - name: Показать результат без секретов
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = process.env.RUNNER_TEMP + '/police-wordstat/wordstat-latest.json';
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const cluster = report.clusters?.[0];
+          const primary = cluster?.calls?.find((item) => item.role === 'primary')?.result;
+          console.log(`phrase=${cluster?.phrase || ''}`);
+          console.log(`total_count=${primary?.total_count ?? 0}`);
+          console.log(`api_calls=${report.totals?.api_calls ?? 0}`);
+          for (const item of (primary?.results || []).slice(0, 20)) {
+            console.log(`${item.count}\t${item.phrase}`);
+          }
+          console.log('associations:');
+          for (const item of (primary?.associations || []).slice(0, 10)) {
+            console.log(`${item.count}\t${item.phrase}`);
+          }
+          NODE
+
+      - name: Сохранить нормализованный отчёт
+        uses: actions/upload-artifact@v4
+        with:
+          name: police-inactivity-wordstat
+          path: ${{ runner.temp }}/police-wordstat/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,12 +1,7 @@
-name: Полицейский кластер — один Wordstat-запрос
+name: Полицейский кластер — Wordstat по явному запуску
 
 on:
-  push:
-    branches:
-      - research/police-inactivity-cluster-20260801
-    paths:
-      - config/seo-data-pipeline.json
-      - .github/workflows/police-wordstat-auto.yml
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -31,26 +26,6 @@ jobs:
           SEO_STATE_DIR: ${{ runner.temp }}/police-wordstat
           YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
         run: node scripts/seo-data-pipeline.mjs --mode=wordstat --hypothesis=C-006
-
-      - name: Показать результат без секретов
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const path = process.env.RUNNER_TEMP + '/police-wordstat/wordstat-latest.json';
-          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
-          const cluster = report.clusters?.[0];
-          const primary = cluster?.calls?.find((item) => item.role === 'primary')?.result;
-          console.log(`phrase=${cluster?.phrase || ''}`);
-          console.log(`total_count=${primary?.total_count ?? 0}`);
-          console.log(`api_calls=${report.totals?.api_calls ?? 0}`);
-          for (const item of (primary?.results || []).slice(0, 20)) {
-            console.log(`${item.count}\t${item.phrase}`);
-          }
-          console.log('associations:');
-          for (const item of (primary?.associations || []).slice(0, 10)) {
-            console.log(`${item.count}\t${item.phrase}`);
-          }
-          NODE
 
       - name: Сохранить нормализованный отчёт
         uses: actions/upload-artifact@v4

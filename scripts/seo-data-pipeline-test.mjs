@@ -41,7 +41,7 @@ assert.ok(wordstatScript.includes("raw_responses_saved: false"), "Сырые API
 assert.ok(feedbackScript.includes("/query-analytics/list"), "Feedback должен получать поисковые данные отдельно по URL");
 assert.ok(feedbackScript.includes("/search-urls/in-search/samples"), "Feedback должен проверять присутствие страниц в поиске");
 assert.ok(feedbackScript.includes("/important-urls"), "Feedback должен читать доступные причины исключения и canonical/duplicate статусы");
-assert.ok(feedbackScript.includes("/uslugi/vozvrat-deneg/" ) || feedbackScript.includes("feedback_clusters"), "Feedback должен включать коммерческую страницу кластера");
+assert.ok(feedbackScript.includes("/uslugi/vozvrat-deneg/") || feedbackScript.includes("feedback_clusters"), "Feedback должен включать коммерческую страницу кластера");
 assert.ok(feedbackScript.includes("canonical_matches"), "Feedback должен проверять canonical на публичном домене");
 assert.ok(feedbackScript.includes("assistant_assets_present"), "После отката должен контролироваться возврат удалённого помощника");
 assert.ok(feedbackScript.includes("sheet-cluster-statistics.csv"), "Должен формироваться отдельный табличный отчёт кластера");

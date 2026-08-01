@@ -466,6 +466,13 @@
       "contentId": "police-no-response",
       "action": "updated",
       "expectedUrl": "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/"
+    },
+    {
+      "path": "docs/current-production-state.md",
+      "kind": "documentation",
+      "contentId": "police-no-response",
+      "action": "updated",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/"
     }
   ],
   "plannedChecks": [

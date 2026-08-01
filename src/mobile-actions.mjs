@@ -70,7 +70,7 @@ const mobileActionsMarkup = `
       ${icon("close")}
     </button>
     <span class="engagement-nudge__eyebrow">Можно начать без звонка</span>
-    <strong id="engagement-nudge-title">Собрать сведения для юриста?</strong>
+    <strong id="engagement-nudge-title">Нужен ориентир по вашей ситуации?</strong>
     <p>Помощник задаст только подходящие вопросы и подготовит сообщение. Выбрать мессенджер можно сразу или после заполнения; ответы останутся в браузере до перехода.</p>
     <div class="engagement-nudge__actions">
       <button class="engagement-nudge__dismiss" type="button">Не сейчас</button>

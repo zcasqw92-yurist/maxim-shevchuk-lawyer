@@ -1,0 +1,195 @@
+name: Зафиксировать контентную сессию полицейского кластера
+
+on:
+  push:
+    branches:
+      - content/police-no-response-20260801
+    paths:
+      - .github/workflows/prepare-police-content-session-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: content/police-no-response-20260801
+
+      - name: Обновить manifest и контентный контракт
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const manifestPath = 'reports/content-sessions/latest.json';
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          manifest.schemaVersion = 3;
+          manifest.sessionId = '20260801-police-no-response';
+          manifest.reviewedAt = '2026-08-01T16:56:00.000Z';
+          manifest.spreadsheet.modifiedTime = '2026-08-01T16:53:00.000Z';
+          manifest.spreadsheet.metadataTabCount = manifest.spreadsheet.discoveredTabs.length;
+          manifest.sourceTrace = {
+            dialogIds: ['6a63110f-f034-83eb-93e8-3569c49cc72a'],
+            situationIds: ['SIT-20260724-002'],
+            workIds: ['ЮД-20260724-001'],
+            contentIds: ['C-006'],
+            caseIds: ['K-001'],
+            notes: 'БПЮ и реплика подтверждают спрос и язык клиента. Юр. доки подтверждают оплаченную работу. K-001 подтверждает выполненную работу и запуск процессуального контроля, но не окончательный результат дела и поэтому не публикуется как успешный кейс.',
+          };
+          manifest.seoReview = {
+            status: 'completed',
+            checkedAt: '2026-08-01T16:48:00.000Z',
+            region: 'Москва',
+            primaryIntent: 'узнать процессуальное решение по заявлению о преступлении при отсутствии ответа полиции и обжаловать конкретное бездействие',
+            verifiedCluster: [
+              'полиция не отвечает на заявление',
+              'полиция пишет проверка ведётся',
+              'как узнать номер КУСП и решение полиции',
+              'жалоба на бездействие полиции',
+            ],
+            intentMap: [
+              { intent: 'широкая юридическая помощь по жалобе на бездействие полиции', target: 'existing service owner /uslugi/zhaloby-i-obrashcheniya/' },
+              { intent: 'нет ответа и неизвестно процессуальное решение', target: 'new article owner /razbory/politsiya-ne-otvechaet-na-zayavlenie/' },
+              { intent: 'полиция повторяет что проверка ведётся', target: 'H2 and FAQ inside the new article' },
+              { intent: 'уже вынесен отказ в возбуждении уголовного дела', target: 'existing article owner /razbory/chto-delat-posle-otkaza-policii/' },
+            ],
+            intentOwnership: [
+              {
+                intent: 'узнать процессуальное решение по заявлению о преступлении при отсутствии ответа полиции и обжаловать конкретное бездействие',
+                ownerUrl: 'https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/',
+                ownerType: 'article',
+                supportingUrls: [
+                  'https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/',
+                  'https://yuristshevchuk.com/razbory/chto-delat-posle-otkaza-policii/',
+                  'https://yuristshevchuk.com/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/',
+                ],
+                supportingCaseIds: ['police-review'],
+                excludedQueries: [
+                  'юрист по жалобам на бездействие полиции',
+                  'что делать после отказа полиции в возбуждении уголовного дела',
+                  'как обжаловать постановление об отказе полиции',
+                  'образец жалобы на бездействие полиции бесплатно',
+                ],
+                existingCompetingUrlsReviewed: [
+                  'https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/',
+                  'https://yuristshevchuk.com/razbory/chto-delat-posle-otkaza-policii/',
+                  'https://yuristshevchuk.com/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/',
+                ],
+                decision: 'new-owner',
+                reason: 'Выдача отдельно подтверждает информационный сценарий, когда заявление зарегистрировано, но заявитель не получил понятного ответа и не знает принятого решения. Коммерческий запрос остаётся странице услуги, а уже вынесенный отказ — существующей статье.',
+              },
+            ],
+            serpSnapshots: [
+              {
+                intent: 'узнать процессуальное решение по заявлению о преступлении при отсутствии ответа полиции и обжаловать конкретное бездействие',
+                checkedAt: '2026-08-01T16:37:00.000Z',
+                region: 'Москва',
+                engines: [
+                  {
+                    engine: 'Yandex',
+                    query: 'полиция не отвечает на заявление что делать',
+                    organicResultsReviewed: 20,
+                    sponsoredResultsObserved: 0,
+                    sponsoredResultLabels: [],
+                    sponsoredAdvertiserTypes: [],
+                    sponsoredOfferPatterns: [],
+                    dominantIntent: 'информационный порядок действий при отсутствии ответа, неизвестном решении и бездействии полиции',
+                    resultTypes: ['официальные разъяснения', 'юридические статьи', 'вопросы и ответы', 'материалы о жалобах'],
+                    localPack: false,
+                    snippetPatterns: ['нет ответа от полиции', 'узнать результат проверки', 'жалоба на бездействие', 'куда обращаться'],
+                    competitorCoverageGaps: ['часто смешиваются отказ принять заявление, отсутствие ответа и уже вынесенный отказ; редко дана единая карта КУСП → срок → решение → жалоба'],
+                    staleOrWeakResults: ['часть выдачи представлена короткими ответами и публикациями без разграничения процессуального и общего порядка'],
+                  },
+                  {
+                    engine: 'Google',
+                    query: 'полиция не отвечает на заявление что делать',
+                    organicResultsReviewed: 10,
+                    sponsoredResultsObserved: 0,
+                    sponsoredResultLabels: [],
+                    sponsoredAdvertiserTypes: [],
+                    sponsoredOfferPatterns: [],
+                    dominantIntent: 'практическая инструкция по установлению результата проверки и обжалованию бездействия',
+                    resultTypes: ['официальные разъяснения', 'юридические статьи', 'правовые сервисы вопросов и ответов'],
+                    localPack: false,
+                    snippetPatterns: ['полиция не сообщает результат', 'срок ответа', 'жалоба прокурору', 'судебное обжалование'],
+                    competitorCoverageGaps: ['многие результаты сразу предлагают жалобу, не помогая сначала установить КУСП, продление и вид решения по статье 145 УПК РФ'],
+                    staleOrWeakResults: ['встречаются общие публикации, не отделяющие сообщение о преступлении от обычного обращения гражданина'],
+                  },
+                ],
+                pageTypeDecision: 'article',
+                decisionReason: 'Преобладает самостоятельная информационная потребность. Wordstat подтвердил точную разговорную формулировку с частотностью 29 по Москве; отдельный запрос про «проверка ведётся» дал смешанную выдачу и остаётся разделом этой статьи.',
+                canProvideBetterAnswer: true,
+              },
+            ],
+            practicalElements: [
+              {
+                contentId: 'police-no-response',
+                targetUrl: 'https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/',
+                type: 'procedure-timeline',
+                title: 'Карта проверки: заявление → КУСП → срок → решение → жалоба',
+                userValue: 'Позволяет определить последнюю подтверждённую стадию и запросить конкретный документ вместо повторных общих обращений.',
+                competitorGap: 'Большинство изученных страниц смешивает разные нарушения и не показывает, как связать регистрацию, сроки 3/10/30 суток и одно из решений статьи 145 УПК РФ.',
+                sourceBasis: 'реальное обращение, дословная реплика клиента, подтверждённые паттерны аудитории, оплаченная юридическая работа и актуальные нормы УПК РФ',
+                sourceIds: ['C-006', 'R-0010', 'P-004', 'P-005', 'K-001', 'ЮД-20260724-001'],
+                placement: 'раздел «Карта проверки: на каком этапе возникла проблема» и связанные разделы о сроках, решениях и адресной жалобе',
+                verifiedAgainstSerp: true,
+              },
+            ],
+            cannibalizationChecked: true,
+            overOptimizationRisk: 'low',
+          };
+          manifest.editorialChecks = {
+            factsSeparatedFromHypotheses: true,
+            paidWorkSeparatedFromPaymentDetails: true,
+            workProcedureAndCaseResultsSeparated: true,
+            legalSourcesVerified: true,
+            anonymizationVerified: true,
+            criticalSourceErrorsResolved: true,
+          };
+          manifest.contentChanges = [
+            {
+              path: 'src/police-inactivity-cluster-data.mjs',
+              kind: 'article',
+              contentId: 'police-no-response',
+              action: 'created',
+              expectedUrl: 'https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/',
+            },
+            {
+              path: 'src/editorial-data.mjs',
+              kind: 'article-registry',
+              contentId: 'police-no-response',
+              action: 'updated',
+              expectedUrl: 'https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/',
+            },
+          ];
+          manifest.plannedChecks = [
+            'npm run test:public-copy',
+            'npm run check',
+            'npm run test:live',
+            'node scripts/live-all-publications-smoke.mjs',
+            'node scripts/live-public-copy-regression-test.mjs',
+          ];
+          manifest.publication = {
+            expectedUrls: ['https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/'],
+            notes: 'Публикуется одна статья-владелец. K-001 остаётся непубличным: выполненная работа подтверждена, но окончательный результат дела отсутствует.',
+          };
+          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+          const configPath = 'config/content-governance.json';
+          const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+          if (!config.governedContentPaths.includes('src/police-inactivity-cluster-data.mjs')) {
+            const index = config.governedContentPaths.indexOf('src/refund-services-cluster-data.mjs');
+            config.governedContentPaths.splice(index + 1, 0, 'src/police-inactivity-cluster-data.mjs');
+          }
+          fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+          NODE
+
+      - name: Удалить одноразовый workflow и зафиксировать сессию
+        run: |
+          rm .github/workflows/prepare-police-content-session-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/content-sessions/latest.json config/content-governance.json .github/workflows/prepare-police-content-session-once.yml
+          git commit -m 'Зафиксировать контентную сессию полицейского кластера'
+          git push origin HEAD:content/police-no-response-20260801

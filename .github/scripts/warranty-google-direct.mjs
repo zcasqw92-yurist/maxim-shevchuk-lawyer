@@ -14,6 +14,7 @@ const response = await fetch(`https://www.google.com/search?${params}`, {
   signal: AbortSignal.timeout(30000),
 });
 const html = await response.text();
+fs.writeFileSync('reports/cluster-research/google-direct.html', html);
 const challenge = /unusual traffic|sorry\/index|detected unusual|captcha/i.test(html);
 const decode = (value) => String(value || '').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const links = [];
@@ -43,6 +44,6 @@ report.results.google = {
 };
 report.gatePassed = Boolean(report.results.yandex?.minimumMet && report.results.google.minimumMet);
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-console.log(`Google direct: status=${response.status}, challenge=${challenge}, organic=${links.length}, passed=${report.results.google.minimumMet}`);
+console.log(`Google direct: status=${response.status}, challenge=${challenge}, bytes=${html.length}, organic=${links.length}, passed=${report.results.google.minimumMet}`);
 for (const item of links.slice(0, 10)) console.log(`GOOGLE ${item.position}: ${item.domain} — ${item.title}`);
 if (!report.gatePassed) process.exitCode = 1;

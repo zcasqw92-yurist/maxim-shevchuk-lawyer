@@ -13,7 +13,7 @@
 
   .legal-assistant {
     min-width: 0;
-    max-height: min(820px, calc(100dvh - 32px));
+    max-height: min(820px, calc(100dvw - 32px));
     overflow: auto;
     padding: clamp(24px, 5vw, 48px);
     color: var(--ink);
@@ -98,6 +98,19 @@
   .legal-assistant__resume { display: block; margin-top: 12px; }
   .legal-assistant__handoff { margin-top: 22px; }
   .legal-assistant__clear { margin-top: 18px; color: var(--muted); }
+
+  .legal-assistant__direct {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(16, 40, 61, .12);
+  }
+
+  .legal-assistant__direct > span {
+    display: block;
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+  }
 
   .legal-assistant__progress {
     display: grid;

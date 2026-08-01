@@ -135,6 +135,7 @@
     "src/debt-cluster-data-legacy.mjs",
     "src/refund-services-cluster-data.mjs",
     "src/police-inactivity-cluster-data.mjs",
+    "src/automotive-warranty-data.mjs",
     "src/refund-voluntary-service-cancellation.mjs",
     "src/editorial-data.mjs",
     "src/case-studies.mjs",

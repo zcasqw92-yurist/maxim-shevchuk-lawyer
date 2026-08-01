@@ -38,6 +38,7 @@ export const site = {
     "/razbory/vernut-dengi-za-neokazannuyu-uslugu": "2026-07-31",
     "/razbory/otkaz-ot-dogovora-okazaniya-uslug": "2026-07-31",
     "/razbory/vernut-dengi-za-navyazannuyu-uslugu": "2026-08-01",
+    "/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney": "2026-08-01",
     "/praktika": "2026-07-29",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-07-28",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-07-29",

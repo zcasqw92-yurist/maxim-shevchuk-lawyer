@@ -13,6 +13,7 @@ const styleModules = [
   "case-studies",
   "search-visibility",
   "mobile-actions",
+  "legal-assistant",
   "visual-trust",
   "video-ready",
   "layout-corrections",

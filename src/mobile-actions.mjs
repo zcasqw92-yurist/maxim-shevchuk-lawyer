@@ -11,6 +11,7 @@ const icon = (name) => {
 
 const base = site.basePath || "";
 const engagementScript = `${base}/assets/engagement-nudge.mjs`;
+const legalAssistantScript = `${base}/assets/legal-assistant.mjs`;
 const conversionAnalyticsScript = `${base}/assets/conversion-analytics.mjs`;
 const channelAnalyticsScript = `${base}/assets/channel-analytics.mjs`;
 const buttonAnalyticsScript = `${base}/assets/button-analytics.mjs`;
@@ -68,12 +69,12 @@ const mobileActionsMarkup = `
     <button class="engagement-nudge__close" type="button" aria-label="Закрыть подсказку">
       ${icon("close")}
     </button>
-    <span class="engagement-nudge__eyebrow">Можно написать без звонка</span>
+    <span class="engagement-nudge__eyebrow">Можно начать без звонка</span>
     <strong id="engagement-nudge-title">Нужен ориентир по вашей ситуации?</strong>
-    <p>Откройте удобный мессенджер. Там будет готовый черновик — измените его при необходимости и отправьте напрямую юристу.</p>
+    <p>Помощник задаст только подходящие вопросы и подготовит сообщение. Выбрать мессенджер можно сразу или после заполнения; ответы останутся в браузере до перехода.</p>
     <div class="engagement-nudge__actions">
       <button class="engagement-nudge__dismiss" type="button">Не сейчас</button>
-      <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-analytics-topic="первичный ориентир по ситуации">Выбрать мессенджер</button>
+      <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-analytics-topic="первичный ориентир по ситуации">Открыть помощника</button>
     </div>
   </aside>
   <div class="mobile-contact mobile-contact--single" aria-label="Быстрое действие" data-mobile-contact>
@@ -81,7 +82,8 @@ const mobileActionsMarkup = `
       ${icon("dialog")}<span>Написать сейчас</span>
     </button>
   </div>
-  <script type="module" src="${engagementScript}"></script>`;
+  <script type="module" src="${engagementScript}"></script>
+  <script type="module" src="${legalAssistantScript}"></script>`;
 
 export const injectMobileActions = (html, pathname) => {
   if (html.includes("data-mobile-contact")) throw new Error(`Мобильная панель добавлена до сборочного этапа: ${pathname}`);

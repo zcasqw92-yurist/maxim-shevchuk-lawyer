@@ -13,7 +13,7 @@
     "reviewNonEmptyCells": true,
     "reviewNotesAndComments": true,
     "baselineSnapshot": {
-      "modifiedTime": "2026-08-01T09:54:13.798Z",
+      "modifiedTime": "2026-08-01T10:42:00.672Z",
       "tabCount": 25,
       "tabs": [
         "00_Старт",
@@ -138,6 +138,7 @@
     "src/editorial-data.mjs",
     "src/case-studies.mjs",
     "src/privacy-policy.mjs",
+    "src/intake-assistant-policy.mjs",
     "src/process-guarantees.mjs",
     "src/geography.mjs",
     "src/search-visibility.mjs",
@@ -163,6 +164,7 @@
     "liveChecks": [
       "npm run test:live",
       "node scripts/live-all-publications-smoke.mjs",
+      "node scripts/intake-assistant-live-test.mjs",
       "node scripts/live-public-copy-regression-test.mjs"
     ],
     "chatReportRequired": true,

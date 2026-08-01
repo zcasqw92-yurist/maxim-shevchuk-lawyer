@@ -1,0 +1,76 @@
+name: Verify refund service live PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/verify-refund-service-live-pr.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout current production code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Wait for exact production SHA
+        env:
+          SITE_CUSTOM_DOMAIN_URL: https://yuristshevchuk.com
+          EXPECTED_BUILD_SHA: 25592980fc9720fe47c1744eef6b662ffb19a348
+          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '120'
+          CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Verify refund service hub on the custom domain
+        env:
+          SITE_URL: https://yuristshevchuk.com
+          EXPECTED_BUILD_SHA: 25592980fc9720fe47c1744eef6b662ffb19a348
+        run: |
+          node <<'NODE'
+          const base = process.env.SITE_URL;
+          const expected = process.env.EXPECTED_BUILD_SHA;
+          const url = new URL('/uslugi/vozvrat-deneg/', base);
+          url.searchParams.set('live_hub_check', `${expected.slice(0, 12)}-${Date.now()}`);
+          const response = await fetch(url, {
+            cache: 'no-store',
+            headers: { 'cache-control': 'no-cache, no-store, max-age=0', pragma: 'no-cache' },
+            redirect: 'follow',
+            signal: AbortSignal.timeout(20000),
+          });
+          const html = await response.text();
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const required = [
+            'Возврат денег за услугу, аванс или навязанный договор',
+            'Выберите ситуацию: основания возврата денег различаются',
+            '/razbory/vernut-dengi-za-neokazannuyu-uslugu/',
+            '/razbory/otkaz-ot-dogovora-okazaniya-uslug/',
+            '/razbory/vernut-dengi-za-navyazannuyu-uslugu/',
+            '/razbory/prodavets-propal-posle-perevoda/',
+            'При возврате предоплаты значение имеют',
+            'После претензии нужно считать срок по применимой норме',
+            'https://cbr.ru/faq/bank_s/kredity/',
+          ];
+          const missing = required.filter((marker) => !html.includes(marker));
+          if (missing.length) throw new Error(`Missing live markers: ${missing.join(', ')}`);
+          const metaSha = html.match(/<meta\s+name=["']site-build-sha["']\s+content=["']([^"']+)/i)?.[1]
+            || html.match(/<meta\s+content=["']([^"']+)["']\s+name=["']site-build-sha/i)?.[1];
+          if (metaSha !== expected) throw new Error(`Page SHA ${metaSha || 'missing'}, expected ${expected}`);
+          for (const forbidden of ['C-166', 'ЮД-ИМП', 'владелец интента', 'SERP', 'оплаченная практика', 'не требует отдельной страницы']) {
+            if (html.includes(forbidden)) throw new Error(`Internal wording leaked: ${forbidden}`);
+          }
+          console.log(`Live refund service hub verified: ${response.url} · ${expected.slice(0, 12)}`);
+          NODE
+
+      - name: Recheck all published articles
+        env:
+          SITE_PUBLIC_URL: https://yuristshevchuk.com
+          EXPECTED_BUILD_SHA: 25592980fc9720fe47c1744eef6b662ffb19a348
+        run: node scripts/live-public-copy-regression-test.mjs

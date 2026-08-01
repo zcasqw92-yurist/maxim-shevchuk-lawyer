@@ -16,7 +16,7 @@ export const site = {
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
   // Максимальная дата содержательного обновления. Даты отдельных страниц
   // задаются явно и не меняются от технической пересборки.
-  contentLastModified: "2026-07-31",
+  contentLastModified: "2026-08-01",
   contentLastModifiedByPath: {
     "/": "2026-07-29",
     "/uslugi": "2026-07-29",
@@ -36,6 +36,7 @@ export const site = {
     "/razbory/prodavets-propal-posle-perevoda": "2026-07-30",
     "/razbory/vernut-dengi-za-neokazannuyu-uslugu": "2026-07-31",
     "/razbory/otkaz-ot-dogovora-okazaniya-uslug": "2026-07-31",
+    "/razbory/vernut-dengi-za-navyazannuyu-uslugu": "2026-08-01",
     "/praktika": "2026-07-29",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-07-28",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-07-29",

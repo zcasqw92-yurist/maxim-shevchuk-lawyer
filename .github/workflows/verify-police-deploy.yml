@@ -1,6 +1,11 @@
 name: Проверить production статьи о бездействии полиции
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/verify-police-deploy.yml
   push:
     branches:
       - ops/verify-police-deploy-20260801

@@ -505,7 +505,7 @@ const run = async () => {
   };
 
   await writeJson(join(stateDir, "feedback-latest.json"), report);
-  await writeJson(join(stateDir, "history", `${today}.json"`.replace('"', "")), report);
+  await writeJson(join(stateDir, "history", `${today}.json`), report);
   await writeCsv(join(stateDir, "webmaster-popular-queries.csv"), ["Запрос", "Показы", "Клики", "Средняя позиция"],
     webmaster.popular_queries.map((item) => [item.query, item.shows, item.clicks, item.avg_position || ""]));
   await writeCsv(join(stateDir, "webmaster-page-queries.csv"), ["Контент ID", "URL", "Запрос", "Показы", "Клики", "CTR", "Средняя позиция"],

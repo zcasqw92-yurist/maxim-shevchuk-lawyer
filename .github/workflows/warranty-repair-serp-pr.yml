@@ -36,6 +36,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: warranty-repair-serp-research
-          path: reports/cluster-research/warranty-repair-serp.json
+          path: reports/cluster-research/
           if-no-files-found: error
           retention-days: 14

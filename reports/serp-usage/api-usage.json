@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-07-31T12:02:00.000Z",
+  "updatedAt": "2026-08-01T16:35:00.000Z",
   "providers": {
     "serpapi": {
-      "cycleId": "2026-07",
+      "cycleId": "2026-08",
       "cycleResetPolicy": "manual",
       "limit": 250,
       "hardStopAt": 240,
       "knownUsed": 6,
       "remainingToProviderLimit": 244,
       "remainingToProjectHardStop": 234,
-      "baselineSource": "SerpApi dashboard screenshot supplied by user after Google-only test",
+      "baselineSource": "Conservative carry-forward of the last dashboard-confirmed usage; no reset is assumed without a new dashboard check",
       "requests": [
         {
           "at": "2026-07-31T11:57:37.000Z",
@@ -31,7 +31,7 @@
       ]
     },
     "yandexSearchApi": {
-      "cycleId": "2026-07",
+      "cycleId": "2026-08",
       "cycleResetPolicy": "manual",
       "knownUsed": null,
       "baselineSource": "Prior usage total is not reliably available; repeated requests are prevented by cache from this point onward",

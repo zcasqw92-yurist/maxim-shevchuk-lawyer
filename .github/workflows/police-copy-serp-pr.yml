@@ -33,6 +33,8 @@ jobs:
           mkdir -p reports/cluster-research
           awk '/node <<'"'"'NODE'"'"'/{capture=1;next} /^          NODE$/{capture=0} capture{sub(/^          /,"");print}' .github/workflows/police-copy-serp-research.yml > /tmp/police-copy-serp.mjs
           sed -i "s/^const fs = require('node:fs');$/import fs from 'node:fs';/" /tmp/police-copy-serp.mjs
+          sed -i "s@^const serperKey = .*@const serperKey = String(process.env.SERPER_API_KEY || '').trim().replace(/^SERPER_API_KEY=/i, '').replace(/^X-API-KEY[:=]\\s*/i, '').replace(/^Bearer\\s+/i, '').replace(/^[\"']|[\"']$/g, '').trim();@" /tmp/police-copy-serp.mjs
+          sed -i "s@^const serpApiKey = .*@const serpApiKey = String(process.env.SERPAPI_API_KEY || '').trim().replace(/^SERPAPI_API_KEY=/i, '').replace(/^API-KEY[:=]\\s*/i, '').replace(/^Bearer\\s+/i, '').replace(/^[\"']|[\"']$/g, '').trim();@" /tmp/police-copy-serp.mjs
           node /tmp/police-copy-serp.mjs
 
       - name: Сохранить снимок выдачи

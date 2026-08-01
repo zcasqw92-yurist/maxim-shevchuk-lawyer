@@ -312,5 +312,5 @@ export const imposedServiceRefundArticle = {
     },
   ],
   sources: Object.values(imposedServiceSources),
-  relatedCaseIds: ["autoclub"],
+  relatedCaseIds: [],
 };

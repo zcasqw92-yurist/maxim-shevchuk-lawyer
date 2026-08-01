@@ -1,0 +1,44 @@
+name: Проверка выдачи — копия постановления полиции
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: seo-api
+    env:
+      QUERY_TEXT: как получить копию постановления об отказе в возбуждении уголовного дела
+      YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+      SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+      SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Выполнить исследование
+        run: |
+          mkdir -p reports/cluster-research
+          awk '/node <<'"'"'NODE'"'"'/{capture=1;next} /^          NODE$/{capture=0} capture{sub(/^          /,"");print}' .github/workflows/police-copy-serp-research.yml > /tmp/police-copy-serp.mjs
+          node /tmp/police-copy-serp.mjs
+
+      - name: Сохранить снимок выдачи
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: police-copy-serp-research
+          path: reports/cluster-research/police-copy-serp.json
+          if-no-files-found: error
+          retention-days: 14

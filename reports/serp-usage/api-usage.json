@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-01T16:35:00.000Z",
+  "updatedAt": "2026-08-01T16:37:12.063Z",
   "providers": {
     "serpapi": {
       "cycleId": "2026-08",
       "cycleResetPolicy": "manual",
       "limit": 250,
       "hardStopAt": 240,
-      "knownUsed": 6,
-      "remainingToProviderLimit": 244,
-      "remainingToProjectHardStop": 234,
+      "knownUsed": 9,
+      "remainingToProviderLimit": 241,
+      "remainingToProjectHardStop": 231,
       "baselineSource": "Conservative carry-forward of the last dashboard-confirmed usage; no reset is assumed without a new dashboard check",
       "requests": [
         {
@@ -27,6 +27,25 @@
           ],
           "reason": "Initial successful Google SERP gate",
           "workflowCommit": "8e013251ad082b8d6e6a7bc0ad87c44148b0b2d7"
+        },
+        {
+          "at": "2026-08-01T16:37:11.761Z",
+          "clusterId": "police-inactivity",
+          "engine": "google",
+          "count": 3,
+          "queryIds": [
+            "police-inactivity-commercial",
+            "police-no-response",
+            "police-review-ongoing"
+          ],
+          "normalizedQueries": [
+            "жалоба на бездействие полиции",
+            "полиция не отвечает на заявление что делать",
+            "полиция пишет проверка ведется что делать"
+          ],
+          "reason": "Explicit approved cache miss",
+          "status": "completed",
+          "workflowCommit": "1d1a32e27bb32f61b4e1499181a98b256400d964"
         }
       ]
     },
@@ -35,7 +54,27 @@
       "cycleResetPolicy": "manual",
       "knownUsed": null,
       "baselineSource": "Prior usage total is not reliably available; repeated requests are prevented by cache from this point onward",
-      "requests": []
+      "requests": [
+        {
+          "at": "2026-08-01T16:37:07.965Z",
+          "clusterId": "police-inactivity",
+          "engine": "yandex",
+          "count": 3,
+          "queryIds": [
+            "police-inactivity-commercial",
+            "police-no-response",
+            "police-review-ongoing"
+          ],
+          "normalizedQueries": [
+            "жалоба на бездействие полиции",
+            "полиция не отвечает на заявление что делать",
+            "полиция пишет проверка ведется что делать"
+          ],
+          "reason": "Explicit approved cache miss",
+          "status": "completed",
+          "workflowCommit": "1d1a32e27bb32f61b4e1499181a98b256400d964"
+        }
+      ]
     }
   }
 }

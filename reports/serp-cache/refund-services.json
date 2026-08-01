@@ -8,13 +8,644 @@
       "region": "Moscow, Russia",
       "country": "ru",
       "language": "ru",
-      "queries": {}
+      "queries": {
+        "police-inactivity-commercial": {
+          "query": "жалоба на бездействие полиции",
+          "checkedAt": "2026-08-01T16:37:11.761Z",
+          "source": "SerpApi Google Search API",
+          "result": {
+            "status": "ok",
+            "provider": "serpapi",
+            "organicResultsReviewed": 9,
+            "sponsoredResultsObserved": 0,
+            "minimumMet": true,
+            "organicResults": [
+              {
+                "title": "Жалоба на бездействие полиции - образец",
+                "url": "https://advokat-sheriev.ru/bezdeistvie-policii.aspx",
+                "domain": "advokat-sheriev.ru",
+                "snippet": "Бездействие органов полиции · ЗАЯВЛЕНИЕ о бездействии сотрудников полиции по проверке сообщения о преступлении · Помощь адвоката 8 (925) 502-40-09. Написать нам ...",
+                "placementType": "organic",
+                "position": 1
+              },
+              {
+                "title": "Жалоба в суд на бездействие полиции. Услуги адвоката ...",
+                "url": "https://advokat-alliance.ru/article/zhaloba-v-sud-na-bezdejstvie-policii/",
+                "domain": "advokat-alliance.ru",
+                "snippet": "Однако помимо искового заявления обязательно нужно предоставить копию паспорта и любые документы, доказывающие бездействие сотрудников органов внутренних дел.",
+                "placementType": "organic",
+                "position": 2
+              },
+              {
+                "title": "Жалоба на бездействие сотрудников полиции",
+                "url": "https://katsaylidi.ru/yuridicheskie-uslugi-fizicheskim-litsam/zhaloba-na-bezdeystvie-politsii",
+                "domain": "katsaylidi.ru",
+                "snippet": "Жалоба на бездействие сотрудников полиции подается вышестоящему начальнику полиции, в суд или прокуратуру. Можно выбрать одну инстанцию или направить документ ...",
+                "placementType": "organic",
+                "position": 3
+              },
+              {
+                "title": "Министерство внутренних дел Российской Федерации",
+                "url": "https://do.gosuslugi.ru/orgs/mvd/",
+                "domain": "do.gosuslugi.ru",
+                "snippet": "Вы можете подать жалобу на в системе досудебного обжалования, если в процессе оказания услуги были нарушения регламента.",
+                "placementType": "organic",
+                "position": 4
+              },
+              {
+                "title": "Образцы жалоб на действия (бездействия) сотрудников ...",
+                "url": "https://nnoblsud.ru/index.php/spravochnaya-informatsiya/poryadok-obrashcheniya-v-sud/1463-obraztsy-zhalob-na-dejstviya-bezdejstviya-sotrudnikov-politsii",
+                "domain": "nnoblsud.ru",
+                "snippet": "Образцы жалоб на действия (бездействия) сотрудников полиции. Обжалование неправомерного бездействия сотрудника полиции. скачать образец в формате DOC, PDF ...",
+                "placementType": "organic",
+                "position": 5
+              },
+              {
+                "title": "Как пожаловаться на действие и бездействие полицейских",
+                "url": "https://ovdinfo.legal/instruction/kak-pozhalovatsya-na-deystvie-i-bezdeystvie-policeyskih",
+                "domain": "ovdinfo.legal",
+                "snippet": "Одним из способов борьбы с нарушениями при задержаниях может стать жалоба начальнику отдела полиции или в прокуратуру.",
+                "placementType": "organic",
+                "position": 6
+              },
+              {
+                "title": "Образец Жалобы в прокуратуру на бездействие полиции",
+                "url": "https://advokat-kozhevnikov.ru/poleznaya-informaciya/obrazcy/obrazec-zhaloby-v-prokuraturu-na-bezdeystvie-policii/",
+                "domain": "advokat-kozhevnikov.ru",
+                "snippet": "Размещенный образец жалобы в прокуратуру на бездействие полиции использован адвокатом в своей юридической практике. Посмотреть сведения об адвокате можно в ...",
+                "placementType": "organic",
+                "position": 7
+              },
+              {
+                "title": "Куда обращаться в случае бездействия полиции?",
+                "url": "https://vce-yuristi.ru/voprosi/11065",
+                "domain": "vce-yuristi.ru",
+                "snippet": "8 (800) 707-58-67 ... Жалоба на бездействие сотрудников полиции подается вышестоящему начальнику полиции, в суд или прокуратуру. Можно выбрать одну инстанцию или ...",
+                "placementType": "organic",
+                "position": 8
+              },
+              {
+                "title": "Порядок обжалования в суд действий, бездействия и ...",
+                "url": "https://lmosev.ru/administration/info/bezopasnost/prokuror_razyasnyaet/poryadok_obzhalovaniya_v_sud_dejstvij-_bezdejstviya_i_reshenij_rajonnogo_otdela_policii/",
+                "domain": "lmosev.ru",
+                "snippet": "Действия (бездействие) и решения сотрудников полиции могут быть обжалованы альтернативно вышестоящему руководству, прокурору и в районный суд. Особенности ...",
+                "placementType": "organic",
+                "position": 9
+              }
+            ],
+            "sponsoredResults": [],
+            "sponsoredResultLabels": [],
+            "diagnostics": {
+              "searchMetadata": {
+                "id": "6a6e209ede1f33f3e297fd5d",
+                "status": "Success",
+                "json_endpoint": "https://serpapi.com/searches/aE5d8wfqtljYAWKevCgNyQ/6a6e209ede1f33f3e297fd5d.json",
+                "pixel_position_endpoint": "https://serpapi.com/searches/aE5d8wfqtljYAWKevCgNyQ/6a6e209ede1f33f3e297fd5d.json_with_pixel_position",
+                "created_at": "2026-08-01 16:36:46 UTC",
+                "processed_at": "2026-08-01 16:36:46 UTC",
+                "google_url": "https://www.google.com/search?q=%D0%B6%D0%B0%D0%BB%D0%BE%D0%B1%D0%B0+%D0%BD%D0%B0+%D0%B1%D0%B5%D0%B7%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D0%B5+%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D0%B8&oq=%D0%B6%D0%B0%D0%BB%D0%BE%D0%B1%D0%B0+%D0%BD%D0%B0+%D0%B1%D0%B5%D0%B7%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D0%B5+%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D0%B8&uule=w+CAIQICINTW9zY293LFJ1c3NpYQ&hl=ru&gl=ru&filter=0&sourceid=chrome&ie=UTF-8",
+                "raw_html_file": "https://serpapi.com/searches/aE5d8wfqtljYAWKevCgNyQ/6a6e209ede1f33f3e297fd5d.html",
+                "total_time_taken": 8.51
+              },
+              "searchParameters": {
+                "engine": "google",
+                "q": "жалоба на бездействие полиции",
+                "location_requested": "Moscow, Russia",
+                "location_used": "Moscow,Russia",
+                "google_domain": "google.com",
+                "hl": "ru",
+                "gl": "ru",
+                "device": "desktop",
+                "filter": "0"
+              },
+              "searchInformation": {
+                "query_displayed": "жалоба на бездействие полиции",
+                "total_results": 104,
+                "time_taken_displayed": 0.26,
+                "organic_results_state": "Results for exact spelling"
+              }
+            }
+          }
+        },
+        "police-no-response": {
+          "query": "полиция не отвечает на заявление что делать",
+          "checkedAt": "2026-08-01T16:37:11.761Z",
+          "source": "SerpApi Google Search API",
+          "result": {
+            "status": "ok",
+            "provider": "serpapi",
+            "organicResultsReviewed": 10,
+            "sponsoredResultsObserved": 0,
+            "minimumMet": true,
+            "organicResults": [
+              {
+                "title": "Что делать, если полиция не сообщает о результатах ...",
+                "url": "https://pravo.gov35.ru/gov_piipravprosvgrazhdan/pravovoe-informirovanie-i-pravovoe-prosveshchenie-grazhdan/prokuratura-vologodskoy-oblasti-razyasnyaet/osobennosti-deyatelnosti-pravookhranitelnykh-organov/chto-delat-esli-politsiya-ne-soobshchaet-o-rezultatakh-rassmotreniya-vashego-zayavleniya-o-sovershen/",
+                "domain": "pravo.gov35.ru",
+                "snippet": "Действия, а также бездействие должностных лиц полиции могут быть обжалованы участниками уголовного судопроизводства, а также иными лицами вышестоящему ...",
+                "placementType": "organic",
+                "position": 1
+              },
+              {
+                "title": "Жалоба на бездействие сотрудников полиции",
+                "url": "https://katsaylidi.ru/yuridicheskie-uslugi-fizicheskim-litsam/zhaloba-na-bezdeystvie-politsii",
+                "domain": "katsaylidi.ru",
+                "snippet": "Если участковый не реагирует на заявление, гражданин может составить жалобу и призвать служителя порядка к исполнению своих обязанностей. Содержание статьи ...",
+                "placementType": "organic",
+                "position": 2
+              },
+              {
+                "title": "Что делать, если подали заявление о преступлении, но ...",
+                "url": "https://harant.ru/blog/ugolovnoe-pravo/chto-delat-esli-podali-zayavlenie-o-prestuplenii-no-nikakih-dejstvij-ne-proishodit/",
+                "domain": "harant.ru",
+                "snippet": "При отсутствии ответа подайте жалобу начальнику отдела полиции с указанием на истечение сроков и неуведомление заявителя. Требуйте сообщить ...",
+                "placementType": "organic",
+                "position": 3
+              },
+              {
+                "title": "Что делать, если полиция бездействует?",
+                "url": "https://nasiliu.net/pronasilie/chto-delat-esli-policziya-bezdejstvuet/",
+                "domain": "nasiliu.net",
+                "snippet": "еще раз набрать 112; · позвонить в дежурную часть отдела полиции по вашему району или дежурному прокурору по вашему району (номера можно найти в интернете); ...",
+                "placementType": "organic",
+                "position": 4
+              },
+              {
+                "title": "Полиция не ответила в нужный срок по моему делу",
+                "url": "https://pravoved.ru/question/164300/",
+                "domain": "pravoved.ru",
+                "snippet": "если ответа не получите, либо вам ответят, что в возбуждении уголовного дела отказано, вы вправе обратиться в прокуратуру с жалобой на ...",
+                "placementType": "organic",
+                "position": 5
+              },
+              {
+                "title": "Что делать если полиция отказывается принимать ...",
+                "url": "https://moirbit.ru/docs/2020_04_21/7Fk9bGad4z9Rz54e3DaES3QF8.doc",
+                "domain": "moirbit.ru",
+                "snippet": "Отказ в приеме и регистрации заявления о совершенном или готовящемся преступлении недопустим. Такое решение может быть обжаловано прокурору или в суд. Согласно ...",
+                "placementType": "organic",
+                "position": 6
+              },
+              {
+                "title": "Как быть, если полиция бездействует в деле о краже ...",
+                "url": "https://vseadvokaty.ru/questions/ugolovnoe-pravo-i-protsess/40840",
+                "domain": "vseadvokaty.ru",
+                "snippet": "Вот шаги, которые вам стоит предпринять: · 1. Уточните статус дела Напишите письменный запрос в отдел полиции, в котором подавали заявление, с ...",
+                "placementType": "organic",
+                "position": 7
+              },
+              {
+                "title": "Что делать, если полиция не отвечает на заявление?",
+                "url": "https://vc.ru/legal/3025865-chto-delat-esli-politsiya-ne-otvechayet-na-zayavlenie",
+                "domain": "vc.ru",
+                "snippet": "В том случае, ели заявителю не будет предоставлен ответ на заявление, он вправе обратится с жалобой в вышестоящий орган МВД, в прокуратуру, или ...",
+                "placementType": "organic",
+                "position": 8
+              },
+              {
+                "title": "Что делать, если не принимают заявление в полиции?",
+                "url": "https://xn--80adbkc3aefnffc4ahj.xn--p1ai/glavnaya/prokuratura-vyborgskogo-rajona-razyasnyaet-chto-delat-esli-ne-prinimayut-zayavlenie-v-policzii/",
+                "domain": "xn--80adbkc3aefnffc4ahj.xn--p1ai",
+                "snippet": "Ответ: Отказ в приеме заявления от граждан сотрудником полиции незаконен. В случае отказа принять заявление обращайтесь органы прокуратуры или ...",
+                "placementType": "organic",
+                "position": 9
+              },
+              {
+                "title": "Нет ответа от полиции даже после жалобы в прокуратуру",
+                "url": "https://harant.ru/questions/q-204183/",
+                "domain": "harant.ru",
+                "snippet": "Добрый день! Направил заявление по административной статье в полицию, зарегистрировал ...",
+                "placementType": "organic",
+                "position": 10
+              }
+            ],
+            "sponsoredResults": [],
+            "sponsoredResultLabels": [],
+            "diagnostics": {
+              "searchMetadata": {
+                "id": "6a6e20a79701217505310829",
+                "status": "Success",
+                "json_endpoint": "https://serpapi.com/searches/S3-SZbceSfs6eJuxE5BR7Q/6a6e20a79701217505310829.json",
+                "pixel_position_endpoint": "https://serpapi.com/searches/S3-SZbceSfs6eJuxE5BR7Q/6a6e20a79701217505310829.json_with_pixel_position",
+                "created_at": "2026-08-01 16:36:55 UTC",
+                "processed_at": "2026-08-01 16:36:55 UTC",
+                "google_url": "https://www.google.com/search?q=%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D1%8F+%D0%BD%D0%B5+%D0%BE%D1%82%D0%B2%D0%B5%D1%87%D0%B0%D0%B5%D1%82+%D0%BD%D0%B0+%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5+%D1%87%D1%82%D0%BE+%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C&oq=%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D1%8F+%D0%BD%D0%B5+%D0%BE%D1%82%D0%B2%D0%B5%D1%87%D0%B0%D0%B5%D1%82+%D0%BD%D0%B0+%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5+%D1%87%D1%82%D0%BE+%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C&uule=w+CAIQICINTW9zY293LFJ1c3NpYQ&hl=ru&gl=ru&filter=0&sourceid=chrome&ie=UTF-8",
+                "raw_html_file": "https://serpapi.com/searches/S3-SZbceSfs6eJuxE5BR7Q/6a6e20a79701217505310829.html",
+                "total_time_taken": 10.38
+              },
+              "searchParameters": {
+                "engine": "google",
+                "q": "полиция не отвечает на заявление что делать",
+                "location_requested": "Moscow, Russia",
+                "location_used": "Moscow,Russia",
+                "google_domain": "google.com",
+                "hl": "ru",
+                "gl": "ru",
+                "device": "desktop",
+                "filter": "0"
+              },
+              "searchInformation": {
+                "query_displayed": "полиция не отвечает на заявление что делать",
+                "total_results": 9520000,
+                "time_taken_displayed": 0.27,
+                "organic_results_state": "Results for exact spelling"
+              }
+            }
+          }
+        },
+        "police-review-ongoing": {
+          "query": "полиция пишет проверка ведется что делать",
+          "checkedAt": "2026-08-01T16:37:11.761Z",
+          "source": "SerpApi Google Search API",
+          "result": {
+            "status": "ok",
+            "provider": "serpapi",
+            "organicResultsReviewed": 9,
+            "sponsoredResultsObserved": 0,
+            "minimumMet": true,
+            "organicResults": [
+              {
+                "title": "Я написал заявлению в полицию, когда я узнаю о ...",
+                "url": "https://kryaradm.ru/informatsiya-dlya-grazhdan/prokuratura-krasnoyarskogo-rajona-raz-yasnyaet/ya-napisal-zayavleniyu-v-politsiyu-kogda-ya-uznayu-o-reshenii-sotrudnikov-mvd",
+                "domain": "kryaradm.ru",
+                "snippet": "По истечении срока проведения проверки сотрудник полиции обязан принять соответствующее процессуальное решение и направить в Ваш адрес уведомление с копией ...",
+                "placementType": "organic",
+                "position": 1
+              },
+              {
+                "title": "К вам пришли с проверкой из полиции",
+                "url": "https://ombudsmanbiz.nso.ru/page/198",
+                "domain": "ombudsmanbiz.nso.ru",
+                "snippet": "Должностные лица органов полиции при проведении проверки обязаны: 1) соблюдать права и законные интересы юридического лица, индивидуального предпринимателя, ...",
+                "placementType": "organic",
+                "position": 2
+              },
+              {
+                "title": "Полицейская проверка на предприятии",
+                "url": "https://grantum.pro/articles/policeyskaya-proverka-na-predpriyatii/",
+                "domain": "grantum.pro",
+                "snippet": "1. Проведение следственных действий (в рамках уголовного дела). Вам обязаны предъявить постановление на обыск. Предоставлять Вам копию ...",
+                "placementType": "organic",
+                "position": 3
+              },
+              {
+                "title": "МЕТОДИЧЕСКИЕ РЕКОМЕНДАЦИИ ❓Что делать, если ...",
+                "url": "https://vk.ru/wall-139453095_2456",
+                "domain": "vk.ru",
+                "snippet": "4. Для того, чтобы потребовать от вас написания объяснения служебная проверка должна быть прежде всего назначена. Очень часто сам факт ...",
+                "placementType": "organic",
+                "position": 4
+              },
+              {
+                "title": "Как действовать, если к Вам с проверкой пришла полиция",
+                "url": "https://delfarvater.ru/files/2012/10/gd_1012_varlamov.pdf",
+                "domain": "delfarvater.ru",
+                "snippet": "житесь с руководителем и уточните, действительно ли конкретные сотрудники направлены к Вам для проведения проверки и на каком основании. Выяснение причин ...",
+                "placementType": "organic",
+                "position": 5
+              },
+              {
+                "title": "Что делать, если полиция не сообщает о результатах ...",
+                "url": "https://pravo.gov35.ru/gov_piipravprosvgrazhdan/pravovoe-informirovanie-i-pravovoe-prosveshchenie-grazhdan/prokuratura-vologodskoy-oblasti-razyasnyaet/osobennosti-deyatelnosti-pravookhranitelnykh-organov/chto-delat-esli-politsiya-ne-soobshchaet-o-rezultatakh-rassmotreniya-vashego-zayavleniya-o-sovershen/",
+                "domain": "pravo.gov35.ru",
+                "snippet": "В соответствии со ст. 144 Уголовно-процессуального кодекса РФ (далее - УПК РФ) проверка сообщения о преступлении осуществляется в срок не позднее 3 суток.",
+                "placementType": "organic",
+                "position": 6
+              },
+              {
+                "title": "Взаимодействие полиции с налоговыми органами",
+                "url": "https://z.berator.ru/enc/kvpp/40/40/50/",
+                "domain": "z.berator.ru",
+                "snippet": "Чтобы привлечь к проверке полицию, налоговые инспекторы должны составить запрос, в котором четко сформулировать, зачем им это нужно. Направить запрос они могут ...",
+                "placementType": "organic",
+                "position": 7
+              },
+              {
+                "title": "Как говорить с проверкой полиции - Дело Модульбанка",
+                "url": "https://delo.modulbank.ru/all/inspection-2",
+                "domain": "delo.modulbank.ru",
+                "snippet": "С чего начать · не открывать дверь сразу; · записывать видео; · убедиться, что у проверяющих документ без ошибок; · проверить, что все проверяющие ...",
+                "placementType": "organic",
+                "position": 8
+              },
+              {
+                "title": "Запрос из полиции: как правильно отвечать?",
+                "url": "https://skpgroup.ru/yuridicheskie-uslugi/zashchita-biznesa-pri-proverkakh/zashchita-pri-proverkakh-mvd/zapros-politsii/",
+                "domain": "skpgroup.ru",
+                "snippet": "Что делать, если поступил запрос УВД о предоставлении информации? · Проверить его законность. · Посмотреть, насколько запрос обоснован. · Убедиться в том, что ...",
+                "placementType": "organic",
+                "position": 9
+              }
+            ],
+            "sponsoredResults": [],
+            "sponsoredResultLabels": [],
+            "diagnostics": {
+              "searchMetadata": {
+                "id": "6a6e20b1a89e02ca010c4282",
+                "status": "Success",
+                "json_endpoint": "https://serpapi.com/searches/fA8guNlodTwSWd1_gEUglQ/6a6e20b1a89e02ca010c4282.json",
+                "pixel_position_endpoint": "https://serpapi.com/searches/fA8guNlodTwSWd1_gEUglQ/6a6e20b1a89e02ca010c4282.json_with_pixel_position",
+                "created_at": "2026-08-01 16:37:05 UTC",
+                "processed_at": "2026-08-01 16:37:05 UTC",
+                "google_url": "https://www.google.com/search?q=%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D1%8F+%D0%BF%D0%B8%D1%88%D0%B5%D1%82+%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0+%D0%B2%D0%B5%D0%B4%D0%B5%D1%82%D1%81%D1%8F+%D1%87%D1%82%D0%BE+%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C&oq=%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D1%8F+%D0%BF%D0%B8%D1%88%D0%B5%D1%82+%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0+%D0%B2%D0%B5%D0%B4%D0%B5%D1%82%D1%81%D1%8F+%D1%87%D1%82%D0%BE+%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C&uule=w+CAIQICINTW9zY293LFJ1c3NpYQ&hl=ru&gl=ru&filter=0&sourceid=chrome&ie=UTF-8",
+                "raw_html_file": "https://serpapi.com/searches/fA8guNlodTwSWd1_gEUglQ/6a6e20b1a89e02ca010c4282.html",
+                "total_time_taken": 1.02
+              },
+              "searchParameters": {
+                "engine": "google",
+                "q": "полиция пишет проверка ведется что делать",
+                "location_requested": "Moscow, Russia",
+                "location_used": "Moscow,Russia",
+                "google_domain": "google.com",
+                "hl": "ru",
+                "gl": "ru",
+                "device": "desktop",
+                "filter": "0"
+              },
+              "searchInformation": {
+                "query_displayed": "полиция пишет проверка ведется что делать",
+                "total_results": 137,
+                "time_taken_displayed": 0.5,
+                "organic_results_state": "Results for exact spelling"
+              }
+            }
+          }
+        }
+      }
     },
     "yandex": {
       "provider": "yandex-search-api",
       "region": "213",
       "language": "ru",
-      "queries": {}
+      "queries": {
+        "police-inactivity-commercial": {
+          "query": "жалоба на бездействие полиции",
+          "checkedAt": "2026-08-01T16:37:07.965Z",
+          "source": "Yandex Search API v2 WebSearch.Search, FORMAT_XML",
+          "result": {
+            "status": "ok",
+            "organicResultsReviewed": 20,
+            "sponsoredResultsObserved": 0,
+            "minimumMet": true,
+            "organicResults": [
+              {
+                "title": "О порядке обжалования действий ( бездействия )",
+                "url": "https://xn--n1aiccj.xn--b1aew.xn--p1ai/informaciya/%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81-%D0%BE%D0%B1%D1%80%D0%B0%D1%89%D0%B5%D0%BD%D0%B8%D1%8F%D0%BC%D0%B8/Porjadok_prijoma_obrashhenij/%D0%BE-%D0%BF%D0%BE%D1%80%D1%8F%D0%B4%D0%BA%D0%B5-%D0%BE%D0%B1%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F-%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D0%B9-%D0%B1%D0%B5%D0%B7%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2",
+                "domain": "xn--n1aiccj.xn--b1aew.xn--p1ai",
+                "snippet": "О порядке обжалования действий ( бездействия ) и решений должностных лиц органов внутренних дел, осуществляемых и принимаемых в ходе рассмотрения обращений. Жалобы на решения, принятые уполномоченным должностным лицом самостоятельного подразделения, подаются руководству органа внутренних дел.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Брянская область",
+                "url": "https://epp.genproc.gov.ru/ru/proc_32/activity/legal-education/explain/e305811/",
+                "domain": "epp.genproc.gov.ru",
+                "snippet": "Как обжаловать бездействие сотрудников полиции при рассмотрении сообщения о преступлении? Статьей 125 Уголовно-процессуального кодекса Российской Федерации установлено, что постановления органа дознания, дознавателя, следователя, руководителя следственного органа об отказе в возбуждении уголовного дела...",
+                "placementType": "organic"
+              },
+              {
+                "title": "Образец жалобы на бездействие сотрудников полиции в 2026...",
+                "url": "https://ppt.ru/art/zhaloba/na-bezdeystvie-sotrudnikov-politsii",
+                "domain": "ppt.ru",
+                "snippet": "Поводы написать жалобу в прокуратуру на бездействие полиции напрямую связаны с обязанностями самого органа. Основанием для заявления является невыполнение обязанностей полицейского, установленных законом №3-ФЗ от 07.02.2011. Оно выражается, например, в игнорировании заявления о совершении правонарушения: гражданин...",
+                "placementType": "organic"
+              },
+              {
+                "title": "Куда жаловаться на бездействие полиции ? | Аргументы... | Дзен",
+                "url": "https://dzen.ru/a/aIWFojRQM05bDP18",
+                "domain": "dzen.ru",
+                "snippet": "Нормально.Рассмотрение жалобы на бездействие полиции составляет 30-60 дней.Вот поэтому так наша полиция и работает. Каким образом нужно ,,убедиться,что ваше обращение в полицию официально зарегистрировано,, , если у вас отказываются принять заявление ?.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Образец жалобы на бездействие сотрудников полиции - Адвокат...",
+                "url": "https://pravo163.ru/obrazec-zhaloby-na-bezdejstvie-sotrudnikov-policii-2/",
+                "domain": "pravo163.ru",
+                "snippet": "1. Рассмотреть жалобу в интересах заявителя ФИО1 по материалу проверки КУСП № НОМЕР от ДАТА в соответствие с требованиями уголовно-процессуального законодательства РФ и приказов Генеральной прокуратуры РФ. 2. Признать бездействие (действие) должностных лиц отдела полиции по району УМВД России...",
+                "placementType": "organic"
+              },
+              {
+                "title": "Образцы жалоб на действия ( бездействия ) сотрудников полиции",
+                "url": "https://nnoblsud.ru/index.php/spravochnaya-informatsiya/poryadok-obrashcheniya-v-sud/1463-obraztsy-zhalob-na-dejstviya-bezdejstviya-sotrudnikov-politsii",
+                "domain": "nnoblsud.ru",
+                "snippet": "Обжалование неправомерного бездействия сотрудника полиции . Обжалование неправомерных действий сотрудника(ов) полиции при задержании. скачать образец в формате DOC, PDF.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Смоленская область",
+                "url": "https://epp.genproc.gov.ru/ru/proc_67/documents/pravovye_osnovy_deyatelnosti/e5917918/",
+                "domain": "epp.genproc.gov.ru",
+                "snippet": "Образец жалобы на бездействие органов полиции .pdf. Скачать [ 122.15 КБ ]. Прямая ссылка на материал. Копировать. Поделиться.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Административный порядок обжалования нормативных правовых...",
+                "url": "https://237.56.xn--b1aew.xn--p1ai/document/72373234",
+                "domain": "237.56.xn--b1aew.xn--p1ai",
+                "snippet": "Внесудебный (административный) порядок обжалования действий ( бездействия ) сотрудника полиции регламентируется Решение, принятое прокурором, не препятствует обращению лица за защитой своих прав в суд. Решение по жалобе на приговор, решение, определение и постановление суда может быть обжаловано только вышестоящему прокурору.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Образец жалобы на бездействие полиции при расследовании...",
+                "url": "https://pravo163.ru/obrazec-zhaloby-na-bezdejstvie-policii-pri-rassledovanii-ugolovnogo-dela/",
+                "domain": "pravo163.ru",
+                "snippet": "Главная. Профессиональные новости. Образец жалобы на бездействие полиции при расследовании уголовного дела. 4. Ответ на жалобу направить по адресу: 443080, г. Самара, пр. Карла Маркса, д. 192, оф. 614 или на электронную почту 2717371@gmail.com. Приложение: копия доверенности на адвоката Антонова А.П.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Обжалование действий сотрудников полиции при рассмотрении...",
+                "url": "https://44.xn--b1aew.xn--p1ai/Rabota_s_obrashhenijami_grazhdan/%D0%BE%D0%B1%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D0%B9-%D1%81%D0%BE%D1%82%D1%80%D1%83%D0%B4%D0%BD%D0%B8%D0%BA%D0%BE%D0%B2-%D0%BF%D0%BE%D0%BB%D0%B8%D1%86%D0%B8%D0%B8",
+                "domain": "44.xn--b1aew.xn--p1ai",
+                "snippet": "Порядок обжалования действий сотрудников полиции . Гражданин имеет право обращаться с жалобой на принятое по обращению в правоохранительные органы решение или на действия ( бездействие )...",
+                "placementType": "organic"
+              }
+            ],
+            "sponsoredResults": [],
+            "sponsoredResultLabels": [],
+            "diagnostics": {
+              "documentCount": 20,
+              "note": "Search API XML document list contains organic documents; paid placements are not included."
+            }
+          }
+        },
+        "police-no-response": {
+          "query": "полиция не отвечает на заявление что делать",
+          "checkedAt": "2026-08-01T16:37:07.965Z",
+          "source": "Yandex Search API v2 WebSearch.Search, FORMAT_XML",
+          "result": {
+            "status": "ok",
+            "organicResultsReviewed": 20,
+            "sponsoredResultsObserved": 0,
+            "minimumMet": true,
+            "organicResults": [
+              {
+                "title": "Если полиция не присылает ответ на ваше заявление ...",
+                "url": "https://m.vk.ru/wall-39108476_54869",
+                "domain": "m.vk.ru",
+                "snippet": "Если вы отправили заявление онлайн на официальном сайте полиции , ответ придет в электронном виде на вашу электронную почту, указанную при оформлении заявления . Срок: согласно Уголовно-процессуальному кодексу (УПК) доследственная проверка ведется 3 или 10 дней, в исключительно редких случаях она продляется до 30 дней.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если полиция не сообщает о результатах...",
+                "url": "https://pravo.gov35.ru/gov_piipravprosvgrazhdan/pravovoe-informirovanie-i-pravovoe-prosveshchenie-grazhdan/prokuratura-vologodskoy-oblasti-razyasnyaet/osobennosti-deyatelnosti-pravookhranitelnykh-organov/chto-delat-esli-politsiya-ne-soobshchaet-o-rezultatakh-rassmotreniya-vashego-zayavleniya-o-sovershen/",
+                "domain": "pravo.gov35.ru",
+                "snippet": "При получении письменного заявления либо при составлении протокола принятия устного заявления о преступлении сотрудник дежурной части органа внутренних дел обязан зарегистрировать заявление в Книге учета сообщений о происшествиях, оформить талон – уведомление и выдает его заявителю.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если полиция не отвечает на заявление ? | Дзен",
+                "url": "https://dzen.ru/a/Yz3P5vva61Dce19r",
+                "domain": "dzen.ru",
+                "snippet": "В этой статье я расскажу, что делать , если полиция не предоставляет ответ на заявление . Статьей 53 Закона о полиции установлено, что действия (бездействие) сотрудника полиции , нарушающие права и законные интересы гражданина, государственного и муниципального органа, общественного объединения, религиозной и иной организации...",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если сотрудник полиции не принимает заявление ?",
+                "url": "https://berezovo.ru/inform/messages/22423/",
+                "domain": "berezovo.ru",
+                "snippet": "Вежливо попросите сотрудника полиции , который вам отказывает, показать удостоверение, затем сообщите, что обжалуете его действия и перепишите ФИО сотрудника и время Вашего обращения в правоохранительные органы. Затем можно обратиться с заявлением в органы прокуратуры.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Куда жаловаться на бездействие полиции ? | Аргументы... | Дзен",
+                "url": "https://dzen.ru/a/aIWFojRQM05bDP18",
+                "domain": "dzen.ru",
+                "snippet": "Если полиция города или района отказывается принимать заявление , не реагирует на обращения или затягивает расследование, жалобу можно подать начальнику полиции , в суд или прокуратуру. Читайте в справке aif.ru, как правильно оформить жалобу, какие документы потребуются и каких результатов можно ожидать в этом случае.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать при отказе в принятии сотрудниками полиции ...",
+                "url": "https://admbk.ru/information/prosecutor-informs/chto-delat-pri-otkaze-v-prinyatii-sotrudnikami-politsii-zayavleniya-o-prestuplenii/",
+                "domain": "admbk.ru",
+                "snippet": "Поэтому необходимо знать, что в случае попыток укрытия сотрудниками полиции сообщения о преступлении от регистрации путем его непринятия, ссылаясь, например, на заведомо «отказной» характер заявления , нужно настаивать на приеме и регистрации сообщения, выдаче талона-уведомления (при письменном обращении)...",
+                "placementType": "organic"
+              },
+              {
+                "title": "Сотрудники прокуратуры разъяснили « Что делать в случае отказа...",
+                "url": "https://kirovskij-r64.gosweb.gosuslugi.ru/dlya-zhiteley/novosti-i-reportazhi/novosti_158.html",
+                "domain": "kirovskij-r64.gosweb.gosuslugi.ru",
+                "snippet": "Для жителей. Новости и репортажи. Сотрудники прокуратуры разъяснили « Что делать в случае отказа в отделе полиции в приеме заявления о преступлении?»",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если полиция бездействует и не реагирует на... | Дзен",
+                "url": "https://dzen.ru/a/ZkHwVTsJZBNLqjpI",
+                "domain": "dzen.ru",
+                "snippet": "Для начала объясню, как правильно подать заявление , чтобы сотрудники полиции не смогли безнаказанно проигнорировать его, а затем расскажу, что делать , если у вас есть жалобы, связанные с ходом дела. Как правильно обратиться в правоохранительные органы и написать заявление .",
+                "placementType": "organic"
+              },
+              {
+                "title": "Как действовать, если полиция не принимает мер по заявлениям ...",
+                "url": "https://pravoved.ru/question/1743342/",
+                "domain": "pravoved.ru",
+                "snippet": "Написали заявления в полицию о краже, никаких ответов не получили, обратились в прокуратуру, прокуратура ответила , и вот уже три месяца никакой реакции. Что делать ? Здравствуйте, а что ответила прокуратура? Если опять нет реакции, надо вновь писать жалобу в прокуратуру.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если в полиции у вас не принимают заявление",
+                "url": "http://www.danilovmr.ru/index.php/dokumenty-oszn/programmy/83-novosti/3260-chto-delat-esli-v-politsii-u-vas-ne-prinimayut-zayavlenie",
+                "domain": "www.danilovmr.ru",
+                "snippet": "Случается, что в полиции отказываются принимать заявление – чаще всего из опасений «повесить» на отдел очередное нераскрытое дело. Надо проявить настойчивость и элементарное знание действующего законодательства. Принять ваше заявление полицейских обязывает приказ МВД России от...",
+                "placementType": "organic"
+              }
+            ],
+            "sponsoredResults": [],
+            "sponsoredResultLabels": [],
+            "diagnostics": {
+              "documentCount": 20,
+              "note": "Search API XML document list contains organic documents; paid placements are not included."
+            }
+          }
+        },
+        "police-review-ongoing": {
+          "query": "полиция пишет проверка ведется что делать",
+          "checkedAt": "2026-08-01T16:37:07.965Z",
+          "source": "Yandex Search API v2 WebSearch.Search, FORMAT_XML",
+          "result": {
+            "status": "ok",
+            "organicResultsReviewed": 20,
+            "sponsoredResultsObserved": 0,
+            "minimumMet": true,
+            "organicResults": [
+              {
+                "title": "МЕТОДИЧЕСКИЕ РЕКОМЕНДАЦИИ Что делать , если...",
+                "url": "https://vk.ru/wall-139453095_2456",
+                "domain": "vk.ru",
+                "snippet": "Очень часто сам факт требования « написать объяснение» используется как акт устрашения. У меня была начальница, которая по каждому поводу орала « пиши объяснение!!!».. при этом ни по одному из них не было назначено проведение служебной проверки . Что она потом с ними делала , я могу только догадываться… наверно сортир обклеивала на даче.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Пишет капитан полиции - ФинДозор Форум",
+                "url": "https://findozor.net/forum/threads/pishet-kapitan-politsii.5809/",
+                "domain": "findozor.net",
+                "snippet": "Тема ' Полиция , участковый, правда или нет? Пришло СМС из полиции , пишет дознаватель'. Что делать если поступил звонок из полиции из-за просрочки Довольно часто при возникновении просрочки может поступить звонок или прийти сообщение в мессенджер от следователя, дознавателя или...",
+                "placementType": "organic"
+              },
+              {
+                "title": "Как действовать, если к Вам с проверкой пришла полиция",
+                "url": "https://lobanov-logist.ru/library/all_articles/59033/",
+                "domain": "lobanov-logist.ru",
+                "snippet": "Проверка личностей полицейских . Если в Вашем офисе появились лица, утверждающие, что они сотрудники полиции и сейчас будет проводиться проверка , потребуйте у них удостоверения сотрудников полиции и перепишите данные. Если они отказываются предъявлять документы – вызывайте наряд полиции по телефону 02.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если полиция пришла в квартиру с проверкой ...",
+                "url": "https://life.rambler.ru/experience/56383657-chto-delat-esli-politsiya-prishla-v-kvartiru-s-proverkoy/",
+                "domain": "life.rambler.ru",
+                "snippet": "Перед массовыми праздниками полиция может приходить с проверками . В материале — о том, как обезопасить себя и отличить реального сотрудника правоохранительных органов от мошенника.",
+                "placementType": "organic"
+              },
+              {
+                "title": "СМС от полиции о доследственной проверке - что делать , если...",
+                "url": "https://9111.ru/questions/19383118/",
+                "domain": "9111.ru",
+                "snippet": "Пришло смс уведомление с полиции о том что в отношении меня проводиться доследственная проверка и что мне надо явиться представился капитаном полиции указал фио, только я живу в другом городе. СМС пришла с номера другого региона, после чего я перезвонила. Это коллекторы либо мошенники. Не ведитесь .",
+                "placementType": "organic"
+              },
+              {
+                "title": "Расскажем, как действовать при внезапной полицейской проверке",
+                "url": "https://1c-wiseadvice.ru/company/blog/kompaniiu-proveriaet-politsiia-kak-obezopasit-sebia-i-svoi-biznes-ot-negativnykh-posledstvii-proverki-chast-2-7700/",
+                "domain": "1c-wiseadvice.ru",
+                "snippet": "Объясним, как вести себя сотрудникам офиса и руководителям при внезапной полицейской проверке офисов компании, а также, как можно подготовиться к данной ситуации, почему приходит полицейская проверка и какие могут быть последствия.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если к вам в офис пришли с проверкой",
+                "url": "https://delovoymir.biz/chto-delat-esli-k-vam-prishli-s-proverkoy.html",
+                "domain": "delovoymir.biz",
+                "snippet": "Объясняем что делать , если в компанию пришли с проверкой правоохранительные органы Читайте подробнее на сайте бизнес журнала «Деловой мир». В ходе проверки обязательно ведется протокол, в котором отражается вся процедура проведения проверки . Что изучается, что обнаружено, что установлено — все это подлежит отражению в документе.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Если полиция не присылает ответ на ваше заявление...",
+                "url": "https://vk.com/wall-39108476_54869",
+                "domain": "vk.com",
+                "snippet": "Если вы отправили заявление онлайн на официальном сайте полиции , ответ придет в электронном виде на вашу электронную почту, указанную при оформлении заявления. Срок: согласно Уголовно-процессуальному кодексу (УПК) доследственная проверка ведется 3 или 10 дней, в исключительно редких случаях она продляется до 30 дней.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Что делать , если потребовали написать объяснение? Итак, если...",
+                "url": "https://vk.com/wall-161444554_97861",
+                "domain": "vk.com",
+                "snippet": "Пишите объяснение только по существу тех вопросов, по которым предложено дать объяснение. В конце объяснения следует написать , что вам не предлагалось давать объяснения по существу каких-либо иных вопросов. Иначе вам может быть предложено написать об одном, а накажут за другое.",
+                "placementType": "organic"
+              },
+              {
+                "title": "Эксперты пояснили, как вести себя при требовании сотрудника...",
+                "url": "https://www.garant.ru/news/1297198/",
+                "domain": "www.garant.ru",
+                "snippet": "Что касается осмотра личных вещей в отделении полиции , то он должен быть зафиксирован в протоколе осмотра – в частности, при проверке телефона сотрудник полиции должен отмечать, какие страницы просматривает. Также эксперт указал на отсутствие судебной практики по рассматриваемому вопросу.",
+                "placementType": "organic"
+              }
+            ],
+            "sponsoredResults": [],
+            "sponsoredResultLabels": [],
+            "diagnostics": {
+              "documentCount": 20,
+              "note": "Search API XML document list contains organic documents; paid placements are not included."
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -10,7 +10,7 @@ const required = [
   "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
   "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
   "/razbory/prodavets-propal-posle-perevoda/",
-  "Возврат предоплаты не требует отдельной страницы",
+  "При возврате предоплаты значение имеют",
   "После претензии нужно считать срок по применимой норме",
 ];
 const missing = required.filter((marker) => !html.includes(marker));

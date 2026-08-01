@@ -71,7 +71,7 @@ const mobileActionsMarkup = `
     </button>
     <span class="engagement-nudge__eyebrow">Можно начать без звонка</span>
     <strong id="engagement-nudge-title">Собрать сведения для юриста?</strong>
-    <p>Помощник задаст только подходящие вопросы и подготовит сообщение. Ответы останутся в браузере до вашего перехода в мессенджер.</p>
+    <p>Помощник задаст только подходящие вопросы и подготовит сообщение. Выбрать мессенджер можно сразу или после заполнения; ответы останутся в браузере до перехода.</p>
     <div class="engagement-nudge__actions">
       <button class="engagement-nudge__dismiss" type="button">Не сейчас</button>
       <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-analytics-topic="первичный ориентир по ситуации">Открыть помощника</button>

@@ -1,0 +1,66 @@
+import fs from 'node:fs';
+
+const query = String(process.env.QUERY_TEXT || '').trim();
+const yandexKey = String(process.env.YANDEX_SEARCH_API_KEY || '').trim();
+const serperKey = String(process.env.SERPER_API_KEY || '').trim().replace(/^SERPER_API_KEY=/i, '').replace(/^X-API-KEY[:=]\s*/i, '').replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '').trim();
+const serpApiKey = String(process.env.SERPAPI_API_KEY || '').trim().replace(/^SERPAPI_API_KEY=/i, '').replace(/^API-KEY[:=]\s*/i, '').replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '').trim();
+for (const value of [yandexKey, serperKey, serpApiKey].filter(Boolean)) console.log(`::add-mask::${value}`);
+
+const clean = (value) => String(value ?? '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+const domainFor = (url) => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
+const unique = (items) => { const seen = new Set(); return items.filter((item) => { const key = String(item.url || '').replace(/\/$/, ''); if (!key || seen.has(key)) return false; seen.add(key); return true; }); };
+const xmlTag = (source, tag) => { const match = source.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, 'i')); return clean(match?.[1] || ''); };
+const decodeRawData = (value) => String(value || '').trimStart().startsWith('<') ? String(value || '') : Buffer.from(String(value || ''), 'base64').toString('utf8');
+
+async function yandex() {
+  if (!yandexKey) throw new Error('YANDEX_SEARCH_API_KEY missing');
+  const response = await fetch('https://searchapi.api.cloud.yandex.net/v2/web/search', {
+    method: 'POST',
+    headers: { Authorization: `Api-Key ${yandexKey}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ query: { searchType: 'SEARCH_TYPE_RU', queryText: query, familyMode: 'FAMILY_MODE_MODERATE', page: '0', fixTypoMode: 'FIX_TYPO_MODE_ON' }, sortSpec: { sortMode: 'SORT_MODE_BY_RELEVANCE', sortOrder: 'SORT_ORDER_DESC' }, groupSpec: { groupMode: 'GROUP_MODE_FLAT', groupsOnPage: '20', docsInGroup: '1' }, maxPassages: '3', region: '213', l10n: 'LOCALIZATION_RU', responseFormat: 'FORMAT_XML' }),
+    signal: AbortSignal.timeout(30000),
+  });
+  const text = await response.text(); let payload = {}; try { payload = text ? JSON.parse(text) : {}; } catch {}
+  if (!response.ok) throw new Error(`Yandex ${response.status}: ${clean(payload?.message || response.statusText)}`);
+  const xml = decodeRawData(payload.rawData);
+  const docs = [...xml.matchAll(/<doc(?:\s[^>]*)?>([\s\S]*?)<\/doc>/gi)].map((match) => match[1]);
+  const organic = unique(docs.map((doc, index) => { const url = xmlTag(doc, 'url'); return { position: index + 1, title: xmlTag(doc, 'title'), url, domain: xmlTag(doc, 'domain') || domainFor(url), snippet: clean(xmlTag(doc, 'passages') || xmlTag(doc, 'headline')).slice(0, 500), placementType: 'organic' }; }).filter((item) => /^https?:\/\//i.test(item.url)));
+  return { engine: 'yandex', region: 'Москва (213)', organicResultsReviewed: organic.length, sponsoredResultsObserved: 0, minimumMet: organic.length >= 5, organicResults: organic.slice(0, 10), sponsoredResults: [] };
+}
+
+const normalizeOrganic = (items) => unique((Array.isArray(items) ? items : []).map((item, index) => { const url = item?.link || item?.url || ''; return { position: Number(item?.position) || index + 1, title: clean(item?.title), url, domain: domainFor(url), snippet: clean(item?.snippet || item?.description).slice(0, 500), placementType: 'organic' }; }).filter((item) => /^https?:\/\//i.test(item.url)));
+const normalizeAds = (items, label) => unique((Array.isArray(items) ? items : []).map((item, index) => { const url = item?.link || item?.url || item?.tracking_link || ''; return { position: Number(item?.position) || index + 1, title: clean(item?.title || item?.name), url, domain: domainFor(url), snippet: clean(item?.description || item?.snippet).slice(0, 500), placementType: 'sponsored', sponsoredLabel: label }; }).filter((item) => /^https?:\/\//i.test(item.url)));
+
+async function google() {
+  if (serperKey) {
+    const response = await fetch('https://google.serper.dev/search', { method: 'POST', headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ q: query, gl: 'ru', hl: 'ru', location: 'Moscow, Moscow, Russia', num: 10, autocorrect: true }), signal: AbortSignal.timeout(30000) });
+    const payload = await response.json(); if (!response.ok) throw new Error(`Serper ${response.status}: ${clean(payload?.message || response.statusText)}`);
+    const organic = normalizeOrganic(payload.organic); const sponsored = unique([...normalizeAds(payload.ads, 'ads'), ...normalizeAds(payload.shopping, 'shopping')]);
+    return { engine: 'google', provider: 'serper', region: 'Москва, Россия', organicResultsReviewed: organic.length, sponsoredResultsObserved: sponsored.length, minimumMet: organic.length >= 5, organicResults: organic.slice(0, 10), sponsoredResults: sponsored.slice(0, 10) };
+  }
+  if (serpApiKey) {
+    const params = new URLSearchParams({ engine: 'google', q: query, location: 'Moscow, Russia', google_domain: 'google.com', gl: 'ru', hl: 'ru', num: '10', filter: '0', api_key: serpApiKey });
+    const response = await fetch(`https://serpapi.com/search.json?${params}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+    const payload = await response.json(); if (!response.ok) throw new Error(`SerpApi ${response.status}: ${clean(payload?.error || response.statusText)}`);
+    const organic = normalizeOrganic(payload.organic_results); const sponsored = unique([...normalizeAds(payload.ads, 'ads'), ...normalizeAds(payload.inline_ads, 'inline_ads'), ...normalizeAds(payload.local_ads, 'local_ads')]);
+    return { engine: 'google', provider: 'serpapi', region: 'Москва, Россия', organicResultsReviewed: organic.length, sponsoredResultsObserved: sponsored.length, minimumMet: organic.length >= 5, organicResults: organic.slice(0, 10), sponsoredResults: sponsored.slice(0, 10) };
+  }
+  throw new Error('Google SERP API key missing');
+}
+
+const report = { generatedAt: new Date().toISOString(), query, rule: 'minimum 5 organic results per engine; sponsored results excluded', results: {} };
+for (const [name, fn] of [['yandex', yandex], ['google', google]]) {
+  try { report.results[name] = await fn(); }
+  catch (error) { report.results[name] = { engine: name, minimumMet: false, organicResultsReviewed: 0, sponsoredResultsObserved: 0, organicResults: [], sponsoredResults: [], error: clean(error?.message || error) }; }
+}
+report.gatePassed = Boolean(report.results.yandex.minimumMet && report.results.google.minimumMet);
+fs.mkdirSync('reports/cluster-research', { recursive: true });
+fs.writeFileSync('reports/cluster-research/warranty-repair-serp.json', `${JSON.stringify(report, null, 2)}\n`);
+for (const engine of ['yandex', 'google']) {
+  const item = report.results[engine];
+  console.log(`${engine}: organic=${item.organicResultsReviewed}, sponsored=${item.sponsoredResultsObserved}, passed=${item.minimumMet}`);
+  for (const result of item.organicResults.slice(0, 10)) console.log(`${engine.toUpperCase()} ${result.position}: ${result.domain} — ${result.title}`);
+  if (item.error) console.log(`${engine} error: ${item.error}`);
+}
+console.log(`Combined gate passed: ${report.gatePassed}`);
+if (!report.gatePassed) process.exitCode = 1;

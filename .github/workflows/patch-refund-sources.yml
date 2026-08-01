@@ -1,0 +1,30 @@
+name: Patch refund official sources
+
+on:
+  push:
+    branches:
+      - content/refund-service-hub
+    paths:
+      - scripts/patch-refund-sources.py
+      - .github/workflows/patch-refund-sources.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: content/refund-service-hub
+      - run: python3 scripts/patch-refund-sources.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/search-visibility.mjs scripts/search-visibility-test.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "Обновить официальные источники страницы возврата денег"
+          git push origin HEAD:content/refund-service-hub

@@ -56,7 +56,11 @@ const injectAutomatedReviewStatus = (html, pathname) => {
 const intakeAssets = () => {
   const base = site.basePath || "";
   const version = site.contentLastModified.replaceAll("-", "");
-  return `  <link rel="stylesheet" href="${base}/assets/intake-assistant.css?v=${version}">\n  <style>#contact-dialog [data-dialog-close],#contact-dialog [data-intake-reset]{min-width:46px!important;min-height:46px!important;transform:none!important}</style>\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>\n`;
+  return `  <link rel="stylesheet" href="${base}/assets/intake-assistant.css?v=${version}">\n  <style>
+    #contact-dialog [data-dialog-close],#contact-dialog [data-intake-reset]{min-width:46px!important;min-height:46px!important;transform:none!important}
+    #contact-dialog .messenger-choices--dialog{display:grid!important;visibility:visible!important;opacity:1!important;position:relative!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;margin-top:18px!important}
+    #contact-dialog .messenger-choices--dialog::before{content:"Или напишите сразу без заполнения";display:block;grid-column:1/-1;margin:0 0 8px;font-size:.82rem;font-weight:700;color:var(--navy-soft)}
+  </style>\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>\n`;
 };
 
 export const finalizeBuildSlots = (html, pathname) => {

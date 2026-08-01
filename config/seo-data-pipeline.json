@@ -1,5 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "last_manual_feedback_request_at": "2026-08-01T15:09:00.000Z",
+  "last_manual_feedback_reason": "Полный контрольный слепок кластера после отката помощника",
   "cache_ttl_days": 30,
   "max_api_calls_per_cluster": 3,
   "max_primary_calls": 1,
@@ -13,7 +15,9 @@
   "webmaster": {
     "api_base": "https://api.webmaster.yandex.net/v4",
     "target_host": "yuristshevchuk.com",
-    "popular_queries_limit": 100
+    "popular_queries_limit": 100,
+    "query_analytics_limit": 500,
+    "in_search_page_limit": 100
   },
   "metrica": {
     "counter_id": "111050150",
@@ -28,11 +32,51 @@
       "publication_faq_open",
       "publication_related_click",
       "publication_messenger_intent",
+      "cta_view",
+      "cta_click",
+      "messenger_dialog_open",
+      "button_action",
       "contact_conversion",
       "contact_telegram",
       "contact_whatsapp"
     ]
   },
+  "feedback_clusters": [
+    {
+      "id": "refund-services",
+      "name": "Возврат денег за услуги и навязанные договоры",
+      "pages": [
+        {
+          "content_id": "service-vozvrat-deneg",
+          "path": "/uslugi/vozvrat-deneg/",
+          "title": "Возврат денег за услугу, аванс или навязанный договор",
+          "type": "Услуга",
+          "published_at": ""
+        },
+        {
+          "content_id": "refund-non-rendered-service",
+          "path": "/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+          "title": "Как вернуть деньги за неоказанную услугу",
+          "type": "Статья",
+          "published_at": "2026-07-31"
+        },
+        {
+          "content_id": "refund-voluntary-service-cancellation",
+          "path": "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
+          "title": "Отказ от договора оказания услуг: как вернуть деньги",
+          "type": "Статья",
+          "published_at": "2026-07-31"
+        },
+        {
+          "content_id": "refund-imposed-service",
+          "path": "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
+          "title": "Как вернуть деньги за навязанную услугу",
+          "type": "Статья",
+          "published_at": "2026-07-31"
+        }
+      ]
+    }
+  ],
   "stop_rules": [
     "Основной интент определён",
     "Тип страницы определён",

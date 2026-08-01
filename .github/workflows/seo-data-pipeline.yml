@@ -11,7 +11,9 @@ on:
       - 'config/seo-data-pipeline.json'
       - 'data/seo/wordstat-cache.json'
       - 'scripts/seo-data-pipeline.mjs'
+      - 'scripts/seo-feedback-pipeline.mjs'
       - 'scripts/seo-data-pipeline-test.mjs'
+      - 'src/editorial-data.mjs'
       - 'src/metrica-goals.mjs'
   workflow_dispatch:
     inputs:
@@ -46,7 +48,7 @@ jobs:
     name: Collect normalized SEO feedback
     environment: seo-api
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       PIPELINE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'feedback' }}
       SEO_HYPOTHESIS_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.hypothesis_id || '' }}
@@ -75,19 +77,35 @@ jobs:
       - name: Run contract test
         run: node scripts/seo-data-pipeline-test.mjs
 
-      - name: Collect feedback without unnecessary Wordstat calls
+      - name: Collect full SEO feedback without Wordstat spending
         shell: bash
         run: |
           set -euo pipefail
-          args=("--mode=${PIPELINE_MODE}")
+          state_dir="${GITHUB_WORKSPACE}/.seo-state/reports/seo-data"
+          wordstat_args=("--mode=wordstat")
           if [[ -n "${SEO_HYPOTHESIS_ID}" ]]; then
-            args+=("--hypothesis=${SEO_HYPOTHESIS_ID}")
+            wordstat_args+=("--hypothesis=${SEO_HYPOTHESIS_ID}")
           fi
           if [[ "${SEO_FORCE_WORDSTAT}" == "true" ]]; then
-            args+=("--force=true")
+            wordstat_args+=("--force=true")
           fi
-          SEO_STATE_DIR="${GITHUB_WORKSPACE}/.seo-state/reports/seo-data" \
-            node scripts/seo-data-pipeline.mjs "${args[@]}"
+
+          case "${PIPELINE_MODE}" in
+            feedback)
+              SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
+              ;;
+            wordstat)
+              SEO_STATE_DIR="${state_dir}" node scripts/seo-data-pipeline.mjs "${wordstat_args[@]}"
+              ;;
+            all)
+              SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
+              SEO_STATE_DIR="${state_dir}" node scripts/seo-data-pipeline.mjs "${wordstat_args[@]}"
+              ;;
+            *)
+              echo "Unknown PIPELINE_MODE=${PIPELINE_MODE}" >&2
+              exit 1
+              ;;
+          esac
 
       - name: Save normalized state to seo-data branch
         shell: bash

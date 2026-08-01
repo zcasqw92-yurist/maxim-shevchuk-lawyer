@@ -18,6 +18,11 @@ const writeJson = async (path, value) => {
 const bool = (value) => ["1", "true", "yes", "on"].includes(String(value || "").trim().toLowerCase());
 const clean = (value) => String(value ?? "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim();
 const normalizeQuery = (value) => clean(value).toLowerCase().replace(/ё/g, "е");
+const numericOrNull = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
 const now = new Date();
 const nowIso = now.toISOString();
 const currentCycle = nowIso.slice(0, 7);
@@ -66,6 +71,9 @@ if (!engineCache) throw new Error(`Cache has no engine section: ${settings.cache
 const providerBudget = budget.providers?.[settings.providerKey] || {};
 const providerUsage = usage.providers?.[settings.providerKey];
 if (!providerUsage) throw new Error(`Usage ledger has no provider: ${settings.providerKey}`);
+const providerKnownUsed = numericOrNull(providerUsage.knownUsed);
+const providerHardStop = numericOrNull(providerBudget.hardStopAt);
+const providerLimit = numericOrNull(providerUsage.limit ?? providerBudget.monthlyLimit);
 
 const freshness = (entry) => {
   if (!entry?.checkedAt) return { fresh: false, ageDays: null };
@@ -133,10 +141,10 @@ if (plannedRequests > 0) {
   if (providerUsage.cycleResetPolicy === "manual" && providerUsage.cycleId !== currentCycle) {
     throw new Error(`Usage cycle is ${providerUsage.cycleId}, current month is ${currentCycle}. Update the dashboard-confirmed cycle manually before spending.`);
   }
-  if (Number.isFinite(Number(providerBudget.hardStopAt)) && Number.isFinite(Number(providerUsage.knownUsed))) {
-    const projected = Number(providerUsage.knownUsed) + plannedRequests;
-    if (projected > Number(providerBudget.hardStopAt)) {
-      throw new Error(`Projected ${settings.providerKey} usage ${projected} exceeds project hard stop ${providerBudget.hardStopAt}.`);
+  if (providerHardStop !== null && providerKnownUsed !== null) {
+    const projected = providerKnownUsed + plannedRequests;
+    if (projected > providerHardStop) {
+      throw new Error(`Projected ${settings.providerKey} usage ${projected} exceeds project hard stop ${providerHardStop}.`);
     }
   }
 }
@@ -160,13 +168,13 @@ if (plannedRequests > 0) {
   };
   providerUsage.requests = Array.isArray(providerUsage.requests) ? providerUsage.requests : [];
   providerUsage.requests.push(usageRecord);
-  if (Number.isFinite(Number(providerUsage.knownUsed))) {
-    providerUsage.knownUsed = Number(providerUsage.knownUsed) + plannedRequests;
-    if (Number.isFinite(Number(providerUsage.limit))) {
-      providerUsage.remainingToProviderLimit = Math.max(0, Number(providerUsage.limit) - providerUsage.knownUsed);
+  if (providerKnownUsed !== null) {
+    providerUsage.knownUsed = providerKnownUsed + plannedRequests;
+    if (providerLimit !== null) {
+      providerUsage.remainingToProviderLimit = Math.max(0, providerLimit - providerUsage.knownUsed);
     }
-    if (Number.isFinite(Number(providerBudget.hardStopAt))) {
-      providerUsage.remainingToProjectHardStop = Math.max(0, Number(providerBudget.hardStopAt) - providerUsage.knownUsed);
+    if (providerHardStop !== null) {
+      providerUsage.remainingToProjectHardStop = Math.max(0, providerHardStop - providerUsage.knownUsed);
     }
   }
   usage.updatedAt = nowIso;

@@ -42,7 +42,7 @@ export const site = {
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-07-29",
     "/o-yuriste": "2026-07-29",
     "/kontakty": "2026-07-29",
-    "/politika-konfidencialnosti": "2026-07-30",
+    "/politika-konfidencialnosti": "2026-08-01",
   },
   name: "Максим Юрьевич Шевчук",
   shortName: "Максим Шевчук",

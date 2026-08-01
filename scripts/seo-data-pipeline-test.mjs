@@ -11,6 +11,8 @@ const cache = JSON.parse(await readFile(join(root, "data", "seo", "wordstat-cach
 const wordstatScript = await readFile(join(root, "scripts", "seo-data-pipeline.mjs"), "utf8");
 const feedbackScriptPath = join(root, "scripts", "seo-feedback-pipeline.mjs");
 const feedbackScript = await readFile(feedbackScriptPath, "utf8");
+const summaryScriptPath = join(root, "scripts", "seo-feedback-summary.mjs");
+const summaryScript = await readFile(summaryScriptPath, "utf8");
 const workflow = await readFile(join(root, ".github", "workflows", "seo-data-pipeline.yml"), "utf8");
 
 assert.equal(config.schema_version, 2, "Конфигурация должна использовать схему полного feedback-снимка");
@@ -64,15 +66,21 @@ assert.ok(feedbackScript.includes("sheet-cluster-statistics.csv"), "Должен
 assert.ok(feedbackScript.includes("sheet-content-contact-signals.csv"), "Контактные сигналы должны выгружаться отдельно от подтверждённых обращений");
 assert.ok(feedbackScript.includes("raw_responses_saved: false"), "Сырые API-ответы feedback-сбора не должны сохраняться");
 assert.ok(feedbackScript.includes("tokens_saved: false"), "Токены не должны сохраняться в отчётах");
+assert.ok(summaryScript.includes("for (const cluster of clusters)"), "Сводка должна формировать отдельный раздел для каждого кластера");
+assert.ok(summaryScript.includes("Контрольных кластеров"), "Сводка должна показывать общее количество контролируемых кластеров");
+assert.ok(summaryScript.includes("Коммерческие страницы в контроле"), "Сводка должна перечислять коммерческие центры кластеров");
 
 const syntax = spawnSync(process.execPath, ["--check", feedbackScriptPath], { cwd: root, encoding: "utf8" });
 assert.equal(syntax.status, 0, `Новый feedback-скрипт должен быть синтаксически корректным: ${syntax.stderr}`);
+const summarySyntax = spawnSync(process.execPath, ["--check", summaryScriptPath], { cwd: root, encoding: "utf8" });
+assert.equal(summarySyntax.status, 0, `Скрипт многокластерной сводки должен быть синтаксически корректным: ${summarySyntax.stderr}`);
 
 assert.match(workflow, /schedule:[\s\S]*cron:\s*'25 4 \* \* 1'/, "Должен быть еженедельный сбор обратной связи");
 assert.match(workflow, /push:[\s\S]*branches:[\s\S]*- main/, "После изменения конвейера должен выполняться контрольный feedback-запуск");
 assert.match(workflow, /PIPELINE_MODE:\s*\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.mode \|\| 'feedback' \}\}/, "Все автоматические события должны использовать безопасный режим feedback");
 assert.match(workflow, /feedback\)[\s\S]*node scripts\/seo-feedback-pipeline\.mjs/, "Режим feedback должен запускать новый сборщик");
 assert.match(workflow, /wordstat\)[\s\S]*node scripts\/seo-data-pipeline\.mjs/, "Режим wordstat должен оставаться отдельным");
+assert.match(workflow, /node scripts\/seo-feedback-summary\.mjs/, "После feedback-сбора должна формироваться сводка по всем кластерам");
 assert.match(workflow, /ref:\s*seo-data/, "История должна сохраняться в отдельной ветке seo-data");
 
 const cacheEntry = cache.entries["topRequests|вернуть долг без расписки|213|DEVICE_ALL"];
@@ -105,4 +113,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("SEO feedback contract passed: refund and police clusters, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");
+console.log("SEO feedback contract passed: refund and police clusters, multi-cluster summary, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");

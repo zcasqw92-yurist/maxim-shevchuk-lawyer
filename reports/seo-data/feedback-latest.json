@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-01T18:39:50.648Z",
+  "generated_at": "2026-08-01T22:44:54.905Z",
   "period": {
     "date1": "2026-07-03",
     "date2": "2026-08-01"
@@ -21,6 +21,12 @@
         "shows": 2,
         "clicks": 0,
         "avg_position": 8
+      },
+      {
+        "query": "максим юрьевич юрист",
+        "shows": 1,
+        "clicks": 0,
+        "avg_position": 6
       },
       {
         "query": "составление искового заявления в москве | максим шевчук",
@@ -92,6 +98,25 @@
         "content_id": "police-no-response",
         "path": "/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
         "absolute_url": "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+        "in_search": false,
+        "in_search_sample": null,
+        "important_url_monitored": false,
+        "robot_http_status": "",
+        "robot_http_code": "",
+        "robot_access_date": "",
+        "excluded_url_status": "",
+        "target_url": "",
+        "canonical_or_duplicate_issue": false,
+        "shows": 0,
+        "clicks": 0,
+        "ctr": 0,
+        "avg_position": 0,
+        "queries": []
+      },
+      {
+        "content_id": "warranty-repair-over-45-days",
+        "path": "/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
+        "absolute_url": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
         "in_search": false,
         "in_search_sample": null,
         "important_url_monitored": false,
@@ -658,6 +683,45 @@
         "noindex": false,
         "assistant_assets_present": false
       },
+      "decision": "Наблюдение: выборка недостаточна, страницу не менять."
+    },
+    {
+      "period": "2026-07-03—2026-08-01",
+      "content_id": "warranty-repair-over-45-days",
+      "cluster_id": "",
+      "url": "/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
+      "title": "Гарантийный ремонт автомобиля превысил 45 дней: что требовать от дилера",
+      "type": "Статья",
+      "published_at": "2026-08-01",
+      "in_search": false,
+      "important_url_monitored": false,
+      "excluded_url_status": "",
+      "target_url": "",
+      "robot_http_code": "",
+      "search_shows": 0,
+      "search_clicks": 0,
+      "search_ctr": 0,
+      "search_avg_position": 0,
+      "search_queries": [],
+      "visits": 0,
+      "pageviews": 0,
+      "users": 0,
+      "publication_view": 0,
+      "scroll_50": 0,
+      "scroll_90": 0,
+      "active_60s": 0,
+      "faq_open": 0,
+      "related_click": 0,
+      "messenger_intent": 0,
+      "cta_view": 0,
+      "cta_click": 0,
+      "messenger_dialog_open": 0,
+      "button_action": 0,
+      "contact_conversion": 0,
+      "telegram": 0,
+      "whatsapp": 0,
+      "conversion_to_chat": "",
+      "live": null,
       "decision": "Наблюдение: выборка недостаточна, страницу не менять."
     },
     {

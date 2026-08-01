@@ -76,6 +76,7 @@ jobs:
           node --check scripts/live-all-publications-smoke.mjs
           node --check scripts/live-public-copy-regression-test.mjs
           node --check scripts/verify-custom-domain-sha.mjs
+          node --check scripts/intake-assistant-live-test.mjs
           npm run check 2>&1 | tee check.log
 
       - name: Verify Yandex Metrica goals and funnels
@@ -128,6 +129,12 @@ jobs:
           CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
         run: node scripts/verify-custom-domain-sha.mjs
 
+      - name: Verify intake assistant on custom domain
+        env:
+          SITE_PUBLIC_URL: ${{ env.SITE_URL }}
+          EXPECTED_BUILD_SHA: ${{ github.sha }}
+        run: node scripts/intake-assistant-live-test.mjs
+
       - name: Recheck all published articles after verified deployment
         env:
           SITE_PUBLIC_URL: ${{ env.SITE_URL }}
@@ -142,6 +149,8 @@ jobs:
           path: |
             reports/custom-domain-sha-verification.json
             reports/public-copy-regression.json
+            reports/intake-assistant-live.json
+            reports/intake-live-*.png
           if-no-files-found: ignore
           retention-days: 7
 

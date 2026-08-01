@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-01T16:37:12.063Z",
+  "updatedAt": "2026-08-01T16:37:26.940Z",
   "providers": {
     "serpapi": {
       "cycleId": "2026-08",
@@ -10,7 +10,7 @@
       "knownUsed": 9,
       "remainingToProviderLimit": 241,
       "remainingToProjectHardStop": 231,
-      "baselineSource": "Conservative carry-forward of the last dashboard-confirmed usage; no reset is assumed without a new dashboard check",
+      "baselineSource": "Консервативный перенос подтвержденного расхода; добавлены 3 фактически выполненных запроса полицейского кластера.",
       "requests": [
         {
           "at": "2026-07-31T11:57:37.000Z",

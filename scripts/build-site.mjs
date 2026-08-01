@@ -3,10 +3,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { services } from "../src/data.mjs";
 import { articles, practiceCases } from "../src/editorial-data.mjs";
+import { writeIntakeAssistantAssets } from "../src/intake-assistant-assets.mjs";
 import { applyPublicationLinkingToDist } from "../src/publication-linking.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const bundlePath = join(root, "dist", "assets", "styles.css");
+const dist = join(root, "dist");
+const bundlePath = join(dist, "assets", "styles.css");
 const styleModules = [
   "styles",
   "site-enhancements",
@@ -26,6 +28,7 @@ const styleModules = [
 ].map((id) => ({ id, path: join(root, "src", `${id}.css`) }));
 
 await import("./build.mjs");
+await writeIntakeAssistantAssets(dist);
 await applyPublicationLinkingToDist({ root, services, articles, practiceCases });
 
 const modules = await Promise.all(styleModules.map(async (module) => ({

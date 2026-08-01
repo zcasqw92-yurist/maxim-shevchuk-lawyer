@@ -1,5 +1,7 @@
+import { site } from "../site.config.mjs";
 import { contentDateForPath, formatContentDate } from "./content-dates.mjs";
 import { applyServiceGeography } from "./geography.mjs";
+import { applyIntakePrivacyPolicy } from "./intake-assistant-policy.mjs";
 import { automatedReviewDate, formatReviewDate } from "./review-dates.mjs";
 
 const slotNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -51,12 +53,18 @@ const injectAutomatedReviewStatus = (html, pathname) => {
   return result;
 };
 
+const intakeAssets = () => {
+  const base = site.basePath || "";
+  const version = site.contentLastModified.replaceAll("-", "");
+  return `  <link rel="stylesheet" href="${base}/assets/intake-assistant.css?v=${version}">\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>\n`;
+};
+
 export const finalizeBuildSlots = (html, pathname) => {
   const unresolved = [...html.matchAll(unresolvedSlotPattern)].map((match) => match[1]);
   const unexpected = unresolved.filter((name) => name !== "head-assets");
   if (unexpected.length) {
     throw new Error(`Не заполнены сборочные слоты ${pathname}: ${[...new Set(unexpected)].join(", ")}`);
   }
-  const finalized = fillBuildSlot(injectAutomatedReviewStatus(html, pathname), "head-assets", "");
-  return applyServiceGeography(finalized);
+  const finalized = fillBuildSlot(injectAutomatedReviewStatus(html, pathname), "head-assets", intakeAssets());
+  return applyIntakePrivacyPolicy(applyServiceGeography(finalized), pathname);
 };

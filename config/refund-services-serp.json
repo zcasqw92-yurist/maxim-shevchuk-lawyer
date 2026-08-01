@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "clusterId": "refund-services",
-  "clusterTitle": "Возврат денег за услуги и навязанные договоры",
+  "clusterId": "police-inactivity",
+  "clusterTitle": "Отказ полиции и бездействие МВД",
   "checkedRegion": {
     "yandexRegionId": "213",
     "label": "Москва",
@@ -12,46 +12,25 @@
   "excludeSponsoredResultsFromMinimum": true,
   "queries": [
     {
-      "id": "refund-lawyer-commercial",
-      "query": "юрист по возврату денег за услуги",
-      "candidateOwner": "/uslugi/vozvrat-deneg/",
+      "id": "police-inactivity-commercial",
+      "query": "жалоба на бездействие полиции",
+      "candidateOwner": "/uslugi/zhaloby-i-obrashcheniya/",
       "candidatePageType": "service",
-      "decisionQuestion": "Подтвердить, что широкий коммерческий интент принадлежит существующей странице услуги."
+      "decisionQuestion": "Проверить, принадлежит ли широкий коммерческий интент существующей странице услуги или выдача ожидает отдельную посадочную страницу."
     },
     {
-      "id": "service-not-rendered",
-      "query": "как вернуть деньги за неоказанную услугу",
-      "candidateOwner": "/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
-      "candidatePageType": "article",
-      "decisionQuestion": "Нужен ли самостоятельный разбор для полного или частичного неоказания услуги."
-    },
-    {
-      "id": "service-contract-refusal",
-      "query": "отказ от договора оказания услуг вернуть деньги",
-      "candidateOwner": "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
-      "candidatePageType": "article",
-      "decisionQuestion": "Отделяет ли выдача добровольный отказ заказчика от нарушения исполнителя."
-    },
-    {
-      "id": "service-prepayment-refund",
-      "query": "как вернуть предоплату за услугу",
+      "id": "police-no-response",
+      "query": "полиция не отвечает на заявление что делать",
       "candidateOwner": null,
       "candidatePageType": "undecided",
-      "decisionQuestion": "Является ли возврат предоплаты самостоятельным интентом или подразделом владельца неоказанной услуги либо отказа от договора."
+      "decisionQuestion": "Проверить самостоятельность сценария, когда заявление зарегистрировано, но заявитель не получил ответа и не знает о процессуальном решении."
     },
     {
-      "id": "imposed-service-refund",
-      "query": "возврат денег за навязанную услугу",
-      "candidateOwner": "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-      "candidatePageType": "article",
-      "decisionQuestion": "Подтвердить самостоятельность спора о навязанной дополнительной услуге и платёжной цепочке."
-    },
-    {
-      "id": "refund-after-claim-deadline",
-      "query": "срок возврата денег после претензии за услугу",
+      "id": "police-review-ongoing",
+      "query": "полиция пишет проверка ведется что делать",
       "candidateOwner": null,
       "candidatePageType": "undecided",
-      "decisionQuestion": "Нужна ли отдельная страница о сроке возврата или достаточно H2 и FAQ внутри основного владельца."
+      "decisionQuestion": "Определить, является ли длительная формальная проверка отдельным интентом или частью материала об отсутствии ответа и процессуального решения."
     }
   ]
 }

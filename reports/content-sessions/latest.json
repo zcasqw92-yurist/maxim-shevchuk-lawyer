@@ -464,6 +464,13 @@
       "contentId": "warranty-repair-over-45-days",
       "action": "updated",
       "expectedUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
+    },
+    {
+      "path": "site.config.mjs",
+      "kind": "content-date",
+      "contentId": "warranty-repair-over-45-days",
+      "action": "updated",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
     }
   ],
   "plannedChecks": [

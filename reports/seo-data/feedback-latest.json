@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-01T15:38:22.618Z",
+  "generated_at": "2026-08-01T15:56:29.304Z",
   "period": {
     "date1": "2026-07-03",
     "date2": "2026-08-01"
@@ -285,7 +285,7 @@
         "queries": []
       },
       {
-        "content_id": "service-vozvrat-deneg",
+        "content_id": "refund-service-hub",
         "path": "/uslugi/vozvrat-deneg/",
         "absolute_url": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
         "in_search": true,
@@ -779,7 +779,7 @@
       "url": "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
       "title": "Как вернуть деньги за навязанную услугу",
       "type": "Статья",
-      "published_at": "2026-07-31",
+      "published_at": "2026-08-01",
       "in_search": true,
       "important_url_monitored": false,
       "excluded_url_status": "",
@@ -900,7 +900,7 @@
     },
     {
       "period": "2026-07-03—2026-08-01",
-      "content_id": "service-vozvrat-deneg",
+      "content_id": "refund-service-hub",
       "cluster_id": "refund-services",
       "url": "/uslugi/vozvrat-deneg/",
       "title": "Возврат денег за услугу, аванс или навязанный договор",
@@ -1055,7 +1055,7 @@
           "url": "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
           "title": "Как вернуть деньги за навязанную услугу",
           "type": "Статья",
-          "published_at": "2026-07-31",
+          "published_at": "2026-08-01",
           "in_search": true,
           "important_url_monitored": false,
           "excluded_url_status": "",
@@ -1098,7 +1098,7 @@
         },
         {
           "period": "2026-07-03—2026-08-01",
-          "content_id": "service-vozvrat-deneg",
+          "content_id": "refund-service-hub",
           "cluster_id": "refund-services",
           "url": "/uslugi/vozvrat-deneg/",
           "title": "Возврат денег за услугу, аванс или навязанный договор",

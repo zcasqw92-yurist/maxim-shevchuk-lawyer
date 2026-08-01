@@ -1,0 +1,97 @@
+name: Сохранить полицейский SERP-снимок
+
+on:
+  push:
+    branches:
+      - research/police-inactivity-cluster-20260801
+    paths:
+      - .github/workflows/persist-police-serp-artifact.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/police-inactivity-cluster-20260801
+
+      - name: Скачать уже полученный artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 30708534383 -n police-inactivity-serp-snapshot -D /tmp/police-serp
+
+      - name: Перенести результаты в кеш и журнал расхода
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const queries = [
+            ['police-inactivity-commercial', 'жалоба на бездействие полиции'],
+            ['police-no-response', 'полиция не отвечает на заявление что делать'],
+            ['police-review-ongoing', 'полиция пишет проверка ведется что делать'],
+          ];
+          const engines = [
+            ['google', '/tmp/police-serp/google-api.json', 'serpapi', 'Moscow, Russia', { country: 'ru', language: 'ru' }],
+            ['yandex', '/tmp/police-serp/yandex-api.json', 'yandex-search-api', '213', { language: 'ru' }],
+          ];
+          const cache = { schemaVersion: 1, clusterId: 'police-inactivity', cacheTtlDays: 14, engines: {} };
+          for (const [engine, path, provider, region, extra] of engines) {
+            const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const target = { provider, region, ...extra, queries: {} };
+            report.queries.forEach((item, index) => {
+              const [id, query] = queries[index];
+              const { cache: cacheMeta, ...result } = item;
+              target.queries[id] = {
+                query,
+                checkedAt: cacheMeta.checkedAt,
+                source: String(report.source || '').replace(' with persistent query cache', ''),
+                result,
+              };
+            });
+            cache.engines[engine] = target;
+          }
+          fs.writeFileSync('reports/serp-cache/refund-services.json', JSON.stringify(cache, null, 2) + '\n');
+
+          const usagePath = 'reports/serp-usage/api-usage.json';
+          const usage = JSON.parse(fs.readFileSync(usagePath, 'utf8'));
+          const ids = queries.map(([id]) => id);
+          const google = usage.providers.serpapi;
+          google.cycleId = '2026-08';
+          google.knownUsed = Math.max(Number(google.knownUsed || 0), 9);
+          google.remainingToProviderLimit = Math.max(0, Number(google.limit || 250) - google.knownUsed);
+          google.remainingToProjectHardStop = Math.max(0, Number(google.hardStopAt || 240) - google.knownUsed);
+          google.baselineSource = 'Консервативный перенос подтвержденного расхода; добавлены 3 фактически выполненных запроса полицейского кластера.';
+          google.requests ||= [];
+          if (!google.requests.some((item) => item.clusterId === 'police-inactivity')) {
+            google.requests.push({
+              at: '2026-08-01T16:37:26.489Z', clusterId: 'police-inactivity', engine: 'google', count: 3,
+              queryIds: ids, reason: 'Explicit approved cache miss',
+              workflowCommit: '1d1a32e27bb32f61b4e1499181a98b256400d964', status: 'completed',
+            });
+          }
+          const yandex = usage.providers.yandexSearchApi;
+          yandex.cycleId = '2026-08';
+          yandex.requests ||= [];
+          if (!yandex.requests.some((item) => item.clusterId === 'police-inactivity')) {
+            yandex.requests.push({
+              at: '2026-08-01T16:37:22.116Z', clusterId: 'police-inactivity', engine: 'yandex', count: 3,
+              queryIds: ids, reason: 'Explicit approved cache miss',
+              workflowCommit: '1d1a32e27bb32f61b4e1499181a98b256400d964', status: 'completed',
+            });
+          }
+          usage.updatedAt = '2026-08-01T16:37:26.940Z';
+          fs.writeFileSync(usagePath, JSON.stringify(usage, null, 2) + '\n');
+          NODE
+
+      - name: Зафиксировать кеш
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/serp-cache/refund-services.json reports/serp-usage/api-usage.json
+          git commit -m 'Сохранить результаты SERP полицейского кластера [skip ci]'
+          git push origin HEAD:research/police-inactivity-cluster-20260801

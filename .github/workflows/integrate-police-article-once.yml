@@ -1,0 +1,50 @@
+name: Подключить статью о бездействии полиции
+
+on:
+  push:
+    branches:
+      - content/police-no-response-20260801
+    paths:
+      - .github/workflows/integrate-police-article-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: content/police-no-response-20260801
+
+      - name: Добавить модуль в редакционный реестр
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'src/editorial-data.mjs';
+          let text = fs.readFileSync(path, 'utf8');
+          const importLine = 'import { policeInactivityClusterArticles } from "./police-inactivity-cluster-data.mjs";';
+          if (!text.includes(importLine)) {
+            text = text.replace(
+              'import { refundServicesClusterArticles } from "./refund-services-cluster-data.mjs";',
+              'import { refundServicesClusterArticles } from "./refund-services-cluster-data.mjs";\n' + importLine,
+            );
+          }
+          if (!text.includes('...policeInactivityClusterArticles')) {
+            text = text.replace(
+              '  ...debtClusterArticles,\n  ...refundServicesClusterArticles,',
+              '  ...policeInactivityClusterArticles,\n  ...debtClusterArticles,\n  ...refundServicesClusterArticles,',
+            );
+          }
+          fs.writeFileSync(path, text);
+          NODE
+
+      - name: Удалить одноразовый workflow и зафиксировать результат
+        run: |
+          rm .github/workflows/integrate-police-article-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/editorial-data.mjs .github/workflows/integrate-police-article-once.yml
+          git commit -m 'Подключить статью о бездействии полиции'
+          git push origin HEAD:content/police-no-response-20260801

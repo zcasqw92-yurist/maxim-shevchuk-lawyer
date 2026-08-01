@@ -1,444 +1,93 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260801-refund-service-hub",
-  "reviewedAt": "2026-08-01T10:00:00.000Z",
+  "sessionId": "20260801-intake-assistant",
+  "reviewedAt": "2026-08-01T11:30:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-01T09:54:13.798Z",
+    "modifiedTime": "2026-08-01T10:42:00.672Z",
     "metadataTabCount": 25,
-    "discoveredTabs": [
-      "00_Старт",
-      "01_БПЮ",
-      "02_ЮрДоки",
-      "03_Оплаты",
-      "04_Дашборд",
-      "05_Контроль",
-      "06_Импорт",
-      "_Справочники",
-      "_Журнал",
-      "07_Диалоги_исследование",
-      "08_Банк_реплик",
-      "09_Паттерны_аудитории",
-      "10_Контентные_возможности",
-      "11_Кейсы_для_публикации",
-      "12_Эффективные_ответы",
-      "13_Статистика_контента",
-      "14_Контент_дашборд",
-      "15_Обращения_с_контента",
-      "_Реестр_диалогов",
-      "_Ситуации_и_связи",
-      "_События_воронки",
-      "_Версии_контента",
-      "16_Контроль_данных",
-      "_Импорт_ЮД_151_200",
-      "Статьи_HARANT"
-    ]
+    "discoveredTabs": ["00_Старт","01_БПЮ","02_ЮрДоки","03_Оплаты","04_Дашборд","05_Контроль","06_Импорт","_Справочники","_Журнал","07_Диалоги_исследование","08_Банк_реплик","09_Паттерны_аудитории","10_Контентные_возможности","11_Кейсы_для_публикации","12_Эффективные_ответы","13_Статистика_контента","14_Контент_дашборд","15_Обращения_с_контента","_Реестр_диалогов","_Ситуации_и_связи","_События_воронки","_Версии_контента","16_Контроль_данных","_Импорт_ЮД_151_200","Статьи_HARANT"]
   },
   "reviewedTabs": [
-    {
-      "name": "00_Старт",
-      "range": "A1:H45",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "project rules",
-        "publication rules"
-      ]
-    },
-    {
-      "name": "01_БПЮ",
-      "range": "A1:AC1004",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "demand",
-        "client language"
-      ]
-    },
-    {
-      "name": "02_ЮрДоки",
-      "range": "A1:AA1004",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "paid work",
-        "practice evidence"
-      ]
-    },
-    {
-      "name": "03_Оплаты",
-      "range": "A1:M13",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "confirmed payment details"
-      ]
-    },
-    {
-      "name": "04_Дашборд",
-      "range": "A1:Y87",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "operational context"
-      ]
-    },
-    {
-      "name": "05_Контроль",
-      "range": "A1:K18",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "data gaps",
-        "control indicators"
-      ]
-    },
-    {
-      "name": "06_Импорт",
-      "range": "A1:U100",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "source coverage"
-      ]
-    },
-    {
-      "name": "_Справочники",
-      "range": "A1:I24",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "classification"
-      ]
-    },
-    {
-      "name": "_Журнал",
-      "range": "A1:K35",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "current demand evidence"
-      ]
-    },
-    {
-      "name": "07_Диалоги_исследование",
-      "range": "A1:AK357",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "audience research"
-      ]
-    },
-    {
-      "name": "08_Банк_реплик",
-      "range": "A1:V711",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "client language",
-        "questions"
-      ]
-    },
-    {
-      "name": "09_Паттерны_аудитории",
-      "range": "A1:X81",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "audience patterns"
-      ]
-    },
-    {
-      "name": "10_Контентные_возможности",
-      "range": "A1:AP170",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content brief",
-        "intent ownership"
-      ]
-    },
-    {
-      "name": "11_Кейсы_для_публикации",
-      "range": "A1:AF105",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "case evidence",
-        "publication limits"
-      ]
-    },
-    {
-      "name": "12_Эффективные_ответы",
-      "range": "A1:V147",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "communication patterns"
-      ]
-    },
-    {
-      "name": "13_Статистика_контента",
-      "range": "A1:AB12",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "performance data"
-      ]
-    },
-    {
-      "name": "14_Контент_дашборд",
-      "range": "A1:N179",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content priorities"
-      ]
-    },
-    {
-      "name": "15_Обращения_с_контента",
-      "range": "A1:AG4",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content attribution"
-      ]
-    },
-    {
-      "name": "_Реестр_диалогов",
-      "range": "A1:Q357",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "source registry"
-      ]
-    },
-    {
-      "name": "_Ситуации_и_связи",
-      "range": "A1:T359",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "cross-source links",
-        "result levels"
-      ]
-    },
-    {
-      "name": "_События_воронки",
-      "range": "A1:J738",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "confirmed funnel events"
-      ]
-    },
-    {
-      "name": "_Версии_контента",
-      "range": "A1:L18",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content versions"
-      ]
-    },
-    {
-      "name": "16_Контроль_данных",
-      "range": "A1:J17",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "critical data errors"
-      ]
-    },
-    {
-      "name": "_Импорт_ЮД_151_200",
-      "range": "A1:T51",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "historical paid-work verification"
-      ]
-    },
-    {
-      "name": "Статьи_HARANT",
-      "range": "A1:P2",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "external publication overlap check"
-      ]
-    }
+    {"name":"00_Старт","range":"A1:H45","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","publication rules"]},
+    {"name":"01_БПЮ","range":"A1:AC1004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["incoming situations","qualification fields"]},
+    {"name":"02_ЮрДоки","range":"A1:AA1004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid-work categories","document patterns"]},
+    {"name":"03_Оплаты","range":"A1:M13","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["financial-data boundary"]},
+    {"name":"04_Дашборд","range":"A1:Y87","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["operational context"]},
+    {"name":"05_Контроль","range":"A1:K18","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["data completeness"]},
+    {"name":"06_Импорт","range":"A1:U100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source coverage"]},
+    {"name":"_Справочники","range":"A1:I24","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["controlled classifications"]},
+    {"name":"_Журнал","range":"A1:K35","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["recent situation categories"]},
+    {"name":"07_Диалоги_исследование","range":"A1:AK357","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["question sequencing","missing-information patterns"]},
+    {"name":"08_Банк_реплик","range":"A1:V711","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["client language","classifier phrases"]},
+    {"name":"09_Паттерны_аудитории","range":"A1:X81","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["next-step need","mixed goals","evidence patterns"]},
+    {"name":"10_Контентные_возможности","range":"A1:AP170","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["existing content routes","topic boundaries"]},
+    {"name":"11_Кейсы_для_публикации","range":"A1:AF105","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["case-result boundary"]},
+    {"name":"12_Эффективные_ответы","range":"A1:V147","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["one-question-at-a-time intake","measurable next step"]},
+    {"name":"13_Статистика_контента","range":"A1:AB12","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["analytics privacy boundary"]},
+    {"name":"14_Контент_дашборд","range":"A1:N179","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["site priorities"]},
+    {"name":"15_Обращения_с_контента","range":"A1:AG4","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["contact attribution boundary"]},
+    {"name":"_Реестр_диалогов","range":"A1:Q357","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["category coverage"]},
+    {"name":"_Ситуации_и_связи","range":"A1:T359","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["multi-topic situations","separate result levels"]},
+    {"name":"_События_воронки","range":"A1:J738","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["initial-information funnel"]},
+    {"name":"_Версии_контента","range":"A1:L19","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["published-version history"]},
+    {"name":"16_Контроль_данных","range":"A1:J17","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical-error controls"]},
+    {"name":"_Импорт_ЮД_151_200","range":"A1:T51","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["historical paid-work categories"]},
+    {"name":"Статьи_HARANT","range":"A1:R2","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["external-publication overlap"]}
   ],
   "sourceTrace": {
-    "dialogIds": [
-      "688cf01a-5a58-8328-b6fe-c4d2b0796668",
-      "6a2fa7a8-2598-83eb-ac54-dcd47ad89786",
-      "68aecbcb-5084-832f-b721-ed443704fab0"
-    ],
-    "situationIds": [],
-    "workIds": [
-      "ЮД-ИМП-003",
-      "ЮД-ИМП-039",
-      "ЮД-ИМП-061"
-    ],
-    "contentIds": [
-      "C-012",
-      "C-071",
-      "C-166"
-    ],
-    "caseIds": [
-      "K-022",
-      "K-050"
-    ],
-    "notes": "Only internal non-personal IDs. Paid work confirms the legal service, not a successful case result. Case candidates remain unpublished."
+    "dialogIds": ["6a648b31-fc08-83eb-8f1b-79093768a0b0","6a63110f-f034-83eb-93e8-3569c49cc72a","69ca961b-b170-832b-bab9-cc6b295638c4"],
+    "situationIds": ["SIT-20260725-001","SIT-20260724-002"],
+    "workIds": [],
+    "contentIds": [],
+    "caseIds": [],
+    "notes": "Only internal non-personal IDs. The assistant uses demand, language and qualification patterns; no case outcome is published or inferred."
   },
   "seoReview": {
     "status": "completed",
     "checkedAt": "2026-07-31T12:00:00.000Z",
     "region": "Москва",
-    "primaryIntent": "получить юридическую помощь по возврату оплаты за услугу, аванс или дополнительный договор",
-    "verifiedCluster": [
-      "юрист по возврату денег за услуги",
-      "вернуть деньги за неоказанную услугу",
-      "отказ от договора оказания услуг",
-      "вернуть деньги за навязанную услугу"
-    ],
+    "primaryIntent": "получить юридическую помощь и безопасно передать юристу структурированное описание ситуации",
+    "verifiedCluster": ["юрист по возврату денег за услуги","первичное обращение к юристу","подготовить описание ситуации для юриста"],
     "intentMap": [
-      {
-        "intent": "широкая юридическая помощь по возврату оплаты",
-        "target": "H1, lead and service guide"
-      },
-      {
-        "intent": "услуга не оказана или оказана частично",
-        "target": "linked article owner"
-      },
-      {
-        "intent": "добровольный отказ без нарушения исполнителя",
-        "target": "linked article owner"
-      },
-      {
-        "intent": "навязанная дополнительная услуга",
-        "target": "linked article owner"
-      },
-      {
-        "intent": "возврат предоплаты и контроль срока после требования",
-        "target": "service guide paragraphs"
-      }
+      {"intent":"получить юридическую помощь по возврату оплаты","target":"existing service owner and site-wide intake assistant"},
+      {"intent":"понять, какие сведения нужны юристу","target":"local intake flow and privacy explanation"}
     ],
-    "intentOwnership": [
-      {
-        "intent": "получить юридическую помощь по возврату оплаты за услугу, аванс или дополнительный договор",
-        "ownerUrl": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-        "ownerType": "service",
-        "supportingUrls": [
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
-        ],
-        "supportingCaseIds": [],
-        "excludedQueries": [
-          "как вернуть деньги за неоказанную услугу",
-          "как отказаться от договора оказания услуг",
-          "как вернуть деньги за навязанную услугу",
-          "что делать если продавец получил деньги и пропал"
-        ],
-        "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
-        ],
-        "decision": "update-owner",
-        "reason": "The existing service page owns the broad commercial need; narrow factual questions remain with their separate explanatory pages."
-      }
-    ],
-    "serpSnapshots": [
-      {
-        "intent": "получить юридическую помощь по возврату оплаты за услугу, аванс или дополнительный договор",
-        "checkedAt": "2026-07-31T12:00:00.000Z",
-        "region": "Москва",
-        "engines": [
-          {
-            "engine": "Yandex",
-            "query": "юрист по возврату денег за услуги",
-            "organicResultsReviewed": 20,
-            "sponsoredResultsObserved": 0,
-            "sponsoredResultLabels": [],
-            "sponsoredAdvertiserTypes": [],
-            "sponsoredOfferPatterns": [],
-            "dominantIntent": "commercial legal assistance with mixed explanatory results",
-            "resultTypes": [
-              "law firm service pages",
-              "legal articles",
-              "consumer explanations"
-            ],
-            "localPack": false,
-            "snippetPatterns": [
-              "refund of payment",
-              "claim preparation",
-              "consumer dispute",
-              "document review"
-            ],
-            "competitorCoverageGaps": [
-              "few pages separate breach, voluntary cancellation and imposed add-on service before offering help"
-            ],
-            "staleOrWeakResults": []
-          },
-          {
-            "engine": "Google",
-            "query": "юрист по возврату денег за услуги",
-            "organicResultsReviewed": 9,
-            "sponsoredResultsObserved": 0,
-            "sponsoredResultLabels": [],
-            "sponsoredAdvertiserTypes": [],
-            "sponsoredOfferPatterns": [],
-            "dominantIntent": "commercial legal assistance supported by informational guidance",
-            "resultTypes": [
-              "law firm service pages",
-              "legal articles",
-              "official consumer sources"
-            ],
-            "localPack": false,
-            "snippetPatterns": [
-              "return money",
-              "consumer rights",
-              "claim",
-              "court recovery"
-            ],
-            "competitorCoverageGaps": [
-              "results often mix all refund grounds and do not help the reader identify the correct first document"
-            ],
-            "staleOrWeakResults": []
-          }
-        ],
-        "pageTypeDecision": "service",
-        "decisionReason": "The broad query expects a commercial legal-help page, while each narrow situation is already assigned to a separate explanatory owner.",
-        "canProvideBetterAnswer": true
-      }
-    ],
-    "practicalElements": [
-      {
-        "contentId": "refund-service-hub",
-        "targetUrl": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-        "type": "decision-tree",
-        "title": "Выберите ситуацию: основания возврата различаются",
-        "userValue": "Helps the reader distinguish breach, voluntary cancellation, imposed service and disappearance after payment before choosing the next document.",
-        "competitorGap": "Most reviewed pages combine different refund grounds and do not route the reader to a focused explanation.",
-        "sourceBasis": "mixed demand and paid legal work",
-        "sourceIds": [
-          "C-012",
-          "C-071",
-          "C-166",
-          "ЮД-ИМП-003",
-          "ЮД-ИМП-039",
-          "ЮД-ИМП-061"
-        ],
-        "placement": "service guide with four linked scenarios and explanations for prepayment and post-claim control",
-        "verifiedAgainstSerp": true
-      }
-    ],
+    "intentOwnership": [{
+      "intent": "получить юридическую помощь по возврату оплаты за услугу, аванс или дополнительный договор",
+      "ownerUrl": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+      "ownerType": "service",
+      "supportingUrls": ["https://yuristshevchuk.com/","https://yuristshevchuk.com/politika-konfidencialnosti/","https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/","https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/","https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/"],
+      "supportingCaseIds": [],
+      "excludedQueries": ["как вернуть деньги за неоказанную услугу","как отказаться от договора оказания услуг","как вернуть деньги за навязанную услугу","бесплатная юридическая консультация с гарантией результата"],
+      "existingCompetingUrlsReviewed": ["https://yuristshevchuk.com/","https://yuristshevchuk.com/uslugi/vozvrat-deneg/","https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/","https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/","https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/"],
+      "decision": "support-owner",
+      "reason": "The site-wide assistant does not create a new indexable landing page; it supports existing service owners by collecting the facts needed for a first substantive response."
+    }],
+    "serpSnapshots": [{
+      "intent": "получить юридическую помощь по возврату оплаты за услугу, аванс или дополнительный договор",
+      "checkedAt": "2026-07-31T12:00:00.000Z",
+      "region": "Москва",
+      "engines": [
+        {"engine":"Yandex","query":"юрист по возврату денег за услуги","organicResultsReviewed":20,"sponsoredResultsObserved":0,"sponsoredResultLabels":[],"sponsoredAdvertiserTypes":[],"sponsoredOfferPatterns":[],"dominantIntent":"commercial legal assistance with explanatory guidance","resultTypes":["law firm service pages","legal articles","consumer explanations"],"localPack":false,"snippetPatterns":["refund of payment","claim preparation","document review"],"competitorCoverageGaps":["few pages help the visitor prepare one structured factual message before contacting the lawyer"],"staleOrWeakResults":[]},
+        {"engine":"Google","query":"юрист по возврату денег за услуги","organicResultsReviewed":9,"sponsoredResultsObserved":0,"sponsoredResultLabels":[],"sponsoredAdvertiserTypes":[],"sponsoredOfferPatterns":[],"dominantIntent":"commercial legal assistance supported by informational guidance","resultTypes":["law firm service pages","legal articles","official consumer sources"],"localPack":false,"snippetPatterns":["return money","consumer rights","claim","court recovery"],"competitorCoverageGaps":["results usually send the visitor to a generic contact form instead of preparing a factual messenger draft"],"staleOrWeakResults":[]}
+      ],
+      "pageTypeDecision": "supporting interactive component without a separate indexable URL",
+      "decisionReason": "The assistant improves the existing commercial path and avoids a competing landing page.",
+      "canProvideBetterAnswer": true
+    }],
+    "practicalElements": [{
+      "contentId": "intake-assistant-privacy",
+      "targetUrl": "https://yuristshevchuk.com/politika-konfidencialnosti/",
+      "type": "procedure-timeline",
+      "title": "Описание локального пути данных помощника",
+      "userValue": "Explains that answers stay in page memory, are not sent automatically and reach the lawyer only after the visitor sends the messenger draft.",
+      "competitorGap": "Generic privacy pages rarely explain the exact local intake flow and the boundary between preparing and sending a message.",
+      "sourceBasis": "confirmed audience and intake patterns from the project spreadsheet",
+      "sourceIds": ["P-005","P-013","P-018","P-019","P-021","S-002","S-017"],
+      "placement": "privacy policy paragraphs for the local assistant and messenger handoff",
+      "verifiedAgainstSerp": true
+    }],
     "cannibalizationChecked": true,
     "overOptimizationRisk": "low"
   },
@@ -451,39 +100,12 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    {
-      "path": "src/service-content.mjs",
-      "kind": "service",
-      "contentId": "refund-service-hub",
-      "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/"
-    },
-    {
-      "path": "src/search-visibility.mjs",
-      "kind": "service",
-      "contentId": "refund-service-hub",
-      "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/"
-    },
-    {
-      "path": "site.config.mjs",
-      "kind": "service-date",
-      "contentId": "refund-service-hub",
-      "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/uslugi/vozvrat-deneg/"
-    }
+    {"path":"site.config.mjs","kind":"privacy-date","contentId":"intake-assistant-privacy","action":"updated","expectedUrl":"https://yuristshevchuk.com/politika-konfidencialnosti/"},
+    {"path":"src/intake-assistant-policy.mjs","kind":"privacy-policy","contentId":"intake-assistant-privacy","action":"created","expectedUrl":"https://yuristshevchuk.com/politika-konfidencialnosti/"}
   ],
-  "plannedChecks": [
-    "npm run test:public-copy",
-    "npm run check",
-    "npm run test:live",
-    "node scripts/live-all-publications-smoke.mjs",
-    "node scripts/live-public-copy-regression-test.mjs"
-  ],
+  "plannedChecks": ["npm run test:intake-assistant","npm run check","node scripts/intake-assistant-live-test.mjs","npm run test:live","node scripts/live-all-publications-smoke.mjs","node scripts/live-public-copy-regression-test.mjs"],
   "publication": {
-    "expectedUrls": [
-      "https://yuristshevchuk.com/uslugi/vozvrat-deneg/"
-    ],
-    "notes": "The service page is updated first. A paid-work case remains unpublished until the procedure and case result are separately confirmed."
+    "expectedUrls": ["https://yuristshevchuk.com/","https://yuristshevchuk.com/politika-konfidencialnosti/"],
+    "notes": "The assistant is a code-only, memory-only site-wide component. It has no database, AI, automatic sending or answer analytics."
   }
 }

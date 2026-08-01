@@ -24,24 +24,40 @@ assert.ok(config.hypotheses.every((item) => item.reason && item.content_id && it
 assert.ok(config.metrica.goal_events.includes("cta_click"), "Feedback должен учитывать клики CTA");
 assert.ok(config.metrica.goal_events.includes("messenger_dialog_open"), "Feedback должен учитывать открытие выбора мессенджера");
 assert.ok(config.metrica.goal_events.includes("button_action"), "Feedback должен учитывать общий контроль кнопочных действий");
+assert.ok(config.feedback_clusters.length >= 2, "Регулярный feedback должен охватывать не менее двух утверждённых кластеров");
 
 const refundCluster = config.feedback_clusters.find((cluster) => cluster.id === "refund-services");
 assert.ok(refundCluster, "Должен быть определён кластер возврата денег за услуги");
-assert.equal(refundCluster.pages.length, 4, "Контрольный кластер должен содержать коммерческую страницу и три статьи");
+assert.equal(refundCluster.pages.length, 4, "Кластер возврата должен содержать коммерческую страницу и три статьи");
 const refundPaths = new Set(refundCluster.pages.map((page) => page.path));
 for (const path of [
   "/uslugi/vozvrat-deneg/",
   "/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
   "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
   "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-]) assert.ok(refundPaths.has(path), `В контрольном кластере отсутствует ${path}`);
+]) assert.ok(refundPaths.has(path), `В кластере возврата отсутствует ${path}`);
+
+const policeCluster = config.feedback_clusters.find((cluster) => cluster.id === "police-inactivity");
+assert.ok(policeCluster, "Должен быть определён кластер отказа полиции и бездействия МВД");
+assert.equal(policeCluster.pages.length, 4, "Полицейский кластер должен содержать услугу, две статьи и кейс");
+const policePaths = new Set(policeCluster.pages.map((page) => page.path));
+for (const path of [
+  "/uslugi/zhaloby-i-obrashcheniya/",
+  "/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+  "/razbory/chto-delat-posle-otkaza-policii/",
+  "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
+]) assert.ok(policePaths.has(path), `В полицейском кластере отсутствует ${path}`);
+
+const trackedClusterPaths = config.feedback_clusters.flatMap((cluster) => cluster.pages.map((page) => page.path));
+assert.equal(new Set(trackedClusterPaths).size, trackedClusterPaths.length, "Один URL не должен одновременно принадлежать нескольким feedback-кластерам");
+assert.ok(config.feedback_clusters.every((cluster) => cluster.pages.some((page) => page.path.startsWith("/uslugi/"))), "У каждого кластера должна быть коммерческая страница-центр");
 
 assert.ok(wordstatScript.includes("wordstat_not_called_on_feedback_schedule: true"), "Старый Wordstat-конвейер должен сохранять безопасное правило");
 assert.ok(wordstatScript.includes("raw_responses_saved: false"), "Сырые API-ответы Wordstat не должны сохраняться");
 assert.ok(feedbackScript.includes("/query-analytics/list"), "Feedback должен получать поисковые данные отдельно по URL");
 assert.ok(feedbackScript.includes("/search-urls/in-search/samples"), "Feedback должен проверять присутствие страниц в поиске");
 assert.ok(feedbackScript.includes("/important-urls"), "Feedback должен читать доступные причины исключения и canonical/duplicate статусы");
-assert.ok(feedbackScript.includes("/uslugi/vozvrat-deneg/") || feedbackScript.includes("feedback_clusters"), "Feedback должен включать коммерческую страницу кластера");
+assert.ok(feedbackScript.includes("/uslugi/vozvrat-deneg/") || feedbackScript.includes("feedback_clusters"), "Feedback должен включать коммерческие страницы кластеров");
 assert.ok(feedbackScript.includes("canonical_matches"), "Feedback должен проверять canonical на публичном домене");
 assert.ok(feedbackScript.includes("assistant_assets_present"), "После отката должен контролироваться возврат удалённого помощника");
 assert.ok(feedbackScript.includes("sheet-cluster-statistics.csv"), "Должен формироваться отдельный табличный отчёт кластера");
@@ -89,4 +105,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("SEO feedback contract passed: full cluster coverage, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");
+console.log("SEO feedback contract passed: refund and police clusters, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");

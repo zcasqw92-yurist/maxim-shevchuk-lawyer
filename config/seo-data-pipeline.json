@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "wordstat_research_started_at": "2026-08-01T16:45:00.000Z",
   "cache_ttl_days": 30,
   "max_api_calls_per_cluster": 3,
   "max_primary_calls": 1,

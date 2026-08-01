@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "clusterId": "police-inactivity",
   "clusterTitle": "Отказ полиции и бездействие МВД",
+  "researchStartedAt": "2026-08-01T16:36:00.000Z",
   "checkedRegion": {
     "yandexRegionId": "213",
     "label": "Москва",

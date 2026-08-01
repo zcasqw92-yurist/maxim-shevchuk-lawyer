@@ -1,0 +1,111 @@
+name: Проверить production статьи о бездействии полиции
+
+on:
+  push:
+    branches:
+      - ops/verify-police-deploy-20260801
+    paths:
+      - .github/workflows/verify-police-deploy.yml
+
+permissions:
+  actions: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Дождаться production workflow и проверить основной домен
+        uses: actions/github-script@v7
+        env:
+          EXPECTED_SHA: 8a2883527b9130da2227dccf19143b45923025a6
+          ARTICLE_URL: https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const expected = process.env.EXPECTED_SHA;
+            const articleUrl = process.env.ARTICLE_URL;
+            const workflows = await github.rest.actions.listRepoWorkflows({ owner, repo, per_page: 100 });
+            const pagesWorkflow = workflows.data.workflows.find((item) => item.path === '.github/workflows/pages.yml');
+            if (!pagesWorkflow) throw new Error('Production pages workflow not found');
+
+            let productionRun;
+            for (let attempt = 1; attempt <= 80; attempt += 1) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id: pagesWorkflow.id,
+                head_sha: expected,
+                per_page: 10,
+              });
+              productionRun = runs.data.workflow_runs.find((run) => run.head_sha === expected);
+              if (productionRun?.status === 'completed') break;
+              console.log(`Waiting for production run, attempt ${attempt}/80: ${productionRun?.status || 'not found'}`);
+              await new Promise((resolve) => setTimeout(resolve, 15000));
+            }
+
+            const checks = [];
+            checks.push(`production run: ${productionRun?.id || 'not found'} / ${productionRun?.conclusion || productionRun?.status || 'unknown'}`);
+            if (!productionRun || productionRun.status !== 'completed' || productionRun.conclusion !== 'success') {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: 116,
+                body: ['## Production-проверка', '', ...checks.map((item) => `- ${item}`), '', 'Публикация не подтверждена.'].join('\n'),
+              });
+              throw new Error('Production workflow did not complete successfully');
+            }
+
+            const fetchFresh = async (url) => fetch(`${url}${url.includes('?') ? '&' : '?'}nonce=${Date.now()}`, {
+              headers: { 'cache-control': 'no-cache', pragma: 'no-cache' },
+              redirect: 'follow',
+            });
+
+            let build;
+            let html;
+            let articleStatus;
+            for (let attempt = 1; attempt <= 20; attempt += 1) {
+              const [buildResponse, articleResponse] = await Promise.all([
+                fetchFresh('https://yuristshevchuk.com/build-info.json'),
+                fetchFresh(articleUrl),
+              ]);
+              articleStatus = articleResponse.status;
+              const buildText = await buildResponse.text();
+              html = await articleResponse.text();
+              try { build = JSON.parse(buildText); } catch { build = null; }
+              if (buildResponse.ok && articleResponse.ok && build?.sha === expected) break;
+              console.log(`Waiting for custom domain, attempt ${attempt}/20: build=${build?.sha || 'invalid'}, article=${articleStatus}`);
+              await new Promise((resolve) => setTimeout(resolve, 10000));
+            }
+
+            const canonical = '<link rel="canonical" href="https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/">';
+            const validations = {
+              'ожидаемый SHA на основном домене': build?.sha === expected,
+              'страница отвечает HTTP 200': articleStatus === 200,
+              'H1 опубликован': html?.includes('Полиция не отвечает на заявление: как узнать решение и обжаловать бездействие'),
+              'canonical корректен': html?.includes(canonical),
+              'карта стадии проверки присутствует': html?.includes('Карта проверки: на каком этапе возникла проблема'),
+              'FAQ присутствует': html?.includes('Прошло больше 30 суток, но полиция пишет, что проверка продолжается'),
+              'страница открыта для индексации': !/name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html || ''),
+              'служебные термины не опубликованы': !/(владелец интента|SERP|контентная карточка|оплаченная практика)/i.test(html || ''),
+            };
+            for (const [label, ok] of Object.entries(validations)) checks.push(`${ok ? '✅' : '❌'} ${label}`);
+            const success = Object.values(validations).every(Boolean);
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: 116,
+              body: [
+                '## Production-проверка',
+                '',
+                ...checks.map((item) => `- ${item}`),
+                '',
+                success
+                  ? '**Статья подтверждена на основном домене.**'
+                  : '**Публикация не прошла все проверки.**',
+              ].join('\n'),
+            });
+            if (!success) throw new Error('Custom-domain article validation failed');

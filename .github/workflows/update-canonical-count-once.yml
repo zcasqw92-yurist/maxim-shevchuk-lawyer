@@ -1,0 +1,54 @@
+name: Обновить количество канонических страниц
+
+on:
+  push:
+    branches:
+      - content/police-no-response-20260801
+    paths:
+      - .github/workflows/update-canonical-count-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: content/police-no-response-20260801
+
+      - name: Обновить документацию и manifest
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const docPath = 'docs/current-production-state.md';
+          let doc = fs.readFileSync(docPath, 'utf8');
+          doc = doc.replace(
+            '25 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и девять юридических разборов, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;',
+            '26 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и десять юридических разборов, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;',
+          );
+          fs.writeFileSync(docPath, doc);
+
+          const manifestPath = 'reports/content-sessions/latest.json';
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          if (!manifest.contentChanges.some((item) => item.path === docPath)) {
+            manifest.contentChanges.push({
+              path: docPath,
+              kind: 'documentation',
+              contentId: 'police-no-response',
+              action: 'updated',
+              expectedUrl: 'https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/',
+            });
+          }
+          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+          NODE
+
+      - name: Удалить workflow и зафиксировать изменение
+        run: |
+          rm .github/workflows/update-canonical-count-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/current-production-state.md reports/content-sessions/latest.json .github/workflows/update-canonical-count-once.yml
+          git commit -m 'Обновить production-состояние для новой статьи'
+          git push origin HEAD:content/police-no-response-20260801

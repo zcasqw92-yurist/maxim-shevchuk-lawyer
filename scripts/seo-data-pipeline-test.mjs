@@ -89,4 +89,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("SEO data pipeline contract passed: full cluster coverage, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");
+console.log("SEO feedback contract passed: full cluster coverage, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");

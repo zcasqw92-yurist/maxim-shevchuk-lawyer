@@ -1,4 +1,5 @@
 import { voluntaryServiceCancellationArticle } from "./refund-voluntary-service-cancellation.mjs";
+import { imposedServiceRefundArticle } from "./refund-imposed-service.mjs";
 
 const refundServiceSources = {
   article13: {
@@ -266,4 +267,5 @@ const nonRenderedServiceArticle = {
 export const refundServicesClusterArticles = [
   nonRenderedServiceArticle,
   voluntaryServiceCancellationArticle,
+  imposedServiceRefundArticle,
 ];

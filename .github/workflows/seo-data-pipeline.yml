@@ -12,6 +12,7 @@ on:
       - 'data/seo/wordstat-cache.json'
       - 'scripts/seo-data-pipeline.mjs'
       - 'scripts/seo-feedback-pipeline.mjs'
+      - 'scripts/seo-feedback-summary.mjs'
       - 'scripts/seo-data-pipeline-test.mjs'
       - 'src/editorial-data.mjs'
       - 'src/metrica-goals.mjs'
@@ -106,6 +107,10 @@ jobs:
               exit 1
               ;;
           esac
+
+          if [[ "${PIPELINE_MODE}" == "feedback" || "${PIPELINE_MODE}" == "all" ]]; then
+            SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-summary.mjs
+          fi
 
       - name: Save normalized state to seo-data branch
         shell: bash

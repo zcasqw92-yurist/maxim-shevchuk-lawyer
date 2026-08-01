@@ -56,7 +56,7 @@ const injectAutomatedReviewStatus = (html, pathname) => {
 const intakeAssets = () => {
   const base = site.basePath || "";
   const version = site.contentLastModified.replaceAll("-", "");
-  return `  <link rel="stylesheet" href="${base}/assets/intake-assistant.css?v=${version}">\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>\n`;
+  return `  <link rel="stylesheet" href="${base}/assets/intake-assistant.css?v=${version}">\n  <style>#contact-dialog [data-dialog-close],#contact-dialog [data-intake-reset]{min-width:44px!important;min-height:44px!important}</style>\n  <script type="module" src="${base}/assets/intake-assistant.mjs?v=${version}"></script>\n`;
 };
 
 export const finalizeBuildSlots = (html, pathname) => {

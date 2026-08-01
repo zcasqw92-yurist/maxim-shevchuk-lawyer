@@ -11,7 +11,7 @@ permissions:
 jobs:
   research:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     environment: seo-api
     env:
       QUERY_TEXT: гарантийный ремонт автомобиля более 45 дней что делать
@@ -27,9 +27,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci --ignore-scripts
 
       - name: Снять органическую выдачу Яндекса и Google
-        run: node .github/scripts/warranty-serp.mjs || node .github/scripts/warranty-google-direct.mjs
+        run: node .github/scripts/warranty-serp.mjs || node .github/scripts/warranty-google-direct.mjs || node .github/scripts/warranty-google-browser.mjs
 
       - name: Сохранить снимок выдачи
         if: always()

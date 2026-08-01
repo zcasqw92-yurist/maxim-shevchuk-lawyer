@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "last_manual_feedback_request_at": "2026-08-01T15:09:00.000Z",
-  "last_manual_feedback_reason": "Полный контрольный слепок кластера после отката помощника",
+  "last_manual_feedback_request_at": "2026-08-01T18:13:00.000Z",
+  "last_manual_feedback_reason": "Добавление полного полицейского кластера в регулярный контроль Вебмастера и Метрики",
   "cache_ttl_days": 30,
   "max_api_calls_per_cluster": 3,
   "max_primary_calls": 1,
@@ -73,6 +73,40 @@
           "title": "Как вернуть деньги за навязанную услугу",
           "type": "Статья",
           "published_at": "2026-08-01"
+        }
+      ]
+    },
+    {
+      "id": "police-inactivity",
+      "name": "Отказ полиции и бездействие МВД",
+      "pages": [
+        {
+          "content_id": "complaints-service-hub",
+          "path": "/uslugi/zhaloby-i-obrashcheniya/",
+          "title": "Жалоба на бездействие, формальный отказ или нарушение прав",
+          "type": "Услуга",
+          "published_at": ""
+        },
+        {
+          "content_id": "police-no-response",
+          "path": "/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+          "title": "Полиция не отвечает на заявление: как узнать решение и обжаловать бездействие",
+          "type": "Статья",
+          "published_at": "2026-08-01"
+        },
+        {
+          "content_id": "police-refusal-next-steps",
+          "path": "/razbory/chto-delat-posle-otkaza-policii/",
+          "title": "Что делать после отказа полиции в возбуждении уголовного дела",
+          "type": "Статья",
+          "published_at": "2026-07-28"
+        },
+        {
+          "content_id": "police-review",
+          "path": "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
+          "title": "Отмена отказов и дополнительная проверка по факту причинения вреда",
+          "type": "Кейс",
+          "published_at": "2026-07-28"
         }
       ]
     }

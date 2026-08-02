@@ -31,26 +31,49 @@ try {
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
   });
   const page = await context.newPage();
-  const url = `https://www.google.com/search?hl=ru&gl=ru&num=20&pws=0&q=${encodeURIComponent(query)}`;
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
-  await page.waitForTimeout(2500);
+  const searchUrl = `https://www.google.com/search?hl=ru&gl=ru&num=20&pws=0&udm=14&q=${encodeURIComponent(query)}`;
+  await page.goto(searchUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+
+  const consentButtons = [
+    page.getByRole("button", { name: /принять все|accept all|согласен|i agree/i }),
+    page.locator('button:has-text("Принять все")'),
+    page.locator('button:has-text("Accept all")'),
+    page.locator('form[action*="consent"] button').last(),
+  ];
+  for (const button of consentButtons) {
+    if (await button.count().catch(() => 0)) {
+      await button.first().click({ timeout: 5000 }).catch(() => {});
+      await page.waitForLoadState("domcontentloaded", { timeout: 15000 }).catch(() => {});
+      break;
+    }
+  }
+
+  if (!page.url().includes("/search")) {
+    await page.goto(searchUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+  }
+  await page.waitForTimeout(3500);
+
   const bodyText = clean(await page.locator("body").innerText().catch(() => ""));
-  if (/unusual traffic|необычн(?:ый|ого) трафик|captcha|провер(?:ьте|ка),? что вы не робот/i.test(bodyText)) {
+  if (/unusual traffic|необычн(?:ый|ого) трафик|captcha|провер(?:ьте|ка),? что вы не робот|our systems have detected/i.test(bodyText)) {
     throw new Error("Google browser: поисковик показал challenge вместо выдачи");
   }
 
-  const raw = await page.locator("a:has(h3)").evaluateAll((anchors) => anchors.map((anchor) => ({
-    href: anchor.href,
-    title: anchor.querySelector("h3")?.textContent || "",
-    containerText: anchor.closest("div[data-snhf]")?.textContent || anchor.parentElement?.parentElement?.textContent || "",
-  })));
+  const raw = await page.locator("a").evaluateAll((anchors) => anchors.map((anchor) => {
+    const heading = anchor.querySelector("h3") || anchor.closest("div")?.querySelector("h3");
+    return {
+      href: anchor.href,
+      title: heading?.textContent || anchor.getAttribute("aria-label") || "",
+      hasHeading: Boolean(heading),
+      containerText: anchor.closest("div[data-snhf]")?.textContent || anchor.closest("div.MjjYud")?.textContent || anchor.parentElement?.parentElement?.textContent || "",
+    };
+  }));
 
   const seen = new Set();
   const organic = [];
   for (const item of raw) {
     const title = clean(item.title);
     const link = String(item.href || "");
-    if (!title || !isExternalOrganic(link)) continue;
+    if (!item.hasHeading || !title || !isExternalOrganic(link)) continue;
     let key;
     try { key = `${new URL(link).hostname.replace(/^www\./, "")}|${title.toLowerCase()}`; }
     catch { continue; }
@@ -60,7 +83,10 @@ try {
     if (organic.length >= 20) break;
   }
 
-  if (organic.length < 5) throw new Error(`Google browser: найдено только ${organic.length} органических результатов`);
+  if (organic.length < 5) {
+    const diagnostic = clean(bodyText).slice(0, 700);
+    throw new Error(`Google browser: найдено только ${organic.length} органических результатов; начало страницы: ${diagnostic}`);
+  }
 
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   report.engines = (report.engines || []).filter((item) => item.engine !== "Google");
@@ -74,7 +100,7 @@ try {
     "# C-003 — слепок органической выдачи",
     "",
     `Дата проверки: ${report.checkedAt}`,
-    `Регион: Москва`,
+    "Регион: Москва",
     `Запрос: \`${report.query}\``,
     "",
   ];

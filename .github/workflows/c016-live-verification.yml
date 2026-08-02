@@ -1,0 +1,73 @@
+name: C-016 live verification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/c016-live-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify production SHA and all publications
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      EXPECTED_BUILD_SHA: '27545edb76b44599882a29ad8188ba465bc05fd3'
+      SITE_CUSTOM_DOMAIN_URL: 'https://yuristshevchuk.com/'
+      SITE_PUBLIC_URL: 'https://yuristshevchuk.com/'
+      SITE_CANONICAL_URL: 'https://yuristshevchuk.com/'
+      CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '60'
+      CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify main domain SHA
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Verify every article and case
+        run: node scripts/live-all-publications-smoke.mjs
+
+      - name: Verify public copy regression
+        run: node scripts/live-public-copy-regression-test.mjs
+
+      - name: Verify C-016 content
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          import urllib.request
+          url = 'https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/?c016_live=27545edb76b4'
+          req = urllib.request.Request(url, headers={'Cache-Control': 'no-cache', 'Pragma': 'no-cache', 'User-Agent': 'Mozilla/5.0'})
+          with urllib.request.urlopen(req, timeout=30) as response:
+              html = response.read().decode('utf-8')
+              assert response.status == 200
+          required = [
+              'Заказчик не оплатил выполненную работу, а договора нет: что делать',
+              'Для взыскания нужно связать шесть обстоятельств',
+              'Как подтвердить цену и рассчитать задолженность',
+              'Что должна содержать досудебная претензия',
+              'Когда переходить к иску',
+          ]
+          for text in required:
+              assert text in html, text
+          assert 'rel="canonical" href="https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"' in html
+          assert re.search(r'<meta\s+name="site-build-sha"\s+content="27545edb76b44599882a29ad8188ba465bc05fd3"', html)
+          print('C-016 live content verified')
+          PY

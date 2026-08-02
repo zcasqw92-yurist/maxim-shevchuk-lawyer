@@ -1,0 +1,64 @@
+name: C-016 date live verification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/c016-date-live-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify corrected article date
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      EXPECTED_BUILD_SHA: '9bf78eeda17c516ddc99699d6ede3c54ee607f42'
+      SITE_CUSTOM_DOMAIN_URL: 'https://yuristshevchuk.com/'
+      SITE_PUBLIC_URL: 'https://yuristshevchuk.com/'
+      SITE_CANONICAL_URL: 'https://yuristshevchuk.com/'
+      CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '60'
+      CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify main domain SHA
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Verify corrected public date
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          import urllib.request
+
+          url = 'https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/?date_live=9bf78eed'
+          req = urllib.request.Request(url, headers={
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'User-Agent': 'Mozilla/5.0',
+          })
+          with urllib.request.urlopen(req, timeout=30) as response:
+              html = response.read().decode('utf-8')
+              assert response.status == 200
+
+          assert '3 августа 2026' in html
+          assert 'datePublished":"2026-08-03"' in html or '"datePublished":"2026-08-03"' in html
+          assert 'dateModified":"2026-08-03"' in html or '"dateModified":"2026-08-03"' in html
+          assert re.search(r'<meta\s+name="site-build-sha"\s+content="9bf78eeda17c516ddc99699d6ede3c54ee607f42"', html)
+          assert 'rel="canonical" href="https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"' in html
+          print('C-016 corrected date verified on production')
+          PY

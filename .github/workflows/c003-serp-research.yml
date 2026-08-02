@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/c003-serp-research.yml'
       - 'scripts/c003-serp-research.mjs'
+      - 'scripts/c003-google-browser-fallback.mjs'
 
 permissions:
   contents: read
@@ -19,7 +20,7 @@ jobs:
     name: Verify Yandex and Google organic results
     environment: seo-api
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
       YANDEX_CLOUD_FOLDER_ID: ${{ secrets.YANDEX_CLOUD_FOLDER_ID }}
@@ -35,8 +36,18 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Run isolated SERP gateway
-        run: node scripts/c003-serp-research.mjs
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Collect API results
+        shell: bash
+        run: node scripts/c003-serp-research.mjs || true
+
+      - name: Complete Google through browser when API is unavailable
+        run: node scripts/c003-google-browser-fallback.mjs
 
       - name: Upload normalized research report
         if: always()

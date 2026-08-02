@@ -9,9 +9,23 @@ const dist = path.join(root, 'dist');
 const outDir = path.join(root, 'reports', 'public-language-audit');
 fs.mkdirSync(outDir, { recursive: true });
 
-const sitemap = fs.readFileSync(path.join(dist, 'sitemap.xml'), 'utf8');
-const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1].trim());
-const canonicalUrls = [...new Set(urls)].filter((url) => /^https:\/\/yuristshevchuk\.com\//.test(url));
+const collectHtml = (directory) => {
+  const files = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...collectHtml(fullPath));
+    else if (entry.isFile() && entry.name.endsWith('.html')) files.push(fullPath);
+  }
+  return files;
+};
+
+const canonicalUrls = [...new Set(collectHtml(dist).flatMap((filePath) => {
+  const html = fs.readFileSync(filePath, 'utf8');
+  const match = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)
+    || html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i);
+  if (!match || !/^https:\/\/yuristshevchuk\.com\//.test(match[1])) return [];
+  return [match[1]];
+}))].sort((a, b) => new URL(a).pathname.localeCompare(new URL(b).pathname, 'ru'));
 
 const port = '4199';
 const origin = `http://127.0.0.1:${port}`;

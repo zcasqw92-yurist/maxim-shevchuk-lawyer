@@ -1,0 +1,41 @@
+name: Полный языковой аудит сайта
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci --ignore-scripts
+
+      - name: Собрать сайт
+        run: npm run build
+
+      - name: Выгрузить весь видимый текст
+        run: node .github/scripts/public-language-audit.mjs
+
+      - name: Сохранить отчёт
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-language-audit
+          path: reports/public-language-audit/
+          if-no-files-found: error
+          retention-days: 14

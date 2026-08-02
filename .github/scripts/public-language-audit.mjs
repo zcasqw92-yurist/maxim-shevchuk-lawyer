@@ -19,18 +19,17 @@ const collectHtml = (directory) => {
   return files;
 };
 
-const targets = collectHtml(dist).flatMap((filePath) => {
+const targets = collectHtml(dist).map((filePath) => {
   const relative = path.relative(dist, filePath).replace(/\\/g, '/');
-  const html = fs.readFileSync(filePath, 'utf8');
-  if (relative === '404.html') return [];
-  if (/http-equiv=["']refresh["']/i.test(html)) return [];
-  if (/name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(html)) return [];
   let pathname;
   if (relative === 'index.html') pathname = '/';
   else if (relative.endsWith('/index.html')) pathname = `/${relative.slice(0, -'index.html'.length)}`;
   else pathname = `/${relative}`;
-  return [{ filePath, pathname }];
+  return { filePath, pathname, relative };
 }).sort((a, b) => a.pathname.localeCompare(b.pathname, 'ru'));
+
+console.log(`FOUND_HTML ${targets.length}`);
+for (const target of targets) console.log(`TARGET ${target.pathname}`);
 
 const port = '4199';
 const origin = `http://127.0.0.1:${port}`;
@@ -106,6 +105,7 @@ try {
         title: document.title,
         h1: clean(document.querySelector('h1')?.innerText || ''),
         canonical: document.querySelector('link[rel="canonical"]')?.href || '',
+        robots: document.querySelector('meta[name="robots"]')?.content || '',
         bodyText: document.body.innerText,
         blocks,
       };
@@ -114,8 +114,10 @@ try {
     pages.push({
       url: extracted.canonical || `https://yuristshevchuk.com${target.pathname}`,
       pathname: target.pathname,
+      sourceFile: target.relative,
       title: normalize(extracted.title),
       h1: normalize(extracted.h1),
+      robots: normalize(extracted.robots),
       bodyText: normalize(extracted.bodyText),
       blocks: extracted.blocks.map((item) => ({ ...item, text: normalize(item.text) })),
     });
@@ -137,11 +139,11 @@ fs.writeFileSync(path.join(outDir, 'public-text.json'), `${JSON.stringify(report
 
 const md = ['# Публичный текст сайта', '', `Страниц: ${pages.length}`, ''];
 for (const page of pages) {
-  md.push(`## ${page.pathname}`, '', `**Title:** ${page.title}`, '', `**H1:** ${page.h1}`, '');
+  md.push(`## ${page.pathname}`, '', `**Title:** ${page.title}`, '', `**H1:** ${page.h1}`, '', `**Robots:** ${page.robots}`, '');
   for (const block of page.blocks) md.push(`- [${block.tag}] ${block.text}`);
   md.push('');
 }
 fs.writeFileSync(path.join(outDir, 'public-text.md'), `${md.join('\n')}\n`);
 
-if (pages.length < 20) throw new Error(`Expected at least 20 public pages, got ${pages.length}`);
+if (pages.length < 30) throw new Error(`Expected at least 30 generated pages, got ${pages.length}`);
 console.log(`Public language audit export completed: ${pages.length} pages.`);

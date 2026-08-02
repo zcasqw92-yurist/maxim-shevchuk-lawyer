@@ -118,6 +118,7 @@ try {
           anchor.dataset.analyticsAuditHref = anchor.getAttribute("href") || "";
           anchor.setAttribute("href", "#analytics-audit");
           anchor.removeAttribute("target");
+          anchor.addEventListener("click", (event) => event.preventDefault(), { capture: true });
         });
 
         for (let index = 0; index < controls.length; index += 1) {
@@ -150,8 +151,7 @@ try {
             continue;
           }
 
-          const cancelled = !control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
-          if (!cancelled && control.matches("a[href]")) history.replaceState(null, "", location.pathname);
+          control.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
           await new Promise((resolve) => setTimeout(resolve, 0));
 
           const events = (window.dataLayer || []).filter((item) => item && typeof item === "object");

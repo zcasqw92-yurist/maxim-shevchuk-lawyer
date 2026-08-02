@@ -31,10 +31,10 @@ for (const [pathname, file] of pages) {
     });
   const webPage = jsonLd.find((node) => ["WebPage", "ProfilePage", "ContactPage", "CollectionPage"].includes(node["@type"]));
   if (webPage?.dateModified !== expected) errors.push(`${pathname}: JSON-LD dateModified ${webPage?.dateModified || "missing"} != ${expected}`);
-  if (!html.includes(`Автоматическая проверка публикации: <time datetime="${reviewDate}">${reviewLabel}</time>.`)) {
+  if (!html.includes(`Материал проверен <time datetime="${reviewDate}">${reviewLabel}</time> и обновлён <time datetime="${expected}">${label}</time>.`)) {
     errors.push(`${pathname}: отсутствует единая дата автоматической проверки`);
   }
-  if (!html.includes(`Правовая редакция материала: <time datetime="${expected}">${label}</time>.`)) {
+  if (!html.includes(`обновлён <time datetime="${expected}">${label}</time>.`)) {
     errors.push(`${pathname}: не сохранена достоверная дата правовой редакции`);
   }
   if (!html.includes(`<meta name="site-automated-review-date" content="${reviewDate}">`)) {
@@ -50,10 +50,10 @@ for (const [pathname, file] of pages) {
 for (const [pathname, file] of pages.filter(([pathname]) => pathname === "/uslugi" || pathname.startsWith("/uslugi/"))) {
   const html = await readFile(join(dist, file), "utf8");
   const expected = contentDateForPath(pathname);
-  if (!html.includes(`Автоматическая проверка публикации: <time datetime="${reviewDate}">${reviewLabel}</time>`)) {
+  if (!html.includes(`Проверено: <time datetime="${reviewDate}">${reviewLabel}</time>`)) {
     errors.push(`${pathname}: дата автоматической проверки публикации не синхронизирована`);
   }
-  if (!html.includes(`Правовая редакция: <time datetime="${expected}">${formatContentDate(expected)}</time>`)) {
+  if (!html.includes(`Обновлено: <time datetime="${expected}">${formatContentDate(expected)}</time>`)) {
     errors.push(`${pathname}: дата правовой редакции экспертного материала не сохранена`);
   }
 }

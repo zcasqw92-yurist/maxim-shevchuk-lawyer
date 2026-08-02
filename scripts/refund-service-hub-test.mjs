@@ -4,14 +4,14 @@ import { join } from "node:path";
 const root = join(import.meta.dirname, "..");
 const html = await readFile(join(root, "dist/uslugi/vozvrat-deneg/index.html"), "utf8");
 const required = [
-  "Возврат денег за услугу, аванс или навязанный договор",
+  "Возврат денег за услугу, аванс или дополнительный договор",
   "Выберите ситуацию: основания возврата денег различаются",
   "/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
   "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
   "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
   "/razbory/prodavets-propal-posle-perevoda/",
-  "При возврате предоплаты значение имеют",
-  "После претензии нужно считать срок по применимой норме",
+  "При возврате предоплаты важны",
+  "После претензии нужно подтвердить вручение",
 ];
 const missing = required.filter((marker) => !html.includes(marker));
 if (missing.length) {

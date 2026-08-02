@@ -70,7 +70,7 @@ const mobileActionsMarkup = `
     </button>
     <span class="engagement-nudge__eyebrow">Можно написать без звонка</span>
     <strong id="engagement-nudge-title">Нужен ориентир по вашей ситуации?</strong>
-    <p>Откройте удобный мессенджер. Там будет готовый черновик — измените его при необходимости и отправьте напрямую юристу.</p>
+    <p>Откройте удобный мессенджер. Там будет готовое сообщение: при необходимости измените его и отправьте напрямую юристу.</p>
     <div class="engagement-nudge__actions">
       <button class="engagement-nudge__dismiss" type="button">Не сейчас</button>
       <button class="engagement-nudge__write" id="engagement-nudge-write" type="button" data-dialog-open data-analytics-topic="первичный ориентир по ситуации">Выбрать мессенджер</button>

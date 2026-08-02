@@ -12,7 +12,7 @@ const expectedPages = [
 ];
 
 const titles = [
-  "Первично — бесплатно",
+  "Первое ознакомление бесплатно",
   "Цена фиксируется заранее",
   "Срок известен до оплаты",
   "После документа — на связи",
@@ -26,7 +26,7 @@ for (const [label, pagePath, placement] of expectedPages) {
   if (sectionCount !== 1) errors.push(`${label}: ожидался один блок гарантий, найдено ${sectionCount}`);
   if (cardCount !== 4) errors.push(`${label}: ожидалось четыре гарантии, найдено ${cardCount}`);
   for (const title of titles) if (!html.includes(title)) errors.push(`${label}: отсутствует гарантия «${title}»`);
-  if (!html.includes("Это гарантии порядка работы, а не обещание конкретного решения")) {
+  if (!html.includes("Это условия моей работы, а не обещание решения суда")) {
     errors.push(`${label}: отсутствует разграничение гарантий процесса и результата`);
   }
 
@@ -44,7 +44,7 @@ for (const [label, pagePath, placement] of expectedPages) {
       errors.push(`${label}: ожидается последовательность «основа практики → направления → условия → стоимость»`);
     }
     if (finalCtaCount !== 0) errors.push(`${label}: общий финальный CTA дублирует блок «Не нашли точного совпадения?»`);
-    if (!html.includes('class="section section--dark compact-dark"') || !html.includes("Описать факты полезнее, чем самостоятельно выбирать документ")) {
+    if (!html.includes('class="section section--dark compact-dark"') || !html.includes("Просто опишите, что произошло")) {
       errors.push(`${label}: должен остаться один предметный финальный блок каталога`);
     }
     if (html.includes("Начнём с правильной квалификации")) errors.push(`${label}: дублирующий заголовок финального CTA не удалён`);

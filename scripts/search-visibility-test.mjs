@@ -32,9 +32,9 @@ const officialHosts = [
 const home = await readFile(join(dist, "index.html"), "utf8");
 if (count(home, /data-search-visibility="home"/g) !== 0) errors.push("Главная: повторяющий каталог поисковый блок должен быть удалён");
 if (!home.includes('class="section section--services"')) errors.push("Главная: видимый каталог направлений должен сохраниться");
-if (!home.includes("Досудебное урегулирование споров — до обращения в суд")) errors.push("Главная: H1 не закрепляет основную специализацию");
-if (!home.includes("Основная специализация — досудебное урегулирование")) errors.push("Главная: первый экран не объясняет специализацию");
-if (!home.includes("Досудебное урегулирование и связанные направления")) errors.push("Главная: каталог не показывает иерархию практики");
+if (!home.includes("Досудебное урегулирование споров")) errors.push("Главная: H1 не закрепляет основную специализацию");
+if (!home.includes("Сначала выясняю, можно ли решить спор без суда")) errors.push("Главная: первый экран не объясняет специализацию");
+if (!home.includes("Помощь до суда и подготовка к дальнейшим действиям")) errors.push("Главная: каталог не показывает связь направлений");
 
 for (const slug of Object.keys(servicePages)) {
   if (!home.includes(`href="/uslugi/${slug}/"`)) errors.push(`Главная: отсутствует внутренняя ссылка на ${slug}`);
@@ -45,9 +45,9 @@ if (focusPhraseCount > 8) errors.push(`Главная: избыточное по
 
 const directory = await readPage("uslugi");
 if (count(directory, /data-search-visibility="services"/g) !== 1) errors.push("Каталог услуг: нужен один экспертный поисковый блок");
-if (!directory.includes("Досудебное урегулирование — основа практики")) errors.push("Каталог услуг: отсутствует иерархический заголовок");
-if (!directory.includes("Основная специализация</strong> — анализ спора")) errors.push("Каталог услуг: не объяснена роль основной специализации");
-if (!directory.includes("Исковое заявление</strong> является следующим этапом")) errors.push("Каталог услуг: не объяснена роль судебного этапа");
+if (!directory.includes("Сначала проверяем возможность решить спор без суда")) errors.push("Каталог услуг: отсутствует заголовок о порядке работы");
+if (!directory.includes("Основное направление</strong> — проверить документы")) errors.push("Каталог услуг: не объяснена роль основной специализации");
+if (!directory.includes("Иск</strong> готовится")) errors.push("Каталог услуг: не объяснена роль судебного этапа");
 
 for (const [slug, title] of Object.entries(servicePages)) {
   const html = await readPage(join("uslugi", slug));
@@ -55,8 +55,8 @@ for (const [slug, title] of Object.entries(servicePages)) {
   if (!html.includes(title)) errors.push(`${slug}: отсутствует индивидуальный заголовок`);
   if (!html.includes("Какие сведения подготовить")) errors.push(`${slug}: отсутствует практический список материалов`);
   if (!html.includes("Материал подготовлен")) errors.push(`${slug}: отсутствует авторство`);
-  if (!html.includes("Автоматическая проверка публикации: <time datetime=")) errors.push(`${slug}: отсутствует дата автоматической проверки публикации`);
-  if (!html.includes("Правовая редакция: <time datetime=")) errors.push(`${slug}: отсутствует достоверная дата правовой редакции`);
+  if (!html.includes("Проверено: <time datetime=")) errors.push(`${slug}: отсутствует дата автоматической проверки публикации`);
+  if (!html.includes("Обновлено: <time datetime=")) errors.push(`${slug}: отсутствует достоверная дата правовой редакции`);
   if (!html.includes("Материал носит общий информационный характер и не заменяет индивидуальный правовой анализ.")) errors.push(`${slug}: отсутствует предупреждение о границах общей информации`);
   if (/data-search-visibility=[^>]*(?:hidden|aria-hidden="true")/.test(html)) errors.push(`${slug}: экспертный блок скрыт`);
   const section = html.match(/<section class="section section--search-guide section--service-guide"[\s\S]*?<\/section>/)?.[0] || "";
@@ -75,9 +75,9 @@ for (const [slug, title] of Object.entries(servicePages)) {
 const pretrial = await readPage(join("uslugi", "dosudebnoe-uregulirovanie"));
 for (const marker of [
   "Главная специализация",
-  "Досудебное урегулирование споров до обращения в суд",
+  "Досудебное урегулирование споров",
   "Досудебная работа не ограничивается одной претензией",
-  "Позиция, требования и план дальнейших действий",
+  "Что будет в претензии и плане действий",
   "Как выстраивается досудебное урегулирование",
 ]) {
   if (!pretrial.includes(marker)) errors.push(`Досудебное урегулирование: отсутствует ключевой маркер ${marker}`);

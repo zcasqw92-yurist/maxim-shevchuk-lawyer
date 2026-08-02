@@ -76,38 +76,28 @@ const applyPublicationMetadata = (html, context, pathname) => {
   return updateJsonLd(result, metadata, pathname);
 };
 
-const unique = (items) => [...new Set(items.filter(Boolean))];
-
-const collectChecklist = (article) => unique(
-  (article.sections || [])
-    .flatMap((section) => section.checklist || [])
-    .map((item) => String(item).replace(/[.;]+$/, ""))
-    .slice(0, 5),
-);
-
 const articleIntake = (article) => {
-  const checklist = collectChecklist(article);
-  const items = checklist.length >= 3 ? checklist : [
-    "краткая хронология с датами",
-    "документы, переписка и подтверждения отправки",
-    "последний ответ, отказ или сведения об отсутствии ответа",
+  const items = [
+    "что произошло и когда",
+    "что вы уже сделали и какой получили ответ",
+    "какого результата хотите добиться",
   ];
   const topic = article.topic || article.title;
   return `
     <section class="article-section editorial-intake" id="self-check" data-article-section="self-check">
       <div class="editorial-intake__grid">
         <div>
-          <span class="editorial-intake__eyebrow">Сверьте свою ситуацию</span>
-          <h2>Что подготовить для предметного первого сообщения</h2>
-          <p>Не нужно заранее составлять юридический документ. Достаточно кратко зафиксировать факты и перечислить то, что уже подтверждает ситуацию.</p>
+          <span class="editorial-intake__eyebrow">Перед сообщением юристу</span>
+          <h2>Что кратко описать</h2>
+          <p>Юридические термины не нужны. Напишите обычными словами:</p>
           <ul class="editorial-checklist">${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
         </div>
         <aside class="editorial-intake__questions">
           <strong>Что можно спросить у юриста</strong>
           <ul>
             <li>достаточно ли имеющихся доказательств;</li>
-            <li>какой путь сильнее именно сейчас;</li>
-            <li>какие сроки и риски нельзя упустить;</li>
+            <li>что лучше сделать сначала;</li>
+            <li>есть ли важные сроки;</li>
             <li>какой документ нужен первым.</li>
           </ul>
           <button class="button button--gold" type="button" data-dialog-open data-topic="${esc(topic)}">Проверить свою ситуацию</button>
@@ -124,7 +114,7 @@ const helpfulness = (id, kind) => `
     <section class="editorial-helpfulness" aria-labelledby="editorial-helpfulness-title" data-editorial-helpfulness data-publication-id="${esc(id)}" data-publication-kind="${esc(kind)}">
       <div class="editorial-helpfulness__copy">
         <span>Обратная связь без персональных данных</span>
-        <h2 id="editorial-helpfulness-title">Материал помог понять следующий шаг?</h2>
+        <h2 id="editorial-helpfulness-title">Статья была полезна?</h2>
       </div>
       <div class="editorial-helpfulness__actions" role="group" aria-label="Оценка полезности материала">
         <button type="button" aria-pressed="false" data-helpfulness-value="yes">Да</button>

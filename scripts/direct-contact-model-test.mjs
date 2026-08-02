@@ -90,9 +90,9 @@ for (const marker of ["new FormData", "reportValidity", "data-callback", "data-p
 const policy = await readFile(join(dist, "politika-konfidencialnosti", "index.html"), "utf8");
 for (const statement of [
   "На сайте отсутствуют формы заявки",
-  "Сайт не формирует и не передаёт оператору базу контактных данных",
-  "Подготовленный текст является только черновиком",
-  "оператор не получает его имя, контакт, текст черновика",
+  "Сайт не создаёт базу контактов посетителей",
+  "Кнопки открывают внешний мессенджер с готовым сообщением",
+  "Если сообщение не отправлено, оператор не получает имя, контакт, текст или сведения о деле",
   "не является публичным предложением передать оператору любые сведения",
 ]) {
   if (!policy.includes(statement)) errors.push(`privacy policy: required direct-contact statement is missing: ${statement}`);

@@ -2,8 +2,8 @@ import { buildSlot, fillBuildSlot } from "./html-slots.mjs";
 
 const guaranteeItems = [
   {
-    title: "Первично — бесплатно",
-    text: "Ознакомлюсь с ситуацией и основными материалами, отвечу на ключевые вопросы и объясню, с чего разумнее начать.",
+    title: "Первое ознакомление бесплатно",
+    text: "Посмотрю основные материалы, отвечу на первые вопросы и объясню, с чего лучше начать.",
   },
   {
     title: "Цена фиксируется заранее",
@@ -33,8 +33,8 @@ export const processGuaranteesBlock = () => `
     <div class="wrap">
       <div class="process-guarantees__head reveal">
         <div>
-          <span class="eyebrow">Гарантии процесса</span>
-          <h2 id="process-guarantees-title">Условия понятны до начала подготовки</h2>
+          <span class="eyebrow">Условия работы</span>
+          <h2 id="process-guarantees-title">Стоимость и срок известны заранее</h2>
         </div>
         <p>Вы заранее понимаете порядок работы, стоимость и срок. После передачи документа общение не прекращается.</p>
       </div>
@@ -46,7 +46,7 @@ export const processGuaranteesBlock = () => `
             <p>${item.text}</p>
           </li>`).join("")}
       </ol>
-      <p class="process-guarantees__note">Это гарантии порядка работы, а не обещание конкретного решения суда, государственного органа или другой стороны.</p>
+      <p class="process-guarantees__note">Это условия моей работы, а не обещание решения суда, государственного органа или другой стороны.</p>
     </div>
   </section>`;
 

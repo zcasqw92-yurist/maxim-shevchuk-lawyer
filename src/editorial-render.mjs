@@ -76,12 +76,12 @@ const authorCard = () => `
     </div>
   </aside>`;
 
-const messengerCta = (topic, title = "Нужно проверить именно вашу ситуацию?") => `
+const messengerCta = (topic, title = "Хотите уточнить свою ситуацию?") => `
   <section class="editorial-cta" aria-labelledby="editorial-cta-title">
     <div>
-      <span class="eyebrow eyebrow--light">Следующий шаг</span>
+      <span class="eyebrow eyebrow--light">Можно спросить юриста</span>
       <h2 id="editorial-cta-title">${esc(title)}</h2>
-      <p>Кратко укажите хронологию, имеющиеся документы и что произошло после последнего обращения. Сообщение откроется как редактируемый черновик в выбранном мессенджере.</p>
+      <p>Кратко укажите, что произошло, какие документы есть и что вы уже сделали. В мессенджере откроется готовое сообщение, которое можно изменить перед отправкой.</p>
     </div>
     <button class="button button--gold" type="button" data-dialog-open data-topic="${esc(topic)}">Написать юристу</button>
   </section>`;
@@ -166,7 +166,7 @@ export const renderArticlesIndex = () => {
     bodyClass: "editorial-page editorial-index-page",
     content: `
       ${breadcrumbs(crumbs)}
-      <section class="inner-hero editorial-index-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">Юридические разборы</span><h1>Понятный порядок действий в сложной ситуации</h1><p>Материалы построены вокруг реальных вопросов: что проверить, какие доказательства сохранить и какой следующий шаг выбрать.</p></div><aside class="inner-hero__aside"><span>Редакционный принцип</span><p>Каждый разбор проверяется юристом, содержит официальные источники и не обещает результат без изучения обстоятельств.</p></aside></div></section>
+      <section class="inner-hero editorial-index-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">Юридические разборы</span><h1>Что делать в конкретной юридической ситуации</h1><p>В каждом материале объясняю, что проверить, какие доказательства сохранить и в каком порядке действовать.</p></div><aside class="inner-hero__aside"><span>Важно</span><p>Статьи содержат общие правила. Точный порядок действий зависит от документов, сроков и обстоятельств вашего дела.</p></aside></div></section>
       <section class="section"><div class="wrap editorial-grid">${articles.map(articleCard).join("")}</div></section>
       ${messengerCta("вопрос по юридическому разбору")}
     `,
@@ -177,7 +177,7 @@ export const renderPracticeIndex = () => {
   const crumbs = [{ name: "Главная", path: "/" }, { name: "Практика", path: "/praktika/" }];
   return {
     title: "Юридическая практика и обезличенные кейсы | Максим Шевчук",
-    description: "Обезличенные примеры юридической работы: исходные обстоятельства, изученные материалы, подготовленные документы и фактический текущий статус.",
+    description: "Обезличенные примеры юридической работы: обстоятельства, изученные материалы, подготовленные документы и текущий статус.",
     image: "/assets/images/maxim-documents.webp",
     imageAlt: "Юрист Максим Шевчук работает с материалами дела",
     imageWidth: 971,
@@ -187,7 +187,7 @@ export const renderPracticeIndex = () => {
     bodyClass: "editorial-page editorial-index-page",
     content: `
       ${breadcrumbs(crumbs)}
-      <section class="inner-hero editorial-index-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">Практика</span><h1>Реальные задачи без раскрытия данных клиентов</h1><p>В кейсах указаны только подтверждённые обстоятельства, выполненная работа и фактический статус. ФИО, адреса и номера материалов не публикуются.</p></div><aside class="inner-hero__aside"><span>Важно</span><p>Результат другого дела зависит от его документов, доказательств, позиции второй стороны и решений государственных органов или суда.</p></aside></div></section>
+      <section class="inner-hero editorial-index-hero"><div class="wrap inner-hero__grid"><div><span class="eyebrow">Практика</span><h1>Реальные задачи без раскрытия данных клиентов</h1><p>В кейсах указаны подтверждённые обстоятельства, подготовленные документы и текущий статус. ФИО, адреса и номера материалов не публикуются.</p></div><aside class="inner-hero__aside"><span>Важно</span><p>Результат другого дела зависит от его документов, доказательств, позиции второй стороны и решений государственных органов или суда.</p></aside></div></section>
       <section class="section"><div class="wrap editorial-grid">${practiceCases.map(caseCard).join("")}</div></section>
       ${messengerCta("похожая юридическая ситуация")}
     `,
@@ -265,7 +265,7 @@ export const renderPracticeCasePage = (caseOrSlug) => {
         <header class="editorial-article__header wrap">
           <span class="eyebrow">${esc(item.category)}</span>
           <h1>${esc(item.title)}</h1>
-          <p class="editorial-lead">Обезличенный пример работы. Публикуются только подтверждённые обстоятельства, выполненные действия и фактический текущий статус.</p>
+          <p class="editorial-lead">Обезличенный пример работы. Здесь указаны подтверждённые обстоятельства, подготовленные документы и текущий статус дела.</p>
           ${metaLine({ category: "Практика", publishedAt: item.publishedAt })}
         </header>
         <div class="wrap editorial-case-grid">

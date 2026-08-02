@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260801-warranty-repair-over-45-days",
-  "reviewedAt": "2026-08-01T21:35:00.000Z",
+  "sessionId": "20260802-site-language-review",
+  "reviewedAt": "2026-08-02T09:42:56.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-01T21:01:26.189Z",
+    "modifiedTime": "2026-08-01T22:54:14.397Z",
     "metadataTabCount": 25,
     "discoveredTabs": [
       "00_Старт",
@@ -35,411 +35,166 @@
     ]
   },
   "reviewedTabs": [
-    {
-      "name": "00_Старт",
-      "range": "A1:H45",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "project rules",
-        "publication rules"
-      ]
-    },
-    {
-      "name": "01_БПЮ",
-      "range": "A1:AC1004",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "demand",
-        "client language"
-      ]
-    },
-    {
-      "name": "02_ЮрДоки",
-      "range": "A1:AA1004",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "paid work",
-        "practice evidence"
-      ]
-    },
-    {
-      "name": "03_Оплаты",
-      "range": "A1:M13",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "confirmed payment details"
-      ]
-    },
-    {
-      "name": "04_Дашборд",
-      "range": "A1:Y87",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "operational context"
-      ]
-    },
-    {
-      "name": "05_Контроль",
-      "range": "A1:K18",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "data gaps",
-        "control indicators"
-      ]
-    },
-    {
-      "name": "06_Импорт",
-      "range": "A1:U100",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "source coverage"
-      ]
-    },
-    {
-      "name": "_Справочники",
-      "range": "A1:I24",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "classification"
-      ]
-    },
-    {
-      "name": "_Журнал",
-      "range": "A1:K35",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "current demand evidence"
-      ]
-    },
-    {
-      "name": "07_Диалоги_исследование",
-      "range": "A1:AK357",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "audience research"
-      ]
-    },
-    {
-      "name": "08_Банк_реплик",
-      "range": "A1:V711",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "client language",
-        "questions"
-      ]
-    },
-    {
-      "name": "09_Паттерны_аудитории",
-      "range": "A1:X81",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "audience patterns"
-      ]
-    },
-    {
-      "name": "10_Контентные_возможности",
-      "range": "A1:AP170",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content brief",
-        "intent ownership"
-      ]
-    },
-    {
-      "name": "11_Кейсы_для_публикации",
-      "range": "A1:AF105",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "case evidence",
-        "publication limits"
-      ]
-    },
-    {
-      "name": "12_Эффективные_ответы",
-      "range": "A1:V147",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "communication patterns"
-      ]
-    },
-    {
-      "name": "13_Статистика_контента",
-      "range": "A1:AB12",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "performance data"
-      ]
-    },
-    {
-      "name": "14_Контент_дашборд",
-      "range": "A1:N179",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content priorities"
-      ]
-    },
-    {
-      "name": "15_Обращения_с_контента",
-      "range": "A1:AG4",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content attribution"
-      ]
-    },
-    {
-      "name": "_Реестр_диалогов",
-      "range": "A1:Q357",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "source registry"
-      ]
-    },
-    {
-      "name": "_Ситуации_и_связи",
-      "range": "A1:T359",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "cross-source links",
-        "result levels"
-      ]
-    },
-    {
-      "name": "_События_воронки",
-      "range": "A1:J738",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "confirmed funnel events"
-      ]
-    },
-    {
-      "name": "_Версии_контента",
-      "range": "A1:L18",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "content versions"
-      ]
-    },
-    {
-      "name": "16_Контроль_данных",
-      "range": "A1:J17",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "critical data errors"
-      ]
-    },
-    {
-      "name": "_Импорт_ЮД_151_200",
-      "range": "A1:T51",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "historical paid-work verification"
-      ]
-    },
-    {
-      "name": "Статьи_HARANT",
-      "range": "A1:P2",
-      "reviewedNonEmptyCells": true,
-      "notesReviewed": true,
-      "usedFor": [
-        "external publication overlap check"
-      ]
-    }
+    { "name": "00_Старт", "range": "A1:H45", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["project and publication rules"] },
+    { "name": "01_БПЮ", "range": "A1:AC17", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["client language and demand"] },
+    { "name": "02_ЮрДоки", "range": "A1:AA216", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["paid work and confirmed results"] },
+    { "name": "03_Оплаты", "range": "A1:M13", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed payment details"] },
+    { "name": "04_Дашборд", "range": "A1:Y87", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["operational context"] },
+    { "name": "05_Контроль", "range": "A1:K18", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["data gaps and control indicators"] },
+    { "name": "06_Импорт", "range": "A1:U8", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source coverage"] },
+    { "name": "_Справочники", "range": "A1:I24", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["classification"] },
+    { "name": "_Журнал", "range": "A1:K36", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["current demand evidence"] },
+    { "name": "07_Диалоги_исследование", "range": "A1:AK357", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience research"] },
+    { "name": "08_Банк_реплик", "range": "A1:V711", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["client wording and questions"] },
+    { "name": "09_Паттерны_аудитории", "range": "A1:X81", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience patterns"] },
+    { "name": "10_Контентные_возможности", "range": "A1:AP170", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content briefs and intent ownership"] },
+    { "name": "11_Кейсы_для_публикации", "range": "A1:AF105", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["case evidence and publication limits"] },
+    { "name": "12_Эффективные_ответы", "range": "A1:V147", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["effective communication patterns"] },
+    { "name": "13_Статистика_контента", "range": "A1:AB22", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content performance"] },
+    { "name": "14_Контент_дашборд", "range": "A1:N157", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content priorities"] },
+    { "name": "15_Обращения_с_контента", "range": "A1:AG4", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content attribution"] },
+    { "name": "_Реестр_диалогов", "range": "A1:Q357", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source registry"] },
+    { "name": "_Ситуации_и_связи", "range": "A1:T360", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["cross-source links and result levels"] },
+    { "name": "_События_воронки", "range": "A1:J739", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed funnel events"] },
+    { "name": "_Версии_контента", "range": "A1:L22", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content versions"] },
+    { "name": "16_Контроль_данных", "range": "A1:J17", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["critical data errors"] },
+    { "name": "_Импорт_ЮД_151_200", "range": "A1:T51", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["historical paid-work verification"] },
+    { "name": "Статьи_HARANT", "range": "A1:R3", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["external publication overlap"] }
   ],
   "sourceTrace": {
-    "dialogIds": [
-      "69d936fe-9314-832b-93e3-39b1273a3c32"
-    ],
-    "situationIds": [
-      "SIT-20260410-001"
-    ],
+    "dialogIds": [],
+    "situationIds": [],
     "workIds": [],
-    "contentIds": [
-      "C-021"
-    ],
+    "contentIds": ["C-021"],
     "caseIds": [],
-    "notes": "БПЮ, карточка C-021 и реплики R-0085/R-0086 подтверждают самостоятельную потребность и язык клиента. Оплаченная работа и подтверждённый результат по этой ситуации в Юр. доки и кейсах не обнаружены, поэтому статья не содержит утверждений о выполненной работе или результате дела."
+    "notes": "Проведена редактура существующего публичного текста без добавления новых фактов, услуг, результатов дел или цен. Полностью проверены значения, заметки, формулы, ссылки и правила проверки данных во всех 25 вкладках. Основные ограничения: использовать язык клиента, не смешивать выполненную работу с результатом дела и не заявлять неподтверждённый исход."
   },
   "seoReview": {
     "status": "completed",
-    "checkedAt": "2026-08-01T21:30:00.000Z",
+    "checkedAt": "2026-08-02T09:40:00.000Z",
     "region": "Москва",
-    "primaryIntent": "выбрать и предъявить дилеру требование после нарушения срока гарантийного ремонта автомобиля",
+    "primaryIntent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы",
     "verifiedCluster": [
-      "гарантийный ремонт автомобиля более 45 дней что делать",
-      "дилер не возвращает автомобиль после гарантийного ремонта",
-      "претензия дилеру за нарушение срока ремонта",
-      "вернуть деньги за автомобиль после 45 дней ремонта"
+      "юрист досудебное урегулирование споров Москва",
+      "досудебное урегулирование споров услуги юриста Москва",
+      "подготовка претензии и переговоры с юристом"
     ],
     "intentMap": [
-      {
-        "intent": "широкая помощь с возвратом денег и претензией",
-        "target": "existing service owner /uslugi/vozvrat-deneg/"
-      },
-      {
-        "intent": "выбрать и предъявить дилеру требование после нарушения срока гарантийного ремонта автомобиля",
-        "target": "new article owner /razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
-      },
-      {
-        "intent": "недостаток автомобиля в первые пятнадцать дней",
-        "target": "excluded from this article; future separate research only"
-      },
-      {
-        "intent": "ремонт автомобиля по ОСАГО или каско",
-        "target": "excluded insurance route"
-      }
+      { "intent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы", "target": "existing page owner /" },
+      { "intent": "заказать конкретную юридическую услугу", "target": "existing service owners under /uslugi/" },
+      { "intent": "получить ответ на конкретную правовую ситуацию", "target": "existing article owners under /razbory/" },
+      { "intent": "посмотреть подтверждённые примеры работы", "target": "existing case owners under /praktika/" }
     ],
     "intentOwnership": [
       {
-        "intent": "выбрать и предъявить дилеру требование после нарушения срока гарантийного ремонта автомобиля",
-        "ownerUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
-        "ownerType": "article",
+        "intent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы",
+        "ownerUrl": "https://yuristshevchuk.com/",
+        "ownerType": "page",
         "supportingUrls": [
+          "https://yuristshevchuk.com/uslugi/",
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+          "https://yuristshevchuk.com/uslugi/vzyskanie-dolga/",
           "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/"
-        ],
-        "supportingCaseIds": [],
-        "excludedQueries": [
-          "вернуть автомобиль в первые 15 дней",
-          "существенный недостаток автомобиля без нарушения срока ремонта",
-          "автомобиль в ремонте более 30 дней за год",
-          "отказ дилера принять автомобиль по гарантии",
-          "некачественный платный ремонт автомобиля",
-          "ремонт автомобиля по ОСАГО или каско",
-          "добровольный отказ от услуги автосервиса"
-        ],
-        "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/",
+          "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
+          "https://yuristshevchuk.com/uslugi/spory-biznesa/",
+          "https://yuristshevchuk.com/uslugi/marketpleysy/",
+          "https://yuristshevchuk.com/razbory/",
+          "https://yuristshevchuk.com/razbory/chto-delat-posle-otkaza-policii/",
+          "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+          "https://yuristshevchuk.com/razbory/vernut-dolg-bez-raspiski/",
+          "https://yuristshevchuk.com/razbory/dolg-po-raspiske-prikaz-ili-isk/",
+          "https://yuristshevchuk.com/razbory/dengi-v-dolg-na-chuzhuyu-kartu/",
+          "https://yuristshevchuk.com/razbory/srok-vozvrata-dolga-ne-ukazan/",
+          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
           "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
           "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
           "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/"
+          "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
+          "https://yuristshevchuk.com/praktika/",
+          "https://yuristshevchuk.com/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
+          "https://yuristshevchuk.com/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske/",
+          "https://yuristshevchuk.com/o-yuriste/",
+          "https://yuristshevchuk.com/kontakty/",
+          "https://yuristshevchuk.com/politika-konfidencialnosti/"
         ],
-        "decision": "new-owner",
-        "reason": "Сценарий относится к нарушению срока устранения недостатка технически сложного товара и завершается самостоятельной досудебной претензией продавцу или уполномоченной организации. Существующие статьи посвящены услугам, добровольному отказу, навязанным договорам и исчезновению получателя денег."
+        "supportingCaseIds": ["debt-demand", "police-review"],
+        "excludedQueries": [
+          "адвокат по уголовному делу",
+          "бесплатная государственная юридическая помощь",
+          "готовый образец претензии без анализа документов",
+          "гарантия победы в суде"
+        ],
+        "existingCompetingUrlsReviewed": [
+          "https://yuristshevchuk.com/uslugi/",
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+          "https://yuristshevchuk.com/razbory/",
+          "https://yuristshevchuk.com/praktika/"
+        ],
+        "decision": "no-new-page",
+        "reason": "Поисковые задачи, адреса и владельцы интентов не менялись. Редактура делает существующие страницы понятнее и не создаёт новую конкурирующую страницу."
       }
     ],
     "serpSnapshots": [
       {
-        "intent": "выбрать и предъявить дилеру требование после нарушения срока гарантийного ремонта автомобиля",
-        "checkedAt": "2026-08-01T21:00:00.000Z",
+        "intent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы",
+        "checkedAt": "2026-08-02T09:38:00.000Z",
         "region": "Москва",
         "engines": [
           {
             "engine": "Yandex",
-            "query": "гарантийный ремонт автомобиля более 45 дней что делать",
-            "organicResultsReviewed": 20,
+            "query": "юрист досудебное урегулирование споров Москва",
+            "organicResultsReviewed": 10,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "информационный порядок действий после нарушения срока гарантийного ремонта автомобиля",
-            "resultTypes": [
-              "правовые справочные материалы",
-              "юридические статьи",
-              "официальные разъяснения",
-              "вопросы и ответы"
-            ],
-            "localPack": false,
-            "snippetPatterns": [
-              "срок ремонта 45 дней",
-              "возврат денег или замена",
-              "неустойка",
-              "ожидание запчастей",
-              "претензия дилеру"
-            ],
-            "competitorCoverageGaps": [
-              "часто смешиваются первые 15 дней, нарушение срока ремонта и совокупные 30 дней невозможности использования; редко дана схема выбора одного требования и проверки надлежащего адресата"
-            ],
-            "staleOrWeakResults": [
-              "часть материалов не учитывает действующее с 2026 года ограничение неустойки по статье 23"
-            ]
+            "dominantIntent": "коммерческий выбор юридической помощи для претензии и переговоров",
+            "resultTypes": ["страницы юридических компаний", "каталоги специалистов", "страницы отдельных услуг"],
+            "localPack": true,
+            "snippetPatterns": ["подготовка претензии", "переговоры", "стоимость услуги", "Москва и Московская область"],
+            "competitorCoverageGaps": ["мало страниц, где простым языком разделены первичная оценка, документы, стоимость и возможные дальнейшие действия без обещания результата"],
+            "staleOrWeakResults": ["часть результатов перегружена общими обещаниями и перечнями смежных услуг"]
           },
           {
             "engine": "Google",
-            "query": "гарантийный ремонт автомобиля более 45 дней что делать",
-            "organicResultsReviewed": 12,
+            "query": "досудебное урегулирование споров услуги юриста Москва",
+            "organicResultsReviewed": 10,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "практическая инструкция по требованиям к дилеру после затянувшегося гарантийного ремонта",
-            "resultTypes": [
-              "юридические статьи",
-              "правовые справочные системы",
-              "вопросы и ответы",
-              "обсуждения владельцев автомобилей"
-            ],
+            "dominantIntent": "сравнить услуги юристов по претензии, переговорам и подготовке спора к суду",
+            "resultTypes": ["страницы юридических фирм", "маркетплейсы специалистов", "информационно-коммерческие страницы услуг"],
             "localPack": false,
-            "snippetPatterns": [
-              "45 дней гарантийного ремонта",
-              "расторжение договора",
-              "замена автомобиля",
-              "неустойка",
-              "что делать владельцу"
-            ],
-            "competitorCoverageGaps": [
-              "многие результаты называют доступные требования, но не связывают акт приёма, письменный срок, соглашение о продлении, адресата претензии и отдельные сроки исполнения"
-            ],
-            "staleOrWeakResults": [
-              "в выдаче присутствуют старые обсуждения и короткие ответы без проверки действующей редакции закона"
-            ]
+            "snippetPatterns": ["досудебное урегулирование", "претензионная работа", "анализ документов", "цены и сроки"],
+            "competitorCoverageGaps": ["часто не объясняется, что именно получает клиент после изучения материалов и чем условия работы отличаются от гарантии исхода"],
+            "staleOrWeakResults": ["встречаются шаблонные описания без конкретного порядка первого обращения"]
           }
         ],
-        "pageTypeDecision": "article",
-        "decisionReason": "Обе органические выдачи показывают самостоятельную проблемную потребность владельца автомобиля, уже передавшего машину на гарантийный ремонт. Коммерческая страница услуги не может полноценно раскрыть расчёт срока и выбор требования.",
+        "pageTypeDecision": "existing page",
+        "decisionReason": "Выдача подтверждает коммерческий интент существующей главной страницы и страниц услуг. Новый URL не требуется; полезнее улучшить ясность текущих текстов.",
         "canProvideBetterAnswer": true
       }
     ],
     "practicalElements": [
       {
-        "contentId": "warranty-repair-over-45-days",
-        "targetUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
-        "type": "legal-route-table",
-        "title": "Матрица выбора требования после нарушения срока гарантийного ремонта",
-        "userValue": "Помогает выбрать один основной результат: завершение ремонта, возврат цены или замена автомобиля, а не смешивать несовместимые требования.",
-        "competitorGap": "В верхней выдаче требования обычно перечисляются без связи с целью владельца, надлежащим адресатом, документами и сроком исполнения.",
-        "sourceBasis": "Карточка C-021, диалог БПЮ, реплики клиента и подтверждённые паттерны о длительном ожидании и необходимости измеримого результата.",
-        "sourceIds": [
-          "C-021",
-          "69d936fe-9314-832b-93e3-39b1273a3c32",
-          "R-0085",
-          "R-0086",
-          "P-004",
-          "P-007",
-          "S-013"
-        ],
-        "placement": "Раздел «Какое требование выбрать после нарушения срока» внутри статьи.",
+        "contentId": "site-language-review",
+        "targetUrl": "https://yuristshevchuk.com/",
+        "type": "other-original-analysis",
+        "title": "Понятное объяснение первого обращения и условий работы",
+        "userValue": "Посетитель сразу понимает, что написать юристу, какие материалы приложить, когда обсуждается стоимость и почему условия работы не являются гарантией исхода дела.",
+        "competitorGap": "В просмотренной выдаче порядок первого обращения часто скрыт за общими рекламными обещаниями или длинным перечнем услуг.",
+        "sourceBasis": "Полная проверка 25 вкладок таблицы, клиентских формулировок, правил публикации и текущего публичного текста сайта.",
+        "sourceIds": ["C-021", "P-004", "P-007", "S-013"],
+        "placement": "Сквозные CTA, главная страница, страницы услуг, статей, кейсов и контактов.",
         "verifiedAgainstSerp": true
       }
     ],
     "cannibalizationChecked": true,
     "wordstat": {
       "used": false,
-      "reason": "Самостоятельность интента и тип страницы подтверждены внутренним обращением и двумя органическими выдачами; частотность не изменила бы архитектурное решение."
+      "reason": "Новые страницы и поисковые кластеры не создавались; редактура не меняет существующее распределение интентов."
     }
   },
   "editorialChecks": {
@@ -451,40 +206,52 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    {
-      "path": "src/automotive-warranty-data.mjs",
-      "kind": "article",
-      "contentId": "warranty-repair-over-45-days",
-      "action": "created",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
-    },
-    {
-      "path": "src/editorial-data.mjs",
-      "kind": "article-registration",
-      "contentId": "warranty-repair-over-45-days",
-      "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
-    },
-    {
-      "path": "site.config.mjs",
-      "kind": "content-date",
-      "contentId": "warranty-repair-over-45-days",
-      "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
-    }
-  ],
-  "plannedChecks": [
-    "npm run test:public-copy",
-    "npm run check",
-    "npm run test:live",
-    "node scripts/live-all-publications-smoke.mjs",
-    "node scripts/live-public-copy-regression-test.mjs"
+    { "path": "site.config.mjs", "kind": "site-wide-copy-date", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/data.mjs", "kind": "shared-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/service-content.mjs", "kind": "service-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/debt-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/debt-cluster-data-legacy.mjs", "kind": "article-and-case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/refund-services-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/police-inactivity-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/automotive-warranty-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/refund-voluntary-service-cancellation.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/editorial-data.mjs", "kind": "article-and-case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/case-studies.mjs", "kind": "case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/privacy-policy.mjs", "kind": "privacy-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/process-guarantees.mjs", "kind": "shared-conditions-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/search-visibility.mjs", "kind": "directory-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" }
   ],
   "publication": {
     "expectedUrls": [
-      "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/"
+      "https://yuristshevchuk.com/",
+      "https://yuristshevchuk.com/uslugi/",
+      "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+      "https://yuristshevchuk.com/uslugi/vzyskanie-dolga/",
+      "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+      "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/",
+      "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
+      "https://yuristshevchuk.com/uslugi/spory-biznesa/",
+      "https://yuristshevchuk.com/uslugi/marketpleysy/",
+      "https://yuristshevchuk.com/razbory/",
+      "https://yuristshevchuk.com/razbory/chto-delat-posle-otkaza-policii/",
+      "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+      "https://yuristshevchuk.com/razbory/vernut-dolg-bez-raspiski/",
+      "https://yuristshevchuk.com/razbory/dolg-po-raspiske-prikaz-ili-isk/",
+      "https://yuristshevchuk.com/razbory/dengi-v-dolg-na-chuzhuyu-kartu/",
+      "https://yuristshevchuk.com/razbory/srok-vozvrata-dolga-ne-ukazan/",
+      "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
+      "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+      "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
+      "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
+      "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
+      "https://yuristshevchuk.com/praktika/",
+      "https://yuristshevchuk.com/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
+      "https://yuristshevchuk.com/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske/",
+      "https://yuristshevchuk.com/o-yuriste/",
+      "https://yuristshevchuk.com/kontakty/",
+      "https://yuristshevchuk.com/politika-konfidencialnosti/"
     ],
-    "notes": "Публикация допускается только после полного CI, live-проверки нового URL и регрессии публичного текста всех ранее опубликованных статей.",
+    "notes": "Публикация допускается после полного локального набора проверок, CI, подтверждения production SHA и регрессии публичного текста всех статей.",
     "status": "ready-for-review"
   }
 }

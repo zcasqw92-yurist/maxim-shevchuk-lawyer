@@ -41,7 +41,7 @@ const articleHtml = await readFile(pageFile(articleRoute), "utf8");
 for (const marker of [
   'id="self-check"',
   'id="message-guide"',
-  "Что подготовить для предметного первого сообщения",
+  "Что кратко описать",
   "Что можно спросить у юриста",
   "Что написать юристу",
   'data-helpfulness-value="yes"',

@@ -51,10 +51,10 @@ const trustStrip = () => `
     <section class="trust-strip" aria-label="Условия начала работы">
       <div class="wrap trust-strip__grid">
         ${[
-          ["01", "Первично бесплатно", "Знакомлюсь с ситуацией и основными материалами"],
-          ["02", "Цена и срок заранее", "Условия фиксируются до начала подготовки"],
+          ["01", "Первое ознакомление бесплатно", "Смотрю ситуацию и основные материалы"],
+          ["02", "Цена и срок заранее", "Согласуем их до начала работы"],
           ["03", "Работаю лично", "Без операторов и передачи обращения третьим лицам"],
-          ["04", "После документа на связи", "Поясняю ответ, отказ или дальнейший шаг"],
+          ["04", "После документа на связи", "Объясняю смысл ответа или отказа и что делать дальше"],
         ].map(([number, title, text]) => `<article class="trust-strip__item proof-reveal"><span>${number}</span><div><strong>${title}</strong><small>${text}</small></div></article>`).join("")}
       </div>
     </section>`;
@@ -177,11 +177,11 @@ const secondaryCases = () => {
 const valueBlock = () => `
     <section class="section section--value section--value-editorial">
       <div class="wrap value-editorial">
-        <div class="value-editorial__intro proof-reveal"><span class="eyebrow">Результат работы</span><h2>Не просто консультация, а понятная опора для действия</h2><p>До начала платной работы становится понятно, что именно нужно сделать, а после подготовки — как пользоваться результатом.</p></div>
+        <div class="value-editorial__intro proof-reveal"><span class="eyebrow">Результат работы</span><h2>Вы получаете документ и понимаете, что делать дальше</h2><p>До начала работы я объясняю, что именно нужно подготовить. После передачи документа рассказываю, как им пользоваться.</p></div>
         <ol class="value-editorial__list">
           ${[
             ["01", "Правовая позиция", "Какие факты имеют значение, чем они подтверждаются и на чём можно строить требования."],
-            ["02", "Готовый результат", "Документ, расчёт или последовательность действий под конкретные обстоятельства."],
+            ["02", "Готовый результат", "Документ, расчёт или порядок действий с учётом ваших обстоятельств."],
             ["03", "Инструкция", "Куда и как направить материалы, какие сроки контролировать и что сохранить."],
             ["04", "Поддержка после ответа", "Можно показать отказ, отписку или новое требование и уточнить дальнейший шаг."],
           ].map(([number, title, text]) => `<li class="proof-reveal"><span>${number}</span><div><h3>${title}</h3><p>${text}</p></div></li>`).join("")}
@@ -199,8 +199,8 @@ const finalCta = () => `
     <section class="section section--cta section--cta-portrait">
       <div class="wrap cta-portrait proof-reveal">
         <img src="${asset("maxim-portrait.webp")}" width="900" height="900" loading="lazy" decoding="async" alt="Максим Юрьевич Шевчук">
-        <div><span class="eyebrow eyebrow--light">Первичный шаг бесплатный</span><h2>Не нужно самостоятельно выбирать претензию, жалобу или иск</h2><p>Коротко опишите, что произошло, и перечислите документы. Первично ознакомлюсь с материалами, отвечу на основные вопросы и предложу понятный следующий шаг.</p></div>
-        <button class="button button--gold" type="button" data-dialog-open>Передать ситуацию юристу${icon("arrow", "button__icon")}</button>
+        <div><span class="eyebrow eyebrow--light">Можно начать бесплатно</span><h2>Не нужно заранее выбирать претензию, жалобу или иск</h2><p>Коротко опишите, что произошло, и перечислите документы. Я посмотрю основные материалы, отвечу на первые вопросы и объясню, с чего начать.</p></div>
+        <button class="button button--gold" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button>
       </div>
     </section>`;
 
@@ -208,14 +208,14 @@ const videoDialog = () => `
   <dialog class="video-placeholder-dialog" id="video-placeholder-dialog" aria-labelledby="video-placeholder-title">
     <button class="proof-dialog__close" type="button" data-video-placeholder-close aria-label="Закрыть">${icon("close")}</button>
     <img src="${asset("maxim-hero.webp")}" width="1536" height="1024" loading="lazy" decoding="async" alt="Максим Юрьевич Шевчук в рабочем кабинете">
-    <div><span class="eyebrow">Видео готовится</span><h2 id="video-placeholder-title">Здесь будет короткое личное объяснение</h2><p>В ролике Максим Юрьевич объяснит, что не нужно самостоятельно определять название документа: достаточно передать ситуацию и основные материалы.</p><button class="button button--primary" type="button" data-video-contact data-dialog-open data-topic="первичное знакомство с ситуацией">Пока описать ситуацию${icon("arrow", "button__icon")}</button></div>
+    <div><span class="eyebrow">Видео готовится</span><h2 id="video-placeholder-title">Здесь будет короткое личное объяснение</h2><p>В ролике Максим Юрьевич объяснит, что не нужно заранее выбирать юридический документ: достаточно кратко описать, что произошло, и показать основные материалы.</p><button class="button button--primary" type="button" data-video-contact data-dialog-open data-topic="первичное знакомство с ситуацией">Пока описать ситуацию${icon("arrow", "button__icon")}</button></div>
   </dialog>`;
 
 const staticOffice = () => `
-    <section class="footer__map footer__map--static" aria-labelledby="office-map-title"><div class="wrap footer__map-static"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${escapeHtml(site.publicOffice.openingHoursLabel)}, по предварительной записи. Дистанционная работа возможна по России.</p></div><a class="footer-map-card" href="${escapeHtml(site.publicOffice.mapUrl)}" target="_blank" rel="noopener" data-track="map">${icon("pin")}<span><small>Яндекс Карты</small><strong>Открыть адрес и построить маршрут</strong><em>Карта не загружается до перехода</em></span>${icon("arrow")}</a></div></section>`;
+    <section class="footer__map footer__map--static" aria-labelledby="office-map-title"><div class="wrap footer__map-static"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${escapeHtml(site.publicOffice.openingHoursLabel)}, по предварительной записи. Дистанционная работа возможна по России.</p></div><a class="footer-map-card" href="${escapeHtml(site.publicOffice.mapUrl)}" target="_blank" rel="noopener" data-track="map">${icon("pin")}<span><small>Яндекс Карты</small><strong>Открыть адрес и построить маршрут</strong></span>${icon("arrow")}</a></div></section>`;
 
 const interactiveOffice = () => `
-    <section class="footer__map footer__map--interactive" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${escapeHtml(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу.</p><a class="text-link" href="${escapeHtml(site.publicOffice.mapUrl)}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><button class="map-poster" type="button" data-map-load aria-label="Загрузить интерактивную карту офиса">${icon("pin")}<span><small>Интерактивная карта не загружена</small><strong>Показать офис на карте</strong><em>Загрузится только после нажатия</em></span></button></div></section>`;
+    <section class="footer__map footer__map--interactive" aria-labelledby="office-map-title"><div class="wrap footer__map-grid"><div><span class="footer__title">Офис в Химках</span><h2 id="office-map-title">Химки, улица Горшина, 2</h2><p>Личный приём — ${escapeHtml(site.publicOffice.openingHoursLabel)}, по предварительной записи. Для согласования времени напишите Максиму Юрьевичу.</p><a class="text-link" href="${escapeHtml(site.publicOffice.mapUrl)}" target="_blank" rel="noopener" data-track="map">Построить маршрут ${icon("arrow")}</a></div><button class="map-poster" type="button" data-map-load aria-label="Показать офис на интерактивной карте">${icon("pin")}<span><small>Адрес офиса</small><strong>Показать на карте</strong></span></button></div></section>`;
 
 const injectGlobalAssets = (html) => appendToBuildSlot(
   html,

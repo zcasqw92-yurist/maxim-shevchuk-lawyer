@@ -122,7 +122,7 @@ const footer = (pageLastModified) => `
           <span class="brand__mark"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Шевчук"></span>
           <span class="brand__text"><strong>Максим Юрьевич Шевчук</strong><small>юрист · Москва</small></span>
         </a>
-        <p>Персональная юридическая практика. Досудебные претензии, жалобы, исковые заявления и защита денежных интересов.</p>
+        <p>Помогаю вернуть деньги, взыскать долг, подготовить претензию, жалобу или исковое заявление.</p>
       </div>
       <div>
         <h2 class="footer__title">Направления</h2>
@@ -271,7 +271,7 @@ const consentBanner = () => site.analytics?.enabled && site.analytics?.requireCo
   <aside class="consent-banner" data-consent-banner hidden aria-labelledby="consent-title">
     <div>
       <strong id="consent-title">Аналитика посещений</strong>
-      <p>С вашего согласия сайт загрузит системы аналитики, чтобы измерять полезность страниц и обращения. Без согласия они не запускаются.</p>
+      <p>С вашего согласия сайт включит аналитику, чтобы считать посещения и действия на страницах. Без согласия она не запускается.</p>
       <a href="/politika-konfidencialnosti/">Подробнее об обработке данных</a>
     </div>
     <div class="consent-banner__actions">
@@ -521,7 +521,7 @@ const priceBlock = () => `
     <div class="wrap">
       <div class="section-head section-head--split reveal">
         <div><span class="eyebrow">Ориентиры по стоимости</span><h2>Понятно, с чего начинается работа</h2></div>
-        <p>Это стартовые ориентиры за подготовку документов. Итоговая стоимость зависит от материалов, объёма требований и состава задачи.</p>
+        <p>Это примерная стоимость подготовки документов. Точная цена зависит от объёма материалов, количества требований и того, что именно нужно подготовить.</p>
       </div>
       <div class="price-grid">
         ${[
@@ -620,7 +620,7 @@ export const renderHome = () => ({
       <div class="wrap">
         <div class="section-head section-head--split reveal">
           <div><span class="eyebrow">С чем обращаются</span><h2>Когда обычная переписка уже не работает</h2></div>
-          <p>Выберите ситуацию, которая ближе к вашей. Правовая конструкция определяется после проверки документов.</p>
+          <p>Выберите ситуацию, которая ближе к вашей. После просмотра документов я уточню, что можно требовать и какой документ нужен.</p>
         </div>
         <div class="situation-grid">
           ${[
@@ -657,8 +657,8 @@ export const renderHome = () => ({
         <div class="about-preview__copy reveal">
           <span class="eyebrow">О юристе</span>
           <h2>Максим Юрьевич Шевчук</h2>
-          <p class="about-preview__lead">Персональная юридическая практика с фокусом на досудебном урегулировании, денежных и договорных спорах.</p>
-          <blockquote>«Задача юриста — не усложнить ситуацию терминами, а найти точку, в которой право начинает работать в пользу клиента».</blockquote>
+          <p class="about-preview__lead">Помогаю урегулировать споры до суда, вернуть деньги и решить договорные разногласия.</p>
+          <blockquote>«Моя задача — разобраться в фактах, объяснить ваши права и подготовить документ, которым можно пользоваться».</blockquote>
           <div class="education-note">${icon("education")}<div><strong>Высшее юридическое образование</strong><span>Российский государственный университет правосудия · диплом 2010 года</span></div></div>
           ${button("Подробнее о юристе", "/o-yuriste/", "secondary")}
         </div>
@@ -694,7 +694,7 @@ export const renderServices = () => {
       <section class="section section--services"><div class="wrap">${serviceCards()}</div></section>
       ${buildSlot("services-guide")}
       ${priceBlock()}
-      <section class="section section--dark compact-dark"><div class="wrap compact-dark__grid"><div><span class="eyebrow eyebrow--light">Не нашли точного совпадения?</span><h2>Описать факты полезнее, чем самостоятельно выбирать документ</h2></div><div><p>Иногда вместо претензии нужна жалоба, вместо заявления в полицию — гражданский иск, а до документа необходим анализ доказательств.</p><button class="button button--gold" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button></div></div></section>
+      <section class="section section--dark compact-dark"><div class="wrap compact-dark__grid"><div><span class="eyebrow eyebrow--light">Не нашли похожую услугу?</span><h2>Просто опишите, что произошло</h2></div><div><p>По документам и обстоятельствам я определю, нужна претензия, жалоба, иск или сначала дополнительная проверка доказательств.</p><button class="button button--gold" type="button" data-dialog-open>Описать ситуацию${icon("arrow", "button__icon")}</button></div></div></section>
       ${cta("Начнём с правильной квалификации", "Коротко изложите хронологию и сообщите, что подтверждается документами, платежами или перепиской.")}
     `,
   };
@@ -742,7 +742,7 @@ export const renderService = (service) => {
       <section class="section section--process"><div class="wrap"><div class="section-head reveal"><span class="eyebrow">Последовательность</span><h2>Как строится работа</h2></div><ol class="process-line"><li><span>01</span><strong>Материалы</strong><p>Вы передаёте краткую хронологию и имеющиеся документы.</p></li><li><span>02</span><strong>Анализ</strong><p>Определяю факты, доказательства и применимые основания.</p></li><li><span>03</span><strong>Позиция</strong><p>Согласовываем требования и ожидаемый результат.</p></li><li><span>04</span><strong>Документ</strong><p>Получаете готовый текст и пояснение дальнейших шагов.</p></li></ol></div></section>
       ${buildSlot("service-guide")}
       <section class="section section--consultation"><div class="wrap consultation-grid consultation-grid--reverse"><div class="consultation-copy reveal"><span class="eyebrow">Персональная работа</span><h2>Документ готовит Максим Юрьевич</h2><p class="lead">Формулировки связываются с вашими фактами и приложениями. После подготовки вы понимаете не только что направить, но и как реагировать на дальнейшее развитие спора.</p><div class="education-note">${icon("education")}<div><strong>Профильное образование</strong><span>Российский государственный университет правосудия</span></div></div>${button("О юристе", "/o-yuriste/", "secondary")}</div><div class="consultation-photo reveal"><img src="/assets/images/maxim-documents.webp" width="971" height="1600" loading="lazy" decoding="async" alt="Юрист Максим Шевчук работает с документами"></div></div></section>
-      <section class="section section--services"><div class="wrap"><div class="section-head section-head--split reveal"><div><span class="eyebrow">Связанные вопросы</span><h2>Другие этапы защиты позиции</h2></div><p>Один спор может последовательно потребовать претензию, обращение в орган и иск. Перейдите к смежному направлению, чтобы увидеть его задачу.</p></div>${relatedServiceCards(service.related)}</div></section>
+      <section class="section section--services"><div class="wrap"><div class="section-head section-head--split reveal"><div><span class="eyebrow">Может быть полезно</span><h2>Другие услуги по вашему спору</h2></div><p>Иногда после претензии требуется жалоба или иск. В этих разделах объяснено, когда нужна каждая услуга.</p></div>${relatedServiceCards(service.related)}</div></section>
       ${cta(`Обсудить: ${service.name.toLowerCase()}`, "Опишите обстоятельства и перечислите документы. Вопрос можно сформулировать обычными словами.")}
     `,
   };
@@ -762,11 +762,11 @@ export const renderAbout = () => {
     mainEntityId: entityUrl(site.personId),
     content: `
       ${breadcrumbs(crumbs)}
-      <section class="about-hero"><div class="wrap about-hero__grid"><div class="about-hero__photo"><img src="/assets/images/maxim-documents.webp" width="971" height="1600" alt="Максим Юрьевич Шевчук — юрист" fetchpriority="high" decoding="async"></div><div class="about-hero__copy"><span class="eyebrow">Персональная практика</span><h1>Максим Юрьевич Шевчук</h1><p class="about-hero__role">Юрист · Москва и Московская область</p><p class="lead">Работаю с досудебными, денежными и договорными спорами: изучаю документы, определяю правовое основание и собираю позицию под конкретную цель клиента.</p><div class="about-hero__facts"><div><strong>2010</strong><span>год получения юридического образования</span></div><div><strong>РГУП</strong><span>Российский государственный университет правосудия</span></div></div><button class="button button--primary" type="button" data-dialog-open>Обсудить ситуацию${icon("arrow", "button__icon")}</button></div></div></section>
-      <section class="section about-story"><div class="wrap story-grid"><div class="story-heading reveal"><span class="eyebrow">Рабочий принцип</span><h2>Сначала понять, что можно доказать</h2></div><div class="story-copy reveal"><p class="lead">В споре легко сосредоточиться на несправедливости произошедшего. Но юридический результат зависит от другого: какие обстоятельства имеют значение, чем они подтверждаются и какое требование следует из закона или договора.</p><p>Поэтому работа начинается не с шаблона документа. Сначала восстанавливается хронология, проверяются платежи, договорённости, переписка и ответы второй стороны. Только после этого формируется позиция.</p><blockquote>Хороший юридический документ позволяет постороннему человеку быстро увидеть логику дела — без догадок и эмоционального шума.</blockquote></div></div></section>
+      <section class="about-hero"><div class="wrap about-hero__grid"><div class="about-hero__photo"><img src="/assets/images/maxim-documents.webp" width="971" height="1600" alt="Максим Юрьевич Шевчук — юрист" fetchpriority="high" decoding="async"></div><div class="about-hero__copy"><span class="eyebrow">Персональная практика</span><h1>Максим Юрьевич Шевчук</h1><p class="about-hero__role">Юрист · Москва и Московская область</p><p class="lead">Работаю с досудебными, денежными и договорными спорами: изучаю документы, определяю правовое основание и готовлю требования с учётом цели клиента.</p><div class="about-hero__facts"><div><strong>2010</strong><span>год получения юридического образования</span></div><div><strong>РГУП</strong><span>Российский государственный университет правосудия</span></div></div><button class="button button--primary" type="button" data-dialog-open>Обсудить ситуацию${icon("arrow", "button__icon")}</button></div></div></section>
+      <section class="section about-story"><div class="wrap story-grid"><div class="story-heading reveal"><span class="eyebrow">Рабочий принцип</span><h2>Сначала понять, что можно доказать</h2></div><div class="story-copy reveal"><p class="lead">В споре важно не только то, что произошло, но и какие обстоятельства имеют юридическое значение, чем они подтверждаются и чего можно требовать по закону или договору.</p><p>Поэтому я не начинаю с шаблона. Сначала восстанавливаю хронологию, проверяю платежи, договорённости, переписку и ответы второй стороны. После этого определяю требования и готовлю документ.</p><blockquote>Хороший документ позволяет быстро понять, что произошло, чем это подтверждается и чего требует заявитель.</blockquote></div></div></section>
       <section class="section section--education"><div class="wrap education-grid"><div class="education-copy reveal"><span class="eyebrow">Образование</span><h2>Высшее юридическое образование</h2><dl><div><dt>Учебное заведение</dt><dd>Российский государственный университет правосудия, Москва</dd></div><div><dt>Направление</dt><dd>40.03.01 «Юриспруденция»</dd></div><div><dt>Квалификация</dt><dd>Бакалавр</dd></div><div><dt>Год выдачи диплома</dt><dd>2010</dd></div></dl><p class="muted">На сайте используется изображение диплома с закрытыми регистрационными данными.</p></div><figure class="diploma-card reveal"><img src="/assets/images/maxim-diploma.webp" width="1170" height="765" loading="lazy" decoding="async" alt="Диплом Максима Юрьевича Шевчука по направлению Юриспруденция"><figcaption>${icon("education")}Документ об образовании и квалификации</figcaption></figure></div></section>
-      <section class="section section--dark" id="process"><div class="wrap"><div class="section-head reveal"><span class="eyebrow eyebrow--light">Работа с обращением</span><h2>Четыре понятных этапа</h2></div><ol class="process-cards"><li><span>01</span><h3>Вы описываете ситуацию</h3><p>Свободным текстом, без необходимости подбирать юридические термины.</p></li><li><span>02</span><h3>Я изучаю материалы</h3><p>Проверяю документы, хронологию, платежи и уже полученные ответы.</p></li><li><span>03</span><h3>Определяю позицию</h3><p>Объясняю возможные требования, ограничения и последовательность действий.</p></li><li><span>04</span><h3>Готовлю результат</h3><p>Документ и пояснение, как им пользоваться при дальнейшем развитии ситуации.</p></li></ol></div></section>
-      ${cta("Передайте ситуацию на первичный разбор", "Краткой хронологии и перечня документов достаточно, чтобы начать предметный разговор.")}
+      <section class="section section--dark" id="process"><div class="wrap"><div class="section-head reveal"><span class="eyebrow eyebrow--light">Как проходит работа</span><h2>Четыре понятных этапа</h2></div><ol class="process-cards"><li><span>01</span><h3>Вы описываете ситуацию</h3><p>Свободным текстом, без необходимости подбирать юридические термины.</p></li><li><span>02</span><h3>Я изучаю материалы</h3><p>Проверяю документы, хронологию, платежи и уже полученные ответы.</p></li><li><span>03</span><h3>Объясняю варианты</h3><p>Рассказываю, чего можно требовать, какие есть ограничения и что делать по порядку.</p></li><li><span>04</span><h3>Готовлю документ</h3><p>Передаю готовый текст и объясняю, куда его направить и как действовать после ответа.</p></li></ol></div></section>
+      ${cta("Кратко опишите ситуацию", "Для начала достаточно изложить события по порядку и перечислить имеющиеся документы.")}
     `,
   };
 };
@@ -779,7 +779,7 @@ export const renderContacts = () => {
     : site.region;
   return {
     title: "Контакты юриста Максима Шевчука | Москва",
-    description: "Связаться с юристом Максимом Юрьевичем Шевчуком и передать ситуацию на первичный разбор.",
+    description: "Связаться с юристом Максимом Юрьевичем Шевчуком и кратко описать юридическую ситуацию.",
     image: "/assets/images/maxim-consultation.webp",
     imageAlt: "Юрист Максим Шевчук проводит консультацию",
     schema: [personSchema(), practiceSchema(), breadcrumbSchema(crumbs)],
@@ -787,9 +787,9 @@ export const renderContacts = () => {
     mainEntityId: entityUrl(site.organizationId),
     content: `
       ${breadcrumbs(crumbs)}
-      <section class="contact-page"><div class="wrap contact-page__grid"><div class="contact-page__intro"><span class="eyebrow">Связаться с юристом</span><h1>Начните с короткого сообщения</h1><p class="lead">Не нужно заполнять форму или подбирать юридические слова. Напишите, что произошло, — Максим Юрьевич лично уточнит детали и предложит следующий шаг.</p><div class="contact-page__methods"><a class="contact-method contact-method--whatsapp" href="${esc(whatsappLink())}" target="_blank" rel="noopener" data-track="whatsapp">${icon("whatsapp")}<span><small>WhatsApp</small><strong>${esc(site.phoneDisplay)}</strong></span>${icon("arrow")}</a><a class="contact-method contact-method--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-track="telegram">${icon("telegram")}<span><small>Telegram</small><strong>@lawrazbor</strong></span>${icon("arrow")}</a></div></div><aside class="contact-page__guide"><div class="contact-page__person"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Юрьевич Шевчук"><span>Максим Юрьевич Шевчук<br><small>юрист · Москва</small></span></div><h2>Что написать в первом сообщении</h2><ol><li><span>01</span>Коротко: что произошло и когда.</li><li><span>02</span>Что хотите получить в результате.</li><li><span>03</span>Какие документы, платежи или переписка сохранились.</li></ol><p>${icon("lock")}Конфиденциально. Сообщение поступает напрямую юристу.</p></aside></div></section>
-      ${office ? `<section class="section section--paper contact-location"><div class="wrap contact-location__grid"><div><span class="eyebrow">Личный приём</span><h2>Офис юридической консультации в Химках</h2><p>Встреча проходит по предварительной записи — так Максим Юрьевич заранее понимает предмет вопроса и может сообщить, какие документы взять с собой.</p></div><address><span>${icon("pin")}</span><div><small>Полный адрес</small><strong>${esc(`${site.publicOffice.postalCode}, ${site.publicOffice.addressRegion}, ${site.publicOffice.addressLocality}, ${site.publicOffice.streetAddress}`)}</strong><small>Часы связи и приёма</small><strong>${esc(site.publicOffice.openingHoursLabel)}, по записи</strong><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Открыть в Яндекс Картах ${icon("arrow")}</a></div></address></div></section>` : ""}
-      <section class="section section--faq"><div class="wrap faq-grid"><div class="faq-intro"><span class="eyebrow">Перед обращением</span><h2>Что можно приложить</h2><p>На первом этапе не обязательно отправлять всё. Сообщите, что у вас есть, и получите перечень действительно нужных материалов.</p></div>${faqBlock(faqs.slice(0, 2))}</div></section>
+      <section class="contact-page"><div class="wrap contact-page__grid"><div class="contact-page__intro"><span class="eyebrow">Связаться с юристом</span><h1>Начните с короткого сообщения</h1><p class="lead">Не нужно заполнять форму или подбирать юридические слова. Напишите, что произошло. Я сам уточню детали и объясню, с чего начать.</p><div class="contact-page__methods"><a class="contact-method contact-method--whatsapp" href="${esc(whatsappLink())}" target="_blank" rel="noopener" data-track="whatsapp">${icon("whatsapp")}<span><small>WhatsApp</small><strong>${esc(site.phoneDisplay)}</strong></span>${icon("arrow")}</a><a class="contact-method contact-method--telegram" href="${esc(site.telegram)}" target="_blank" rel="noopener" data-track="telegram">${icon("telegram")}<span><small>Telegram</small><strong>@lawrazbor</strong></span>${icon("arrow")}</a></div></div><aside class="contact-page__guide"><div class="contact-page__person"><img src="/assets/images/maxim-portrait.webp" width="900" height="900" alt="Максим Юрьевич Шевчук"><span>Максим Юрьевич Шевчук<br><small>юрист · Москва</small></span></div><h2>Что написать в первом сообщении</h2><ol><li><span>01</span>Коротко: что произошло и когда.</li><li><span>02</span>Что хотите получить в результате.</li><li><span>03</span>Какие документы, платежи или переписка сохранились.</li></ol><p>${icon("lock")}Конфиденциально. Сообщение поступает напрямую юристу.</p></aside></div></section>
+      ${office ? `<section class="section section--paper contact-location"><div class="wrap contact-location__grid"><div><span class="eyebrow">Личный приём</span><h2>Офис юридической консультации в Химках</h2><p>Встречи проходят по предварительной записи. До встречи кратко опишите вопрос, и я сообщу, какие документы взять с собой.</p></div><address><span>${icon("pin")}</span><div><small>Полный адрес</small><strong>${esc(`${site.publicOffice.postalCode}, ${site.publicOffice.addressRegion}, ${site.publicOffice.addressLocality}, ${site.publicOffice.streetAddress}`)}</strong><small>Часы связи и приёма</small><strong>${esc(site.publicOffice.openingHoursLabel)}, по записи</strong><a class="text-link" href="${esc(yandexMapsLink())}" target="_blank" rel="noopener" data-track="map">Открыть в Яндекс Картах ${icon("arrow")}</a></div></address></div></section>` : ""}
+      <section class="section section--faq"><div class="wrap faq-grid"><div class="faq-intro"><span class="eyebrow">Перед обращением</span><h2>Что можно приложить</h2><p>Сразу отправлять все документы не обязательно. Напишите, что у вас есть, и я скажу, какие материалы нужны для начала.</p></div>${faqBlock(faqs.slice(0, 2))}</div></section>
     `,
   };
 };

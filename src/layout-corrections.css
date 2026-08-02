@@ -367,5 +367,12 @@ html[data-proof-motion="ready"] .section--cta-portrait .cta-portrait,
 }
 
 @media (max-width: 350px) {
+  .hero__content,
+  .about-preview__copy,
+  .case-studies__head > * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .brand__text small { display: none; }
 }

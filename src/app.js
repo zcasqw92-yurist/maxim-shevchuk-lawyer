@@ -220,7 +220,7 @@ addEventListener("resize", () => {
 }, { passive: true });
 
 const genericMessage = "Здравствуйте, Максим Юрьевич. Хочу получить первичную оценку ситуации. Кратко опишу, что произошло, и приложу имеющиеся документы:";
-const defaultDialogCopy = "Выберите мессенджер. В нём откроется заполненный черновик, который можно изменить или не отправлять. Сайт не получает содержание сообщения.";
+const defaultDialogCopy = "Выберите мессенджер. Откроется готовое сообщение: его можно изменить перед отправкой. Сайт не получает его текст.";
 
 const cleanTelegramBase = (href) => {
   const url = new URL(href || "https://t.me/lawrazbor", location.href);
@@ -283,7 +283,7 @@ const openDialog = (control) => {
     topicLabel.textContent = topic ? `Вы выбрали: ${topic}` : "";
   }
   if (dialogCopy) dialogCopy.textContent = topic
-    ? "Выберите мессенджер. В нём откроется готовый черновик по выбранному вопросу. Измените его при необходимости и отправьте самостоятельно."
+    ? "Выберите мессенджер. Откроется готовое сообщение по выбранному вопросу. При необходимости измените его и отправьте самостоятельно."
     : defaultDialogCopy;
   dialog.showModal();
   track("messenger_dialog_open", { topic: topic || "general", page_path: location.pathname });

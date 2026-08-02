@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260802-public-copy-audit-fixes",
-  "reviewedAt": "2026-08-02T11:14:08.000Z",
+  "sessionId": "20260802-unofficial-work-unpaid-wages",
+  "reviewedAt": "2026-08-02T17:58:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-01T22:54:14.397Z",
+    "modifiedTime": "2026-08-02T17:55:00.000Z",
     "metadataTabCount": 25,
     "discoveredTabs": [
       "00_Старт",
@@ -35,166 +35,405 @@
     ]
   },
   "reviewedTabs": [
-    { "name": "00_Старт", "range": "A1:H45", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["project and publication rules"] },
-    { "name": "01_БПЮ", "range": "A1:AC17", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["client language and demand"] },
-    { "name": "02_ЮрДоки", "range": "A1:AA216", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["paid work and confirmed results"] },
-    { "name": "03_Оплаты", "range": "A1:M13", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed payment details"] },
-    { "name": "04_Дашборд", "range": "A1:Y87", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["operational context"] },
-    { "name": "05_Контроль", "range": "A1:K18", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["data gaps and control indicators"] },
-    { "name": "06_Импорт", "range": "A1:U8", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source coverage"] },
-    { "name": "_Справочники", "range": "A1:I24", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["classification"] },
-    { "name": "_Журнал", "range": "A1:K36", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["current demand evidence"] },
-    { "name": "07_Диалоги_исследование", "range": "A1:AK357", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience research"] },
-    { "name": "08_Банк_реплик", "range": "A1:V711", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["client wording and questions"] },
-    { "name": "09_Паттерны_аудитории", "range": "A1:X81", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["audience patterns"] },
-    { "name": "10_Контентные_возможности", "range": "A1:AP170", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content briefs and intent ownership"] },
-    { "name": "11_Кейсы_для_публикации", "range": "A1:AF105", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["case evidence and publication limits"] },
-    { "name": "12_Эффективные_ответы", "range": "A1:V147", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["effective communication patterns"] },
-    { "name": "13_Статистика_контента", "range": "A1:AB22", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content performance"] },
-    { "name": "14_Контент_дашборд", "range": "A1:N157", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content priorities"] },
-    { "name": "15_Обращения_с_контента", "range": "A1:AG4", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content attribution"] },
-    { "name": "_Реестр_диалогов", "range": "A1:Q357", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["source registry"] },
-    { "name": "_Ситуации_и_связи", "range": "A1:T360", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["cross-source links and result levels"] },
-    { "name": "_События_воронки", "range": "A1:J739", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["confirmed funnel events"] },
-    { "name": "_Версии_контента", "range": "A1:L22", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["content versions"] },
-    { "name": "16_Контроль_данных", "range": "A1:J17", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["critical data errors"] },
-    { "name": "_Импорт_ЮД_151_200", "range": "A1:T51", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["historical paid-work verification"] },
-    { "name": "Статьи_HARANT", "range": "A1:R3", "reviewedNonEmptyCells": true, "notesReviewed": true, "usedFor": ["external publication overlap"] }
+    {
+      "name": "00_Старт",
+      "range": "A1:H45",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "project and publication rules"
+      ]
+    },
+    {
+      "name": "01_БПЮ",
+      "range": "A1:AC17",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "client language and demand"
+      ]
+    },
+    {
+      "name": "02_ЮрДоки",
+      "range": "A1:AA216",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "paid work and confirmed results"
+      ]
+    },
+    {
+      "name": "03_Оплаты",
+      "range": "A1:M13",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "confirmed payment details"
+      ]
+    },
+    {
+      "name": "04_Дашборд",
+      "range": "A1:Y87",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "operational context"
+      ]
+    },
+    {
+      "name": "05_Контроль",
+      "range": "A1:K18",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "data gaps and control indicators"
+      ]
+    },
+    {
+      "name": "06_Импорт",
+      "range": "A1:U8",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "source coverage"
+      ]
+    },
+    {
+      "name": "_Справочники",
+      "range": "A1:I24",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "classification"
+      ]
+    },
+    {
+      "name": "_Журнал",
+      "range": "A1:K36",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "current demand evidence"
+      ]
+    },
+    {
+      "name": "07_Диалоги_исследование",
+      "range": "A1:AK357",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "audience research"
+      ]
+    },
+    {
+      "name": "08_Банк_реплик",
+      "range": "A1:V711",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "client wording and questions"
+      ]
+    },
+    {
+      "name": "09_Паттерны_аудитории",
+      "range": "A1:X81",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "audience patterns"
+      ]
+    },
+    {
+      "name": "10_Контентные_возможности",
+      "range": "A1:AP170",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content briefs and intent ownership"
+      ]
+    },
+    {
+      "name": "11_Кейсы_для_публикации",
+      "range": "A1:AF105",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "case evidence and publication limits"
+      ]
+    },
+    {
+      "name": "12_Эффективные_ответы",
+      "range": "A1:V147",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "effective communication patterns"
+      ]
+    },
+    {
+      "name": "13_Статистика_контента",
+      "range": "A1:AB22",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content performance"
+      ]
+    },
+    {
+      "name": "14_Контент_дашборд",
+      "range": "A1:N157",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content priorities"
+      ]
+    },
+    {
+      "name": "15_Обращения_с_контента",
+      "range": "A1:AG4",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content attribution"
+      ]
+    },
+    {
+      "name": "_Реестр_диалогов",
+      "range": "A1:Q357",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "source registry"
+      ]
+    },
+    {
+      "name": "_Ситуации_и_связи",
+      "range": "A1:T360",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "cross-source links and result levels"
+      ]
+    },
+    {
+      "name": "_События_воронки",
+      "range": "A1:J739",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "confirmed funnel events"
+      ]
+    },
+    {
+      "name": "_Версии_контента",
+      "range": "A1:L22",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "content versions"
+      ]
+    },
+    {
+      "name": "16_Контроль_данных",
+      "range": "A1:J17",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "critical data errors"
+      ]
+    },
+    {
+      "name": "_Импорт_ЮД_151_200",
+      "range": "A1:T51",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "historical paid-work verification"
+      ]
+    },
+    {
+      "name": "Статьи_HARANT",
+      "range": "A1:R3",
+      "reviewedNonEmptyCells": true,
+      "notesReviewed": true,
+      "usedFor": [
+        "external publication overlap"
+      ]
+    }
   ],
   "sourceTrace": {
-    "dialogIds": [],
-    "situationIds": [],
+    "dialogIds": [
+      "6a65c73d-d584-83eb-91ee-47e246c23051",
+      "6a23c9cb-0778-83eb-a2fc-2047b6843b65"
+    ],
+    "situationIds": [
+      "SIT-20260726-001",
+      "SIT-20260606-002"
+    ],
     "workIds": [],
-    "contentIds": ["C-021"],
+    "contentIds": [
+      "C-005"
+    ],
     "caseIds": [],
-    "notes": "Выполняется второй точечный проход по замечаниям контрольного аудита существующего публичного текста без добавления новых фактов, услуг, результатов дел или цен. Повтор одного и того же CTA во всех 11 разборах сохраняется по прямому решению владельца сайта. Полностью проверены значения, заметки, формулы, ссылки и правила проверки данных во всех 25 вкладках. Основные ограничения: использовать язык клиента, не смешивать выполненную работу с результатом дела и не заявлять неподтверждённый исход."
+    "notes": "Внутренние обращения подтверждают самостоятельную проблему: длительная работа без оформления, частичные авансы, табели, журналы, переписка и спор о размере оплаты. Оплаченная работа и подтверждённый итог по этим ситуациям не установлены, поэтому кейс и утверждение о положительном результате не создаются."
   },
   "seoReview": {
     "status": "completed",
-    "checkedAt": "2026-08-02T09:40:00.000Z",
+    "checkedAt": "2026-08-02T17:57:27.063Z",
     "region": "Москва",
-    "primaryIntent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы",
+    "primaryIntent": "взыскать невыплаченную зарплату после фактической работы без оформленного трудового договора",
     "verifiedCluster": [
-      "юрист досудебное урегулирование споров Москва",
-      "досудебное урегулирование споров услуги юриста Москва",
-      "подготовка претензии и переговоры с юристом"
+      "работал без трудового договора не выплатили зарплату",
+      "работал неофициально не отдали зарплату",
+      "как доказать трудовые отношения без договора",
+      "взыскать зарплату при неофициальном трудоустройстве"
     ],
     "intentMap": [
-      { "intent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы", "target": "existing page owner /" },
-      { "intent": "заказать конкретную юридическую услугу", "target": "existing service owners under /uslugi/" },
-      { "intent": "получить ответ на конкретную правовую ситуацию", "target": "existing article owners under /razbory/" },
-      { "intent": "посмотреть подтверждённые примеры работы", "target": "existing case owners under /praktika/" }
+      {
+        "intent": "взыскать зарплату после работы без оформленного трудового договора",
+        "target": "new article owner /razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+      },
+      {
+        "intent": "заказать подготовку иска об установлении трудовых отношений и взыскании зарплаты",
+        "target": "existing service owner /uslugi/iskovoe-zayavlenie/"
+      },
+      {
+        "intent": "официально оформленному работнику задержали зарплату без спора о трудовых отношениях",
+        "target": "excluded from this article; future research only"
+      },
+      {
+        "intent": "не оплатили разовую работу или гражданско-правовой договор",
+        "target": "excluded civil-law route"
+      }
     ],
     "intentOwnership": [
       {
-        "intent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы",
-        "ownerUrl": "https://yuristshevchuk.com/",
-        "ownerType": "page",
+        "intent": "взыскать невыплаченную зарплату после фактической работы без оформленного трудового договора",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/",
+        "ownerType": "article",
         "supportingUrls": [
-          "https://yuristshevchuk.com/uslugi/",
-          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
-          "https://yuristshevchuk.com/uslugi/vzyskanie-dolga/",
-          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/",
           "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
-          "https://yuristshevchuk.com/uslugi/spory-biznesa/",
-          "https://yuristshevchuk.com/uslugi/marketpleysy/",
-          "https://yuristshevchuk.com/razbory/",
-          "https://yuristshevchuk.com/razbory/chto-delat-posle-otkaza-policii/",
-          "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
-          "https://yuristshevchuk.com/razbory/vernut-dolg-bez-raspiski/",
-          "https://yuristshevchuk.com/razbory/dolg-po-raspiske-prikaz-ili-isk/",
-          "https://yuristshevchuk.com/razbory/dengi-v-dolg-na-chuzhuyu-kartu/",
-          "https://yuristshevchuk.com/razbory/srok-vozvrata-dolga-ne-ukazan/",
-          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
-          "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-          "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
-          "https://yuristshevchuk.com/praktika/",
-          "https://yuristshevchuk.com/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
-          "https://yuristshevchuk.com/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske/",
-          "https://yuristshevchuk.com/o-yuriste/",
-          "https://yuristshevchuk.com/kontakty/",
-          "https://yuristshevchuk.com/politika-konfidencialnosti/"
+          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"
         ],
-        "supportingCaseIds": ["debt-demand", "police-review"],
+        "supportingCaseIds": [],
         "excludedQueries": [
-          "адвокат по уголовному делу",
-          "бесплатная государственная юридическая помощь",
-          "готовый образец претензии без анализа документов",
-          "гарантия победы в суде"
+          "задержка зарплаты официальному работнику",
+          "незаконное увольнение и восстановление на работе",
+          "оплата по договору подряда",
+          "оплата самозанятому",
+          "производственная травма без оформления",
+          "образец иска о зарплате бесплатно"
         ],
         "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/uslugi/",
-          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+          "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
+          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/",
           "https://yuristshevchuk.com/razbory/",
-          "https://yuristshevchuk.com/praktika/"
+          "https://yuristshevchuk.com/uslugi/vzyskanie-dolga/"
         ],
-        "decision": "no-new-page",
-        "reason": "Поисковые задачи, адреса и владельцы интентов не менялись. Редактура делает существующие страницы понятнее и не создаёт новую конкурирующую страницу."
+        "decision": "new-owner",
+        "reason": "Существующие страницы не раскрывают установление трудовых отношений, доказательство конкретного работодателя и расчёт зарплаты при частичных авансах. Органическая выдача подтверждает отдельную информационную потребность."
       }
     ],
     "serpSnapshots": [
       {
-        "intent": "выбрать юриста для досудебного урегулирования спора и понять порядок работы",
-        "checkedAt": "2026-08-02T09:38:00.000Z",
+        "intent": "взыскать невыплаченную зарплату после фактической работы без оформленного трудового договора",
+        "checkedAt": "2026-08-02T17:57:27.063Z",
         "region": "Москва",
         "engines": [
           {
             "engine": "Yandex",
-            "query": "юрист досудебное урегулирование споров Москва",
-            "organicResultsReviewed": 10,
+            "query": "работал без трудового договора не выплатили зарплату",
+            "organicResultsReviewed": 20,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "коммерческий выбор юридической помощи для претензии и переговоров",
-            "resultTypes": ["страницы юридических компаний", "каталоги специалистов", "страницы отдельных услуг"],
-            "localPack": true,
-            "snippetPatterns": ["подготовка претензии", "переговоры", "стоимость услуги", "Москва и Московская область"],
-            "competitorCoverageGaps": ["мало страниц, где простым языком разделены первичная оценка, документы, стоимость и возможные дальнейшие действия без обещания результата"],
-            "staleOrWeakResults": ["часть результатов перегружена общими обещаниями и перечнями смежных услуг"]
+            "dominantIntent": "информационная инструкция по доказыванию неофициальной работы и взысканию зарплаты",
+            "resultTypes": [
+              "юридические статьи",
+              "официальные разъяснения",
+              "правовые справочные материалы",
+              "вопросы и ответы"
+            ],
+            "localPack": false,
+            "snippetPatterns": [
+              "работал неофициально",
+              "доказать трудовые отношения",
+              "трудовая инспекция",
+              "иск в суд",
+              "взыскать зарплату"
+            ],
+            "competitorCoverageGaps": [
+              "редко разделяются доказательства факта работы, работодателя, периода, ставки и итогового долга с учётом авансов"
+            ],
+            "staleOrWeakResults": [
+              "часть публикаций ограничивается общим перечислением инспекции, прокуратуры и суда без расчёта и проверки работодателя"
+            ]
           },
           {
             "engine": "Google",
-            "query": "досудебное урегулирование споров услуги юриста Москва",
-            "organicResultsReviewed": 10,
+            "query": "работал без трудового договора не выплатили зарплату",
+            "organicResultsReviewed": 9,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "сравнить услуги юристов по претензии, переговорам и подготовке спора к суду",
-            "resultTypes": ["страницы юридических фирм", "маркетплейсы специалистов", "информационно-коммерческие страницы услуг"],
+            "dominantIntent": "практический порядок получения зарплаты при неофициальной работе",
+            "resultTypes": [
+              "юридические статьи",
+              "официальные ответы",
+              "правовые инструкции",
+              "образовательные материалы"
+            ],
             "localPack": false,
-            "snippetPatterns": ["досудебное урегулирование", "претензионная работа", "анализ документов", "цены и сроки"],
-            "competitorCoverageGaps": ["часто не объясняется, что именно получает клиент после изучения материалов и чем условия работы отличаются от гарантии исхода"],
-            "staleOrWeakResults": ["встречаются шаблонные описания без конкретного порядка первого обращения"]
+            "snippetPatterns": [
+              "не выплатили зарплату",
+              "работа без договора",
+              "куда обращаться",
+              "признать трудовые отношения",
+              "подать иск"
+            ],
+            "competitorCoverageGaps": [
+              "мало материалов, которые показывают единую матрицу доказательств и отдельно объясняют спор о размере обещанной оплаты"
+            ],
+            "staleOrWeakResults": [
+              "встречаются короткие рекомендации без границы между трудовым спором и неоплаченным гражданским заказом"
+            ]
           }
         ],
-        "pageTypeDecision": "existing page",
-        "decisionReason": "Выдача подтверждает коммерческий интент существующей главной страницы и страниц услуг. Новый URL не требуется; полезнее улучшить ясность текущих текстов.",
+        "pageTypeDecision": "article",
+        "decisionReason": "Обе системы показывают самостоятельный проблемный запрос. Коммерческая страница иска не может полноценно раскрыть признаки трудовых отношений, доказательства ставки и расчёт долга.",
         "canProvideBetterAnswer": true
       }
     ],
     "practicalElements": [
       {
-        "contentId": "site-language-review",
-        "targetUrl": "https://yuristshevchuk.com/",
-        "type": "other-original-analysis",
-        "title": "Понятное объяснение первого обращения и условий работы",
-        "userValue": "Посетитель сразу понимает, что написать юристу, какие материалы приложить, когда обсуждается стоимость и почему условия работы не являются гарантией исхода дела.",
-        "competitorGap": "В просмотренной выдаче порядок первого обращения часто скрыт за общими рекламными обещаниями или длинным перечнем услуг.",
-        "sourceBasis": "Полная проверка 25 вкладок таблицы, клиентских формулировок, правил публикации и текущего публичного текста сайта.",
-        "sourceIds": ["C-021", "P-004", "P-007", "S-013"],
-        "placement": "Сквозные CTA, главная страница, страницы услуг, статей, кейсов и контактов.",
+        "contentId": "unofficial-work-unpaid-wages",
+        "targetUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/",
+        "type": "evidence-matrix",
+        "title": "Матрица доказательств и расчёта по пяти вопросам",
+        "userValue": "Помогает проверить не только факт работы, но и работодателя, период, согласованную ставку и остаток долга с учётом авансов.",
+        "competitorGap": "Большинство верхних результатов перечисляет способы обращения, но не связывает пять самостоятельных предметов доказывания в одну проверяемую схему.",
+        "sourceBasis": "реальные обращения БПЮ, дословные реплики, контентная карточка и актуальные нормы трудового права",
+        "sourceIds": [
+          "C-005",
+          "6a65c73d-d584-83eb-91ee-47e246c23051",
+          "6a23c9cb-0778-83eb-a2fc-2047b6843b65",
+          "R-0008",
+          "R-0197",
+          "R-0198",
+          "SIT-20260726-001",
+          "SIT-20260606-002"
+        ],
+        "placement": "раздел «Сначала разделите доказательства на пять частей» и связанный расчёт задолженности",
         "verifiedAgainstSerp": true
       }
     ],
     "cannibalizationChecked": true,
+    "overOptimizationRisk": "low",
     "wordstat": {
       "used": false,
-      "reason": "Новые страницы и поисковые кластеры не создавались; редактура не меняет существующее распределение интентов."
+      "reason": "Самостоятельность интента и тип страницы подтверждены внутренними обращениями и двумя органическими выдачами; частотность не изменила бы архитектурное решение."
     }
   },
   "editorialChecks": {
@@ -206,58 +445,39 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    { "path": "site.config.mjs", "kind": "site-wide-copy-date", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/data.mjs", "kind": "shared-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/service-content.mjs", "kind": "service-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/app.js", "kind": "messenger-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/render.mjs", "kind": "service-layout-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/process-guarantees.mjs", "kind": "shared-conditions-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/publication-linking.mjs", "kind": "publication-link-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/editorial-enhancements.mjs", "kind": "publication-feedback-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/editorial-render.mjs", "kind": "case-link-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/debt-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/debt-cluster-data-legacy.mjs", "kind": "article-and-case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/refund-services-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/police-inactivity-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/automotive-warranty-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/refund-voluntary-service-cancellation.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/refund-imposed-service.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/editorial-data.mjs", "kind": "article-and-case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/case-studies.mjs", "kind": "case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/privacy-policy.mjs", "kind": "privacy-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/search-visibility.mjs", "kind": "directory-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" }
+    {
+      "path": "src/informal-employment-wage-data.mjs",
+      "kind": "article",
+      "contentId": "unofficial-work-unpaid-wages",
+      "action": "created",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+    },
+    {
+      "path": "src/editorial-data.mjs",
+      "kind": "article-registration",
+      "contentId": "unofficial-work-unpaid-wages",
+      "action": "updated",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+    },
+    {
+      "path": "site.config.mjs",
+      "kind": "content-date",
+      "contentId": "unofficial-work-unpaid-wages",
+      "action": "updated",
+      "expectedUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+    }
   ],
   "publication": {
     "expectedUrls": [
-      "https://yuristshevchuk.com/",
-      "https://yuristshevchuk.com/uslugi/",
-      "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
-      "https://yuristshevchuk.com/uslugi/vzyskanie-dolga/",
-      "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-      "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/",
-      "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
-      "https://yuristshevchuk.com/uslugi/spory-biznesa/",
-      "https://yuristshevchuk.com/uslugi/marketpleysy/",
-      "https://yuristshevchuk.com/razbory/",
-      "https://yuristshevchuk.com/razbory/chto-delat-posle-otkaza-policii/",
-      "https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
-      "https://yuristshevchuk.com/razbory/vernut-dolg-bez-raspiski/",
-      "https://yuristshevchuk.com/razbory/dolg-po-raspiske-prikaz-ili-isk/",
-      "https://yuristshevchuk.com/razbory/dengi-v-dolg-na-chuzhuyu-kartu/",
-      "https://yuristshevchuk.com/razbory/srok-vozvrata-dolga-ne-ukazan/",
-      "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
-      "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
-      "https://yuristshevchuk.com/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
-      "https://yuristshevchuk.com/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
-      "https://yuristshevchuk.com/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
-      "https://yuristshevchuk.com/praktika/",
-      "https://yuristshevchuk.com/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
-      "https://yuristshevchuk.com/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske/",
-      "https://yuristshevchuk.com/o-yuriste/",
-      "https://yuristshevchuk.com/kontakty/",
-      "https://yuristshevchuk.com/politika-konfidencialnosti/"
+      "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
     ],
-    "notes": "Публикация допускается после полного локального набора проверок, CI, подтверждения production SHA и регрессии публичного текста всех статей.",
+    "notes": "Публикуется статья без кейса и без заявления положительного результата. Завершение возможно только после полного CI, подтверждения production SHA и проверки всех прежних статей.",
     "status": "ready-for-review"
-  }
+  },
+  "plannedChecks": [
+    "npm run check",
+    "npm run test:live",
+    "node scripts/live-all-publications-smoke.mjs",
+    "node scripts/live-public-copy-regression-test.mjs"
+  ]
 }

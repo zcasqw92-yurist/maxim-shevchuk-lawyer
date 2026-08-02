@@ -1,0 +1,73 @@
+name: C-005 live verification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/c005-live-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify production SHA and all publications
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      EXPECTED_BUILD_SHA: '8110e236760f7897f055eabfcfcf634498dbec99'
+      SITE_CUSTOM_DOMAIN_URL: 'https://yuristshevchuk.com/'
+      SITE_PUBLIC_URL: 'https://yuristshevchuk.com/'
+      SITE_CANONICAL_URL: 'https://yuristshevchuk.com/'
+      CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '60'
+      CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify main domain SHA
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Verify every article and case
+        run: node scripts/live-all-publications-smoke.mjs
+
+      - name: Verify public copy regression
+        run: node scripts/live-public-copy-regression-test.mjs
+
+      - name: Verify C-005 content
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          import urllib.request
+          url = 'https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/?c005_live=8110e236760f'
+          req = urllib.request.Request(url, headers={'Cache-Control': 'no-cache', 'Pragma': 'no-cache', 'User-Agent': 'Mozilla/5.0'})
+          with urllib.request.urlopen(req, timeout=30) as response:
+              html = response.read().decode('utf-8')
+              assert response.status == 200
+          required = [
+              'Работал без трудового договора и не выплатили зарплату: как доказать долг',
+              'Сначала разделите доказательства на пять частей',
+              'Как подтверждать размер обещанной зарплаты',
+              'Составьте расчёт задолженности по каждому периоду',
+              'Куда обращаться за выплатой',
+          ]
+          for text in required:
+              assert text in html, text
+          assert 'rel="canonical" href="https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"' in html
+          assert re.search(r'<meta\s+name="site-build-sha"\s+content="8110e236760f7897f055eabfcfcf634498dbec99"', html)
+          print('C-005 live content verified')
+          PY

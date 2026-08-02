@@ -1,0 +1,42 @@
+name: Интеграция C-005
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/scripts/integrate-c005.mjs'
+      - '.github/workflows/integrate-c005.yml'
+      - 'src/informal-employment-wage-data.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.head_ref == 'agent/c005-unpaid-wages-article'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Получить ветку
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Интегрировать статью
+        run: node .github/scripts/integrate-c005.mjs
+
+      - name: Зафиксировать изменения
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/content-governance.json docs/current-production-state.md reports/content-sessions/latest.json site.config.mjs src/editorial-data.mjs .github/scripts/integrate-c005.mjs .github/workflows/integrate-c005.yml
+          git commit -m "Интегрировать разбор о невыплате зарплаты"
+          git push origin HEAD:${{ github.head_ref }}

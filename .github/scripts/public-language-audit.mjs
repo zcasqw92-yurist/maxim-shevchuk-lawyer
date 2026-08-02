@@ -19,13 +19,18 @@ const collectHtml = (directory) => {
   return files;
 };
 
-const canonicalUrls = [...new Set(collectHtml(dist).flatMap((filePath) => {
+const targets = collectHtml(dist).flatMap((filePath) => {
+  const relative = path.relative(dist, filePath).replace(/\\/g, '/');
   const html = fs.readFileSync(filePath, 'utf8');
-  const match = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)
-    || html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i);
-  if (!match || !/^https:\/\/yuristshevchuk\.com\//.test(match[1])) return [];
-  return [match[1]];
-}))].sort((a, b) => new URL(a).pathname.localeCompare(new URL(b).pathname, 'ru'));
+  if (relative === '404.html') return [];
+  if (/http-equiv=["']refresh["']/i.test(html)) return [];
+  if (/name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(html)) return [];
+  let pathname;
+  if (relative === 'index.html') pathname = '/';
+  else if (relative.endsWith('/index.html')) pathname = `/${relative.slice(0, -'index.html'.length)}`;
+  else pathname = `/${relative}`;
+  return [{ filePath, pathname }];
+}).sort((a, b) => a.pathname.localeCompare(b.pathname, 'ru'));
 
 const port = '4199';
 const origin = `http://127.0.0.1:${port}`;
@@ -68,11 +73,10 @@ try {
     viewport: { width: 1440, height: 1000 },
   });
 
-  for (const publicUrl of canonicalUrls) {
-    const pathname = new URL(publicUrl).pathname;
+  for (const target of targets) {
     const page = await context.newPage();
-    const response = await page.goto(`${origin}${pathname}`, { waitUntil: 'networkidle', timeout: 30000 });
-    if (!response?.ok()) throw new Error(`${pathname}: HTTP ${response?.status()}`);
+    const response = await page.goto(`${origin}${target.pathname}`, { waitUntil: 'networkidle', timeout: 30000 });
+    if (!response?.ok()) throw new Error(`${target.pathname}: HTTP ${response?.status()}`);
 
     const extracted = await page.evaluate(() => {
       const visible = (el) => {
@@ -101,21 +105,22 @@ try {
       return {
         title: document.title,
         h1: clean(document.querySelector('h1')?.innerText || ''),
+        canonical: document.querySelector('link[rel="canonical"]')?.href || '',
         bodyText: document.body.innerText,
         blocks,
       };
     });
 
     pages.push({
-      url: publicUrl,
-      pathname,
+      url: extracted.canonical || `https://yuristshevchuk.com${target.pathname}`,
+      pathname: target.pathname,
       title: normalize(extracted.title),
       h1: normalize(extracted.h1),
       bodyText: normalize(extracted.bodyText),
       blocks: extracted.blocks.map((item) => ({ ...item, text: normalize(item.text) })),
     });
     await page.close();
-    console.log(`AUDITED ${pathname}: ${extracted.blocks.length} blocks`);
+    console.log(`AUDITED ${target.pathname}: ${extracted.blocks.length} blocks`);
   }
 } finally {
   await browser.close();
@@ -138,5 +143,5 @@ for (const page of pages) {
 }
 fs.writeFileSync(path.join(outDir, 'public-text.md'), `${md.join('\n')}\n`);
 
-if (pages.length < 20) throw new Error(`Expected at least 20 canonical pages, got ${pages.length}`);
+if (pages.length < 20) throw new Error(`Expected at least 20 public pages, got ${pages.length}`);
 console.log(`Public language audit export completed: ${pages.length} pages.`);

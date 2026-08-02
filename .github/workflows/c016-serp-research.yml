@@ -1,0 +1,56 @@
+name: C-016 SERP research
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/c016-serp-research.yml'
+      - 'scripts/c016-serp-research.mjs'
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22.17.0'
+
+jobs:
+  research:
+    name: Verify Yandex and Google organic results
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+      YANDEX_CLOUD_FOLDER_ID: ${{ secrets.YANDEX_CLOUD_FOLDER_ID }}
+      SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+      SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+
+    steps:
+      - name: Checkout research branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Collect and validate organic results
+        run: node scripts/c016-serp-research.mjs
+
+      - name: Upload normalized research report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c016-serp-research-${{ github.run_id }}
+          path: reports/c016-serp-research
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish report summary
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f reports/c016-serp-research/results.md ]]; then
+            cat reports/c016-serp-research/results.md >> "$GITHUB_STEP_SUMMARY"
+          fi

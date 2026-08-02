@@ -30,6 +30,7 @@ for (const service of services) {
   const serviceArticles = articles.filter((item) => item.serviceSlug === service.slug);
   const serviceCases = practiceCases.filter((item) => item.serviceSlug === service.slug);
   if (serviceArticles.length && !html.includes("publication-linking--service")) errors.push(`${service.slug}: отсутствует автоматический блок публикаций`);
+  if (html.includes("Новые публикации этого направления добавляются сюда автоматически")) errors.push(`${service.slug}: посетителю показано техническое описание публикации`);
   for (const article of serviceArticles) if (!hasHref(html, articlePath(article))) errors.push(`${service.slug}: не отображается статья ${article.slug}`);
   for (const item of serviceCases) if (!hasHref(html, casePath(item))) errors.push(`${service.slug}: не отображается кейс ${item.slug}`);
 }
@@ -60,7 +61,10 @@ for (const item of practiceCases) {
   if (service) {
     const expectedTopic = `похожая ситуация: ${service.name.toLowerCase()}`;
     if (!html.includes(`data-topic="${expectedTopic}"`)) errors.push(`${item.slug}: итоговый CTA не соответствует направлению ${service.slug}`);
+    if (!html.includes("Столкнулись с похожей ситуацией?")) errors.push(`${item.slug}: итоговый CTA не сформулирован языком клиента`);
+    if (!html.includes(`>${service.name}</a>`)) errors.push(`${item.slug}: вместо названия услуги показана внутренняя подпись`);
   }
+  if (html.includes("Связанная услуга")) errors.push(`${item.slug}: осталась внутренняя подпись «Связанная услуга»`);
 }
 
 const knownRoutes = new Set([

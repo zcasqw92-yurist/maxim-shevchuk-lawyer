@@ -94,7 +94,7 @@ const runEngine = async (engineName, engine) => {
 
         await page.locator("[data-header] [data-dialog-open]").first().click();
         let links = await dialogLinks(page);
-        const genericParts = ["Хочу получить первичную оценку ситуации", "Кратко опишу"];
+        const genericParts = ["Хочу понять, что можно сделать в моей ситуации", "Кратко опишу"];
         expectParts(`${label}: generic Telegram`, textParam(links.telegram), genericParts);
         expectParts(`${label}: generic WhatsApp`, textParam(links.whatsapp), genericParts);
         await closeDialog(links.dialog);

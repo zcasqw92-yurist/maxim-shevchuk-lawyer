@@ -113,7 +113,6 @@ const articleIntake = (article) => {
 const helpfulness = (id, kind) => `
     <section class="editorial-helpfulness" aria-labelledby="editorial-helpfulness-title" data-editorial-helpfulness data-publication-id="${esc(id)}" data-publication-kind="${esc(kind)}">
       <div class="editorial-helpfulness__copy">
-        <span>Обратная связь без персональных данных</span>
         <h2 id="editorial-helpfulness-title">Статья была полезна?</h2>
       </div>
       <div class="editorial-helpfulness__actions" role="group" aria-label="Оценка полезности материала">

@@ -8,14 +8,14 @@ const errors = [];
 
 const expectedPages = [
   ["услуги", join("uslugi", "index.html"), "catalog-sequence"],
-  ...services.map((service) => [service.slug, join("uslugi", service.slug, "index.html"), "after-contact"]),
+  ...services.map((service) => [service.slug, join("uslugi", service.slug, "index.html"), "single-flow"]),
 ];
 
 const titles = [
-  "Первое ознакомление бесплатно",
-  "Цена фиксируется заранее",
-  "Срок известен до оплаты",
-  "После документа — на связи",
+  "Вы описываете ситуацию",
+  "Я смотрю основные документы",
+  "До оплаты согласуем работу",
+  "После подготовки остаюсь на связи",
 ];
 
 for (const [label, pagePath, placement] of expectedPages) {
@@ -31,9 +31,11 @@ for (const [label, pagePath, placement] of expectedPages) {
   }
 
   const guaranteeIndex = html.indexOf('class="section section--process-guarantees"');
-  if (placement === "after-contact") {
+  if (placement === "single-flow") {
     const contactIndex = html.indexOf('class="contact-path');
-    if (contactIndex < 0 || guaranteeIndex < contactIndex) errors.push(`${label}: блок должен идти после сценария первого обращения`);
+    const serviceHeroIndex = html.indexOf('class="service-hero"');
+    if (contactIndex >= 0) errors.push(`${label}: сценарий первого обращения не должен дублировать единый порядок работы`);
+    if (serviceHeroIndex < 0 || guaranteeIndex < serviceHeroIndex) errors.push(`${label}: единый порядок работы должен идти после первого экрана услуги`);
     if (finalCtaCount !== 1) errors.push(`${label}: на странице услуги должен остаться один персональный финальный CTA, найдено ${finalCtaCount}`);
   }
   if (placement === "catalog-sequence") {
@@ -87,4 +89,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; the catalog follows the approved narrative sequence, the palette is consistent, and detail pages keep their personal CTA`);
+console.log(`Process guarantees checks passed: ${expectedPages.length} service pages; detail pages use one work-flow block, the catalog sequence and palette are consistent, and personal CTAs are preserved`);

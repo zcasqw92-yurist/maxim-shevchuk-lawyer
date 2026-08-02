@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260802-site-language-review",
-  "reviewedAt": "2026-08-02T09:42:56.000Z",
+  "sessionId": "20260802-public-copy-audit-fixes",
+  "reviewedAt": "2026-08-02T11:14:08.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
     "modifiedTime": "2026-08-01T22:54:14.397Z",
@@ -67,7 +67,7 @@
     "workIds": [],
     "contentIds": ["C-021"],
     "caseIds": [],
-    "notes": "Проведена редактура существующего публичного текста без добавления новых фактов, услуг, результатов дел или цен. Полностью проверены значения, заметки, формулы, ссылки и правила проверки данных во всех 25 вкладках. Основные ограничения: использовать язык клиента, не смешивать выполненную работу с результатом дела и не заявлять неподтверждённый исход."
+    "notes": "Выполняется второй точечный проход по замечаниям контрольного аудита существующего публичного текста без добавления новых фактов, услуг, результатов дел или цен. Повтор одного и того же CTA во всех 11 разборах сохраняется по прямому решению владельца сайта. Полностью проверены значения, заметки, формулы, ссылки и правила проверки данных во всех 25 вкладках. Основные ограничения: использовать язык клиента, не смешивать выполненную работу с результатом дела и не заявлять неподтверждённый исход."
   },
   "seoReview": {
     "status": "completed",
@@ -209,16 +209,22 @@
     { "path": "site.config.mjs", "kind": "site-wide-copy-date", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/data.mjs", "kind": "shared-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/service-content.mjs", "kind": "service-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/app.js", "kind": "messenger-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/render.mjs", "kind": "service-layout-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/process-guarantees.mjs", "kind": "shared-conditions-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/publication-linking.mjs", "kind": "publication-link-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/editorial-enhancements.mjs", "kind": "publication-feedback-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/editorial-render.mjs", "kind": "case-link-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/debt-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/debt-cluster-data-legacy.mjs", "kind": "article-and-case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/refund-services-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/police-inactivity-cluster-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/automotive-warranty-data.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/refund-voluntary-service-cancellation.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
+    { "path": "src/refund-imposed-service.mjs", "kind": "article-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/editorial-data.mjs", "kind": "article-and-case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/case-studies.mjs", "kind": "case-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/privacy-policy.mjs", "kind": "privacy-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
-    { "path": "src/process-guarantees.mjs", "kind": "shared-conditions-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" },
     { "path": "src/search-visibility.mjs", "kind": "directory-copy", "contentId": "site-language-review", "action": "updated", "expectedUrl": "https://yuristshevchuk.com/" }
   ],
   "publication": {

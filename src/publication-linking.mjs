@@ -50,7 +50,6 @@ const serviceMaterialsBlock = ({ service, articles, practiceCases, html }) => {
         <div class="wrap">
           <div class="section-head section-head--split reveal">
             <div><span class="eyebrow">Материалы по направлению</span><div class="publication-linking__title" id="publication-linking-${esc(service.slug)}" role="heading" aria-level="2">Разборы и практика по этой теме</div></div>
-            <p>Новые публикации этого направления добавляются сюда автоматически после прохождения редакционной и технической проверки.</p>
           </div>
           <div class="editorial-grid publication-linking__grid">${serviceArticles.map(articleCard).join("")}${missingCases.map(caseCard).join("")}</div>
         </div>
@@ -82,7 +81,7 @@ const updateCaseCta = (html, practiceCase, services) => {
   if (!service) return html;
   const cta = html.match(/<section class="editorial-cta"[\s\S]*?<\/section>/)?.[0];
   if (!cta) throw new Error(`Перелинковка: не найден итоговый CTA кейса ${practiceCase.slug}`);
-  const title = `Есть похожая задача по направлению «${service.name}»?`;
+  const title = "Столкнулись с похожей ситуацией?";
   const topic = `похожая ситуация: ${service.name.toLowerCase()}`;
   const updated = cta
     .replace(/<h2 id="editorial-cta-title">[\s\S]*?<\/h2>/, `<h2 id="editorial-cta-title">${esc(title)}</h2>`)

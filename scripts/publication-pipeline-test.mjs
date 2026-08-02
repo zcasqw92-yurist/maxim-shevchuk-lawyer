@@ -51,6 +51,28 @@ for (const marker of [
   if (!articleHtml.includes(marker)) errors.push(`${articleRoute}: missing publication marker ${marker}`);
 }
 
+for (const item of articles) {
+  const route = `/razbory/${item.slug}/`;
+  const html = await readFile(pageFile(route), "utf8");
+  for (const marker of [
+    'id="self-check"',
+    'id="message-guide"',
+    "Перед сообщением юристу",
+    "Проверить свою ситуацию",
+    "Что написать юристу",
+    'class="editorial-cta"',
+  ]) {
+    if (!html.includes(marker)) errors.push(`${route}: согласованный повторяющийся CTA повреждён, отсутствует ${marker}`);
+  }
+  if (html.includes("Обратная связь без персональных данных")) errors.push(`${route}: осталась техническая подпись блока оценки`);
+}
+
+for (const item of practiceCases) {
+  const route = `/praktika/${item.slug}/`;
+  const html = await readFile(pageFile(route), "utf8");
+  if (html.includes("Обратная связь без персональных данных")) errors.push(`${route}: осталась техническая подпись блока оценки`);
+}
+
 const manifest = JSON.parse(await readFile(join(dist, "editorial-publications.json"), "utf8"));
 if (manifest.schemaVersion !== 1) errors.push("editorial-publications.json: unsupported schemaVersion");
 if (manifest.counts?.articles !== articles.length || manifest.counts?.practiceCases !== practiceCases.length) {

@@ -733,7 +733,6 @@ export const renderService = (service) => {
           <aside class="service-hero__card"><span class="service-hero__icon">${icon(service.icon)}</span><strong>С чего начинается работа</strong><p>С проверки документов, хронологии, платежей, переписки и уже полученных ответов.</p>${service.priceFrom ? `<div class="service-hero__price"><small>Подготовка документа</small><b>${esc(service.priceFrom)}</b></div>` : ""}<ul><li>${icon("check")}Факты</li><li>${icon("check")}Доказательства</li><li>${icon("check")}Правовое основание</li></ul></aside>
         </div>
       </section>
-      ${contactPath("contact-path--service")}
       ${buildSlot("service-guarantees")}
       <section class="section"><div class="wrap two-lists">
         <div class="reveal"><span class="eyebrow">Когда это направление подходит</span><h2>Типовые исходные ситуации</h2><ul class="number-list">${service.problems.map((item, i) => `<li><span>0${i + 1}</span><p>${esc(item)}</p></li>`).join("")}</ul></div>

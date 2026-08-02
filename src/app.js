@@ -219,7 +219,7 @@ addEventListener("resize", () => {
   if (mobileMenuOpen && matchMedia("(min-width: 901px)").matches) closeMobileMenu({ restoreFocus: false });
 }, { passive: true });
 
-const genericMessage = "Здравствуйте, Максим Юрьевич. Хочу получить первичную оценку ситуации. Кратко опишу, что произошло, и приложу имеющиеся документы:";
+const genericMessage = "Здравствуйте, Максим Юрьевич. Хочу понять, что можно сделать в моей ситуации. Кратко опишу, что произошло, и приложу имеющиеся документы:";
 const defaultDialogCopy = "Выберите мессенджер. Откроется готовое сообщение: его можно изменить перед отправкой. Сайт не получает его текст.";
 
 const cleanTelegramBase = (href) => {

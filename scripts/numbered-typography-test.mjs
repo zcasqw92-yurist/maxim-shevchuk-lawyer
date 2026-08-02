@@ -52,13 +52,11 @@ const routes = [
   {
     route: serviceRoute,
     indexChecks: [
-      [".contact-path__steps > li > span", 15],
       [".process-guarantee > span", 15],
       [".process-line > li > span", 15],
       [".service-card__number", 14],
     ],
     copyChecks: [
-      [".contact-path__steps p", 14],
       [".process-guarantee p", 15],
       [".process-line p", 15],
       [".service-card p", 14],

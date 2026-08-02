@@ -180,7 +180,7 @@ try {
   const genericTelegram = await dialog.locator("[data-track='telegram']").getAttribute("href");
   if (!genericWhatsapp?.startsWith("https://api.whatsapp.com/send?phone=79806574199&text=")) failures.push("interaction: WhatsApp draft is missing");
   if (!genericTelegram?.startsWith("https://t.me/lawrazbor?text=")) failures.push("interaction: Telegram draft is missing");
-  if (!prefilledText(genericTelegram).includes("Хочу получить первичную оценку ситуации")) failures.push("interaction: generic prefilled text changed");
+  if (!prefilledText(genericTelegram).includes("Хочу понять, что можно сделать в моей ситуации")) failures.push("interaction: generic prefilled text changed");
   await dialog.locator("[data-dialog-close]").click();
 
   await interactionPage.locator('[data-topic="ориентир стоимости юридической помощи"]').first().click();
@@ -258,7 +258,7 @@ try {
     const mobileDialog = page.locator("#contact-dialog[open]");
     await mobileDialog.waitFor({ state: "visible" });
     const mobileTelegram = await mobileDialog.locator("[data-track='telegram']").getAttribute("href");
-    if (!prefilledText(mobileTelegram).includes("Хочу получить первичную оценку ситуации")) failures.push(`mobile ${width}px: starter message is incomplete`);
+    if (!prefilledText(mobileTelegram).includes("Хочу понять, что можно сделать в моей ситуации")) failures.push(`mobile ${width}px: starter message is incomplete`);
     if (await mobileDialog.locator("form, input, select, textarea").count()) failures.push(`mobile ${width}px: dialog contains data-entry controls`);
     await mobileDialog.locator("[data-dialog-close]").click();
 

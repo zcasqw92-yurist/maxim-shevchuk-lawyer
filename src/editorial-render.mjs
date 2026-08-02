@@ -1,5 +1,6 @@
 import { site } from "../site.config.mjs";
 import { formatContentDate } from "./content-dates.mjs";
+import { services } from "./data.mjs";
 import { renderShell } from "./render.mjs";
 import {
   articles,
@@ -243,6 +244,7 @@ export const renderArticlePage = (articleOrSlug) => {
 export const renderPracticeCasePage = (caseOrSlug) => {
   const item = typeof caseOrSlug === "string" ? findPracticeCaseBySlug(caseOrSlug) : caseOrSlug;
   if (!item) throw new Error("Не найден практический кейс");
+  const service = services.find((entry) => entry.slug === item.serviceSlug);
   const path = `/praktika/${item.slug}/`;
   const crumbs = [{ name: "Главная", path: "/" }, { name: "Практика", path: "/praktika/" }, { name: item.title, path }];
   const linkedArticles = item.relatedArticleSlugs.map(findArticleBySlug).filter(Boolean);
@@ -278,7 +280,7 @@ export const renderPracticeCasePage = (caseOrSlug) => {
             ${linkedArticles.length ? `<section class="article-section editorial-related"><h2>Разбор по этой теме</h2>${linkedArticles.map(articleCard).join("")}</section>` : ""}
             ${authorCard()}
           </div>
-          <aside class="editorial-case-aside"><strong>Ограничения публикации</strong><p>Не раскрываются ФИО, адреса, номера материалов и иные идентификаторы. Описание не является обещанием аналогичного результата.</p><a href="/uslugi/${item.serviceSlug}/">Связанная услуга</a></aside>
+          <aside class="editorial-case-aside"><strong>Ограничения публикации</strong><p>Не раскрываются ФИО, адреса, номера материалов и иные идентификаторы. Описание не является обещанием аналогичного результата.</p><a href="/uslugi/${item.serviceSlug}/">${esc(service?.name || "Услуга по теме")}</a></aside>
         </div>
       </article>
       <div class="wrap">${messengerCta("жалоба на отказ или неполную проверку", "Столкнулись с похожей проверкой?")}</div>

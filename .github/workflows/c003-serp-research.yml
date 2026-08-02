@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/c003-serp-research.yml'
       - 'scripts/c003-serp-research.mjs'
+      - 'scripts/c003-google-key-crosscheck.mjs'
       - 'scripts/c003-google-browser-fallback.mjs'
 
 permissions:
@@ -46,8 +47,19 @@ jobs:
         shell: bash
         run: node scripts/c003-serp-research.mjs || true
 
-      - name: Complete Google through browser when API is unavailable
-        run: node scripts/c003-google-browser-fallback.mjs
+      - name: Cross-check the configured key against SerpApi
+        shell: bash
+        run: node scripts/c003-google-key-crosscheck.mjs || true
+
+      - name: Complete Google through browser when APIs are unavailable
+        shell: bash
+        run: |
+          google_count="$(node -e "const r=require('./reports/c003-serp-research/results.json'); const g=(r.engines||[]).find(x=>x.engine==='Google'); process.stdout.write(String(g?.organic?.length||0));")"
+          if [[ "${google_count}" -ge 5 ]]; then
+            echo "Google organic results already obtained: ${google_count}"
+          else
+            node scripts/c003-google-browser-fallback.mjs
+          fi
 
       - name: Upload normalized research report
         if: always()

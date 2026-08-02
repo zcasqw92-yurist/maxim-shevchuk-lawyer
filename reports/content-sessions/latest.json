@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260802-unofficial-work-unpaid-wages",
-  "reviewedAt": "2026-08-02T17:58:00.000Z",
+  "sessionId": "20260802-unpaid-services-without-contract",
+  "reviewedAt": "2026-08-02T21:32:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-02T17:55:00.000Z",
+    "modifiedTime": "2026-08-02T21:25:56.239Z",
     "metadataTabCount": 25,
     "discoveredTabs": [
       "00_Старт",
@@ -263,169 +263,186 @@
   ],
   "sourceTrace": {
     "dialogIds": [
-      "6a65c73d-d584-83eb-91ee-47e246c23051",
-      "6a23c9cb-0778-83eb-a2fc-2047b6843b65"
+      "6996cc94-efec-8386-8cbc-99b2be595059"
     ],
     "situationIds": [
-      "SIT-20260726-001",
-      "SIT-20260606-002"
+      "SIT-20260219-001"
     ],
-    "workIds": [],
+    "workIds": [
+      "ЮД-ИМП-094",
+      "ЮД-ИМП-136",
+      "ЮД-ИМП-171",
+      "ЮД-ИМП-177"
+    ],
     "contentIds": [
-      "C-005"
+      "C-016"
     ],
     "caseIds": [],
-    "notes": "Внутренние обращения подтверждают самостоятельную проблему: длительная работа без оформления, частичные авансы, табели, журналы, переписка и спор о размере оплаты. Оплаченная работа и подтверждённый итог по этим ситуациям не установлены, поэтому кейс и утверждение о положительном результате не создаются."
+    "notes": "Прямое обращение БПЮ подтверждает потребность в досудебной претензии после выполнения услуги без письменного договора. Исторические записи ЮрДоки подтверждают оплаченную подготовку претензий и правовых позиций по взысканию оплаты за монтажные, малярные, интерьерные и иные работы. Итог взыскания отдельно не подтверждён, поэтому публичный кейс и обещание результата не создаются."
   },
   "seoReview": {
     "status": "completed",
-    "checkedAt": "2026-08-02T17:57:27.063Z",
+    "checkedAt": "2026-08-02T21:29:13.039Z",
     "region": "Москва",
-    "primaryIntent": "взыскать невыплаченную зарплату после фактической работы без оформленного трудового договора",
+    "primaryIntent": "взыскать оплату за выполненную разовую работу или оказанную услугу без единого подписанного договора",
     "verifiedCluster": [
-      "работал без трудового договора не выплатили зарплату",
-      "работал неофициально не отдали зарплату",
-      "как доказать трудовые отношения без договора",
-      "взыскать зарплату при неофициальном трудоустройстве"
+      "как взыскать оплату за выполненную работу без договора",
+      "заказчик не оплатил работу без договора",
+      "взыскать оплату за услуги по переписке",
+      "претензия заказчику за неоплаченную работу"
     ],
     "intentMap": [
       {
-        "intent": "взыскать зарплату после работы без оформленного трудового договора",
-        "target": "new article owner /razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+        "intent": "взыскать оплату за выполненную разовую работу или услугу без подписанного договора",
+        "target": "new article owner /razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
       },
       {
-        "intent": "заказать подготовку иска об установлении трудовых отношений и взыскании зарплаты",
-        "target": "existing service owner /uslugi/iskovoe-zayavlenie/"
+        "intent": "заказать досудебную претензию с расчётом задолженности заказчика",
+        "target": "existing service owner /uslugi/dosudebnoe-uregulirovanie/"
       },
       {
-        "intent": "официально оформленному работнику задержали зарплату без спора о трудовых отношениях",
-        "target": "excluded from this article; future research only"
+        "intent": "не выплатили зарплату при неофициальной работе",
+        "target": "existing article owner /razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
       },
       {
-        "intent": "не оплатили разовую работу или гражданско-правовой договор",
-        "target": "excluded civil-law route"
+        "intent": "вернуть заем без расписки",
+        "target": "existing article owner /razbory/vernut-dolg-bez-raspiski/"
+      },
+      {
+        "intent": "заказчик требует возврат за неоказанную услугу",
+        "target": "existing refund cluster owner /razbory/vernut-dengi-za-neokazannuyu-uslugu/"
       }
     ],
     "intentOwnership": [
       {
-        "intent": "взыскать невыплаченную зарплату после фактической работы без оформленного трудового договора",
-        "ownerUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/",
+        "intent": "взыскать оплату за выполненную разовую работу или оказанную услугу без единого подписанного договора",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/",
         "ownerType": "article",
         "supportingUrls": [
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
           "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
-          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"
+          "https://yuristshevchuk.com/uslugi/spory-biznesa/"
         ],
         "supportingCaseIds": [],
         "excludedQueries": [
-          "задержка зарплаты официальному работнику",
-          "незаконное увольнение и восстановление на работе",
-          "оплата по договору подряда",
-          "оплата самозанятому",
-          "производственная травма без оформления",
-          "образец иска о зарплате бесплатно"
+          "не выплатили зарплату без трудового договора",
+          "вернуть долг без расписки",
+          "возврат денег за неоказанную услугу",
+          "бесплатный образец претензии",
+          "некачественная работа требования заказчика",
+          "спор по подписанному договору с согласованным актом"
         ],
         "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/",
-          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/",
-          "https://yuristshevchuk.com/razbory/",
-          "https://yuristshevchuk.com/uslugi/vzyskanie-dolga/"
+          "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/",
+          "https://yuristshevchuk.com/razbory/vernut-dolg-bez-raspiski/",
+          "https://yuristshevchuk.com/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+          "https://yuristshevchuk.com/uslugi/spory-biznesa/",
+          "https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/"
         ],
         "decision": "new-owner",
-        "reason": "Существующие страницы не раскрывают установление трудовых отношений, доказательство конкретного работодателя и расчёт зарплаты при частичных авансах. Органическая выдача подтверждает отдельную информационную потребность."
+        "reason": "Существующие страницы раскрывают трудовую зарплату, заем и требования заказчика о возврате денег, но не показывают исполнителю, как доказать гражданский заказ, цену, передачу и принятие результата, рассчитать задолженность и подготовить претензию."
       }
     ],
     "serpSnapshots": [
       {
-        "intent": "взыскать невыплаченную зарплату после фактической работы без оформленного трудового договора",
-        "checkedAt": "2026-08-02T17:57:27.063Z",
+        "intent": "взыскать оплату за выполненную разовую работу или оказанную услугу без единого подписанного договора",
+        "checkedAt": "2026-08-02T21:29:13.039Z",
         "region": "Москва",
         "engines": [
           {
             "engine": "Yandex",
-            "query": "работал без трудового договора не выплатили зарплату",
+            "query": "как взыскать оплату за выполненную работу без договора",
             "organicResultsReviewed": 20,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "информационная инструкция по доказыванию неофициальной работы и взысканию зарплаты",
+            "dominantIntent": "практическая инструкция исполнителю по взысканию стоимости работ или услуг без единого договора",
             "resultTypes": [
               "юридические статьи",
-              "официальные разъяснения",
-              "правовые справочные материалы",
+              "судебные обзоры",
+              "правовые справочные подборки",
               "вопросы и ответы"
             ],
             "localPack": false,
             "snippetPatterns": [
-              "работал неофициально",
-              "доказать трудовые отношения",
-              "трудовая инспекция",
-              "иск в суд",
-              "взыскать зарплату"
+              "выполненные работы без договора",
+              "переписка и счета",
+              "принятие результата",
+              "претензия",
+              "взыскание в суде"
             ],
             "competitorCoverageGaps": [
-              "редко разделяются доказательства факта работы, работодателя, периода, ставки и итогового долга с учётом авансов"
+              "редко связываются заказ, объём, цена, исполнение, принятие и остаток долга в одну доказательственную матрицу",
+              "слабо объясняется различие между договорным требованием и стоимостью фактически полученного результата"
             ],
             "staleOrWeakResults": [
-              "часть публикаций ограничивается общим перечислением инспекции, прокуратуры и суда без расчёта и проверки работодателя"
+              "часть результатов ограничивается перечнем документов и общей рекомендацией обратиться в суд без расчёта и досудебного маршрута"
             ]
           },
           {
             "engine": "Google",
-            "query": "работал без трудового договора не выплатили зарплату",
+            "query": "как взыскать оплату за выполненную работу без договора",
             "organicResultsReviewed": 9,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "практический порядок получения зарплаты при неофициальной работе",
+            "dominantIntent": "взыскание оплаты исполнителем после выполнения работ без письменного договора",
             "resultTypes": [
+              "правовые подборки",
               "юридические статьи",
-              "официальные ответы",
-              "правовые инструкции",
-              "образовательные материалы"
+              "ответы бизнесу",
+              "материалы о трудовых спорах"
             ],
             "localPack": false,
             "snippetPatterns": [
-              "не выплатили зарплату",
-              "работа без договора",
-              "куда обращаться",
-              "признать трудовые отношения",
-              "подать иск"
+              "заказчик не заплатил",
+              "работы без договора",
+              "доказать выполнение",
+              "подать претензию и иск",
+              "принятие результата"
             ],
             "competitorCoverageGaps": [
-              "мало материалов, которые показывают единую матрицу доказательств и отдельно объясняют спор о размере обещанной оплаты"
+              "выдача смешивает разовый гражданский заказ с трудовой зарплатой",
+              "мало материалов с отдельной проверкой цены, приёмки и авансов"
             ],
             "staleOrWeakResults": [
-              "встречаются короткие рекомендации без границы между трудовым спором и неоплаченным гражданским заказом"
+              "несколько результатов посвящены работнику без трудового договора и не отвечают исполнителю по гражданскому заказу"
             ]
           }
         ],
         "pageTypeDecision": "article",
-        "decisionReason": "Обе системы показывают самостоятельный проблемный запрос. Коммерческая страница иска не может полноценно раскрыть признаки трудовых отношений, доказательства ставки и расчёт долга.",
+        "decisionReason": "Обе системы подтверждают отдельную проблемную потребность. Коммерческая страница досудебного урегулирования не должна заменять подробную доказательственную инструкцию для исполнителя, а статья о зарплате принадлежит другому правовому маршруту.",
         "canProvideBetterAnswer": true
       }
     ],
     "practicalElements": [
       {
-        "contentId": "unofficial-work-unpaid-wages",
-        "targetUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/",
+        "contentId": "unpaid-services-without-contract",
+        "targetUrl": "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/",
         "type": "evidence-matrix",
-        "title": "Матрица доказательств и расчёта по пяти вопросам",
-        "userValue": "Помогает проверить не только факт работы, но и работодателя, период, согласованную ставку и остаток долга с учётом авансов.",
-        "competitorGap": "Большинство верхних результатов перечисляет способы обращения, но не связывает пять самостоятельных предметов доказывания в одну проверяемую схему.",
-        "sourceBasis": "реальные обращения БПЮ, дословные реплики, контентная карточка и актуальные нормы трудового права",
+        "title": "Матрица из шести обстоятельств и развилка правового основания",
+        "userValue": "Помогает исполнителю проверить заказ, объём, цену, выполнение, передачу и принятие результата, рассчитать остаток после авансов и понять, какой документ нужен дальше.",
+        "competitorGap": "Верхние результаты обычно перечисляют переписку, счета и акты, но редко соединяют их с расчётом и выбором между договорным требованием и взысканием стоимости фактически полученного результата.",
+        "sourceBasis": "прямое обращение БПЮ, подтверждённые паттерны аудитории, оплаченная подготовка претензий и актуальные нормы гражданского права",
         "sourceIds": [
-          "C-005",
-          "6a65c73d-d584-83eb-91ee-47e246c23051",
-          "6a23c9cb-0778-83eb-a2fc-2047b6843b65",
-          "R-0008",
-          "R-0197",
-          "R-0198",
-          "SIT-20260726-001",
-          "SIT-20260606-002"
+          "C-016",
+          "6996cc94-efec-8386-8cbc-99b2be595059",
+          "SIT-20260219-001",
+          "R-0033",
+          "R-0034",
+          "P-002",
+          "P-004",
+          "P-008",
+          "P-015",
+          "ЮД-ИМП-094",
+          "ЮД-ИМП-136",
+          "ЮД-ИМП-171",
+          "ЮД-ИМП-177"
         ],
-        "placement": "раздел «Сначала разделите доказательства на пять частей» и связанный расчёт задолженности",
+        "placement": "разделы о шести обстоятельствах, расчёте долга, досудебной претензии и выборе правового основания",
         "verifiedAgainstSerp": true
       }
     ],
@@ -433,7 +450,7 @@
     "overOptimizationRisk": "low",
     "wordstat": {
       "used": false,
-      "reason": "Самостоятельность интента и тип страницы подтверждены внутренними обращениями и двумя органическими выдачами; частотность не изменила бы архитектурное решение."
+      "reason": "Самостоятельность потребности, коммерческий документ и тип страницы подтверждены внутренними источниками и двумя органическими выдачами; частотность не изменила бы решение."
     }
   },
   "editorialChecks": {
@@ -446,32 +463,32 @@
   },
   "contentChanges": [
     {
-      "path": "src/informal-employment-wage-data.mjs",
+      "path": "src/unpaid-services-without-contract-data.mjs",
       "kind": "article",
-      "contentId": "unofficial-work-unpaid-wages",
+      "contentId": "unpaid-services-without-contract",
       "action": "created",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+      "expectedUrl": "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
     },
     {
       "path": "src/editorial-data.mjs",
       "kind": "article-registration",
-      "contentId": "unofficial-work-unpaid-wages",
+      "contentId": "unpaid-services-without-contract",
       "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+      "expectedUrl": "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
     },
     {
       "path": "site.config.mjs",
       "kind": "content-date",
-      "contentId": "unofficial-work-unpaid-wages",
+      "contentId": "unpaid-services-without-contract",
       "action": "updated",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+      "expectedUrl": "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
     }
   ],
   "publication": {
     "expectedUrls": [
-      "https://yuristshevchuk.com/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/"
+      "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
     ],
-    "notes": "Публикуется статья без кейса и без заявления положительного результата. Завершение возможно только после полного CI, подтверждения production SHA и проверки всех прежних статей.",
+    "notes": "Публикуется статья, ведущая к подготовке досудебной претензии и при необходимости иска. Положительный результат по историческим работам не заявляется. Завершение возможно только после полного CI, подтверждения production SHA и повторной проверки прежних статей.",
     "status": "ready-for-review"
   },
   "plannedChecks": [

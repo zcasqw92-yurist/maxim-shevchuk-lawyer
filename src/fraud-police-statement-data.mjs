@@ -6,6 +6,7 @@ import {
 export const fraudPoliceStatementArticles = sourceArticles.map((article) => ({
   ...article,
   status: "published",
+  relatedCaseIds: [],
 }));
 
 export { validateFraudPoliceStatementData };

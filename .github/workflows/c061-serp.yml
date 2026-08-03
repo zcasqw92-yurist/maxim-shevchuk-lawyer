@@ -1,0 +1,70 @@
+name: C-061 SERP gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/c061-serp.json'
+      - 'scripts/c061-yandex-serp.mjs'
+      - 'scripts/c061-google-serp.mjs'
+      - '.github/workflows/c061-serp.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  serp:
+    environment: seo-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout article branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Check Yandex organic results
+        continue-on-error: true
+        env:
+          YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
+        run: node scripts/c061-yandex-serp.mjs
+
+      - name: Check Google organic and sponsored results
+        continue-on-error: true
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+        run: node scripts/c061-google-serp.mjs
+
+      - name: Upload SERP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c061-serp-reports
+          path: reports/serp-snapshots/c061/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce combined gate
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const yandex = JSON.parse(fs.readFileSync('reports/serp-snapshots/c061/yandex-api.json', 'utf8'));
+          const google = JSON.parse(fs.readFileSync('reports/serp-snapshots/c061/google-api.json', 'utf8'));
+          const y = yandex.queries?.[0];
+          const g = google.queries?.[0];
+          console.log(JSON.stringify({
+            query: y?.query || g?.query,
+            yandexOrganic: y?.organicResultsReviewed || 0,
+            googleOrganic: g?.organicResultsReviewed || 0,
+            googleSponsored: g?.sponsoredResultsObserved || 0,
+            yandexPassed: Boolean(y?.minimumMet),
+            googlePassed: Boolean(g?.minimumMet)
+          }, null, 2));
+          if (!y?.minimumMet || !g?.minimumMet) process.exit(1);
+          NODE

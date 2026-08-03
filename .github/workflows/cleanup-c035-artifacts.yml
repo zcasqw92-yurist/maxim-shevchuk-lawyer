@@ -24,11 +24,11 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
 
-      - name: Restore baseline reports and remove temporary files
+      - name: Remove generated test artifacts
         shell: bash
         run: |
-          git checkout origin/main -- reports/diploma-layout reports/engagement-nudge reports/hero-consent
           rm -f check.log
+          rm -rf reports/diploma-layout reports/engagement-nudge reports/hero-consent
           rm -f .github/workflows/cleanup-c035-artifacts.yml
 
       - name: Commit clean publication diff

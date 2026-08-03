@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "policyId": "owner-approved-existing-seo-pool",
+  "requiredMode": "owner-approved-existing-statistics-reuse",
+  "governedPaths": [
+    "src/fraud-police-statement-source.mjs",
+    "src/fraud-police-statement-data.mjs"
+  ],
+  "requiredSourceFields": [
+    "title",
+    "checkedAt",
+    "primaryQuery",
+    "demandRange",
+    "strategicScore",
+    "intent",
+    "pageType",
+    "priority",
+    "limitations"
+  ]
+}

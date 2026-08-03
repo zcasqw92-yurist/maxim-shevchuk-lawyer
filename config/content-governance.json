@@ -138,6 +138,7 @@
     "src/automotive-warranty-data.mjs",
     "src/informal-employment-wage-data.mjs",
     "src/unpaid-services-without-contract-data.mjs",
+    "src/autoservice-paint-defects-data.mjs",
     "src/refund-voluntary-service-cancellation.mjs",
     "src/editorial-data.mjs",
     "src/case-studies.mjs",

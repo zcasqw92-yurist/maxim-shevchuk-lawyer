@@ -44,6 +44,7 @@ export const site = {
     "/razbory/plokho-pokrasili-mashinu-v-avtoservise": "2026-08-03",
     "/razbory/spisali-dengi-po-sudebnomu-prikazu": "2026-08-03",
     "/razbory/tovar-ne-postavlen-posle-oplaty-scheta": "2026-08-03",
+    "/razbory/pretenziya-za-tovarnyy-znak-na-marketpleyse": "2026-08-03",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

@@ -11,7 +11,7 @@ export {
 export const renderArticlePage = (articleOrSlug) => {
   const page = renderBaseArticlePage(articleOrSlug);
   const content = page.content.replace(
-    /(<section class="article-section" id="evidence-matrix"[^>]*>\s*)<h2>/,
+    /(<section class="article-section" id="[^"]+"[^>]*>\s*)<h2>/g,
     '$1<h2 style="overflow-wrap:anywhere">',
   );
   return { ...page, content };

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "policyId": "owner-approved-serp-experiment",
+  "purpose": "Разрешить публикацию без прямых снимков Яндекса и Google только как явно санкционированный и измеримый эксперимент.",
+  "requiredMode": "owner-approved-publication-without-direct-serp",
+  "requiredCheckpointsDays": [
+    14,
+    30,
+    60,
+    90
+  ],
+  "requiredMetrics": [
+    "indexation",
+    "impressions",
+    "clicks",
+    "ctr",
+    "averagePosition",
+    "searchQueries",
+    "activeReading60s",
+    "scroll75",
+    "scroll100",
+    "serviceClicks",
+    "chatTransitions",
+    "qualifiedLeads"
+  ],
+  "requirements": {
+    "approvedByOwner": true,
+    "directSerpSnapshotsAvailable": false,
+    "journalRecordRequired": true,
+    "successCriteriaRequired": true,
+    "failureCriteriaRequired": true,
+    "singleContentIdRequired": true,
+    "practicalElementMustBeVerifiedAgainstExperiment": true
+  },
+  "governedPaths": [
+    "src/editorial-data-base.mjs",
+    "src/trademark-claim-marketplace-source.mjs",
+    "src/trademark-claim-marketplace-data.mjs"
+  ]
+}

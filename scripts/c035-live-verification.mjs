@@ -64,7 +64,16 @@ if (!articleHtml.includes("3 августа 2026")) throw new Error("На стр
 if (!articleHtml.includes('"datePublished":"2026-08-03"')) throw new Error("JSON-LD datePublished не равен 2026-08-03");
 if (!articleHtml.includes('"dateModified":"2026-08-03"')) throw new Error("JSON-LD dateModified не равен 2026-08-03");
 if (!articleHtml.includes('/uslugi/dosudebnoe-uregulirovanie/')) throw new Error("Нет ссылки на связанную услугу");
-if (!articleHtml.includes('name="robots" content="index,follow"')) throw new Error("Страница не открыта для индексации");
+
+const robotsTag = [...articleHtml.matchAll(/<meta\b[^>]*>/gi)]
+  .map((match) => match[0])
+  .find((tag) => /\bname=["']robots["']/i.test(tag)) || "";
+const robotsContent = robotsTag.match(/\bcontent=["']([^"']+)["']/i)?.[1]
+  ?.toLowerCase()
+  .replace(/\s+/g, "") || "";
+if (!robotsContent.split(",").includes("index") || !robotsContent.split(",").includes("follow")) {
+  throw new Error(`Страница не открыта для индексации: ${robotsContent || "meta robots не найден"}`);
+}
 
 const metaSha = articleHtml.match(/<meta[^>]+name=["']site-build-sha["'][^>]+content=["']([^"']+)["']/i)?.[1]
   || articleHtml.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']site-build-sha["']/i)?.[1]
@@ -84,6 +93,7 @@ console.log(JSON.stringify({
   httpStatus: articleResponse.status,
   canonical,
   h1,
+  robots: robotsContent,
   visibleDate: "3 августа 2026",
   datePublished: "2026-08-03",
   dateModified: "2026-08-03",

@@ -40,6 +40,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Align the SERP snapshot with its intent owner
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/integrate-c035-article.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = 'intent: "действия после некачественной покраски автомобиля в автосервисе",'
+          new = 'intent: "зафиксировать плохую покраску автомобиля до переделки, выбрать требование и направить претензию обычному платному автосервису",'
+          if old not in text:
+              raise SystemExit('SERP intent marker not found')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+
       - name: Integrate article into governed files
         run: node scripts/integrate-c035-article.mjs
 

@@ -1,0 +1,32 @@
+name: Проверка production-публикации
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/verify-production-publication.mjs
+      - .github/workflows/verify-production-publication.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Проверить production-run, live SHA, статью и IndexNow
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: b5ac6f133d8910b61532f0088f22226ccc3d068d
+        run: node scripts/verify-production-publication.mjs

@@ -65,7 +65,7 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Align governance data and public wording
+      - name: Align governance data, SEO and public wording
         shell: bash
         run: |
           python3 - <<'PY'
@@ -81,11 +81,20 @@ jobs:
 
           article_path = Path('src/judicial-order-after-writeoff-data.mjs')
           article = article_path.read_text(encoding='utf-8')
+
           old_paragraph = 'Если срок истёк, статья 129 ГПК РФ требует обосновать невозможность представить возражения вовремя по причинам, не зависящим от должника. Поэтому поздний документ должен включать не только несогласие, но и проверяемую хронологию с приложениями.'
           new_paragraph = 'Если десятидневный срок уже прошёл, объясните суду, почему вы не могли возразить раньше, и подтвердите это документами. Укажите, когда впервые узнали о приказе, что помешало получить его своевременно и как быстро обратились после обнаружения.'
           if old_paragraph not in article:
               raise SystemExit('Public-copy paragraph marker not found')
-          article_path.write_text(article.replace(old_paragraph, new_paragraph), encoding='utf-8')
+          article = article.replace(old_paragraph, new_paragraph)
+
+          old_seo_title = 'seoTitle: "Списали деньги по судебному приказу: как отменить и вернуть",'
+          new_seo_title = 'seoTitle: "Списали деньги по приказу: отмена и возврат",'
+          if old_seo_title not in article:
+              raise SystemExit('SEO title marker not found')
+          article = article.replace(old_seo_title, new_seo_title)
+
+          article_path.write_text(article, encoding='utf-8')
           PY
 
       - name: Integrate article into governed files

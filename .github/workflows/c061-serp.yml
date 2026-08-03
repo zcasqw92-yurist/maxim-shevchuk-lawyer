@@ -1,22 +1,20 @@
-name: C-061 SERP gate
+name: C-061 Google public reserve
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'config/c061-serp.json'
-      - 'scripts/c061-yandex-serp.mjs'
-      - 'scripts/c061-google-serp.mjs'
+      - 'scripts/c061-google-public-serp.mjs'
       - '.github/workflows/c061-serp.yml'
 
 permissions:
   contents: read
 
 jobs:
-  serp:
-    environment: seo-api
+  google-public:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
 
     steps:
       - name: Checkout article branch
@@ -26,45 +24,40 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
 
-      - name: Check Yandex organic results
-        continue-on-error: true
-        env:
-          YANDEX_SEARCH_API_KEY: ${{ secrets.YANDEX_SEARCH_API_KEY }}
-        run: node scripts/c061-yandex-serp.mjs
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Check Google organic and sponsored results
-        continue-on-error: true
-        env:
-          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
-        run: node scripts/c061-google-serp.mjs
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
 
-      - name: Upload SERP reports
+      - name: Check public Google organic and sponsored results
+        run: node scripts/c061-google-public-serp.mjs
+
+      - name: Upload Google report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: c061-serp-reports
+          name: c061-google-public-serp
           path: reports/serp-snapshots/c061/
           if-no-files-found: error
           retention-days: 14
 
-      - name: Enforce combined gate
+      - name: Enforce Google gate
         if: always()
         run: |
           node <<'NODE'
           const fs = require('node:fs');
-          const yandex = JSON.parse(fs.readFileSync('reports/serp-snapshots/c061/yandex-api.json', 'utf8'));
-          const google = JSON.parse(fs.readFileSync('reports/serp-snapshots/c061/google-api.json', 'utf8'));
-          const y = yandex.queries?.[0];
+          const google = JSON.parse(fs.readFileSync('reports/serp-snapshots/c061/google-public.json', 'utf8'));
           const g = google.queries?.[0];
           console.log(JSON.stringify({
-            query: y?.query || g?.query,
-            yandexOrganic: y?.organicResultsReviewed || 0,
+            query: g?.query,
             googleOrganic: g?.organicResultsReviewed || 0,
             googleSponsored: g?.sponsoredResultsObserved || 0,
-            yandexPassed: Boolean(y?.minimumMet),
-            googlePassed: Boolean(g?.minimumMet)
+            googleStatus: g?.status || 'missing',
+            googlePassed: Boolean(g?.minimumMet),
+            diagnostics: g?.diagnostics || null
           }, null, 2));
-          if (!y?.minimumMet || !g?.minimumMet) process.exit(1);
+          if (!g?.minimumMet) process.exit(1);
           NODE

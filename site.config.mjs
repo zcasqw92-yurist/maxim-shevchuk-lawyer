@@ -16,7 +16,7 @@ export const site = {
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
   // Максимальная дата содержательного обновления. Даты отдельных страниц
   // задаются явно и не меняются от технической пересборки.
-  contentLastModified: "2026-08-02",
+  contentLastModified: "2026-08-03",
   contentLastModifiedByPath: {
     "/": "2026-08-02",
     "/uslugi": "2026-08-02",
@@ -27,7 +27,7 @@ export const site = {
     "/uslugi/iskovoe-zayavlenie": "2026-08-02",
     "/uslugi/spory-biznesa": "2026-08-02",
     "/uslugi/marketpleysy": "2026-08-02",
-    "/razbory": "2026-08-02",
+    "/razbory": "2026-08-03",
     "/razbory/chto-delat-posle-otkaza-policii": "2026-08-02",
     "/razbory/politsiya-ne-otvechaet-na-zayavlenie": "2026-08-02",
     "/razbory/vernut-dolg-bez-raspiski": "2026-08-02",
@@ -40,7 +40,8 @@ export const site = {
     "/razbory/vernut-dengi-za-navyazannuyu-uslugu": "2026-08-02",
     "/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney": "2026-08-02",
     "/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu": "2026-08-02",
-    "/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora": "2026-08-02",
+    "/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora": "2026-08-03",
+    "/razbory/plokho-pokrasili-mashinu-v-avtoservise": "2026-08-03",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

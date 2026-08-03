@@ -5,6 +5,7 @@ import { policeInactivityClusterArticles } from "./police-inactivity-cluster-dat
 import { automotiveWarrantyArticles } from "./automotive-warranty-data.mjs";
 import { informalEmploymentWageArticles } from "./informal-employment-wage-data.mjs";
 import { unpaidServicesWithoutContractArticles } from "./unpaid-services-without-contract-data.mjs";
+import { autoservicePaintDefectsArticles } from "./autoservice-paint-defects-data.mjs";
 
 const articleSources = {
   article148: { title: "Статья 148 УПК РФ — отказ в возбуждении уголовного дела", url: "https://www.consultant.ru/document/cons_doc_LAW_34481/2dee6703cab2cabdbb193fde2ecb6baf1f69ac2e/" },
@@ -98,6 +99,7 @@ export const articles = [
   ...automotiveWarrantyArticles,
   ...informalEmploymentWageArticles,
   ...unpaidServicesWithoutContractArticles,
+  ...autoservicePaintDefectsArticles,
   ...debtClusterArticles,
   ...refundServicesClusterArticles,
 ];

@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 60); do
-            published_sha="$(curl --fail --silent --show-error --location --no-cache \
+            published_sha="$(curl --fail --silent --show-error --location \
               -H 'Cache-Control: no-cache' \
               "${SITE_PUBLIC_URL}/build-info.json?verify=${GITHUB_RUN_ID}-${attempt}" \
               | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{try{console.log(JSON.parse(s).sha||"")}catch{console.log("")}})')"
@@ -56,14 +56,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          article_html="$(curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' "${ARTICLE_URL}?verify=${GITHUB_RUN_ID}")"
+          article_html="$(curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' "${ARTICLE_URL}?verify=${GITHUB_RUN_ID}")"
           grep -Fq 'Заявление в полицию о мошенничестве: как изложить факты и приложить доказательства' <<<"$article_html"
           grep -Fq "content=\"${EXPECTED_BUILD_SHA}\"" <<<"$article_html"
           grep -Fq 'Матрица фактов для заявления о мошенничестве' <<<"$article_html"
           grep -Fq 'data-editorial-helpfulness' <<<"$article_html"
           ! grep -Eiq '<(form|input|select|textarea)\b' <<<"$article_html"
 
-          manifest="$(curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' "${SITE_PUBLIC_URL}/editorial-publications.json?verify=${GITHUB_RUN_ID}")"
+          manifest="$(curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' "${SITE_PUBLIC_URL}/editorial-publications.json?verify=${GITHUB_RUN_ID}")"
           MANIFEST="$manifest" node - <<'NODE'
           const manifest = JSON.parse(process.env.MANIFEST);
           if (manifest.counts?.articles !== 18) throw new Error(`Ожидалось 18 статей, получено ${manifest.counts?.articles}`);
@@ -72,11 +72,11 @@ jobs:
           if (!article || article.status !== 'published') throw new Error('Новая статья отсутствует в публичном реестре');
           NODE
 
-          curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' \
+          curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' \
             "${SITE_PUBLIC_URL}/sitemap-articles.xml?verify=${GITHUB_RUN_ID}" \
             | grep -Fq "$ARTICLE_URL"
 
-          curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' \
+          curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' \
             "${SITE_PUBLIC_URL}/feed.xml?verify=${GITHUB_RUN_ID}" \
             | grep -Fq "$ARTICLE_URL"
 

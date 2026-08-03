@@ -42,6 +42,7 @@ export const site = {
     "/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu": "2026-08-02",
     "/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora": "2026-08-03",
     "/razbory/plokho-pokrasili-mashinu-v-avtoservise": "2026-08-03",
+    "/razbory/spisali-dengi-po-sudebnomu-prikazu": "2026-08-03",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

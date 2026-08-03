@@ -28,5 +28,5 @@ jobs:
       - name: Проверить production-run, live SHA, статью и IndexNow
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          EXPECTED_SHA: b5ac6f133d8910b61532f0088f22226ccc3d068d
+          EXPECTED_SHA: 397f537517cce82087e0a94c05bbdf737dc72705
         run: node scripts/verify-production-publication.mjs

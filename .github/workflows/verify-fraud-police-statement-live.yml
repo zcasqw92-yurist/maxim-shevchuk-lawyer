@@ -1,0 +1,90 @@
+name: Независимая проверка статьи о заявлении в полицию
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-fraud-police-statement-live.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-publication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SITE_PUBLIC_URL: https://yuristshevchuk.com
+      SITE_CANONICAL_URL: https://yuristshevchuk.com
+      EXPECTED_BUILD_SHA: d6523ab149c6f096d976282062fef46a8fcc970d
+      ARTICLE_URL: https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/
+    steps:
+      - name: Получить код проверяемого релиза
+        uses: actions/checkout@v4
+        with:
+          ref: d6523ab149c6f096d976282062fef46a8fcc970d
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Дождаться точного production SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            published_sha="$(curl --fail --silent --show-error --location --no-cache \
+              -H 'Cache-Control: no-cache' \
+              "${SITE_PUBLIC_URL}/build-info.json?verify=${GITHUB_RUN_ID}-${attempt}" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{try{console.log(JSON.parse(s).sha||"")}catch{console.log("")}})')"
+            echo "Попытка ${attempt}: опубликован ${published_sha:-missing}"
+            if [[ "$published_sha" == "$EXPECTED_BUILD_SHA" ]]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production не отдал ожидаемый SHA ${EXPECTED_BUILD_SHA}" >&2
+          exit 1
+
+      - name: Проверить новую страницу и машинные реестры
+        shell: bash
+        run: |
+          set -euo pipefail
+          article_html="$(curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' "${ARTICLE_URL}?verify=${GITHUB_RUN_ID}")"
+          grep -Fq 'Заявление в полицию о мошенничестве: как изложить факты и приложить доказательства' <<<"$article_html"
+          grep -Fq "content=\"${EXPECTED_BUILD_SHA}\"" <<<"$article_html"
+          grep -Fq 'Матрица фактов для заявления о мошенничестве' <<<"$article_html"
+          grep -Fq 'data-editorial-helpfulness' <<<"$article_html"
+          ! grep -Eiq '<(form|input|select|textarea)\b' <<<"$article_html"
+
+          manifest="$(curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' "${SITE_PUBLIC_URL}/editorial-publications.json?verify=${GITHUB_RUN_ID}")"
+          MANIFEST="$manifest" node - <<'NODE'
+          const manifest = JSON.parse(process.env.MANIFEST);
+          if (manifest.counts?.articles !== 18) throw new Error(`Ожидалось 18 статей, получено ${manifest.counts?.articles}`);
+          if (manifest.counts?.practiceCases !== 2) throw new Error(`Ожидалось 2 кейса, получено ${manifest.counts?.practiceCases}`);
+          const article = manifest.articles?.find((item) => item.slug === 'zayavlenie-v-politsiyu-o-moshennichestve');
+          if (!article || article.status !== 'published') throw new Error('Новая статья отсутствует в публичном реестре');
+          NODE
+
+          curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' \
+            "${SITE_PUBLIC_URL}/sitemap-articles.xml?verify=${GITHUB_RUN_ID}" \
+            | grep -Fq "$ARTICLE_URL"
+
+          curl --fail --silent --show-error --location --no-cache -H 'Cache-Control: no-cache' \
+            "${SITE_PUBLIC_URL}/feed.xml?verify=${GITHUB_RUN_ID}" \
+            | grep -Fq "$ARTICLE_URL"
+
+      - name: Установить браузеры
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Перепроверить все опубликованные статьи и кейсы
+        run: node scripts/live-all-publications-smoke.mjs
+
+      - name: Итог
+        run: echo "Production подтверждён — 18 статей, 2 кейса, SHA ${EXPECTED_BUILD_SHA}"

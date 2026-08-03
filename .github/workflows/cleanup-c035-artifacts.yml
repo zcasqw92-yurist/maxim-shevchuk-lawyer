@@ -1,0 +1,41 @@
+name: Cleanup C-035 test artifacts
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/cleanup-c035-artifacts.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout article branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Restore baseline reports and remove temporary files
+        shell: bash
+        run: |
+          git checkout origin/main -- reports/diploma-layout reports/engagement-nudge reports/hero-consent
+          rm -f check.log
+          rm -f .github/workflows/cleanup-c035-artifacts.yml
+
+      - name: Commit clean publication diff
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Убрать технические артефакты проверки C-035"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"

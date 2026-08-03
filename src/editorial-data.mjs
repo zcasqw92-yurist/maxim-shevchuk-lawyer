@@ -8,10 +8,15 @@ import {
   trademarkClaimMarketplaceArticles,
   validateTrademarkClaimMarketplaceData,
 } from "./trademark-claim-marketplace-data.mjs";
+import {
+  fraudPoliceStatementArticles,
+  validateFraudPoliceStatementData,
+} from "./fraud-police-statement-data.mjs";
 
 export const articles = [
   ...baseArticles,
   ...trademarkClaimMarketplaceArticles,
+  ...fraudPoliceStatementArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);
@@ -19,6 +24,7 @@ export const findArticleBySlug = (slug) => articles.find((item) => item.slug ===
 export const validateEditorialData = () => {
   validateBaseEditorialData();
   validateTrademarkClaimMarketplaceData();
+  validateFraudPoliceStatementData();
 
   const slugs = new Set();
   const ids = new Set();

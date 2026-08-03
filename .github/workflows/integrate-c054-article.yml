@@ -65,18 +65,27 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Align practical element with governance schema
+      - name: Align governance data and public wording
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          path = Path('scripts/integrate-c054-article.mjs')
-          text = path.read_text(encoding='utf-8')
-          old = 'type: "deadline-and-money-state-matrix",'
-          new = 'type: "evidence-matrix",'
-          if old not in text:
+
+          integration_path = Path('scripts/integrate-c054-article.mjs')
+          integration = integration_path.read_text(encoding='utf-8')
+          old_type = 'type: "deadline-and-money-state-matrix",'
+          new_type = 'type: "evidence-matrix",'
+          if old_type not in integration:
               raise SystemExit('Practical element type marker not found')
-          path.write_text(text.replace(old, new), encoding='utf-8')
+          integration_path.write_text(integration.replace(old_type, new_type), encoding='utf-8')
+
+          article_path = Path('src/judicial-order-after-writeoff-data.mjs')
+          article = article_path.read_text(encoding='utf-8')
+          old_paragraph = 'Если срок истёк, статья 129 ГПК РФ требует обосновать невозможность представить возражения вовремя по причинам, не зависящим от должника. Поэтому поздний документ должен включать не только несогласие, но и проверяемую хронологию с приложениями.'
+          new_paragraph = 'Если десятидневный срок уже прошёл, объясните суду, почему вы не могли возразить раньше, и подтвердите это документами. Укажите, когда впервые узнали о приказе, что помешало получить его своевременно и как быстро обратились после обнаружения.'
+          if old_paragraph not in article:
+              raise SystemExit('Public-copy paragraph marker not found')
+          article_path.write_text(article.replace(old_paragraph, new_paragraph), encoding='utf-8')
           PY
 
       - name: Integrate article into governed files

@@ -1,0 +1,60 @@
+name: Integrate C-035 article
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/integrate-c035-article.yml'
+      - 'scripts/integrate-c035-article.mjs'
+      - 'src/autoservice-paint-defects-data.mjs'
+      - 'reports/cluster-research/autoservice-paint-defects.md'
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: '22.17.0'
+
+jobs:
+  integrate:
+    name: Integrate, validate and commit article
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout article branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Integrate article into governed files
+        run: node scripts/integrate-c035-article.mjs
+
+      - name: Run full publication contract
+        run: npm run check
+        env:
+          SITE_PRODUCTION: 'true'
+          SITE_URL: 'https://yuristshevchuk.com'
+          SITE_BASE_PATH: ''
+
+      - name: Commit verified content changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Интегрировать разбор о плохой покраске автомобиля"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"

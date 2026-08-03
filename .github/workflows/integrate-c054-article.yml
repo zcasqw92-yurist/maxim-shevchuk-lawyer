@@ -65,6 +65,20 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
+      - name: Align practical element with governance schema
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/integrate-c054-article.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = 'type: "deadline-and-money-state-matrix",'
+          new = 'type: "evidence-matrix",'
+          if old not in text:
+              raise SystemExit('Practical element type marker not found')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+
       - name: Integrate article into governed files
         run: node scripts/integrate-c054-article.mjs
 

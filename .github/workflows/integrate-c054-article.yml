@@ -73,11 +73,19 @@ jobs:
 
           integration_path = Path('scripts/integrate-c054-article.mjs')
           integration = integration_path.read_text(encoding='utf-8')
+
           old_type = 'type: "deadline-and-money-state-matrix",'
           new_type = 'type: "evidence-matrix",'
           if old_type not in integration:
               raise SystemExit('Practical element type marker not found')
-          integration_path.write_text(integration.replace(old_type, new_type), encoding='utf-8')
+          integration = integration.replace(old_type, new_type)
+
+          old_doc_marker = '- 31 канонический содержательный URL: главная, каталог и семь страниц услуг, раздел и пятнадцать юридических разборов, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;'
+          new_doc_marker = '- 31 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и пятнадцать юридических разборов, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;'
+          if old_doc_marker not in integration:
+              raise SystemExit('Production documentation marker not found')
+          integration = integration.replace(old_doc_marker, new_doc_marker)
+          integration_path.write_text(integration, encoding='utf-8')
 
           article_path = Path('src/judicial-order-after-writeoff-data.mjs')
           article = article_path.read_text(encoding='utf-8')

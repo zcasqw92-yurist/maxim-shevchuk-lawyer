@@ -1,0 +1,39 @@
+name: C-054 live verification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/c054-live-verification.yml'
+      - 'scripts/c054-live-verification.mjs'
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22.17.0'
+
+jobs:
+  verify:
+    name: Verify production article and SHA
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout verification branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Verify new article on custom domain
+        run: node scripts/c054-live-verification.mjs
+
+      - name: Recheck all published articles
+        env:
+          SITE_PUBLIC_URL: 'https://yuristshevchuk.com'
+          EXPECTED_BUILD_SHA: 'c7c4980ee33cd937f8d27380653af332c1c19915'
+        run: node scripts/live-public-copy-regression-test.mjs

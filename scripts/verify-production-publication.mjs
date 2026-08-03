@@ -19,6 +19,11 @@ const githubJson = async (url) => {
   if (!response.ok) throw new Error(`GitHub API ${response.status}: ${await response.text()}`);
   return response.json();
 };
+const githubText = async (url) => {
+  const response = await fetch(url, { headers, redirect: "follow" });
+  if (!response.ok) return `Unable to download logs: HTTP ${response.status} ${await response.text()}`;
+  return response.text();
+};
 
 let run;
 for (let attempt = 0; attempt < 80; attempt += 1) {
@@ -32,15 +37,25 @@ for (let attempt = 0; attempt < 80; attempt += 1) {
 if (!run) throw new Error(`Production workflow was not found for ${expectedSha}`);
 console.log(`Production run: ${run.html_url}`);
 console.log(`Production conclusion: ${run.conclusion}`);
-if (run.status !== "completed" || run.conclusion !== "success") {
-  throw new Error(`Production workflow did not succeed: status=${run.status}, conclusion=${run.conclusion}`);
-}
 
 const jobs = await githubJson(run.jobs_url);
 for (const job of jobs.jobs || []) {
   console.log(`Job ${job.name}: ${job.conclusion}`);
   for (const step of job.steps || []) console.log(`  Step ${step.number} ${step.name}: ${step.conclusion}`);
 }
+
+if (run.status !== "completed" || run.conclusion !== "success") {
+  for (const job of jobs.jobs || []) {
+    if (job.conclusion === "failure") {
+      const logs = await githubText(`https://api.github.com/repos/${repo}/actions/jobs/${job.id}/logs`);
+      console.log(`\n===== FAILED JOB LOG TAIL: ${job.name} (${job.id}) =====`);
+      console.log(logs.slice(-50000));
+      console.log("===== END FAILED JOB LOG TAIL =====\n");
+    }
+  }
+  throw new Error(`Production workflow did not succeed: status=${run.status}, conclusion=${run.conclusion}`);
+}
+
 const indexNowStep = (jobs.jobs || []).flatMap((job) => job.steps || []).find((step) => /IndexNow/i.test(step.name));
 if (!indexNowStep || indexNowStep.conclusion !== "success") {
   throw new Error(`IndexNow step is missing or unsuccessful: ${indexNowStep?.conclusion || "missing"}`);

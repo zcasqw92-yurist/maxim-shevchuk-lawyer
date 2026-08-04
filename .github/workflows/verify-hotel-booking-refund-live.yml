@@ -1,0 +1,147 @@
+name: Независимая проверка статьи о возврате за бронь
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-hotel-booking-refund-live.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  verify-live-publication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE_PUBLIC_URL: https://yuristshevchuk.com
+      SITE_CANONICAL_URL: https://yuristshevchuk.com
+      EXPECTED_BUILD_SHA: 1c40cc9d2c3bff29d3ad25c6e0bfc4e9cb624645
+      ARTICLE_URL: https://yuristshevchuk.com/razbory/vernut-dengi-za-otmenennuyu-bron-otelya/
+    steps:
+      - name: Проверить production workflow и обязательные шаги
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const expectedSha = process.env.EXPECTED_BUILD_SHA;
+            const requiredSteps = [
+              'Build and validate production site',
+              'Verify Yandex Metrica goals and funnels',
+              'Deploy to GitHub Pages',
+              'Verify published build',
+              'Verify SHA through custom domain',
+              'Recheck all published articles after verified deployment',
+              'Notify IndexNow about changed pages',
+            ];
+
+            let run;
+            for (let attempt = 1; attempt <= 80; attempt += 1) {
+              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: 'main',
+                event: 'push',
+                per_page: 50,
+              });
+              run = data.workflow_runs.find((item) => item.head_sha === expectedSha && item.name === 'Deploy GitHub Pages');
+              if (run?.status === 'completed') break;
+              core.info(`Попытка ${attempt}: production run ${run ? `${run.id} — ${run.status}` : 'ещё не найден'}`);
+              await new Promise((resolve) => setTimeout(resolve, 15000));
+            }
+
+            if (!run) throw new Error(`Production run для ${expectedSha} не найден`);
+            if (run.status !== 'completed') throw new Error(`Production run ${run.id} не завершён: ${run.status}`);
+            if (run.conclusion !== 'success') throw new Error(`Production run ${run.id} завершён с ${run.conclusion}`);
+
+            const { data: jobsData } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id,
+              per_page: 100,
+              filter: 'latest',
+            });
+            const job = jobsData.jobs.find((item) => item.name === 'build-and-deploy');
+            if (!job || job.conclusion !== 'success') throw new Error('Задание build-and-deploy не завершено успешно');
+
+            for (const name of requiredSteps) {
+              const step = job.steps.find((item) => item.name === name);
+              if (!step) throw new Error(`Не найден обязательный шаг: ${name}`);
+              if (step.conclusion !== 'success') throw new Error(`Шаг «${name}» завершён с ${step.conclusion}`);
+            }
+
+            core.notice(`PRODUCTION_RUN_ID=${run.id}`);
+            core.notice(`PRODUCTION_RUN_URL=${run.html_url}`);
+            core.notice(`PRODUCTION_SHA=${run.head_sha}`);
+            core.notice('INDEXNOW_STEP=success');
+            core.notice('ALL_PUBLICATIONS_RECHECK=success');
+
+      - name: Получить код проверяемого релиза
+        uses: actions/checkout@v4
+        with:
+          ref: 1c40cc9d2c3bff29d3ad25c6e0bfc4e9cb624645
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Дождаться точного production SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            published_sha="$(curl --fail --silent --show-error --location \
+              -H 'Cache-Control: no-cache' \
+              "${SITE_PUBLIC_URL}/build-info.json?verify=${GITHUB_RUN_ID}-${attempt}" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{try{console.log(JSON.parse(s).sha||"")}catch{console.log("")}})')"
+            echo "Попытка ${attempt}: опубликован ${published_sha:-missing}"
+            if [[ "$published_sha" == "$EXPECTED_BUILD_SHA" ]]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production не отдал ожидаемый SHA ${EXPECTED_BUILD_SHA}" >&2
+          exit 1
+
+      - name: Проверить новую страницу и машинные реестры
+        shell: bash
+        run: |
+          set -euo pipefail
+          article_html="$(curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' "${ARTICLE_URL}?verify=${GITHUB_RUN_ID}")"
+          grep -Fq 'Как вернуть предоплату за отменённую бронь отеля, если отель и сервис перекладывают ответственность' <<<"$article_html"
+          grep -Fq "content=\"${EXPECTED_BUILD_SHA}\"" <<<"$article_html"
+          grep -Fq 'Матрица ответственности по отменённой брони' <<<"$article_html"
+          grep -Fq 'data-editorial-helpfulness' <<<"$article_html"
+          ! grep -Eiq '<(form|input|select|textarea)\b' <<<"$article_html"
+
+          manifest="$(curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' "${SITE_PUBLIC_URL}/editorial-publications.json?verify=${GITHUB_RUN_ID}")"
+          MANIFEST="$manifest" node - <<'NODE'
+          const manifest = JSON.parse(process.env.MANIFEST);
+          if (manifest.counts?.articles !== 19) throw new Error(`Ожидалось 19 статей, получено ${manifest.counts?.articles}`);
+          if (manifest.counts?.practiceCases !== 2) throw new Error(`Ожидалось 2 кейса, получено ${manifest.counts?.practiceCases}`);
+          const article = manifest.articles?.find((item) => item.slug === 'vernut-dengi-za-otmenennuyu-bron-otelya');
+          if (!article || article.status !== 'published') throw new Error('Новая статья отсутствует в публичном реестре');
+          NODE
+
+          curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' \
+            "${SITE_PUBLIC_URL}/sitemap-articles.xml?verify=${GITHUB_RUN_ID}" \
+            | grep -Fq "$ARTICLE_URL"
+
+          curl --fail --silent --show-error --location -H 'Cache-Control: no-cache' \
+            "${SITE_PUBLIC_URL}/feed.xml?verify=${GITHUB_RUN_ID}" \
+            | grep -Fq "$ARTICLE_URL"
+
+      - name: Установить браузеры
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Перепроверить все опубликованные статьи и кейсы
+        run: node scripts/live-all-publications-smoke.mjs
+
+      - name: Итог
+        run: echo "Production подтверждён — 19 статей, 2 кейса, SHA ${EXPECTED_BUILD_SHA}"

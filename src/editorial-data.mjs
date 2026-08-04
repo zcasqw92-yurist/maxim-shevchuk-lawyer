@@ -12,11 +12,16 @@ import {
   fraudPoliceStatementArticles,
   validateFraudPoliceStatementData,
 } from "./fraud-police-statement-data.mjs";
+import {
+  hotelBookingRefundArticles,
+  validateHotelBookingRefundData,
+} from "./hotel-booking-refund-data.mjs";
 
 export const articles = [
   ...baseArticles,
   ...trademarkClaimMarketplaceArticles,
   ...fraudPoliceStatementArticles,
+  ...hotelBookingRefundArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);
@@ -25,6 +30,7 @@ export const validateEditorialData = () => {
   validateBaseEditorialData();
   validateTrademarkClaimMarketplaceData();
   validateFraudPoliceStatementData();
+  validateHotelBookingRefundData();
 
   const slugs = new Set();
   const ids = new Set();

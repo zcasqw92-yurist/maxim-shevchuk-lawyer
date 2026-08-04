@@ -13,30 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Wait for expected SHA on custom domain
+      - name: Verify expected SHA and live article
         shell: bash
         env:
           EXPECTED_SHA: '26ea438cd0075aa6a09420a3406aeff4f5527c3a'
           ARTICLE_URL: 'https://yuristshevchuk.com/razbory/skrytyy-defekt-poderzhannogo-avtomobilya/'
         run: |
           set -euo pipefail
-          found=''
-          for attempt in $(seq 1 36); do
-            nonce="$(date +%s)-${attempt}"
-            body="$(curl -fsSL --retry 2 --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "https://yuristshevchuk.com/build-info.json?nonce=${nonce}" || true)"
-            echo "attempt=${attempt} build-info=${body}"
-            if printf '%s' "$body" | grep -Fq "$EXPECTED_SHA"; then
-              found='yes'
-              break
-            fi
-            sleep 10
-          done
-          test "$found" = 'yes'
+          curl -fsSL --retry 3 --connect-timeout 10 --max-time 40 \
+            -H 'Cache-Control: no-cache' \
+            "https://yuristshevchuk.com/build-info.json?nonce=$(date +%s)" \
+            -o build-info.json
+          grep -Fq "$EXPECTED_SHA" build-info.json
 
-          html="$(curl -fsSL --retry 3 --connect-timeout 10 --max-time 40 -H 'Cache-Control: no-cache' "${ARTICLE_URL}?nonce=$(date +%s)")"
-          printf '%s' "$html" | grep -Fq 'Купили подержанный автомобиль со скрытым дефектом: что делать до ремонта'
-          printf '%s' "$html" | grep -Fq 'Матрица скрытого недостатка подержанного автомобиля'
-          printf '%s' "$html" | grep -Fq 'https://yuristshevchuk.com/razbory/skrytyy-defekt-poderzhannogo-avtomobilya/'
-          printf '%s' "$html" | grep -Fq 'index,follow'
-          printf '%s' "$html" | grep -Fq "$EXPECTED_SHA"
+          curl -fsSL --retry 3 --connect-timeout 10 --max-time 40 \
+            -H 'Cache-Control: no-cache' \
+            "${ARTICLE_URL}?nonce=$(date +%s)" \
+            -o article.html
+          grep -Fq 'Купили подержанный автомобиль со скрытым дефектом: что делать до ремонта' article.html
+          grep -Fq 'Матрица скрытого недостатка подержанного автомобиля' article.html
+          grep -Fq 'https://yuristshevchuk.com/razbory/skrytyy-defekt-poderzhannogo-avtomobilya/' article.html
+          grep -Fq 'index,follow' article.html
+          grep -Fq "$EXPECTED_SHA" article.html
           echo 'LIVE_VERIFY_SUCCESS'

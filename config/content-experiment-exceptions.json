@@ -3,12 +3,7 @@
   "policyId": "owner-approved-serp-experiment",
   "purpose": "Разрешить публикацию без прямых снимков Яндекса и Google только как явно санкционированный и измеримый эксперимент.",
   "requiredMode": "owner-approved-publication-without-direct-serp",
-  "requiredCheckpointsDays": [
-    14,
-    30,
-    60,
-    90
-  ],
+  "requiredCheckpointsDays": [14, 30, 60, 90],
   "requiredMetrics": [
     "indexation",
     "impressions",
@@ -35,6 +30,8 @@
   "governedPaths": [
     "src/editorial-data-base.mjs",
     "src/trademark-claim-marketplace-source.mjs",
-    "src/trademark-claim-marketplace-data.mjs"
+    "src/trademark-claim-marketplace-data.mjs",
+    "src/hotel-booking-refund-source.mjs",
+    "src/hotel-booking-refund-data.mjs"
   ]
 }

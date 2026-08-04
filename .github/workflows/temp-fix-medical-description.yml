@@ -1,0 +1,41 @@
+name: Temp fix medical description
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/temp-fix-medical-description.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Shorten SEO description
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/medical-error-first-steps-data.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = 'Что делать при подозрении на врачебную ошибку после родов: какие медицинские документы запросить, как проверить качество помощи и причинную связь, куда жаловаться и когда готовить претензию.'
+          new = 'Что делать при подозрении на врачебную ошибку после родов: какие документы запросить, как проверить качество помощи, причинную связь и основания для компенсации.'
+          if old not in text:
+              raise SystemExit('Исходное SEO-описание не найдено')
+          if not 70 <= len(new) <= 170:
+              raise SystemExit(f'Новая длина вне лимита: {len(new)}')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          print(f'Новая длина SEO-description: {len(new)}')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/medical-error-first-steps-data.mjs
+          git commit -m 'Сократить SEO-описание медицинской статьи'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

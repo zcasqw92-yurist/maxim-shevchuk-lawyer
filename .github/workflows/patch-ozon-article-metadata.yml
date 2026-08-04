@@ -1,0 +1,51 @@
+name: Синхронизировать метаданные статьи Ozon
+
+on:
+  push:
+    branches:
+      - agent/ozon-lost-goods-logistics-article
+    paths:
+      - .github/workflows/patch-ozon-article-metadata.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить ветку
+        uses: actions/checkout@v4
+        with:
+          ref: agent/ozon-lost-goods-logistics-article
+      - name: Обновить карту дат и production-паспорт
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const route = '    "/razbory/ozon-poteryal-tovar-ili-nachislil-lishnyuyu-logistiku": "2026-08-04",\n';
+          const configPath = 'site.config.mjs';
+          let config = fs.readFileSync(configPath, 'utf8');
+          if (!config.includes(route.trim())) {
+            const anchor = '    "/razbory/dengi-za-kontraktnyy-dvigatel-bez-raspiski": "2026-08-04",\n';
+            if (!config.includes(anchor)) throw new Error('Не найден якорь последней статьи');
+            config = config.replace(anchor, anchor + route);
+            fs.writeFileSync(configPath, config);
+          }
+
+          const docPath = 'docs/current-production-state.md';
+          let doc = fs.readFileSync(docPath, 'utf8');
+          const before = '36 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и двадцать юридических разборов, раздел и два полных кейса практики';
+          const after = '37 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и двадцать один юридический разбор, раздел и два полных кейса практики';
+          if (!doc.includes(after)) {
+            if (!doc.includes(before)) throw new Error('Не найдено прежнее число URL');
+            doc = doc.replace(before, after);
+            fs.writeFileSync(docPath, doc);
+          }
+          NODE
+      - name: Зафиксировать изменения
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site.config.mjs docs/current-production-state.md
+          git diff --cached --quiet || git commit -m "Обновить карту дат и число публикаций"
+          git push

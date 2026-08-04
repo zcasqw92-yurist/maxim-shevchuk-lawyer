@@ -1,0 +1,49 @@
+name: Temp fix medical copy
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/temp-fix-medical-copy.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Replace service wording
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          article = Path('src/medical-error-first-steps-data.mjs')
+          text = article.read_text(encoding='utf-8')
+          replacements = {
+              'Жалобы и обращения: запрос документов, анализ материалов и выбор правового маршрута': 'Помощь с запросом медицинских документов и подготовкой жалоб',
+              'Матрица проверки медицинского эпизода': 'Как связать симптомы, действия врачей и последствия',
+              'Жалоба должна содержать проверяемую хронологию и конкретные вопросы. Фраза «наказать виновных» без указания эпизода, времени и предполагаемого нарушения обычно приводит к формальному ответу.': 'В жалобе лучше по порядку указать, что произошло, когда вы обращались за помощью и какие вопросы просите проверить. Одной просьбы «наказать виновных» обычно недостаточно: органу нужны конкретные события и документы.',
+              'Рабочая последовательность: симптом → требуемая реакция → фактическая реакция → подтверждающий документ → последствие → вопрос о причинной связи.': 'Сравнивайте события по порядку: симптом → необходимая реакция → фактические действия врачей → подтверждающий документ → последствие → вопрос о причинной связи.',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'Не найден фрагмент: {old}')
+              text = text.replace(old, new)
+          article.write_text(text, encoding='utf-8')
+
+          manifest = Path('reports/content-sessions/latest.json')
+          manifest_text = manifest.read_text(encoding='utf-8')
+          manifest_text = manifest_text.replace('Матрица проверки медицинского эпизода', 'Как связать симптомы, действия врачей и последствия')
+          manifest.write_text(manifest_text, encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/medical-error-first-steps-data.mjs reports/content-sessions/latest.json
+          git commit -m 'Упростить клиентские формулировки медицинской статьи'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

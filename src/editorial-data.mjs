@@ -18,6 +18,12 @@ import {
 } from "./hotel-booking-refund-data.mjs";
 import { contractEngineNoReceiptArticles } from "./contract-engine-no-receipt-data.mjs";
 import { ozonLostGoodsLogisticsArticles } from "./ozon-lost-goods-logistics-data.mjs";
+import { usedCarHiddenDefectArticles } from "./used-car-hidden-defect-data.mjs";
+
+const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((article) => ({
+  ...article,
+  seoTitle: "Скрытый дефект автомобиля после покупки",
+}));
 
 export const articles = [
   ...baseArticles,
@@ -26,6 +32,7 @@ export const articles = [
   ...hotelBookingRefundArticles,
   ...contractEngineNoReceiptArticles,
   ...ozonLostGoodsLogisticsArticles,
+  ...usedCarHiddenDefectPublicationArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

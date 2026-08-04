@@ -13,14 +13,32 @@ const verifiedSourceUrls = new Map([
   ["Статья 782 ГК РФ — односторонний отказ от договора возмездного оказания услуг", "https://www.consultant.ru/document/cons_doc_LAW_9027/e21d6a868cf614117afa2f93877215e487cd4aee/"],
 ]);
 
-export const hotelBookingRefundArticles = sourceArticles.map((article) => ({
-  ...article,
-  status: "published",
-  sources: article.sources.map((source) => ({
-    ...source,
-    url: verifiedSourceUrls.get(source.title) || source.url,
-  })),
-  relatedCaseIds: [],
-}));
+const normalizeClientWording = (value) => {
+  if (typeof value === "string") {
+    return value === "Нужен другой правовой маршрут"
+      ? "Правила нужно проверять отдельно"
+      : value;
+  }
+  if (Array.isArray(value)) return value.map(normalizeClientWording);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, normalizeClientWording(entry)]),
+    );
+  }
+  return value;
+};
+
+export const hotelBookingRefundArticles = sourceArticles.map((sourceArticle) => {
+  const article = normalizeClientWording(sourceArticle);
+  return {
+    ...article,
+    status: "published",
+    sources: article.sources.map((source) => ({
+      ...source,
+      url: verifiedSourceUrls.get(source.title) || source.url,
+    })),
+    relatedCaseIds: [],
+  };
+});
 
 export { validateHotelBookingRefundData };

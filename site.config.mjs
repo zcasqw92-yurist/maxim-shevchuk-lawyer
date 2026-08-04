@@ -49,6 +49,7 @@ export const site = {
     "/razbory/vernut-dengi-za-otmenennuyu-bron-otelya": "2026-08-04",
     "/razbory/dengi-za-kontraktnyy-dvigatel-bez-raspiski": "2026-08-04",
     "/razbory/ozon-poteryal-tovar-ili-nachislil-lishnyuyu-logistiku": "2026-08-04",
+    "/razbory/skrytyy-defekt-poderzhannogo-avtomobilya": "2026-08-04",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

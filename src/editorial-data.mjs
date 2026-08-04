@@ -17,6 +17,7 @@ import {
   validateHotelBookingRefundData,
 } from "./hotel-booking-refund-data.mjs";
 import { contractEngineNoReceiptArticles } from "./contract-engine-no-receipt-data.mjs";
+import { ozonLostGoodsLogisticsArticles } from "./ozon-lost-goods-logistics-data.mjs";
 
 export const articles = [
   ...baseArticles,
@@ -24,6 +25,7 @@ export const articles = [
   ...fraudPoliceStatementArticles,
   ...hotelBookingRefundArticles,
   ...contractEngineNoReceiptArticles,
+  ...ozonLostGoodsLogisticsArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

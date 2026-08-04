@@ -16,12 +16,14 @@ import {
   hotelBookingRefundArticles,
   validateHotelBookingRefundData,
 } from "./hotel-booking-refund-data.mjs";
+import { contractEngineNoReceiptArticles } from "./contract-engine-no-receipt-data.mjs";
 
 export const articles = [
   ...baseArticles,
   ...trademarkClaimMarketplaceArticles,
   ...fraudPoliceStatementArticles,
   ...hotelBookingRefundArticles,
+  ...contractEngineNoReceiptArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

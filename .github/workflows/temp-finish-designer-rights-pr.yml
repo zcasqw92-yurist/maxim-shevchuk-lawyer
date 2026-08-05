@@ -1,0 +1,115 @@
+name: Temp finish designer rights article PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/temp-finish-designer-rights-pr.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finish-publication:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/designer-infographic-exclusive-rights
+          fetch-depth: 0
+      - name: Register article and content session
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          
+          site_path = Path("site.config.mjs")
+          site = site_path.read_text(encoding="utf-8")
+          anchor = '    "/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika": "2026-08-05",\n'
+          addition = '    "/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku": "2026-08-05",\n'
+          if addition not in site:
+              if anchor not in site:
+                  raise SystemExit("site.config anchor not found")
+              site = site.replace(anchor, anchor + addition)
+          site_path.write_text(site, encoding="utf-8")
+          
+          config_path = Path("config/content-experiment-exceptions.json")
+          config = json.loads(config_path.read_text(encoding="utf-8"))
+          new_path = "src/designer-infographic-exclusive-rights-data.mjs"
+          if new_path not in config["governedPaths"]:
+              config["governedPaths"].append(new_path)
+          config_path.write_text(json.dumps(config, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+          
+          report_path = Path("reports/cluster-research/designer-infographic-exclusive-rights.md")
+          report_path.write_text("# C-025 — договор с дизайнером и права на инфографику\n\nДата проверки: 5 августа 2026 года.\n\n## Решение по владельцу интента\n\nНовая страница становится единственным владельцем ситуации, когда заказчик хочет оформить исключительные права на уже созданную или будущую инфографику, получить исходники и защитить карточку товара от копирования.\n\nЦелевой URL:\n\n`https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/`\n\nКоммерческий маршрут:\n\n- `/uslugi/spory-biznesa/` — анализ исходных документов, подготовка договора, реестра объектов, заданий и актов;\n- самостоятельный спор о копировании не становится владельцем текущей страницы и рассматривается только после проверки цепочки права.\n\nИсключены запросы:\n\n- регистрация товарного знака;\n- спор о фирменном наименовании;\n- патентование дизайна;\n- готовая жалоба на конкретный маркетплейс;\n- удаление карточки без проверки доказательств;\n- трудовые права штатного дизайнера;\n- налоговая модель работы с самозанятым как самостоятельный интент;\n- обещание конкретной суммы компенсации.\n\n## Внутренние источники\n\n- C-025;\n- диалог `68d42e98-2864-8323-89cb-f1e06033d3ec`;\n- ситуация `SIT-20250924-002`;\n- реплики `R-0203`, `R-0204`.\n\nИсходный сценарий: заказчик заказал инфографику у самозанятого дизайнера, работа уже была выполнена, отношения предполагались постоянными, а готовые материалы, по словам клиента, уже скопировали на Ozon. Клиент хотел полный договор и акт передачи прав.\n\nОплаченная юридическая работа, заключение договора, переход права, доказанное нарушение и положительный результат внутренними источниками не подтверждены. Статья не заявляет, что площадка обязана удалить карточку, что копирование уже доказано или что заказчик вправе получить определённую сумму.\n\n## Проверка существующего сайта\n\nНа сайте есть материал о претензии за товарный знак на маркетплейсе, но он относится к зарегистрированному обозначению и ответу на претензию. Новый материал посвящён авторскому праву на инфографику и оформлению отношений с дизайнером до либо после создания макетов.\n\nСамостоятельного владельца интента о договоре авторского заказа, отчуждении права на готовые макеты, реестре объектов, исходниках и акте на сайте нет.\n\n## Правовая проверка\n\nПроверены действующие на 5 августа 2026 года положения:\n\n- статьи 1227 и 1228 ГК РФ — разграничение материального носителя и исключительного права, определение автора;\n- статья 1234 ГК РФ — письменная форма, вознаграждение и момент перехода исключительного права;\n- статьи 1265, 1266 и 1270 ГК РФ — личные права автора, неприкосновенность произведения и способы использования;\n- статьи 1285 и 1288 ГК РФ — отчуждение права на существующее произведение и договор авторского заказа;\n- статья 1296 ГК РФ и пункт 107 Постановления Пленума Верховного Суда РФ № 10 — разграничение заказа у автора и произведения, созданного подрядчиком, который автором не является;\n- пункт 70 Постановления Пленума Верховного Суда РФ № 10 — судьба требований за нарушение, совершённое до перехода права;\n- статьи 1252.1 и 1301 ГК РФ в редакции, действующей с 4 января 2026 года, — общие правила и способы расчёта компенсации.\n\nЗафиксированы важные ограничения:\n\n1. Передача исходников, файла, доступа или оплата не заменяют письменное оформление исключительного права.\n2. Самозанятость дизайнера не определяет авторство и объём передаваемых прав.\n3. Когда подрядчиком выступает сам автор, нельзя автоматически применять статью 1296 вместо договора авторского заказа.\n4. Возмездное отчуждение требует согласования вознаграждения или порядка его определения.\n5. Личные права автора не отчуждаются; рабочие изменения макета требуют аккуратного согласия.\n6. Дизайнер не может передать больше прав на стоки, шрифты и шаблоны, чем получил сам.\n7. Требование о компенсации за нарушение до перехода исключительного права не переходит к приобретателю автоматически.\n8. Обращение к маркетплейсу и размер судебной компенсации не гарантируются заранее.\n\n## Оригинальный практический элемент\n\n**Проверка цепочки прав на каждый макет**:\n\n`автор → конкретный объект → основание создания → сторонние элементы → вознаграждение → момент перехода → использование и изменения → передача результата → фиксация копирования`\n\nЭлемент помогает:\n\n1. выбрать между договором авторского заказа и отчуждением права на готовую работу;\n2. связать договор с конкретными файлами, версиями и товарами;\n3. проверить лицензии на сторонние элементы;\n4. определить, когда заказчик стал правообладателем;\n5. разделить прошлое и продолжающееся нарушение;\n6. подготовить доказательства для претензии, обращения к площадке или суда.\n\n## Внешняя проверка и ограничение\n\nПрямые подтверждённые снимки минимум пяти органических результатов отдельно в Яндексе и Google не получены. Результаты выдачи не выдумываются. Публикация проводится как контролируемый SEO-эксперимент.\n\nУспех: релевантные органические показы и содержательное чтение либо хотя бы одно квалифицированное обращение о договоре с дизайнером, передаче прав, реестре макетов, исходниках или защите инфографики.\n\nНеуспех: после 90 дней при нормальной индексации отсутствуют релевантные показы, чтение и квалифицированные обращения.\n\nКонтрольные даты: 19 августа, 4 сентября, 4 октября и 3 ноября 2026 года. До достаточной выборки не создавать отдельные конкурирующие URL под акт передачи, исходники, самозанятого дизайнера и копирование инфографики.\n", encoding="utf-8")
+          
+          manifest_path = Path("reports/content-sessions/latest.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          manifest["sessionId"] = "20260805-1150-designer-infographic-exclusive-rights"
+          manifest["reviewedAt"] = "2026-08-05T09:50:00.000Z"
+          manifest["spreadsheet"]["modifiedTime"] = "2026-08-05T09:45:26.555Z"
+          manifest["sourceTrace"] = {
+              "dialogIds": ["68d42e98-2864-8323-89cb-f1e06033d3ec"],
+              "situationIds": ["SIT-20250924-002"],
+              "workIds": [],
+              "contentIds": ["C-025"],
+              "caseIds": [],
+              "notes": "Only internal IDs; no personal data or full dialog text. Paid work, transfer of rights, infringement and case result are not confirmed."
+          }
+          manifest["seoReview"] = {"status": "completed", "checkedAt": "2026-08-05T09:50:00.000Z", "region": "Россия / онлайн", "primaryIntent": "Заказчик хочет оформить исключительные права на уже созданную или будущую инфографику, получить исходники и защитить карточку товара от копирования.", "verifiedCluster": ["договор с дизайнером передача исключительных прав", "акт передачи прав на инфографику", "кому принадлежат права на дизайн маркетплейса", "инфографику скопировали на Ozon"], "intentMap": [{"intent": "достаточно ли акта", "target": "H1, лид и раздел о роли акта"}, {"intent": "какой договор нужен с дизайнером", "target": "Раздел о готовой и будущей работе автора"}, {"intent": "что включить в договор", "target": "Договор с реестром объектов"}, {"intent": "как доказать права на макет", "target": "Практический блок из девяти звеньев"}, {"intent": "можно ли менять инфографику", "target": "Раздел о согласии на изменения"}, {"intent": "что делать при копировании", "target": "Фиксация, прошлое нарушение и выбор способа защиты"}], "intentOwnership": [{"intent": "Заказчик оформляет исключительные права на инфографику у дизайнера и готовит доказательства для использования и защиты макетов.", "ownerUrl": "https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/", "ownerType": "article", "supportingUrls": ["https://yuristshevchuk.com/uslugi/spory-biznesa/", "https://yuristshevchuk.com/uslugi/marketpleysy/"], "supportingCaseIds": [], "excludedQueries": ["регистрация товарного знака", "ответ на претензию за товарный знак", "патентование дизайна", "налоги самозанятого дизайнера", "готовая жалоба на Ozon", "трудовой договор со штатным дизайнером"], "existingCompetingUrlsReviewed": ["https://yuristshevchuk.com/razbory/pretenziya-za-tovarnyy-znak-na-marketpleyse/", "https://yuristshevchuk.com/uslugi/spory-biznesa/", "https://yuristshevchuk.com/uslugi/marketpleysy/"], "decision": "new-owner", "reason": "На сайте не было самостоятельного владельца интента о договоре с дизайнером, отчуждении прав на готовые макеты, авторском заказе, реестре объектов и исходниках."}], "serpSnapshots": [], "practicalElements": [{"contentId": "designer-infographic-exclusive-rights", "targetUrl": "https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/", "type": "evidence-chain", "title": "Как проверить цепочку прав на каждую инфографику", "userValue": "Помогает связать автора, конкретный файл, вознаграждение, момент перехода права и доказательства копирования.", "competitorGap": "Вместо общего шаблона читатель получает проверку каждого макета от автора и сторонних элементов до передачи результата и нарушения.", "sourceBasis": "client-dialog-and-current-law", "sourceIds": ["C-025", "68d42e98-2864-8323-89cb-f1e06033d3ec", "SIT-20250924-002", "R-0203", "R-0204"], "placement": "H2 с девятью последовательными проверками после блока о договоре", "verifiedAgainstSerp": false, "verifiedAgainstExperiment": true}], "cannibalizationChecked": true, "overOptimizationRisk": "low", "experimentException": {"mode": "owner-approved-publication-without-direct-serp", "approvedByOwner": true, "directSerpSnapshotsAvailable": false, "contentId": "designer-infographic-exclusive-rights", "approvedAt": "2026-08-05T09:50:00.000Z", "journalRecord": "Команда владельца разработать следующую статью; C-025 выбрана по очереди после C-024.", "reason": "Прямые подтверждённые снимки минимум пяти органических результатов отдельно в Яндексе и Google не получены; выдуманные данные не используются.", "successCriteria": "Релевантные органические показы и содержательное чтение либо хотя бы одно квалифицированное обращение о договоре с дизайнером, передаче прав, реестре макетов, исходниках или защите инфографики.", "failureCriteria": "После 90 дней при нормальной индексации отсутствуют релевантные показы, чтение и квалифицированные обращения.", "checkpointsDays": [14, 30, 60, 90], "metrics": ["indexation", "impressions", "clicks", "ctr", "averagePosition", "searchQueries", "activeReading60s", "scroll75", "scroll100", "serviceClicks", "chatTransitions", "qualifiedLeads"]}}
+          manifest["editorialChecks"] = {
+              "factsSeparatedFromHypotheses": True,
+              "paidWorkSeparatedFromPaymentDetails": True,
+              "workProcedureAndCaseResultsSeparated": True,
+              "legalSourcesVerified": True,
+              "anonymizationVerified": True,
+              "criticalSourceErrorsResolved": True
+          }
+          manifest["contentChanges"] = [
+              {
+                  "path": "site.config.mjs",
+                  "kind": "article-route",
+                  "contentId": "designer-infographic-exclusive-rights",
+                  "action": "updated",
+                  "expectedUrl": "https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"
+              },
+              {
+                  "path": "src/editorial-data.mjs",
+                  "kind": "article-registry",
+                  "contentId": "designer-infographic-exclusive-rights",
+                  "action": "updated",
+                  "expectedUrl": "https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"
+              },
+              {
+                  "path": "src/designer-infographic-exclusive-rights-data.mjs",
+                  "kind": "article",
+                  "contentId": "designer-infographic-exclusive-rights",
+                  "action": "created",
+                  "expectedUrl": "https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"
+              }
+          ]
+          manifest["publication"] = {
+              "expectedUrls": ["https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"],
+              "notes": "CI, deployment and live results are reported in chat after publication. Checkpoints: 19.08, 04.09, 04.10 and 03.11.2026."
+          }
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+          
+          docs_path = Path("docs/current-production-state.md")
+          docs = docs_path.read_text(encoding="utf-8")
+          docs = docs.replace("Актуально на 4 августа 2026 года.", "Актуально на 5 августа 2026 года.")
+          docs = docs.replace(
+              "40 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и двадцать четыре юридических разбора, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;",
+              "41 канонический содержательный URL: главная, каталог и семь страниц услуг, раздел и двадцать пять юридических разборов, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;"
+          )
+          docs_path.write_text(docs, encoding="utf-8")
+          PY
+          rm -f .github/workflows/temp-finish-designer-rights.yml
+          rm -f .github/workflows/temp-finish-designer-rights-pr.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Завершить регистрацию статьи C-025"
+          git push origin HEAD:agent/designer-infographic-exclusive-rights

@@ -48,10 +48,25 @@ for (const slug of ["dosudebnoe-uregulirovanie", "iskovoe-zayavlenie", "zhaloby-
 }
 
 const copy = JSON.stringify(article).toLowerCase();
-for (const forbidden of ["маша", "гаишник", "узбек", "40 домов", "6500000", "6 500 000"]) {
-  if (copy.includes(forbidden)) fail(`source personal or unverified detail leaked: ${forbidden}`);
+for (const forbidden of [
+  "маша",
+  "гаишник",
+  "узбек",
+  "40 домов",
+  "6500000",
+  "6 500 000",
+  "рабочей базе",
+  "оплаченная практика",
+  "была оплачена юридическая работа",
+  "востребованность юридической работы",
+]) {
+  if (copy.includes(forbidden)) fail(`source, personal or internal detail leaked: ${forbidden}`);
 }
-for (const requiredBoundary of ["не позволяет заявлять", "не подтверждены", "не доказывают мошенничество"]) {
+for (const requiredBoundary of [
+  "не означает, что деньги уже взысканы",
+  "результат зависит",
+  "не доказывают мошенничество",
+]) {
   if (!copy.includes(requiredBoundary)) fail(`missing evidentiary boundary: ${requiredBoundary}`);
 }
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260805-2125-yandex-delivery-lost-parcel",
-  "reviewedAt": "2026-08-05T19:25:00.000Z",
+  "sessionId": "20260805-2245-c122-editorial-single-source",
+  "reviewedAt": "2026-08-05T20:45:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
     "modifiedTime": "2026-08-05T19:18:52.230Z",
@@ -73,14 +73,14 @@
     "workIds": [],
     "contentIds": ["C-122"],
     "caseIds": ["K-068"],
-    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work is confirmed, but the final insurance or court result is not confirmed."
+    "notes": "Only internal IDs; no personal data or full dialog text. This session normalizes the existing published lead into one source file and does not change the public wording or claim a new case result."
   },
   "seoKnowledgeBaseReview": {
     "accumulatedDataChecked": true,
     "collectionIds": ["SEO-20260805-SERP-YA-C122", "SEO-20260805-SERP-GO-C122"],
     "keywordIds": ["KW-20260805-C122-YA", "KW-20260805-C122-GO"],
     "newPaidCollectionRequired": false,
-    "paidCollectionReason": "No paid SEO request was performed. Fresh intent verification used free reserve web search and the results were imported into the cumulative SEO registry.",
+    "paidCollectionReason": "No new SEO collection was needed for a technical source normalization that leaves the verified intent, owner URL and public text unchanged.",
     "preflightId": "PF-20260805-C122",
     "draftAuthorization": "РАЗРЕШЕНО",
     "draftStartedAfterAuthorization": true
@@ -196,12 +196,12 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    {"path":"site.config.mjs","kind":"article-route","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
-    {"path":"src/editorial-data.mjs","kind":"article-registry","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
-    {"path":"src/editorial-render-base.mjs","kind":"related-service-links","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
-    {"path":"src/yandex-delivery-lost-parcel-data.mjs","kind":"article","contentId":"yandex-delivery-lost-parcel","action":"created","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"}
+    {"path":"src/yandex-delivery-lost-parcel-data.mjs","kind":"article-source-normalization","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
+    {"path":"src/editorial-data.mjs","kind":"article-registry-normalization","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"}
   ],
   "plannedChecks": [
+    "npm run test:editorial-single-source",
+    "npm run test:public-copy",
     "npm run check",
     "npm run test:live",
     "node scripts/live-all-publications-smoke.mjs",
@@ -209,6 +209,6 @@
   ],
   "publication": {
     "expectedUrls": ["https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"],
-    "notes": "CI, deployment and production checks are reported after merge. SEO checkpoints: 19.08, 04.09, 04.10 and 03.11.2026."
+    "notes": "Technical source normalization only: the already published first-screen wording remains unchanged. The new regression test blocks future public body-copy overrides in the registry."
   }
 }

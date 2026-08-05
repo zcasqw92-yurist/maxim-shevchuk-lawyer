@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260805-2315-c125-house-construction-refund",
-  "reviewedAt": "2026-08-05T21:15:00.000Z",
+  "sessionId": "20260805-2358-c125-accepted-work-crosslink",
+  "reviewedAt": "2026-08-05T21:58:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-05T21:10:06.269Z",
+    "modifiedTime": "2026-08-05T21:19:07.900Z",
     "metadataTabCount": 28,
     "discoveredTabs": [
       "00_Старт", "01_БПЮ", "02_ЮрДоки", "03_Оплаты", "04_Дашборд", "05_Контроль", "06_Импорт", "_Справочники", "_Журнал", "07_Диалоги_исследование", "08_Банк_реплик", "09_Паттерны_аудитории", "10_Контентные_возможности", "11_Кейсы_для_публикации", "12_Эффективные_ответы", "13_Статистика_контента", "14_Контент_дашборд", "15_Обращения_с_контента", "_Реестр_диалогов", "_Ситуации_и_связи", "_События_воронки", "_Версии_контента", "16_Контроль_данных", "_Импорт_ЮД_151_200", "Статьи_HARANT", "17_SEO_сборы", "18_SEO_база_ключей", "19_SEO_preflight"
@@ -46,7 +46,7 @@
     "workIds": ["ЮД-ИМП-112"],
     "contentIds": ["C-125"],
     "caseIds": ["K-071"],
-    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work and the problem scenario are confirmed. Filing, response, recovery and final case outcome are not confirmed."
+    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work and the problem scenario are confirmed. Filing, response, recovery and final case outcome are not confirmed. Follow-up legal review clarified Article 28(4): usability alone is not acceptance."
   },
   "seoKnowledgeBaseReview": {
     "accumulatedDataChecked": true,
@@ -153,7 +153,7 @@
         "type": "evidence-matrix",
         "title": "Матрица возврата: пять вопросов по договору, оплате, сроку, результату и сумме требования",
         "userValue": "Помогает определить, что уже доказано, какую часть оплаты можно требовать и какие возражения подрядчика нужно закрыть до претензии.",
-        "competitorGap": "Organic results usually list general steps but do not connect the promised result, every payment, the violated deadline, the usable partial work and the final calculation in one matrix.",
+        "competitorGap": "Organic results usually list general steps but do not connect the promised result, every payment, the violated deadline, the accepted partial work and the final calculation in one matrix.",
         "sourceBasis": "paid-practice-and-current-law",
         "sourceIds": ["C-125", "K-071", "ЮД-ИМП-112", "SEO-20260805-SERP-YA-C125", "SEO-20260805-SERP-GO-C125", "PF-20260805-C125"],
         "placement": "Dedicated H2 before the claim calculation and pretrial claim sections",
@@ -172,9 +172,10 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    {"path":"src/house-construction-contractor-refund-data.mjs","kind":"article","contentId":"house-construction-contractor-refund","action":"created","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
-    {"path":"src/editorial-data.mjs","kind":"article-registry","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
-    {"path":"site.config.mjs","kind":"article-route","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"}
+    {"path":"src/house-construction-contractor-refund-data.mjs","kind":"article-legal-clarification","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
+    {"path":"src/publication-linking.mjs","kind":"contextual-linking","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
+    {"path":"scripts/house-construction-contractor-refund-test.mjs","kind":"publication-contract","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
+    {"path":"docs/PUBLICATION_LINKING.md","kind":"documentation","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"}
   ],
   "plannedChecks": [
     "npm run check",
@@ -184,6 +185,6 @@
   ],
   "publication": {
     "expectedUrls": ["https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"],
-    "notes": "CI, deployment and production checks are reported after merge. Direct Yandex and Google exports were unavailable; reserve organic search limitations are recorded openly."
+    "notes": "Follow-up legal precision review completed before final live acceptance. Article 28(4) distinction and mandatory contextual police-article link are contract-tested. Direct Yandex and Google exports remain unavailable; reserve organic search limitations are recorded openly."
   }
 }

@@ -92,7 +92,7 @@ export const site = {
   webmasterVerification: {
     google: env("GOOGLE_SITE_VERIFICATION"),
     googleDomainVerified: true,
-    yandex: env("YANDEX_WEBMASTER_VERIFICATION") || "e7084a7111f8d766",
+    yandex: env("YANDEX_SITE_VERIFICATION") || "e7084a7111f8d766",
   },
   analytics: {
     enabled: env("SITE_ANALYTICS_ENABLED") === "true",
@@ -101,7 +101,7 @@ export const site = {
     yandexMetricaId: env("YANDEX_METRICA_ID"),
   },
   video: {
-    enabled: env("SITE_VIDEO_ENABLED") === "true",
+    enabled: true,
     title: env("SITE_VIDEO_TITLE") || "Не знаете, с чего начать? Объясню за 45 секунд",
     durationLabel: env("SITE_VIDEO_DURATION") || "45 секунд",
     poster: env("SITE_VIDEO_POSTER") || "/assets/images/maxim-hero.webp",

@@ -22,6 +22,9 @@ if (!article.description || article.description.length < 70 || article.descripti
 }
 if (!article.lead.includes("зафиксируйте фактическое состояние участка")) fail("lead lacks the immediate first action");
 if (!article.lead.includes("не просить подрядчика «расторгнуть договор»")) fail("lead lacks the refusal-versus-termination distinction");
+if (!(article.relatedArticleSlugs || []).includes("zayavlenie-v-politsiyu-o-moshennichestve")) {
+  fail("mandatory contextual link to the fraud-statement article is missing");
+}
 
 const requiredSections = [
   "first-actions",
@@ -76,5 +79,11 @@ for (const requiredBoundary of [
 if (!copy.includes("одностороннего отказа")) fail("target document does not contain unilateral-refusal logic");
 if (!copy.includes("соразмер")) fail("interim-measures proportionality is missing");
 if (!copy.includes("до их получения")) fail("fraud route lacks the initial-intent boundary");
+if (!copy.includes("которую потребитель действительно принял")) {
+  fail("consumer-delay refusal must distinguish accepted work from merely usable work");
+}
+if (!copy.includes("пригодный, но не принятый результат")) {
+  fail("article must state that usability alone does not authorize withholding payment");
+}
 
 console.log("C-125 publication contract passed");

@@ -1,0 +1,197 @@
+name: Temp finish bailiff article
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/temp-finish-bailiff-article.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finish-publication:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Register article and content session
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          article_url = 'https://yuristshevchuk.com/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika/'
+          article_path = 'src/bailiff-small-pension-payments-data.mjs'
+
+          editorial_path = root / 'src/editorial-data.mjs'
+          editorial = editorial_path.read_text(encoding='utf-8')
+          import_anchor = 'import { medicalErrorFirstStepsArticles } from "./medical-error-first-steps-data.mjs";'
+          new_import = 'import { bailiffSmallPensionPaymentsArticles } from "./bailiff-small-pension-payments-data.mjs";'
+          if new_import not in editorial:
+              if import_anchor not in editorial:
+                  raise SystemExit('Не найден якорь импорта editorial-data.mjs')
+              editorial = editorial.replace(import_anchor, import_anchor + '\n' + new_import)
+          spread_anchor = '  ...medicalErrorFirstStepsArticles,\n];'
+          if '...bailiffSmallPensionPaymentsArticles' not in editorial:
+              if spread_anchor not in editorial:
+                  raise SystemExit('Не найден якорь массива editorial-data.mjs')
+              editorial = editorial.replace(spread_anchor, '  ...medicalErrorFirstStepsArticles,\n  ...bailiffSmallPensionPaymentsArticles,\n];')
+          editorial_path.write_text(editorial, encoding='utf-8')
+
+          site_path = root / 'site.config.mjs'
+          site = site_path.read_text(encoding='utf-8')
+          site = site.replace('contentLastModified: "2026-08-04"', 'contentLastModified: "2026-08-05"')
+          site = site.replace('"/razbory": "2026-08-04"', '"/razbory": "2026-08-05"')
+          route_anchor = '    "/razbory/vrachebnaya-oshibka-pri-rodah-s-chego-nachat": "2026-08-04",'
+          new_route = '    "/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika": "2026-08-05",'
+          if new_route not in site:
+              if route_anchor not in site:
+                  raise SystemExit('Не найден якорь маршрута site.config.mjs')
+              site = site.replace(route_anchor, route_anchor + '\n' + new_route)
+          site_path.write_text(site, encoding='utf-8')
+
+          policy_path = root / 'config/content-experiment-exceptions.json'
+          policy = json.loads(policy_path.read_text(encoding='utf-8'))
+          if article_path not in policy['governedPaths']:
+              policy['governedPaths'].append(article_path)
+          policy_path.write_text(json.dumps(policy, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
+
+          state_path = root / 'docs/current-production-state.md'
+          state = state_path.read_text(encoding='utf-8')
+          old_state = '- 39 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и двадцать три юридических разбора, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;'
+          new_state = '- 40 канонических содержательных URL: главная, каталог и семь страниц услуг, раздел и двадцать четыре юридических разбора, раздел и два полных кейса практики, страница о юристе, контакты и политика конфиденциальности;'
+          if old_state not in state:
+              raise SystemExit('Не найдено описание production-состава')
+          state_path.write_text(state.replace(old_state, new_state), encoding='utf-8')
+
+          manifest_path = root / 'reports/content-sessions/latest.json'
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          reviewed_at = '2026-08-05T08:00:00.000Z'
+          manifest['schemaVersion'] = 3
+          manifest['sessionId'] = '20260805-1000-bailiff-small-pension-payments'
+          manifest['reviewedAt'] = reviewed_at
+          manifest['spreadsheet']['id'] = '1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24'
+          manifest['spreadsheet']['modifiedTime'] = '2026-08-05T07:37:14.112Z'
+          manifest['spreadsheet']['metadataTabCount'] = len(manifest['spreadsheet']['discoveredTabs'])
+          manifest['sourceTrace'] = {
+              'dialogIds': ['6925d171-2fc8-8325-8b00-545c734955a4'],
+              'situationIds': ['SIT-20251125-001'],
+              'workIds': [],
+              'contentIds': ['C-024'],
+              'caseIds': [],
+              'notes': 'Only internal IDs; no personal data or full dialog text. Paid work and case result are not confirmed.'
+          }
+          metrics = ['indexation','impressions','clicks','ctr','averagePosition','searchQueries','activeReading60s','scroll75','scroll100','serviceClicks','chatTransitions','qualifiedLeads']
+          primary_intent = 'Взыскатель получает небольшие выплаты из пенсии должника и хочет проверить удержания, распределение денег, поиск имущества и конкретное бездействие пристава.'
+          manifest['seoReview'] = {
+              'status': 'completed',
+              'checkedAt': reviewed_at,
+              'region': 'Россия / онлайн',
+              'primaryIntent': primary_intent,
+              'verifiedCluster': [
+                  'пристав перечисляет мало денег взыскателю',
+                  'маленькие выплаты по исполнительному производству',
+                  'взыскание с пенсии должника',
+                  'жалоба на бездействие пристава взыскатель'
+              ],
+              'intentMap': [
+                  {'intent': 'почему пристав перечисляет мало', 'target': 'H1, лид и краткий ответ'},
+                  {'intent': 'можно ли взыскивать с пенсионера или инвалида', 'target': 'Раздел о виде дохода и защищённых выплатах'},
+                  {'intent': 'обязан ли пристав удерживать 70 процентов', 'target': 'Раздел о пределах удержаний'},
+                  {'intent': 'как проверить расчёт и распределение', 'target': 'Практический блок из восьми звеньев'},
+                  {'intent': 'что просить у пристава', 'target': 'Ходатайство о конкретных исполнительных действиях'},
+                  {'intent': 'куда жаловаться', 'target': 'Жалоба в порядке подчинённости и административный иск'}
+              ],
+              'intentOwnership': [{
+                  'intent': primary_intent,
+                  'ownerUrl': article_url,
+                  'ownerType': 'article',
+                  'supportingUrls': [
+                      'https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/',
+                      'https://yuristshevchuk.com/uslugi/iskovoe-zayavlenie/'
+                  ],
+                  'supportingCaseIds': [],
+                  'excludedQueries': [
+                      'как должнику уменьшить удержания',
+                      'как сохранить прожиточный минимум должнику',
+                      'как отменить судебный приказ',
+                      'расчёт задолженности по алиментам',
+                      'как снять арест со счёта должника',
+                      'иск о разделе имущества супругов'
+                  ],
+                  'existingCompetingUrlsReviewed': [
+                      'https://yuristshevchuk.com/razbory/spisali-dengi-po-sudebnomu-prikazu/',
+                      'https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/'
+                  ],
+                  'decision': 'new-owner',
+                  'reason': 'На сайте не было самостоятельного владельца интента взыскателя о маленьких выплатах, проверке удержаний, распределения денег и конкретного бездействия пристава.'
+              }],
+              'serpSnapshots': [],
+              'practicalElements': [{
+                  'contentId': 'bailiff-small-pension-payments',
+                  'targetUrl': article_url,
+                  'type': 'evidence-matrix',
+                  'title': 'Как проверить, почему выплаты такие маленькие',
+                  'userValue': 'Помогает найти конкретное звено, где возникла ошибка или бездействие, и сформулировать проверяемое требование приставу.',
+                  'competitorGap': 'Вместо общей рекомендации жаловаться читатель получает связку исполнительного документа, дохода, удержания, распределения, имущества и конкретного бездействия.',
+                  'sourceBasis': 'client-dialog-and-current-law',
+                  'sourceIds': ['C-024','6925d171-2fc8-8325-8b00-545c734955a4','SIT-20251125-001','R-0201','R-0202'],
+                  'placement': 'H2 с восемью последовательными проверками до блока о ходатайстве',
+                  'verifiedAgainstSerp': False,
+                  'verifiedAgainstExperiment': True
+              }],
+              'cannibalizationChecked': True,
+              'overOptimizationRisk': 'low',
+              'experimentException': {
+                  'mode': 'owner-approved-publication-without-direct-serp',
+                  'approvedByOwner': True,
+                  'directSerpSnapshotsAvailable': False,
+                  'contentId': 'bailiff-small-pension-payments',
+                  'approvedAt': reviewed_at,
+                  'journalRecord': 'Команда владельца разработать следующую статью; C-024 выбрана по очереди после C-023.',
+                  'reason': 'Прямые подтверждённые снимки минимум пяти органических результатов отдельно в Яндексе и Google не получены; выдуманные данные не используются.',
+                  'successCriteria': 'Релевантные органические показы и содержательное чтение либо хотя бы одно квалифицированное обращение о проверке удержаний, распределения денег, имущества или бездействия пристава.',
+                  'failureCriteria': 'После 90 дней при нормальной индексации отсутствуют релевантные показы, чтение и квалифицированные обращения.',
+                  'checkpointsDays': [14,30,60,90],
+                  'metrics': metrics
+              }
+          }
+          manifest['editorialChecks'] = {
+              'factsSeparatedFromHypotheses': True,
+              'paidWorkSeparatedFromPaymentDetails': True,
+              'workProcedureAndCaseResultsSeparated': True,
+              'legalSourcesVerified': True,
+              'anonymizationVerified': True,
+              'criticalSourceErrorsResolved': True
+          }
+          manifest['contentChanges'] = [
+              {'path': 'site.config.mjs', 'kind': 'article-route', 'contentId': 'bailiff-small-pension-payments', 'action': 'updated', 'expectedUrl': article_url},
+              {'path': 'src/editorial-data.mjs', 'kind': 'article-registry', 'contentId': 'bailiff-small-pension-payments', 'action': 'updated', 'expectedUrl': article_url},
+              {'path': article_path, 'kind': 'article', 'contentId': 'bailiff-small-pension-payments', 'action': 'created', 'expectedUrl': article_url}
+          ]
+          manifest['plannedChecks'] = [
+              'npm run check',
+              'npm run test:live',
+              'node scripts/live-all-publications-smoke.mjs',
+              'node scripts/live-public-copy-regression-test.mjs'
+          ]
+          manifest['publication'] = {
+              'expectedUrls': [article_url],
+              'notes': 'CI, deployment and live results are reported in chat after publication. Checkpoints: 19.08, 04.09, 04.10 and 03.11.2026.'
+          }
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
+
+          workflow = root / '.github/workflows/temp-finish-bailiff-article.yml'
+          workflow.unlink()
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/editorial-data.mjs site.config.mjs config/content-experiment-exceptions.json docs/current-production-state.md reports/content-sessions/latest.json .github/workflows/temp-finish-bailiff-article.yml
+          git commit -m 'Завершить регистрацию статьи C-024'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

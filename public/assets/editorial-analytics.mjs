@@ -8,6 +8,9 @@ if (publication) {
   const requiresConsent = body.dataset.analyticsRequiresConsent === "true";
   const analyticsEnabled = body.dataset.analyticsEnabled === "true";
   const sent = new Set();
+  const pendingYandexEvents = [];
+  let flushTimer = 0;
+  let flushAttempts = 0;
 
   const consentGranted = () => {
     if (!analyticsEnabled) return false;
@@ -17,6 +20,24 @@ if (publication) {
     } catch {
       return false;
     }
+  };
+
+  const canSendToYandex = () => /^\d+$/.test(yandexMetricaId) && typeof window.ym === "function";
+  const flushPendingYandexEvents = () => {
+    flushTimer = 0;
+    if (!pendingYandexEvents.length) return;
+    if (canSendToYandex()) {
+      for (const item of pendingYandexEvents.splice(0)) {
+        window.ym(Number(yandexMetricaId), "reachGoal", item.event, item.payload);
+      }
+      flushAttempts = 0;
+      return;
+    }
+    flushAttempts += 1;
+    if (flushAttempts < 40) flushTimer = window.setTimeout(flushPendingYandexEvents, 250);
+  };
+  const scheduleYandexFlush = () => {
+    if (!flushTimer) flushTimer = window.setTimeout(flushPendingYandexEvents, 0);
   };
 
   const track = (event, params = {}) => {
@@ -29,8 +50,11 @@ if (publication) {
     };
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event, ...payload });
-    if (/^\d+$/.test(yandexMetricaId) && typeof window.ym === "function") {
+    if (canSendToYandex()) {
       window.ym(Number(yandexMetricaId), "reachGoal", event, payload);
+    } else if (/^\d+$/.test(yandexMetricaId)) {
+      pendingYandexEvents.push({ event, payload });
+      scheduleYandexFlush();
     }
     return true;
   };
@@ -44,7 +68,12 @@ if (publication) {
 
   const trackView = () => trackOnce("view", "publication_view");
   trackView();
-  document.querySelector("[data-consent-accept]")?.addEventListener("click", () => setTimeout(trackView, 0));
+  document.querySelector("[data-consent-accept]")?.addEventListener("click", () => {
+    window.setTimeout(() => {
+      trackView();
+      scheduleYandexFlush();
+    }, 0);
+  });
 
   const measureScroll = () => {
     const max = Math.max(document.documentElement.scrollHeight - innerHeight, 1);
@@ -60,15 +89,19 @@ if (publication) {
   measureScroll();
 
   let activeSeconds = 0;
-  let recentActivity = true;
-  const markActivity = () => { recentActivity = true; };
-  for (const eventName of ["scroll", "pointerdown", "keydown", "touchstart"]) {
+  let lastActivityAt = Date.now();
+  const activeGraceMs = 45_000;
+  const markActivity = () => { lastActivityAt = Date.now(); };
+  for (const eventName of ["scroll", "pointerdown", "keydown", "touchstart", "focus"]) {
     addEventListener(eventName, markActivity, { passive: true });
   }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") markActivity();
+  });
   setInterval(() => {
-    if (document.visibilityState !== "visible" || !recentActivity) return;
+    if (document.visibilityState !== "visible") return;
+    if (Date.now() - lastActivityAt > activeGraceMs) return;
     activeSeconds += 1;
-    recentActivity = activeSeconds < 5;
     for (const threshold of [30, 60, 120]) {
       if (activeSeconds >= threshold) {
         trackOnce(`active-${threshold}`, `publication_active_${threshold}s`, { active_seconds: threshold });

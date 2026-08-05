@@ -140,3 +140,5 @@ console.log("Editorial single-source contract passed: public body copy is not ov
           git add src/yandex-delivery-lost-parcel-data.mjs src/editorial-data.mjs scripts/editorial-single-source-test.mjs package.json .github/workflows/editorial-single-source-fix.yml
           git commit -m "Enforce single source for article copy"
           git push origin HEAD:agent/editorial-single-source
+
+# Triggered after the workflow was already present on the branch.

@@ -1,0 +1,150 @@
+name: Temporary editorial single-source maintenance
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out target branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/editorial-single-source
+          fetch-depth: 0
+          path: target
+
+      - name: Normalize source and add permanent regression test
+        working-directory: target
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json
+
+          article_path = Path('src/yandex-delivery-lost-parcel-data.mjs')
+          registry_path = Path('src/editorial-data.mjs')
+          package_path = Path('package.json')
+          test_path = Path('scripts/editorial-single-source-test.mjs')
+
+          old_lead = 'Когда отправление не найдено, спор обычно нельзя сводить к одному вопросу: сохранился чек или нет. Сначала нужно установить тариф, оценочную стоимость, условия страхования и лицо, которое отвечает по договору. Затем отдельно подтвердить передачу посылки, её содержимое, стоимость каждой вещи и факт утраты. Кассовый чек удобен, но при его отсутствии доказательственную цепочку можно собрать из истории заказов, банковских операций, фотографий, переписки и сведений о цене сопоставимых вещей.'
+          new_lead = 'Отправление не найдено, а чеки на вещи не сохранились. Сохраните карточку заказа, статусы, переписку, полис и сведения об оценочной стоимости. Для каждой вещи соберите подтверждение покупки или принадлежности, фотографии, банковские операции и цены сопоставимых товаров. После этого подайте страховое заявление и отдельно проверьте, кому направлять досудебную претензию.'
+
+          article = article_path.read_text(encoding='utf-8')
+          if article.count(old_lead) != 1:
+              raise SystemExit(f'Expected exactly one old lead, found {article.count(old_lead)}')
+          article_path.write_text(article.replace(old_lead, new_lead, 1), encoding='utf-8')
+
+          registry = registry_path.read_text(encoding='utf-8')
+          wrapper = '''const yandexDeliveryLostParcelPublicationArticles = yandexDeliveryLostParcelArticles.map((article) => ({
+  ...article,
+  lead: "Отправление не найдено, а чеки на вещи не сохранились. Сохраните карточку заказа, статусы, переписку, полис и сведения об оценочной стоимости. Для каждой вещи соберите подтверждение покупки или принадлежности, фотографии, банковские операции и цены сопоставимых товаров. После этого подайте страховое заявление и отдельно проверьте, кому направлять досудебную претензию.",
+}));
+
+'''
+          if registry.count(wrapper) != 1:
+              raise SystemExit('Expected the C-122 publication wrapper exactly once')
+          registry = registry.replace(wrapper, '', 1)
+          registry = registry.replace('...yandexDeliveryLostParcelPublicationArticles,', '...yandexDeliveryLostParcelArticles,', 1)
+          registry_path.write_text(registry, encoding='utf-8')
+
+          test_path.write_text(r'''import { readFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const registryPath = join(root, "src", "editorial-data.mjs");
+const sourcePath = join(root, "src", "yandex-delivery-lost-parcel-data.mjs");
+const registry = await readFile(registryPath, "utf8");
+const source = await readFile(sourcePath, "utf8");
+
+const forbiddenPublicCopyFields = [
+  "title",
+  "description",
+  "lead",
+  "shortAnswer",
+  "sections",
+  "faq",
+  "ctaTitle",
+  "serviceLabel",
+  "relatedServices",
+  "topic",
+];
+const wrapperPattern = /const\s+([A-Za-z0-9_$]+)\s*=\s*([A-Za-z0-9_$]+)\.map\(\s*\(article\)\s*=>\s*\(\{\s*\.\.\.article,([\s\S]*?)\}\)\s*\)\s*;/g;
+const violations = [];
+for (const match of registry.matchAll(wrapperPattern)) {
+  const [, wrapperName, sourceName, overrides] = match;
+  for (const field of forbiddenPublicCopyFields) {
+    if (new RegExp(`\\b${field}\\s*:`).test(overrides)) {
+      violations.push(`${wrapperName} overrides ${field} from ${sourceName}`);
+    }
+  }
+}
+if (violations.length) {
+  throw new Error(`Public article copy must live in its source module, not in editorial-data.mjs:\n- ${violations.join("\n- ")}`);
+}
+
+const expectedLead = "Отправление не найдено, а чеки на вещи не сохранились. Сохраните карточку заказа, статусы, переписку, полис и сведения об оценочной стоимости. Для каждой вещи соберите подтверждение покупки или принадлежности, фотографии, банковские операции и цены сопоставимых товаров. После этого подайте страховое заявление и отдельно проверьте, кому направлять досудебную претензию.";
+if (!source.includes(`lead: "${expectedLead}"`)) throw new Error("C-122 lead is not stored in its dedicated source module");
+if (source.includes("доказательственную цепочку")) throw new Error("C-122 source still contains the rejected phrase");
+if (registry.includes("yandexDeliveryLostParcelPublicationArticles")) throw new Error("C-122 still uses a publication-only wrapper");
+
+const { articles } = await import("../src/editorial-data.mjs");
+const article = articles.find((item) => item.id === "yandex-delivery-lost-parcel");
+if (!article) throw new Error("C-122 is missing from the registry");
+if (article.lead !== expectedLead) throw new Error("Published C-122 lead differs from its source value");
+
+console.log("Editorial single-source contract passed");
+''', encoding='utf-8')
+
+          package = json.loads(package_path.read_text(encoding='utf-8'))
+          scripts = package['scripts']
+          addition = 'npm run test:public-copy && npm run test:editorial-single-source'
+          if addition not in scripts['check']:
+              scripts['check'] = scripts['check'].replace('npm run test:public-copy', addition, 1)
+          scripts['test:editorial-single-source'] = 'node scripts/editorial-single-source-test.mjs'
+          package_path.write_text(json.dumps(package, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          branch_workflow = Path('.github/workflows/editorial-single-source-fix.yml')
+          if branch_workflow.exists():
+              branch_workflow.unlink()
+          PY
+
+      - name: Verify target branch changes
+        working-directory: target
+        run: |
+          npm run test:editorial-single-source
+          npm run test:public-copy
+
+      - name: Commit target branch changes
+        working-directory: target
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/yandex-delivery-lost-parcel-data.mjs src/editorial-data.mjs scripts/editorial-single-source-test.mjs package.json .github/workflows/editorial-single-source-fix.yml
+          git commit -m "Enforce single source for article copy"
+          git push origin HEAD:agent/editorial-single-source
+
+      - name: Check out main for self-removal
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          path: cleanup
+
+      - name: Remove temporary workflow from main
+        working-directory: cleanup
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/temporary-editorial-single-source-maintenance.yml
+          git add .github/workflows/temporary-editorial-single-source-maintenance.yml
+          git commit -m "Remove temporary editorial maintenance workflow"
+          git push origin HEAD:main

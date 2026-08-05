@@ -31,6 +31,10 @@ const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((
   seoTitle: "Скрытый дефект автомобиля после покупки",
 }));
 
+const contractorRepairQualityClaimResponsePublicationArticles = contractorRepairQualityClaimResponseArticles.map(
+  ({ contentId: _internalContentId, ...article }) => article,
+);
+
 export const articles = [
   ...baseArticles,
   ...trademarkClaimMarketplaceArticles,
@@ -44,7 +48,7 @@ export const articles = [
   ...designerInfographicExclusiveRightsArticles,
   ...yandexDeliveryLostParcelArticles,
   ...houseConstructionContractorRefundArticles,
-  ...contractorRepairQualityClaimResponseArticles,
+  ...contractorRepairQualityClaimResponsePublicationArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

@@ -16,7 +16,7 @@ export const site = {
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
   // Максимальная дата содержательного обновления. Даты отдельных страниц
   // задаются явно и не меняются от технической пересборки.
-  contentLastModified: "2026-08-04",
+  contentLastModified: "2026-08-05",
   contentLastModifiedByPath: {
     "/": "2026-08-02",
     "/uslugi": "2026-08-02",
@@ -27,7 +27,7 @@ export const site = {
     "/uslugi/iskovoe-zayavlenie": "2026-08-02",
     "/uslugi/spory-biznesa": "2026-08-02",
     "/uslugi/marketpleysy": "2026-08-02",
-    "/razbory": "2026-08-04",
+    "/razbory": "2026-08-05",
     "/razbory/chto-delat-posle-otkaza-policii": "2026-08-02",
     "/razbory/politsiya-ne-otvechaet-na-zayavlenie": "2026-08-02",
     "/razbory/vernut-dolg-bez-raspiski": "2026-08-02",
@@ -51,6 +51,7 @@ export const site = {
     "/razbory/ozon-poteryal-tovar-ili-nachislil-lishnyuyu-logistiku": "2026-08-04",
     "/razbory/skrytyy-defekt-poderzhannogo-avtomobilya": "2026-08-04",
     "/razbory/vrachebnaya-oshibka-pri-rodah-s-chego-nachat": "2026-08-04",
+    "/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika": "2026-08-05",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

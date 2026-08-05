@@ -29,11 +29,6 @@ const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((
   seoTitle: "Скрытый дефект автомобиля после покупки",
 }));
 
-const yandexDeliveryLostParcelPublicationArticles = yandexDeliveryLostParcelArticles.map((article) => ({
-  ...article,
-  lead: "Отправление не найдено, а чеки на вещи не сохранились. Сохраните карточку заказа, статусы, переписку, полис и сведения об оценочной стоимости. Для каждой вещи соберите подтверждение покупки или принадлежности, фотографии, банковские операции и цены сопоставимых товаров. После этого подайте страховое заявление и отдельно проверьте, кому направлять досудебную претензию.",
-}));
-
 export const articles = [
   ...baseArticles,
   ...trademarkClaimMarketplaceArticles,
@@ -45,7 +40,7 @@ export const articles = [
   ...medicalErrorFirstStepsArticles,
   ...bailiffSmallPensionPaymentsArticles,
   ...designerInfographicExclusiveRightsArticles,
-  ...yandexDeliveryLostParcelPublicationArticles,
+  ...yandexDeliveryLostParcelArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

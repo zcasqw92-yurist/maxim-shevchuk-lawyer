@@ -1,46 +1,19 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260805-2245-c122-editorial-single-source",
-  "reviewedAt": "2026-08-05T20:45:00.000Z",
+  "sessionId": "20260805-2315-c125-house-construction-refund",
+  "reviewedAt": "2026-08-05T21:15:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-05T19:18:52.230Z",
+    "modifiedTime": "2026-08-05T21:10:06.269Z",
     "metadataTabCount": 28,
     "discoveredTabs": [
-      "00_Старт",
-      "01_БПЮ",
-      "02_ЮрДоки",
-      "03_Оплаты",
-      "04_Дашборд",
-      "05_Контроль",
-      "06_Импорт",
-      "_Справочники",
-      "_Журнал",
-      "07_Диалоги_исследование",
-      "08_Банк_реплик",
-      "09_Паттерны_аудитории",
-      "10_Контентные_возможности",
-      "11_Кейсы_для_публикации",
-      "12_Эффективные_ответы",
-      "13_Статистика_контента",
-      "14_Контент_дашборд",
-      "15_Обращения_с_контента",
-      "_Реестр_диалогов",
-      "_Ситуации_и_связи",
-      "_События_воронки",
-      "_Версии_контента",
-      "16_Контроль_данных",
-      "_Импорт_ЮД_151_200",
-      "Статьи_HARANT",
-      "17_SEO_сборы",
-      "18_SEO_база_ключей",
-      "19_SEO_preflight"
+      "00_Старт", "01_БПЮ", "02_ЮрДоки", "03_Оплаты", "04_Дашборд", "05_Контроль", "06_Импорт", "_Справочники", "_Журнал", "07_Диалоги_исследование", "08_Банк_реплик", "09_Паттерны_аудитории", "10_Контентные_возможности", "11_Кейсы_для_публикации", "12_Эффективные_ответы", "13_Статистика_контента", "14_Контент_дашборд", "15_Обращения_с_контента", "_Реестр_диалогов", "_Ситуации_и_связи", "_События_воронки", "_Версии_контента", "16_Контроль_данных", "_Импорт_ЮД_151_200", "Статьи_HARANT", "17_SEO_сборы", "18_SEO_база_ключей", "19_SEO_preflight"
     ]
   },
   "reviewedTabs": [
-    {"name":"00_Старт","range":"A1:H90","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","SEO gate","SEO preflight"]},
+    {"name":"00_Старт","range":"A1:H90","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","SEO gate","publication rules"]},
     {"name":"01_БПЮ","range":"A1:AC1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["demand","client language"]},
-    {"name":"02_ЮрДоки","range":"A1:AA1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice"]},
+    {"name":"02_ЮрДоки","range":"A1:AA1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice boundaries"]},
     {"name":"03_Оплаты","range":"A1:M2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed payments only"]},
     {"name":"04_Дашборд","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["operational context"]},
     {"name":"05_Контроль","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["data gaps"]},
@@ -50,137 +23,140 @@
     {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience research"]},
     {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["verbatim language","search hypotheses"]},
     {"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience patterns"]},
-    {"name":"10_Контентные_возможности","range":"A1:AX1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content brief","intent map","preflight linkage"]},
-    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["case evidence","anonymization"]},
+    {"name":"10_Контентные_возможности","range":"A1:AX1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-125 brief","intent map","preflight linkage"]},
+    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["K-071 evidence","anonymization","outcome limits"]},
     {"name":"12_Эффективные_ответы","range":"A1:V1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["communication patterns"]},
     {"name":"13_Статистика_контента","range":"A1:AB2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["performance data"]},
     {"name":"14_Контент_дашборд","range":"A1:R200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content priorities"]},
     {"name":"15_Обращения_с_контента","range":"A1:AG2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["lead language","attribution"]},
     {"name":"_Реестр_диалогов","range":"A1:Q2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source registry"]},
-    {"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["cross-source links","result levels"]},
+    {"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source links","result levels"]},
     {"name":"_События_воронки","range":"A1:J5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed funnel events"]},
     {"name":"_Версии_контента","range":"A1:L1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content versions"]},
-    {"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical data errors","SEO preflight blockers"]},
+    {"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical data errors","SEO blockers"]},
     {"name":"_Импорт_ЮД_151_200","range":"A1:T100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["historical source verification"]},
-    {"name":"Статьи_HARANT","range":"A1:R1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["external publication overlap check"]},
-    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO collection registry","cost and freshness"]},
-    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["keyword reuse","intent ownership"]},
-    {"name":"19_SEO_preflight","range":"A1:S1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["pre-draft authorization","Yandex and Google evidence"]}
+    {"name":"Статьи_HARANT","range":"A1:R1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["external overlap check"]},
+    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO collections","cost and freshness"]},
+    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["keyword ownership","query reuse"]},
+    {"name":"19_SEO_preflight","range":"A1:S1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["draft authorization","Yandex and Google evidence"]}
   ],
   "sourceTrace": {
-    "dialogIds": [],
-    "situationIds": [],
-    "workIds": [],
-    "contentIds": ["C-122"],
-    "caseIds": ["K-068"],
-    "notes": "Only internal IDs; no personal data or full dialog text. This session normalizes the existing published lead into one source file and does not change the public wording or claim a new case result."
+    "dialogIds": ["68aabb55-ee88-8326-81e0-9e942102a737"],
+    "situationIds": ["SIT-YD-20250824-112"],
+    "workIds": ["ЮД-ИМП-112"],
+    "contentIds": ["C-125"],
+    "caseIds": ["K-071"],
+    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work and the problem scenario are confirmed. Filing, response, recovery and final case outcome are not confirmed."
   },
   "seoKnowledgeBaseReview": {
     "accumulatedDataChecked": true,
-    "collectionIds": ["SEO-20260805-SERP-YA-C122", "SEO-20260805-SERP-GO-C122"],
-    "keywordIds": ["KW-20260805-C122-YA", "KW-20260805-C122-GO"],
+    "collectionIds": ["SEO-20260805-SERP-YA-C125", "SEO-20260805-SERP-GO-C125"],
+    "keywordIds": ["KW-20260805-C125-YA", "KW-20260805-C125-GO"],
     "newPaidCollectionRequired": false,
-    "paidCollectionReason": "No new SEO collection was needed for a technical source normalization that leaves the verified intent, owner URL and public text unchanged.",
-    "preflightId": "PF-20260805-C122",
+    "paidCollectionReason": "No paid SEO call was needed. The accumulated base was checked and fresh reserve organic results for both engines were reviewed and registered.",
+    "preflightId": "PF-20260805-C125",
     "draftAuthorization": "РАЗРЕШЕНО",
     "draftStartedAfterAuthorization": true
   },
   "seoReview": {
     "status": "completed",
-    "checkedAt": "2026-08-05T19:25:00.000Z",
+    "checkedAt": "2026-08-05T21:05:00.000Z",
     "region": "Россия / Москва",
-    "primaryIntent": "Отправитель хочет получить компенсацию за потерянную Яндекс Доставкой посылку и доказать стоимость вещей без чеков.",
+    "primaryIntent": "Частный заказчик хочет отказаться от договора строительства дома и вернуть оплату из-за сорванного срока или очевидного отсутствия работ.",
     "verifiedCluster": [
-      "Яндекс Доставка потеряла посылку как получить компенсацию без чеков",
-      "Яндекс Доставка потеряла посылку компенсация",
-      "как доказать стоимость посылки без чеков"
+      "подрядчик не построил дом после оплаты как вернуть деньги",
+      "подрядчик не начал строительство дома вернуть аванс",
+      "сорван срок строительства частного дома претензия"
     ],
     "intentMap": [
-      {"intent":"что делать сразу после пропажи","target":"лид, короткий ответ и блок фиксации доказательств"},
-      {"intent":"как получить страховую выплату","target":"разделы о двух маршрутах, полисе и адресате"},
-      {"intent":"как доказать стоимость без чеков","target":"матрица доказательств и блок по старым вещам"},
-      {"intent":"что написать в претензии","target":"структура досудебной претензии"},
-      {"intent":"что делать после отказа","target":"дополнение доказательств, претензия и судебный маршрут"}
+      {"intent":"что сделать сразу","target":"лид и раздел фиксации объекта"},
+      {"intent":"кто отвечает","target":"раздел о стороне договора и представителе"},
+      {"intent":"когда отказаться","target":"раздел о статье 28 Закона о защите прав потребителей и статье 715 ГК РФ"},
+      {"intent":"что делать со сваями и материалами","target":"раздел о частичном результате"},
+      {"intent":"как рассчитать возврат","target":"матрица возврата и раздел расчёта"},
+      {"intent":"когда полиция и арест имущества","target":"разделы об обеспечительных мерах и первоначальном умысле"}
     ],
     "intentOwnership": [
       {
-        "intent": "Отправитель хочет получить компенсацию за потерянную Яндекс Доставкой посылку и доказать стоимость вещей без чеков.",
-        "ownerUrl": "https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/",
+        "intent": "Частный заказчик хочет отказаться от договора строительства дома и вернуть оплату из-за сорванного срока или очевидного отсутствия работ.",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/",
         "ownerType": "article",
         "supportingUrls": [
           "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+          "https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/"
         ],
-        "supportingCaseIds": ["K-068"],
+        "supportingCaseIds": ["K-071"],
         "excludedQueries": [
-          "Яндекс Маркет потерял заказ покупателя",
-          "Ozon потерял товар продавца",
-          "повредили посылку при доставке",
-          "курьер украл посылку заявление в полицию",
-          "международная доставка потеряла посылку"
+          "ремонт квартиры подрядчик сорвал срок",
+          "застройщик не передал квартиру по ДДУ",
+          "купили участок без подряда",
+          "подрядчик построил дом с недостатками",
+          "как привлечь строителя за мошенничество без договора"
         ],
         "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/razbory/ozon-poteryal-tovar-ili-nachislil-lishnyuyu-logistiku/",
+          "https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/",
+          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
           "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/"
         ],
         "decision": "new-owner",
-        "reason": "На сайте не было самостоятельной страницы о частной отправке через Яндекс Доставку, страховом урегулировании и доказательстве стоимости старых вещей без чеков."
+        "reason": "Existing pages do not own the combined intent of private house construction, unilateral refusal, partial construction result, refund calculation and enforcement risk."
       }
     ],
     "serpSnapshots": [
       {
-        "intent": "Отправитель хочет получить компенсацию за потерянную Яндекс Доставкой посылку и доказать стоимость вещей без чеков.",
-        "checkedAt": "2026-08-05T19:25:00.000Z",
+        "intent": "Частный заказчик хочет отказаться от договора строительства дома и вернуть оплату из-за сорванного срока или очевидного отсутствия работ.",
+        "checkedAt": "2026-08-05T21:05:00.000Z",
         "region": "Россия / Москва",
         "engines": [
           {
             "engine": "Yandex",
-            "query": "Яндекс Доставка потеряла посылку как получить компенсацию без чеков",
+            "query": "подрядчик не построил дом после оплаты как вернуть деньги",
             "organicResultsReviewed": 20,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "Информационный: порядок обращения, страхование и подтверждение ущерба",
-            "resultTypes": ["официальные страницы Яндекса", "юридические статьи", "пользовательские обсуждения"],
+            "dominantIntent": "Информационно-коммерческий: прекратить подряд, вернуть оплату и выбрать претензионный или судебный маршрут",
+            "resultTypes": ["юридические статьи", "судебные акты", "вопросы потребителей", "материалы о строительном подряде"],
             "localPack": false,
-            "snippetPatterns": ["обращение в поддержку и страховое заявление", "чеки и иные документы о стоимости", "лимит зависит от объявленной стоимости"],
-            "competitorCoverageGaps": ["нет единой матрицы доказательств по каждой вещи", "редко разделяются страховое требование и претензия к исполнителю", "слабо объясняется оценка старых и подержанных вещей"],
-            "staleOrWeakResults": ["часть материалов относится к покупкам на маркетплейсе или к корпоративным тарифам"]
+            "snippetPatterns": ["направить претензию подрядчику", "отказаться от договора при нарушении срока", "взыскать аванс и неустойку"],
+            "competitorCoverageGaps": ["редко разделяются покупка земли и подряд", "не объясняется ответственность стороны договора и представителя", "частичный результат и материалы учитываются без рабочей матрицы", "обеспечительные меры часто упоминаются без доказательства риска"],
+            "staleOrWeakResults": ["резервная веб-выдача, а не прямой экспорт yandex.ru", "часть материалов посвящена ремонту или ДДУ, а не строительству частного дома"]
           },
           {
             "engine": "Google",
-            "query": "Яндекс Доставка потеряла посылку как получить компенсацию без чеков",
+            "query": "подрядчик не построил дом после оплаты как вернуть деньги",
             "organicResultsReviewed": 10,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "Информационный: страховая выплата, доказательства стоимости и обжалование отказа",
-            "resultTypes": ["официальные документы сервиса", "справочные материалы", "жалобы пользователей"],
+            "dominantIntent": "Информационно-коммерческий: возврат аванса, отказ от договора, неустойка и иск",
+            "resultTypes": ["юридические разборы", "судебная практика", "ответы на обращения", "нормативные материалы"],
             "localPack": false,
-            "snippetPatterns": ["подать заявление через поддержку", "подтвердить содержимое и стоимость", "проверить страховой лимит"],
-            "competitorCoverageGaps": ["нет пошаговой связи между приложением, полисом, претензией и иском", "не объясняется, чем подтвердить стоимость вместо чека для разных видов вещей", "не отделён факт юридической работы от подтверждённого результата"],
-            "staleOrWeakResults": ["встречаются страницы о других продуктах Яндекса и неподтверждённые пользовательские советы"]
+            "snippetPatterns": ["зафиксировать нарушение срока", "расторгнуть или отказаться от договора", "потребовать возврат денег и убытки"],
+            "competitorCoverageGaps": ["не различаются просьба расторгнуть договор и односторонний отказ", "редко проверяется пригодность свай или фундамента", "уголовный маршрут часто смешивается с гражданским взысканием", "нет последовательной матрицы доказательств и расчёта"],
+            "staleOrWeakResults": ["Google-подобная резервная выдача; прямой Google.com не гарантирован", "часть страниц не учитывает актуальную редакцию потребительского закона"]
           }
         ],
         "pageTypeDecision": "article",
-        "decisionReason": "Пользователю нужен последовательный разбор доказательств и маршрутов, который не помещается в FAQ или краткую услугу и имеет самостоятельный информационно-коммерческий интент.",
+        "decisionReason": "The intent requires a detailed evidence and document route that cannot be answered reliably by a short FAQ or a generic service page.",
         "canProvideBetterAnswer": true
       }
     ],
     "practicalElements": [
       {
-        "contentId": "yandex-delivery-lost-parcel",
-        "targetUrl": "https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/",
+        "contentId": "house-construction-contractor-refund",
+        "targetUrl": "https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/",
         "type": "evidence-matrix",
-        "title": "Матрица доказательств: пять вопросов по каждой вещи",
-        "userValue": "Помогает проверить существование вещи, её передачу в посылке, принадлежность, стоимость и состояние до направления страхового заявления или претензии.",
-        "competitorGap": "В органической выдаче встречаются отдельные советы про чеки и скриншоты, но нет единой предметной матрицы для старых, подержанных, подаренных и уникальных вещей.",
+        "title": "Матрица возврата: пять вопросов по договору, оплате, сроку, результату и сумме требования",
+        "userValue": "Помогает определить, что уже доказано, какую часть оплаты можно требовать и какие возражения подрядчика нужно закрыть до претензии.",
+        "competitorGap": "Organic results usually list general steps but do not connect the promised result, every payment, the violated deadline, the usable partial work and the final calculation in one matrix.",
         "sourceBasis": "paid-practice-and-current-law",
-        "sourceIds": ["C-122", "K-068", "SEO-20260805-SERP-YA-C122", "SEO-20260805-SERP-GO-C122", "PF-20260805-C122"],
-        "placement": "Самостоятельный H2 после раздела о подтверждении стоимости без чеков",
+        "sourceIds": ["C-125", "K-071", "ЮД-ИМП-112", "SEO-20260805-SERP-YA-C125", "SEO-20260805-SERP-GO-C125", "PF-20260805-C125"],
+        "placement": "Dedicated H2 before the claim calculation and pretrial claim sections",
         "verifiedAgainstSerp": true
       }
     ],
@@ -196,19 +172,18 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    {"path":"src/yandex-delivery-lost-parcel-data.mjs","kind":"article-source-normalization","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
-    {"path":"src/editorial-data.mjs","kind":"article-registry-normalization","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"}
+    {"path":"src/house-construction-contractor-refund-data.mjs","kind":"article","contentId":"house-construction-contractor-refund","action":"created","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
+    {"path":"src/editorial-data.mjs","kind":"article-registry","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
+    {"path":"site.config.mjs","kind":"article-route","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"}
   ],
   "plannedChecks": [
-    "npm run test:editorial-single-source",
-    "npm run test:public-copy",
     "npm run check",
     "npm run test:live",
     "node scripts/live-all-publications-smoke.mjs",
     "node scripts/live-public-copy-regression-test.mjs"
   ],
   "publication": {
-    "expectedUrls": ["https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"],
-    "notes": "Technical source normalization only: the already published first-screen wording remains unchanged. The new regression test blocks future public body-copy overrides in the registry."
+    "expectedUrls": ["https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"],
+    "notes": "CI, deployment and production checks are reported after merge. Direct Yandex and Google exports were unavailable; reserve organic search limitations are recorded openly."
   }
 }

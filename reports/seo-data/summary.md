@@ -3,7 +3,7 @@
 - Период Метрики: 2026-07-07—2026-08-05
 - Запросы Вебмастера по страницам: последние 14 дней
 - Google Search Console: не используется (not_configured)
-- Атрибуция Метрики: страницы: viewed_page_url; цели: landing_page_fallback
+- Атрибуция Метрики: страницы: viewed_page_url; цели: event_url_action_goal
 - Страниц в общем отчёте: 29
 - Контрольных кластеров: 2
 - Страниц в контрольных кластерах: 8
@@ -16,7 +16,7 @@
 - Клики двух поисковиков: 1
 - Входные визиты кластеров: 4
 - Просмотры страниц кластеров: 69
-- Переходы к контакту из кластеров: 0
+- Переходы к контакту из кластеров: 1
 - Коммерческие страницы в контроле: /uslugi/vozvrat-deneg/, /uslugi/zhaloby-i-obrashcheniya/
 
 ## Возврат денег за услуги и навязанные договоры
@@ -39,9 +39,8 @@
 - Клики Google: 0
 - Входные визиты: 2
 - Просмотры страниц: 50
-- Переходы к контакту: 0
+- Переходы к контакту: 1
 
 - Для Google требуется доступ: Нужен секрет GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON и доступ сервисного аккаунта к ресурсу Search Console.
-- Цели Метрики временно привязаны к странице входа: Metrica event report 400: Metrics and dimensions with different prefixes can be used together only when filtering data, value: ym:ep:eventURLPath is incompatible with ym:ev:goal590789822reaches, error code: 4011.
 - Wordstat при feedback-сборе не вызывается.
 - При малой выборке страницы автоматически не переписываются.

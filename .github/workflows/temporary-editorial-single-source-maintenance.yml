@@ -148,3 +148,5 @@ console.log("Editorial single-source contract passed");
           git add .github/workflows/temporary-editorial-single-source-maintenance.yml
           git commit -m "Remove temporary editorial maintenance workflow"
           git push origin HEAD:main
+
+# Second push: the workflow already existed before this event.

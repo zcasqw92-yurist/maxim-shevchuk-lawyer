@@ -21,20 +21,15 @@ const forbiddenPublicCopyFields = [
   "topic",
 ];
 
-const wrapperPattern = /const\s+([A-Za-z0-9_$]+)\s*=\s*([A-Za-z0-9_$]+)\.map\(\s*\(article\)\s*=>\s*\(\{\s*\.\.\.article,([\s\S]*?)\}\)\s*\)\s*;/g;
-const violations = [];
+const registryViolations = forbiddenPublicCopyFields.filter((field) => (
+  new RegExp(`(^|[,{;\\n]\\s*)${field}\\s*:`, "m").test(registry)
+));
 
-for (const match of registry.matchAll(wrapperPattern)) {
-  const [, wrapperName, sourceName, overrides] = match;
-  for (const field of forbiddenPublicCopyFields) {
-    if (new RegExp(`\\b${field}\\s*:`).test(overrides)) {
-      violations.push(`${wrapperName} overrides ${field} from ${sourceName}`);
-    }
-  }
-}
-
-if (violations.length) {
-  throw new Error(`Public article copy must live in its source module, not in editorial-data.mjs:\n- ${violations.join("\n- ")}`);
+if (registryViolations.length) {
+  throw new Error(
+    `Public article copy must live in dedicated source modules. `
+    + `editorial-data.mjs contains forbidden fields: ${registryViolations.join(", ")}`,
+  );
 }
 
 const expectedLead = "Отправление не найдено, а чеки на вещи не сохранились. Сохраните карточку заказа, статусы, переписку, полис и сведения об оценочной стоимости. Для каждой вещи соберите подтверждение покупки или принадлежности, фотографии, банковские операции и цены сопоставимых товаров. После этого подайте страховое заявление и отдельно проверьте, кому направлять досудебную претензию.";
@@ -56,4 +51,4 @@ if (article.lead !== expectedLead) {
   throw new Error("Published C-122 lead differs from its single source value");
 }
 
-console.log("Editorial single-source contract passed");
+console.log("Editorial single-source contract passed: article body copy exists only in dedicated source modules");

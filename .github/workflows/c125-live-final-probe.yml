@@ -1,0 +1,93 @@
+name: C-125 final live probe
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  live-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Wait for exact production build and verify article
+        env:
+          EXPECTED_SHA: c26e561c71ddd00770dd223696a27d938c55efc8
+          ARTICLE_URL: https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/
+        run: |
+          node <<'NODE'
+          const expectedSha = process.env.EXPECTED_SHA;
+          const articleUrl = process.env.ARTICLE_URL;
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+          let last = "";
+          for (let attempt = 1; attempt <= 36; attempt += 1) {
+            try {
+              const buildResponse = await fetch(`https://yuristshevchuk.com/build-info.json?probe=${Date.now()}`, { cache: "no-store" });
+              const build = buildResponse.ok ? await buildResponse.json() : {};
+              const liveSha = String(build.sha || build.commit || build.buildSha || "");
+              last = `attempt=${attempt} buildStatus=${buildResponse.status} liveSha=${liveSha || "missing"}`;
+              console.log(last);
+
+              if (liveSha !== expectedSha) {
+                await sleep(10000);
+                continue;
+              }
+
+              const response = await fetch(`${articleUrl}?probe=${Date.now()}`, { cache: "no-store", redirect: "follow" });
+              const html = await response.text();
+              if (response.status !== 200) throw new Error(`article HTTP ${response.status}`);
+
+              const required = [
+                "Подрядчик не построил дом после оплаты: как отказаться от договора и вернуть деньги",
+                "работы, которую потребитель действительно принял",
+                "пригодный, но не принятый результат",
+                "/razbory/zayavlenie-v-politsiyu-o-moshennichestve/",
+                "/uslugi/vozvrat-deneg/",
+                "/uslugi/dosudebnoe-uregulirovanie/",
+              ];
+              for (const fragment of required) {
+                if (!html.includes(fragment)) throw new Error(`missing live fragment: ${fragment}`);
+              }
+
+              const canonical = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)?.[1]
+                || html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i)?.[1];
+              if (canonical !== articleUrl) throw new Error(`unexpected canonical: ${canonical || "missing"}`);
+
+              const description = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1]
+                || html.match(/<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i)?.[1];
+              if (!description || description.length < 70 || description.length > 170) {
+                throw new Error(`description length ${description?.length || 0}`);
+              }
+
+              for (const forbidden of ["рабочей базе", "оплаченная практика", "Маша", "гаишник", "40 домов"]) {
+                if (html.toLowerCase().includes(forbidden.toLowerCase())) throw new Error(`forbidden live text: ${forbidden}`);
+              }
+
+              const indexResponse = await fetch(`https://yuristshevchuk.com/razbory/?probe=${Date.now()}`, { cache: "no-store" });
+              const indexHtml = await indexResponse.text();
+              if (!indexResponse.ok || !indexHtml.includes("/razbory/podryadchik-ne-postroil-dom-posle-oplaty/")) {
+                throw new Error("article is absent from live /razbory/ index");
+              }
+
+              console.log(JSON.stringify({
+                ok: true,
+                expectedSha,
+                liveSha,
+                articleStatus: response.status,
+                canonical,
+                descriptionLength: description.length,
+                indexStatus: indexResponse.status,
+              }, null, 2));
+              process.exit(0);
+            } catch (error) {
+              last = `attempt=${attempt} error=${error.message}`;
+              console.error(last);
+              await sleep(10000);
+            }
+          }
+
+          throw new Error(`C-125 live probe timed out: ${last}`);
+          NODE

@@ -1,0 +1,47 @@
+name: Temp live verify bailiff small payments
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/temp-live-verify-bailiff-small-payments.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for expected SHA and verify live article
+        shell: bash
+        env:
+          EXPECTED_SHA: 4b4d0bd83cb52829f44e2a23900258dfeefa979a
+          ARTICLE_URL: https://yuristshevchuk.com/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika/
+        run: |
+          set -euo pipefail
+          found=''
+          for attempt in $(seq 1 48); do
+            curl -fsSL --retry 2 --connect-timeout 10 --max-time 30 \
+              -H 'Cache-Control: no-cache' \
+              "https://yuristshevchuk.com/build-info.json?nonce=$(date +%s)-${attempt}" \
+              -o build-info.json || true
+            if grep -Fq "$EXPECTED_SHA" build-info.json 2>/dev/null; then
+              found='yes'
+              break
+            fi
+            sleep 10
+          done
+          test "$found" = 'yes'
+          grep -Fq '"articles": 24' build-info.json
+          grep -Fq '"practiceCases": 2' build-info.json
+
+          curl -fsSL --retry 3 --connect-timeout 10 --max-time 40 \
+            -H 'Cache-Control: no-cache' \
+            "${ARTICLE_URL}?nonce=$(date +%s)" \
+            -o article.html
+          grep -Fq 'Пристав перечисляет слишком мало: как взыскателю проверить удержания с пенсии должника' article.html
+          grep -Fq 'Как проверить, почему выплаты такие маленькие' article.html
+          grep -Fq 'https://yuristshevchuk.com/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika/' article.html
+          grep -Fq 'index,follow' article.html
+          grep -Fq "$EXPECTED_SHA" article.html
+          echo 'LIVE_VERIFY_SUCCESS'

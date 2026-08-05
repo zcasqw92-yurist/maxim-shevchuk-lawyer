@@ -58,9 +58,9 @@ const serviceMaterialsBlock = ({ service, articles, practiceCases, html }) => {
 
 const relatedMaterialsBlock = ({ current, articles, practiceCases, html, kind }) => {
   const sameServiceArticles = articles.filter((item) => item.serviceSlug === current.serviceSlug && item.slug !== current.slug).sort(byFreshness);
-  const explicitArticles = kind === "case"
-    ? (current.relatedArticleSlugs || []).map((slug) => articles.find((item) => item.slug === slug)).filter(Boolean)
-    : [];
+  const explicitArticles = (current.relatedArticleSlugs || [])
+    .map((slug) => articles.find((item) => item.slug === slug))
+    .filter(Boolean);
   const relatedArticles = uniqueBy([...explicitArticles, ...sameServiceArticles], "slug")
     .filter((item) => !hasHref(html, articlePath(item)))
     .slice(0, 4);
@@ -101,6 +101,10 @@ export const validatePublicationLinking = ({ services, articles, practiceCases }
       const linkedCase = caseMap.get(caseId);
       if (!linkedCase) errors.push(`Статья ${article.slug}: кейс ${caseId} не существует`);
       else if (linkedCase.serviceSlug !== article.serviceSlug) errors.push(`Статья ${article.slug}: кейс ${caseId} относится к другому направлению`);
+    }
+    for (const slug of article.relatedArticleSlugs || []) {
+      if (slug === article.slug) errors.push(`Статья ${article.slug}: нельзя связать статью с самой собой`);
+      else if (!articleMap.has(slug)) errors.push(`Статья ${article.slug}: связанный разбор ${slug} не существует`);
     }
   }
 

@@ -13,8 +13,9 @@ const [sourceArticle] = contractorRepairQualityClaimResponseArticles;
 const article = articles.find((item) => item.id === "contractor-repair-quality-claim-response");
 
 if (!article) fail("article is absent from editorial registry");
-if (article !== sourceArticle) fail("registry must use the dedicated source object");
-if (article.contentId !== "C-139") fail("unexpected Content ID");
+if (article === sourceArticle) fail("public registry must strip internal source metadata");
+if (sourceArticle.contentId !== "C-139") fail("internal source lost Content ID");
+if (Object.hasOwn(article, "contentId")) fail("internal Content ID leaked into public article");
 if (article.status !== "published") fail("article status must be published");
 if (article.slug !== "zakazchik-trebuet-vernut-dengi-za-remont") fail("unexpected slug");
 if (!article.title.includes("как подрядчику ответить на претензию")) fail("H1 does not answer the contractor-side intent");
@@ -63,6 +64,7 @@ for (const required of [
 }
 
 for (const forbidden of [
+  "c-139",
   "юд-имп-151",
   "оплаченная работа",
   "гарантирую результат",

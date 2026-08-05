@@ -13,9 +13,11 @@ on:
       - 'scripts/seo-data-pipeline.mjs'
       - 'scripts/seo-feedback-pipeline.mjs'
       - 'scripts/seo-feedback-enrichment.mjs'
+      - 'scripts/seo-metrica-event-goals.mjs'
       - 'scripts/seo-feedback-summary.mjs'
       - 'scripts/seo-data-pipeline-test.mjs'
       - 'scripts/seo-feedback-enrichment-test.mjs'
+      - 'scripts/seo-metrica-event-goals-test.mjs'
       - 'src/editorial-data.mjs'
       - 'src/metrica-goals.mjs'
       - 'public/assets/editorial-analytics.mjs'
@@ -85,6 +87,7 @@ jobs:
         run: |
           node scripts/seo-data-pipeline-test.mjs
           node scripts/seo-feedback-enrichment-test.mjs
+          node scripts/seo-metrica-event-goals-test.mjs
 
       - name: Collect full SEO feedback without Wordstat spending
         shell: bash
@@ -103,6 +106,7 @@ jobs:
             feedback)
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-enrichment.mjs
+              SEO_STATE_DIR="${state_dir}" node scripts/seo-metrica-event-goals.mjs
               ;;
             wordstat)
               SEO_STATE_DIR="${state_dir}" node scripts/seo-data-pipeline.mjs "${wordstat_args[@]}"
@@ -110,6 +114,7 @@ jobs:
             all)
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-enrichment.mjs
+              SEO_STATE_DIR="${state_dir}" node scripts/seo-metrica-event-goals.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-data-pipeline.mjs "${wordstat_args[@]}"
               ;;
             *)

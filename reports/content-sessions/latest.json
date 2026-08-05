@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260805-2358-c125-accepted-work-crosslink",
-  "reviewedAt": "2026-08-05T21:58:00.000Z",
+  "sessionId": "20260806-0154-c139-contractor-claim-response",
+  "reviewedAt": "2026-08-05T22:54:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-05T21:19:07.900Z",
+    "modifiedTime": "2026-08-05T22:54:00.000Z",
     "metadataTabCount": 28,
     "discoveredTabs": [
       "00_Старт", "01_БПЮ", "02_ЮрДоки", "03_Оплаты", "04_Дашборд", "05_Контроль", "06_Импорт", "_Справочники", "_Журнал", "07_Диалоги_исследование", "08_Банк_реплик", "09_Паттерны_аудитории", "10_Контентные_возможности", "11_Кейсы_для_публикации", "12_Эффективные_ответы", "13_Статистика_контента", "14_Контент_дашборд", "15_Обращения_с_контента", "_Реестр_диалогов", "_Ситуации_и_связи", "_События_воронки", "_Версии_контента", "16_Контроль_данных", "_Импорт_ЮД_151_200", "Статьи_HARANT", "17_SEO_сборы", "18_SEO_база_ключей", "19_SEO_preflight"
@@ -13,22 +13,22 @@
   "reviewedTabs": [
     {"name":"00_Старт","range":"A1:H90","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","SEO gate","publication rules"]},
     {"name":"01_БПЮ","range":"A1:AC1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["demand","client language"]},
-    {"name":"02_ЮрДоки","range":"A1:AA1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice boundaries"]},
+    {"name":"02_ЮрДоки","range":"A1:AA1004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice boundaries","ЮД-ИМП-151"]},
     {"name":"03_Оплаты","range":"A1:M2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed payments only"]},
     {"name":"04_Дашборд","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["operational context"]},
     {"name":"05_Контроль","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["data gaps"]},
     {"name":"06_Импорт","range":"A1:U1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source coverage"]},
     {"name":"_Справочники","range":"A1:I1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["classification"]},
     {"name":"_Журнал","range":"A1:K2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["provenance"]},
-    {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience research"]},
-    {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["verbatim language","search hypotheses"]},
+    {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-139 source dialog","audience research"]},
+    {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["R-0601","R-0602","search hypothesis"]},
     {"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience patterns"]},
-    {"name":"10_Контентные_возможности","range":"A1:AX1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-125 brief","intent map","preflight linkage"]},
-    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["K-071 evidence","anonymization","outcome limits"]},
-    {"name":"12_Эффективные_ответы","range":"A1:V1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["communication patterns"]},
-    {"name":"13_Статистика_контента","range":"A1:AB2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["performance data"]},
+    {"name":"10_Контентные_возможности","range":"A1:BJ1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-139 brief","commercial editorial fields","intent map","preflight linkage"]},
+    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["K-080 evidence","anonymization","outcome limits"]},
+    {"name":"12_Эффективные_ответы","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["communication patterns","order attribution fields"]},
+    {"name":"13_Статистика_контента","range":"A1:AF2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["performance and order metrics"]},
     {"name":"14_Контент_дашборд","range":"A1:R200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content priorities"]},
-    {"name":"15_Обращения_с_контента","range":"A1:AG2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["lead language","attribution"]},
+    {"name":"15_Обращения_с_контента","range":"A1:AI2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["lead language","conversion reason fields"]},
     {"name":"_Реестр_диалогов","range":"A1:Q2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source registry"]},
     {"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source links","result levels"]},
     {"name":"_События_воронки","range":"A1:J5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed funnel events"]},
@@ -36,127 +36,140 @@
     {"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical data errors","SEO blockers"]},
     {"name":"_Импорт_ЮД_151_200","range":"A1:T100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["historical source verification"]},
     {"name":"Статьи_HARANT","range":"A1:R1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["external overlap check"]},
-    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO collections","cost and freshness"]},
-    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["keyword ownership","query reuse"]},
-    {"name":"19_SEO_preflight","range":"A1:S1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["draft authorization","Yandex and Google evidence"]}
+    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO-20260806-SERP-YA-C139","SEO-20260806-SERP-GO-C139"]},
+    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["KW-20260806-C139-YA","KW-20260806-C139-GO"]},
+    {"name":"19_SEO_preflight","range":"A1:S1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["PF-20260806-C139","draft authorization"]}
   ],
   "sourceTrace": {
-    "dialogIds": ["68aabb55-ee88-8326-81e0-9e942102a737"],
-    "situationIds": ["SIT-YD-20250824-112"],
-    "workIds": ["ЮД-ИМП-112"],
-    "contentIds": ["C-125"],
-    "caseIds": ["K-071"],
-    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work and the problem scenario are confirmed. Filing, response, recovery and final case outcome are not confirmed. Follow-up legal review clarified Article 28(4): usability alone is not acceptance."
+    "dialogIds": ["6888a6ac-8cbc-8320-88a4-ed7bb8634faa"],
+    "situationIds": ["SIT-YD-20250729-151"],
+    "workIds": ["ЮД-ИМП-151"],
+    "contentIds": ["C-139"],
+    "caseIds": ["K-080"],
+    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work and preparation or substantial revision of a response/position are confirmed. Sending, procedure result and final case outcome are not confirmed."
   },
   "seoKnowledgeBaseReview": {
     "accumulatedDataChecked": true,
-    "collectionIds": ["SEO-20260805-SERP-YA-C125", "SEO-20260805-SERP-GO-C125"],
-    "keywordIds": ["KW-20260805-C125-YA", "KW-20260805-C125-GO"],
+    "collectionIds": ["SEO-20260806-SERP-YA-C139", "SEO-20260806-SERP-GO-C139"],
+    "keywordIds": ["KW-20260806-C139-YA", "KW-20260806-C139-GO"],
     "newPaidCollectionRequired": false,
-    "paidCollectionReason": "No paid SEO call was needed. The accumulated base was checked and fresh reserve organic results for both engines were reviewed and registered.",
-    "preflightId": "PF-20260805-C125",
+    "paidCollectionReason": "No paid SEO call was needed. The accumulated base was checked and two fresh reserve web result sets were registered.",
+    "preflightId": "PF-20260806-C139",
     "draftAuthorization": "РАЗРЕШЕНО",
     "draftStartedAfterAuthorization": true
   },
   "seoReview": {
     "status": "completed",
-    "checkedAt": "2026-08-05T21:05:00.000Z",
+    "checkedAt": "2026-08-05T22:50:00.000Z",
     "region": "Россия / Москва",
-    "primaryIntent": "Частный заказчик хочет отказаться от договора строительства дома и вернуть оплату из-за сорванного срока или очевидного отсутствия работ.",
+    "primaryIntent": "Подрядчик получил претензию о недостатках ремонта и должен подготовить мотивированный ответ, не ухудшая доказательственную позицию.",
     "verifiedCluster": [
-      "подрядчик не построил дом после оплаты как вернуть деньги",
-      "подрядчик не начал строительство дома вернуть аванс",
-      "сорван срок строительства частного дома претензия"
+      "заказчик требует вернуть деньги за ремонт что делать подрядчику",
+      "ответ подрядчика на претензию по качеству ремонта",
+      "защита подрядчика от претензий по качеству ремонта"
     ],
     "intentMap": [
-      {"intent":"что сделать сразу","target":"лид и раздел фиксации объекта"},
-      {"intent":"кто отвечает","target":"раздел о стороне договора и представителе"},
-      {"intent":"когда отказаться","target":"раздел о статье 28 Закона о защите прав потребителей и статье 715 ГК РФ"},
-      {"intent":"что делать со сваями и материалами","target":"раздел о частичном результате"},
-      {"intent":"как рассчитать возврат","target":"матрица возврата и раздел расчёта"},
-      {"intent":"когда полиция и арест имущества","target":"разделы об обеспечительных мерах и первоначальном умысле"}
+      {"intent":"что сделать сразу","target":"лид и first-actions"},
+      {"intent":"что означает подписанный акт","target":"acceptance-act"},
+      {"intent":"кто доказывает причину дефекта","target":"guarantee-and-proof"},
+      {"intent":"как провести осмотр","target":"inspection-access"},
+      {"intent":"что написать в ответе","target":"response-content"},
+      {"intent":"каков срок","target":"response-deadlines"},
+      {"intent":"почему нужен индивидуальный документ","target":"lawyer-work и common-errors"}
     ],
     "intentOwnership": [
       {
-        "intent": "Частный заказчик хочет отказаться от договора строительства дома и вернуть оплату из-за сорванного срока или очевидного отсутствия работ.",
-        "ownerUrl": "https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/",
+        "intent": "Подрядчик получил претензию о недостатках ремонта и должен подготовить мотивированный ответ, не ухудшая доказательственную позицию.",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
         "ownerType": "article",
         "supportingUrls": [
-          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
           "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
-          "https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/"
+          "https://yuristshevchuk.com/uslugi/spory-biznesa/",
+          "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
         ],
-        "supportingCaseIds": ["K-071"],
+        "supportingCaseIds": ["K-080"],
         "excludedQueries": [
-          "ремонт квартиры подрядчик сорвал срок",
-          "застройщик не передал квартиру по ДДУ",
-          "купили участок без подряда",
-          "подрядчик построил дом с недостатками",
-          "как привлечь строителя за мошенничество без договора"
+          "как заказчику вернуть деньги за некачественный ремонт",
+          "строитель взял аванс и пропал",
+          "подрядчик не построил дом после оплаты",
+          "заказчик не оплатил выполненные работы",
+          "претензия к автосервису по качеству ремонта"
         ],
         "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/",
-          "https://yuristshevchuk.com/razbory/prodavets-propal-posle-perevoda/",
-          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
-          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/"
+          "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/",
+          "https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/",
+          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
+          "https://yuristshevchuk.com/uslugi/spory-biznesa/"
         ],
         "decision": "new-owner",
-        "reason": "Existing pages do not own the combined intent of private house construction, unilateral refusal, partial construction result, refund calculation and enforcement risk."
+        "reason": "Existing pages do not own the contractor-side stage after a quality claim has already been received and do not lead to one motivated response document."
       }
     ],
     "serpSnapshots": [
       {
-        "intent": "Частный заказчик хочет отказаться от договора строительства дома и вернуть оплату из-за сорванного срока или очевидного отсутствия работ.",
-        "checkedAt": "2026-08-05T21:05:00.000Z",
+        "intent": "Подрядчик получил претензию о недостатках ремонта и должен подготовить мотивированный ответ, не ухудшая доказательственную позицию.",
+        "checkedAt": "2026-08-05T22:50:00.000Z",
         "region": "Россия / Москва",
         "engines": [
           {
             "engine": "Yandex",
-            "query": "подрядчик не построил дом после оплаты как вернуть деньги",
-            "organicResultsReviewed": 20,
-            "sponsoredResultsObserved": 0,
-            "sponsoredResultLabels": [],
-            "sponsoredAdvertiserTypes": [],
-            "sponsoredOfferPatterns": [],
-            "dominantIntent": "Информационно-коммерческий: прекратить подряд, вернуть оплату и выбрать претензионный или судебный маршрут",
-            "resultTypes": ["юридические статьи", "судебные акты", "вопросы потребителей", "материалы о строительном подряде"],
-            "localPack": false,
-            "snippetPatterns": ["направить претензию подрядчику", "отказаться от договора при нарушении срока", "взыскать аванс и неустойку"],
-            "competitorCoverageGaps": ["редко разделяются покупка земли и подряд", "не объясняется ответственность стороны договора и представителя", "частичный результат и материалы учитываются без рабочей матрицы", "обеспечительные меры часто упоминаются без доказательства риска"],
-            "staleOrWeakResults": ["резервная веб-выдача, а не прямой экспорт yandex.ru", "часть материалов посвящена ремонту или ДДУ, а не строительству частного дома"]
-          },
-          {
-            "engine": "Google",
-            "query": "подрядчик не построил дом после оплаты как вернуть деньги",
+            "query": "заказчик требует вернуть деньги за ремонт что делать подрядчику",
             "organicResultsReviewed": 10,
             "sponsoredResultsObserved": 0,
             "sponsoredResultLabels": [],
             "sponsoredAdvertiserTypes": [],
             "sponsoredOfferPatterns": [],
-            "dominantIntent": "Информационно-коммерческий: возврат аванса, отказ от договора, неустойка и иск",
-            "resultTypes": ["юридические разборы", "судебная практика", "ответы на обращения", "нормативные материалы"],
+            "dominantIntent": "Информационно-коммерческий: оценить претензию и подготовить ответ подрядчика",
+            "resultTypes": ["вопросы юристам", "материалы заказчиков", "нормативные источники", "судебные акты"],
             "localPack": false,
-            "snippetPatterns": ["зафиксировать нарушение срока", "расторгнуть или отказаться от договора", "потребовать возврат денег и убытки"],
-            "competitorCoverageGaps": ["не различаются просьба расторгнуть договор и односторонний отказ", "редко проверяется пригодность свай или фундамента", "уголовный маршрут часто смешивается с гражданским взысканием", "нет последовательной матрицы доказательств и расчёта"],
-            "staleOrWeakResults": ["Google-подобная резервная выдача; прямой Google.com не гарантирован", "часть страниц не учитывает актуальную редакцию потребительского закона"]
+            "snippetPatterns": ["подписан акт", "требует вернуть деньги", "недостатки ремонта", "ответ на претензию"],
+            "competitorCoverageGaps": ["мало материалов со стороны подрядчика", "редко разделяются акт, скрытые недостатки и гарантия", "не показана цена общего отказа", "нет готовой структуры доказательного ответа"],
+            "staleOrWeakResults": ["резервная веб-выдача, а не прямой экспорт yandex.ru", "много единичных вопросов без цельной методики"]
+          },
+          {
+            "engine": "Google",
+            "query": "ответ подрядчика на претензию по качеству ремонта",
+            "organicResultsReviewed": 10,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "Информационно-коммерческий: проверить требования и составить мотивированный ответ",
+            "resultTypes": ["образцы", "вопросы юристам", "судебная практика", "потребительские статьи"],
+            "localPack": false,
+            "snippetPatterns": ["претензия по качеству", "подрядчик", "осмотр", "акт приёмки"],
+            "competitorCoverageGaps": ["шаблоны не объясняют бремя доказывания", "мало конкретики по доступу к объекту", "денежные требования смешиваются с устранением", "редко описан состав работы юриста"],
+            "staleOrWeakResults": ["резервная веб-выдача, а не прямой экспорт google.com", "часть результатов относится к ремонту автомобилей или крупному B2B-подряду"]
           }
         ],
         "pageTypeDecision": "article",
-        "decisionReason": "The intent requires a detailed evidence and document route that cannot be answered reliably by a short FAQ or a generic service page.",
+        "decisionReason": "Интент требует последовательного разъяснения фактов, доказательств, правовых развилок и одного целевого документа.",
         "canProvideBetterAnswer": true
       }
     ],
     "practicalElements": [
       {
-        "contentId": "house-construction-contractor-refund",
-        "targetUrl": "https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/",
-        "type": "evidence-matrix",
-        "title": "Матрица возврата: пять вопросов по договору, оплате, сроку, результату и сумме требования",
-        "userValue": "Помогает определить, что уже доказано, какую часть оплаты можно требовать и какие возражения подрядчика нужно закрыть до претензии.",
-        "competitorGap": "Organic results usually list general steps but do not connect the promised result, every payment, the violated deadline, the accepted partial work and the final calculation in one matrix.",
-        "sourceBasis": "paid-practice-and-current-law",
-        "sourceIds": ["C-125", "K-071", "ЮД-ИМП-112", "SEO-20260805-SERP-YA-C125", "SEO-20260805-SERP-GO-C125", "PF-20260805-C125"],
-        "placement": "Dedicated H2 before the claim calculation and pretrial claim sections",
+        "contentId": "C-139",
+        "targetUrl": "https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
+        "type": "decision-tree",
+        "title": "Разделение претензии по типу требования и доказательствам",
+        "userValue": "Помогает подрядчику определить, что признать, что проверить и как ответить по каждому пункту.",
+        "competitorGap": "В выдаче требования об устранении, снижении цены, расходах третьих лиц и полном возврате часто смешиваются.",
+        "sourceBasis": "paid-practice",
+        "sourceIds": ["ЮД-ИМП-151", "K-080", "R-0601", "R-0602"],
+        "placement": "H2 claim-breakdown и response-options",
+        "verifiedAgainstSerp": true
+      },
+      {
+        "contentId": "C-139",
+        "targetUrl": "https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
+        "type": "risk-map",
+        "title": "Ошибка подрядчика → доказательственная потеря → последствие",
+        "userValue": "Показывает цену молчания, общего отказа и необдуманного признания.",
+        "competitorGap": "Большинство материалов перечисляет ошибки без связи с последствием для позиции подрядчика.",
+        "sourceBasis": "other-original-analysis",
+        "sourceIds": ["C-139", "ЮД-ИМП-151"],
+        "placement": "H2 common-errors",
         "verifiedAgainstSerp": true
       }
     ],
@@ -172,19 +185,21 @@
     "criticalSourceErrorsResolved": true
   },
   "contentChanges": [
-    {"path":"src/house-construction-contractor-refund-data.mjs","kind":"article-legal-clarification","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
-    {"path":"src/publication-linking.mjs","kind":"contextual-linking","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
-    {"path":"scripts/house-construction-contractor-refund-test.mjs","kind":"publication-contract","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"},
-    {"path":"docs/PUBLICATION_LINKING.md","kind":"documentation","contentId":"house-construction-contractor-refund","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"}
+    {"path":"src/contractor-repair-quality-claim-response-data.mjs","kind":"article","contentId":"C-139","action":"created","expectedUrl":"https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"},
+    {"path":"src/editorial-data.mjs","kind":"registry","contentId":"C-139","action":"registered","expectedUrl":"https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"},
+    {"path":"src/editorial-render-base.mjs","kind":"renderer","contentId":"C-139","action":"added article-specific CTA fields","expectedUrl":"https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"},
+    {"path":"site.config.mjs","kind":"metadata","contentId":"C-139","action":"registered content date","expectedUrl":"https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"}
   ],
   "plannedChecks": [
+    "npm run test:contractor-claim-response",
+    "npm run test:editorial-commercial-gate",
     "npm run check",
     "npm run test:live",
     "node scripts/live-all-publications-smoke.mjs",
     "node scripts/live-public-copy-regression-test.mjs"
   ],
   "publication": {
-    "expectedUrls": ["https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/"],
-    "notes": "Follow-up legal precision review completed before final live acceptance. Article 28(4) distinction and mandatory contextual police-article link are contract-tested. Direct Yandex and Google exports remain unavailable; reserve organic search limitations are recorded openly."
+    "expectedUrls": ["https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"],
+    "notes": "CI, deployment, public-copy regression and live results are recorded after publication. Rollback branch and full spreadsheet backup were created before changes."
   }
 }

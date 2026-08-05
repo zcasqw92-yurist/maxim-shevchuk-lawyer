@@ -24,11 +24,16 @@ import { bailiffSmallPensionPaymentsArticles } from "./bailiff-small-pension-pay
 import { designerInfographicExclusiveRightsArticles } from "./designer-infographic-exclusive-rights-data.mjs";
 import { yandexDeliveryLostParcelArticles } from "./yandex-delivery-lost-parcel-data.mjs";
 import { houseConstructionContractorRefundArticles } from "./house-construction-contractor-refund-data.mjs";
+import { contractorRepairQualityClaimResponseArticles } from "./contractor-repair-quality-claim-response-data.mjs";
 
 const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((article) => ({
   ...article,
   seoTitle: "Скрытый дефект автомобиля после покупки",
 }));
+
+const contractorRepairQualityClaimResponsePublicationArticles = contractorRepairQualityClaimResponseArticles.map(
+  ({ contentId: _internalContentId, ...article }) => article,
+);
 
 export const articles = [
   ...baseArticles,
@@ -43,6 +48,7 @@ export const articles = [
   ...designerInfographicExclusiveRightsArticles,
   ...yandexDeliveryLostParcelArticles,
   ...houseConstructionContractorRefundArticles,
+  ...contractorRepairQualityClaimResponsePublicationArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

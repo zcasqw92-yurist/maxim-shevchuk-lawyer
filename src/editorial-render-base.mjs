@@ -77,15 +77,20 @@ const authorCard = () => `
     </div>
   </aside>`;
 
-const messengerCta = (topic, title = "Хотите уточнить свою ситуацию?") => `
+const messengerCta = (topic, title = "Хотите уточнить свою ситуацию?", options = {}) => {
+  const eyebrow = options.eyebrow || "Можно спросить юриста";
+  const description = options.description || "Кратко укажите, что произошло, какие документы есть и что вы уже сделали. В мессенджере откроется готовое сообщение, которое можно изменить перед отправкой.";
+  const buttonLabel = options.buttonLabel || "Написать юристу";
+  return `
   <section class="editorial-cta" aria-labelledby="editorial-cta-title">
     <div>
-      <span class="eyebrow eyebrow--light">Можно спросить юриста</span>
+      <span class="eyebrow eyebrow--light">${esc(eyebrow)}</span>
       <h2 id="editorial-cta-title">${esc(title)}</h2>
-      <p>Кратко укажите, что произошло, какие документы есть и что вы уже сделали. В мессенджере откроется готовое сообщение, которое можно изменить перед отправкой.</p>
+      <p>${esc(description)}</p>
     </div>
-    <button class="button button--gold" type="button" data-dialog-open data-topic="${esc(topic)}">Написать юристу</button>
+    <button class="button button--gold" type="button" data-dialog-open data-topic="${esc(topic)}">${esc(buttonLabel)}</button>
   </section>`;
+};
 
 const articleCard = (article) => `
   <article class="editorial-card">
@@ -239,7 +244,11 @@ export const renderArticlePage = (articleOrSlug) => {
           </div>
         </div>
       </article>
-      <div class="wrap">${messengerCta(article.topic, article.ctaTitle)}</div>
+      <div class="wrap">${messengerCta(article.topic, article.ctaTitle, {
+        eyebrow: article.ctaEyebrow,
+        description: article.ctaDescription,
+        buttonLabel: article.ctaButtonLabel,
+      })}</div>
     `,
   };
 };

@@ -55,6 +55,7 @@ export const site = {
     "/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku": "2026-08-05",
     "/razbory/yandeks-dostavka-poteryala-posylku": "2026-08-05",
     "/razbory/podryadchik-ne-postroil-dom-posle-oplaty": "2026-08-06",
+    "/razbory/zakazchik-trebuet-vernut-dengi-za-remont": "2026-08-06",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

@@ -101,7 +101,7 @@ export const site = {
     yandexMetricaId: env("YANDEX_METRICA_ID"),
   },
   video: {
-    enabled: true,
+    enabled: env("SITE_VIDEO_ENABLED") === "true",
     title: env("SITE_VIDEO_TITLE") || "Не знаете, с чего начать? Объясню за 45 секунд",
     durationLabel: env("SITE_VIDEO_DURATION") || "45 секунд",
     poster: env("SITE_VIDEO_POSTER") || "/assets/images/maxim-hero.webp",

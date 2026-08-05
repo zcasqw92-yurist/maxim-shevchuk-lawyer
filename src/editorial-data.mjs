@@ -21,6 +21,7 @@ import { ozonLostGoodsLogisticsArticles } from "./ozon-lost-goods-logistics-data
 import { usedCarHiddenDefectArticles } from "./used-car-hidden-defect-data.mjs";
 import { medicalErrorFirstStepsArticles } from "./medical-error-first-steps-data.mjs";
 import { bailiffSmallPensionPaymentsArticles } from "./bailiff-small-pension-payments-data.mjs";
+import { designerInfographicExclusiveRightsArticles } from "./designer-infographic-exclusive-rights-data.mjs";
 
 const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((article) => ({
   ...article,
@@ -37,6 +38,7 @@ export const articles = [
   ...usedCarHiddenDefectPublicationArticles,
   ...medicalErrorFirstStepsArticles,
   ...bailiffSmallPensionPaymentsArticles,
+  ...designerInfographicExclusiveRightsArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

@@ -52,6 +52,7 @@ export const site = {
     "/razbory/skrytyy-defekt-poderzhannogo-avtomobilya": "2026-08-04",
     "/razbory/vrachebnaya-oshibka-pri-rodah-s-chego-nachat": "2026-08-04",
     "/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika": "2026-08-05",
+    "/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku": "2026-08-05",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

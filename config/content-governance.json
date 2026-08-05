@@ -13,8 +13,8 @@
     "reviewNonEmptyCells": true,
     "reviewNotesAndComments": true,
     "baselineSnapshot": {
-      "modifiedTime": "2026-08-01T09:54:13.798Z",
-      "tabCount": 25,
+      "modifiedTime": "2026-08-05T18:29:59.515Z",
+      "tabCount": 28,
       "tabs": [
         "00_Старт",
         "01_БПЮ",
@@ -40,9 +40,33 @@
         "_Версии_контента",
         "16_Контроль_данных",
         "_Импорт_ЮД_151_200",
-        "Статьи_HARANT"
+        "Статьи_HARANT",
+        "17_SEO_сборы",
+        "18_SEO_база_ключей",
+        "19_SEO_preflight"
       ]
     }
+  },
+  "seoKnowledgeBase": {
+    "collectionRegistryTab": "17_SEO_сборы",
+    "keywordRegistryTab": "18_SEO_база_ключей",
+    "preflightTab": "19_SEO_preflight",
+    "requireAccumulatedDataReviewBeforePaidCall": true,
+    "requirePaidCollectionRegisteredBeforeCall": true,
+    "requirePaidCollectionJustification": true,
+    "requireAllReturnedKeywordsImported": true,
+    "requireYandexAndGoogleCollectionIdsBeforeDraft": true,
+    "requireKeywordIdsBeforeDraft": true,
+    "requireDraftAuthorization": true,
+    "draftAuthorizationValue": "РАЗРЕШЕНО",
+    "nonArticleDecisionValue": "ТЕКСТ СТАТЬИ НЕ НУЖЕН",
+    "blockedValue": "ЗАБЛОКИРОВАНО",
+    "governedStatuses": [
+      "В работе",
+      "Готово к публикации"
+    ],
+    "legacyPublishedExempt": true,
+    "searchConsoleAndWebmasterArePaid": false
   },
   "clusterPreparation": {
     "requiredGates": [
@@ -163,7 +187,8 @@
     "mustChangeWithGovernedContent": true,
     "mustListEveryDiscoveredTab": true,
     "mustNotContainPersonalData": true,
-    "mustPassAllClusterGates": true
+    "mustPassAllClusterGates": true,
+    "mustPassSeoPreflight": true
   },
   "publication": {
     "localFullSiteCheck": "npm run check",
@@ -176,6 +201,9 @@
     "chatReportFields": [
       "spreadsheet snapshot and reviewed tabs",
       "created or updated content",
+      "accumulated SEO collections and keyword IDs used",
+      "paid SEO collection decision and justification",
+      "SEO preflight ID and draft authorization",
       "intent owner and excluded queries",
       "Yandex and Google organic SERP snapshot",
       "sponsored SERP placements recorded separately",

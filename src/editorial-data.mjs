@@ -22,10 +22,16 @@ import { usedCarHiddenDefectArticles } from "./used-car-hidden-defect-data.mjs";
 import { medicalErrorFirstStepsArticles } from "./medical-error-first-steps-data.mjs";
 import { bailiffSmallPensionPaymentsArticles } from "./bailiff-small-pension-payments-data.mjs";
 import { designerInfographicExclusiveRightsArticles } from "./designer-infographic-exclusive-rights-data.mjs";
+import { yandexDeliveryLostParcelArticles } from "./yandex-delivery-lost-parcel-data.mjs";
 
 const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((article) => ({
   ...article,
   seoTitle: "Скрытый дефект автомобиля после покупки",
+}));
+
+const yandexDeliveryLostParcelPublicationArticles = yandexDeliveryLostParcelArticles.map((article) => ({
+  ...article,
+  lead: "Отправление не найдено, а чеки на вещи не сохранились. Сохраните карточку заказа, статусы, переписку, полис и сведения об оценочной стоимости. Для каждой вещи соберите подтверждение покупки или принадлежности, фотографии, банковские операции и цены сопоставимых товаров. После этого подайте страховое заявление и отдельно проверьте, кому направлять досудебную претензию.",
 }));
 
 export const articles = [
@@ -39,6 +45,7 @@ export const articles = [
   ...medicalErrorFirstStepsArticles,
   ...bailiffSmallPensionPaymentsArticles,
   ...designerInfographicExclusiveRightsArticles,
+  ...yandexDeliveryLostParcelPublicationArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

@@ -166,6 +166,7 @@
     "src/judicial-order-after-writeoff-data.mjs",
     "src/unshipped-goods-after-invoice-data.mjs",
     "src/refund-voluntary-service-cancellation.mjs",
+    "src/yandex-delivery-lost-parcel-data.mjs",
     "src/editorial-data.mjs",
     "src/case-studies.mjs",
     "src/privacy-policy.mjs",

@@ -1,1 +1,214 @@
-{"schemaVersion":3,"sessionId":"20260805-1150-designer-infographic-exclusive-rights","reviewedAt":"2026-08-05T09:50:00.000Z","spreadsheet":{"id":"1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24","modifiedTime":"2026-08-05T09:45:26.555Z","metadataTabCount":25,"discoveredTabs":["00_Старт","01_БПЮ","02_ЮрДоки","03_Оплаты","04_Дашборд","05_Контроль","06_Импорт","_Справочники","_Журнал","07_Диалоги_исследование","08_Банк_реплик","09_Паттерны_аудитории","10_Контентные_возможности","11_Кейсы_для_публикации","12_Эффективные_ответы","13_Статистика_контента","14_Контент_дашборд","15_Обращения_с_контента","_Реестр_диалогов","_Ситуации_и_связи","_События_воронки","_Версии_контента","16_Контроль_данных","_Импорт_ЮД_151_200","Статьи_HARANT"]},"reviewedTabs":[{"name":"00_Старт","range":"A1:H66","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","SEO gate","owner-approved experiment decision"]},{"name":"01_БПЮ","range":"A1:AC1004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["demand","client language"]},{"name":"02_ЮрДоки","range":"A1:AA1004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice"]},{"name":"03_Оплаты","range":"A1:M2004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed payments only"]},{"name":"04_Дашборд","range":"A1:Z87","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["operational context"]},{"name":"05_Контроль","range":"A1:L18","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["data gaps"]},{"name":"06_Импорт","range":"A1:U100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source coverage"]},{"name":"_Справочники","range":"A1:I24","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["classification"]},{"name":"_Журнал","range":"A1:K2004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["provenance","experiment approval"]},{"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience research"]},{"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["verbatim language","search hypotheses"]},{"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience patterns"]},{"name":"10_Контентные_возможности","range":"A1:AP1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content brief","intent map","cannibalization"]},{"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["case evidence","anonymization"]},{"name":"12_Эффективные_ответы","range":"A1:V1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["communication patterns"]},{"name":"13_Статистика_контента","range":"A1:AB2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["performance data"]},{"name":"14_Контент_дашборд","range":"A1:R200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content priorities"]},{"name":"15_Обращения_с_контента","range":"A1:AG2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["lead language","attribution"]},{"name":"_Реестр_диалогов","range":"A1:Q2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source registry"]},{"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["cross-source links","result levels"]},{"name":"_События_воронки","range":"A1:J4999","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed funnel events"]},{"name":"_Версии_контента","range":"A1:L1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content versions"]},{"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical data errors"]},{"name":"_Импорт_ЮД_151_200","range":"A1:T100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["historical paid-work verification"]},{"name":"Статьи_HARANT","range":"A1:R1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["external publication overlap"]}],"sourceTrace":{"dialogIds":["68d42e98-2864-8323-89cb-f1e06033d3ec"],"situationIds":["SIT-20250924-002"],"workIds":[],"contentIds":["C-025"],"caseIds":[],"notes":"Only internal IDs; no personal data or full dialog text. Paid work, transfer of rights, infringement and case result are not confirmed."},"seoReview":{"status":"completed","checkedAt":"2026-08-05T09:50:00.000Z","region":"Россия / онлайн","primaryIntent":"Заказчик хочет оформить исключительные права на уже созданную или будущую инфографику, получить исходники и защитить карточку товара от копирования.","verifiedCluster":["договор с дизайнером передача исключительных прав","акт передачи прав на инфографику","кому принадлежат права на дизайн маркетплейса","инфографику скопировали на Ozon"],"intentMap":[{"intent":"достаточно ли акта","target":"H1, лид и раздел о роли акта"},{"intent":"какой договор нужен с дизайнером","target":"Раздел о готовой и будущей работе автора"},{"intent":"что включить в договор","target":"Договор с реестром объектов"},{"intent":"как доказать права на макет","target":"Практический блок из девяти звеньев"},{"intent":"можно ли менять инфографику","target":"Раздел о согласии на изменения"},{"intent":"что делать при копировании","target":"Фиксация, прошлое нарушение и выбор способа защиты"}],"intentOwnership":[{"intent":"Заказчик оформляет исключительные права на инфографику у дизайнера и готовит доказательства для использования и защиты макетов.","ownerUrl":"https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/","ownerType":"article","supportingUrls":["https://yuristshevchuk.com/uslugi/spory-biznesa/","https://yuristshevchuk.com/uslugi/marketpleysy/"],"supportingCaseIds":[],"excludedQueries":["регистрация товарного знака","ответ на претензию за товарный знак","патентование дизайна","налоги самозанятого дизайнера","готовая жалоба на Ozon","трудовой договор со штатным дизайнером"],"existingCompetingUrlsReviewed":["https://yuristshevchuk.com/razbory/pretenziya-za-tovarnyy-znak-na-marketpleyse/","https://yuristshevchuk.com/uslugi/spory-biznesa/","https://yuristshevchuk.com/uslugi/marketpleysy/"],"decision":"new-owner","reason":"На сайте не было самостоятельного владельца интента о договоре с дизайнером, отчуждении прав на готовые макеты, авторском заказе, реестре объектов и исходниках."}],"serpSnapshots":[],"practicalElements":[{"contentId":"designer-infographic-exclusive-rights","targetUrl":"https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/","type":"evidence-matrix","title":"Как проверить цепочку прав на каждую инфографику","userValue":"Помогает связать автора, конкретный файл, вознаграждение, момент перехода права и доказательства копирования.","competitorGap":"Вместо общего шаблона читатель получает проверку каждого макета от автора и сторонних элементов до передачи результата и нарушения.","sourceBasis":"client-dialog-and-current-law","sourceIds":["C-025","68d42e98-2864-8323-89cb-f1e06033d3ec","SIT-20250924-002","R-0203","R-0204"],"placement":"H2 с девятью последовательными проверками после блока о договоре","verifiedAgainstSerp":false,"verifiedAgainstExperiment":true}],"cannibalizationChecked":true,"overOptimizationRisk":"low","experimentException":{"mode":"owner-approved-publication-without-direct-serp","approvedByOwner":true,"directSerpSnapshotsAvailable":false,"contentId":"designer-infographic-exclusive-rights","approvedAt":"2026-08-05T09:50:00.000Z","journalRecord":"Команда владельца разработать следующую статью; C-025 выбрана по очереди после C-024.","reason":"Прямые подтверждённые снимки минимум пяти органических результатов отдельно в Яндексе и Google не получены; выдуманные данные не используются.","successCriteria":"Релевантные органические показы и содержательное чтение либо хотя бы одно квалифицированное обращение о договоре с дизайнером, передаче прав, реестре макетов, исходниках или защите инфографики.","failureCriteria":"После 90 дней при нормальной индексации отсутствуют релевантные показы, чтение и квалифицированные обращения.","checkpointsDays":[14,30,60,90],"metrics":["indexation","impressions","clicks","ctr","averagePosition","searchQueries","activeReading60s","scroll75","scroll100","serviceClicks","chatTransitions","qualifiedLeads"]}},"editorialChecks":{"factsSeparatedFromHypotheses":true,"paidWorkSeparatedFromPaymentDetails":true,"workProcedureAndCaseResultsSeparated":true,"legalSourcesVerified":true,"anonymizationVerified":true,"criticalSourceErrorsResolved":true},"contentChanges":[{"path":"site.config.mjs","kind":"article-route","contentId":"designer-infographic-exclusive-rights","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"},{"path":"src/editorial-data.mjs","kind":"article-registry","contentId":"designer-infographic-exclusive-rights","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"},{"path":"src/designer-infographic-exclusive-rights-data.mjs","kind":"article","contentId":"designer-infographic-exclusive-rights","action":"created","expectedUrl":"https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"}],"plannedChecks":["npm run check","npm run test:live","node scripts/live-all-publications-smoke.mjs","node scripts/live-public-copy-regression-test.mjs"],"publication":{"expectedUrls":["https://yuristshevchuk.com/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/"],"notes":"CI, deployment and live results are reported in chat after publication. Checkpoints: 19.08, 04.09, 04.10 and 03.11.2026."}}
+{
+  "schemaVersion": 3,
+  "sessionId": "20260805-2125-yandex-delivery-lost-parcel",
+  "reviewedAt": "2026-08-05T19:25:00.000Z",
+  "spreadsheet": {
+    "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
+    "modifiedTime": "2026-08-05T19:18:52.230Z",
+    "metadataTabCount": 28,
+    "discoveredTabs": [
+      "00_Старт",
+      "01_БПЮ",
+      "02_ЮрДоки",
+      "03_Оплаты",
+      "04_Дашборд",
+      "05_Контроль",
+      "06_Импорт",
+      "_Справочники",
+      "_Журнал",
+      "07_Диалоги_исследование",
+      "08_Банк_реплик",
+      "09_Паттерны_аудитории",
+      "10_Контентные_возможности",
+      "11_Кейсы_для_публикации",
+      "12_Эффективные_ответы",
+      "13_Статистика_контента",
+      "14_Контент_дашборд",
+      "15_Обращения_с_контента",
+      "_Реестр_диалогов",
+      "_Ситуации_и_связи",
+      "_События_воронки",
+      "_Версии_контента",
+      "16_Контроль_данных",
+      "_Импорт_ЮД_151_200",
+      "Статьи_HARANT",
+      "17_SEO_сборы",
+      "18_SEO_база_ключей",
+      "19_SEO_preflight"
+    ]
+  },
+  "reviewedTabs": [
+    {"name":"00_Старт","range":"A1:H90","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","SEO gate","SEO preflight"]},
+    {"name":"01_БПЮ","range":"A1:AC1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["demand","client language"]},
+    {"name":"02_ЮрДоки","range":"A1:AA1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice"]},
+    {"name":"03_Оплаты","range":"A1:M2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed payments only"]},
+    {"name":"04_Дашборд","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["operational context"]},
+    {"name":"05_Контроль","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["data gaps"]},
+    {"name":"06_Импорт","range":"A1:U1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source coverage"]},
+    {"name":"_Справочники","range":"A1:I1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["classification"]},
+    {"name":"_Журнал","range":"A1:K2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["provenance"]},
+    {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience research"]},
+    {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["verbatim language","search hypotheses"]},
+    {"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience patterns"]},
+    {"name":"10_Контентные_возможности","range":"A1:AX1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content brief","intent map","preflight linkage"]},
+    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["case evidence","anonymization"]},
+    {"name":"12_Эффективные_ответы","range":"A1:V1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["communication patterns"]},
+    {"name":"13_Статистика_контента","range":"A1:AB2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["performance data"]},
+    {"name":"14_Контент_дашборд","range":"A1:R200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content priorities"]},
+    {"name":"15_Обращения_с_контента","range":"A1:AG2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["lead language","attribution"]},
+    {"name":"_Реестр_диалогов","range":"A1:Q2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source registry"]},
+    {"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["cross-source links","result levels"]},
+    {"name":"_События_воронки","range":"A1:J5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed funnel events"]},
+    {"name":"_Версии_контента","range":"A1:L1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content versions"]},
+    {"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical data errors","SEO preflight blockers"]},
+    {"name":"_Импорт_ЮД_151_200","range":"A1:T100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["historical source verification"]},
+    {"name":"Статьи_HARANT","range":"A1:R1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["external publication overlap check"]},
+    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO collection registry","cost and freshness"]},
+    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["keyword reuse","intent ownership"]},
+    {"name":"19_SEO_preflight","range":"A1:S1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["pre-draft authorization","Yandex and Google evidence"]}
+  ],
+  "sourceTrace": {
+    "dialogIds": [],
+    "situationIds": [],
+    "workIds": [],
+    "contentIds": ["C-122"],
+    "caseIds": ["K-068"],
+    "notes": "Only internal IDs; no personal data or full dialog text. Paid legal work is confirmed, but the final insurance or court result is not confirmed."
+  },
+  "seoKnowledgeBaseReview": {
+    "accumulatedDataChecked": true,
+    "collectionIds": ["SEO-20260805-SERP-YA-C122", "SEO-20260805-SERP-GO-C122"],
+    "keywordIds": ["KW-20260805-C122-YA", "KW-20260805-C122-GO"],
+    "newPaidCollectionRequired": false,
+    "paidCollectionReason": "No paid SEO request was performed. Fresh intent verification used free reserve web search and the results were imported into the cumulative SEO registry.",
+    "preflightId": "PF-20260805-C122",
+    "draftAuthorization": "РАЗРЕШЕНО",
+    "draftStartedAfterAuthorization": true
+  },
+  "seoReview": {
+    "status": "completed",
+    "checkedAt": "2026-08-05T19:25:00.000Z",
+    "region": "Россия / Москва",
+    "primaryIntent": "Отправитель хочет получить компенсацию за потерянную Яндекс Доставкой посылку и доказать стоимость вещей без чеков.",
+    "verifiedCluster": [
+      "Яндекс Доставка потеряла посылку как получить компенсацию без чеков",
+      "Яндекс Доставка потеряла посылку компенсация",
+      "как доказать стоимость посылки без чеков"
+    ],
+    "intentMap": [
+      {"intent":"что делать сразу после пропажи","target":"лид, короткий ответ и блок фиксации доказательств"},
+      {"intent":"как получить страховую выплату","target":"разделы о двух маршрутах, полисе и адресате"},
+      {"intent":"как доказать стоимость без чеков","target":"матрица доказательств и блок по старым вещам"},
+      {"intent":"что написать в претензии","target":"структура досудебной претензии"},
+      {"intent":"что делать после отказа","target":"дополнение доказательств, претензия и судебный маршрут"}
+    ],
+    "intentOwnership": [
+      {
+        "intent": "Отправитель хочет получить компенсацию за потерянную Яндекс Доставкой посылку и доказать стоимость вещей без чеков.",
+        "ownerUrl": "https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/",
+        "ownerType": "article",
+        "supportingUrls": [
+          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"
+        ],
+        "supportingCaseIds": ["K-068"],
+        "excludedQueries": [
+          "Яндекс Маркет потерял заказ покупателя",
+          "Ozon потерял товар продавца",
+          "повредили посылку при доставке",
+          "курьер украл посылку заявление в полицию",
+          "международная доставка потеряла посылку"
+        ],
+        "existingCompetingUrlsReviewed": [
+          "https://yuristshevchuk.com/razbory/ozon-poteryal-tovar-ili-nachislil-lishnyuyu-logistiku/",
+          "https://yuristshevchuk.com/uslugi/vozvrat-deneg/",
+          "https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"
+        ],
+        "decision": "new-owner",
+        "reason": "На сайте не было самостоятельной страницы о частной отправке через Яндекс Доставку, страховом урегулировании и доказательстве стоимости старых вещей без чеков."
+      }
+    ],
+    "serpSnapshots": [
+      {
+        "intent": "Отправитель хочет получить компенсацию за потерянную Яндекс Доставкой посылку и доказать стоимость вещей без чеков.",
+        "checkedAt": "2026-08-05T19:25:00.000Z",
+        "region": "Россия / Москва",
+        "engines": [
+          {
+            "engine": "Yandex",
+            "query": "Яндекс Доставка потеряла посылку как получить компенсацию без чеков",
+            "organicResultsReviewed": 20,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "Информационный: порядок обращения, страхование и подтверждение ущерба",
+            "resultTypes": ["официальные страницы Яндекса", "юридические статьи", "пользовательские обсуждения"],
+            "localPack": false,
+            "snippetPatterns": ["обращение в поддержку и страховое заявление", "чеки и иные документы о стоимости", "лимит зависит от объявленной стоимости"],
+            "competitorCoverageGaps": ["нет единой матрицы доказательств по каждой вещи", "редко разделяются страховое требование и претензия к исполнителю", "слабо объясняется оценка старых и подержанных вещей"],
+            "staleOrWeakResults": ["часть материалов относится к покупкам на маркетплейсе или к корпоративным тарифам"]
+          },
+          {
+            "engine": "Google",
+            "query": "Яндекс Доставка потеряла посылку как получить компенсацию без чеков",
+            "organicResultsReviewed": 10,
+            "sponsoredResultsObserved": 0,
+            "sponsoredResultLabels": [],
+            "sponsoredAdvertiserTypes": [],
+            "sponsoredOfferPatterns": [],
+            "dominantIntent": "Информационный: страховая выплата, доказательства стоимости и обжалование отказа",
+            "resultTypes": ["официальные документы сервиса", "справочные материалы", "жалобы пользователей"],
+            "localPack": false,
+            "snippetPatterns": ["подать заявление через поддержку", "подтвердить содержимое и стоимость", "проверить страховой лимит"],
+            "competitorCoverageGaps": ["нет пошаговой связи между приложением, полисом, претензией и иском", "не объясняется, чем подтвердить стоимость вместо чека для разных видов вещей", "не отделён факт юридической работы от подтверждённого результата"],
+            "staleOrWeakResults": ["встречаются страницы о других продуктах Яндекса и неподтверждённые пользовательские советы"]
+          }
+        ],
+        "pageTypeDecision": "article",
+        "decisionReason": "Пользователю нужен последовательный разбор доказательств и маршрутов, который не помещается в FAQ или краткую услугу и имеет самостоятельный информационно-коммерческий интент.",
+        "canProvideBetterAnswer": true
+      }
+    ],
+    "practicalElements": [
+      {
+        "contentId": "yandex-delivery-lost-parcel",
+        "targetUrl": "https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/",
+        "type": "evidence-matrix",
+        "title": "Матрица доказательств: пять вопросов по каждой вещи",
+        "userValue": "Помогает проверить существование вещи, её передачу в посылке, принадлежность, стоимость и состояние до направления страхового заявления или претензии.",
+        "competitorGap": "В органической выдаче встречаются отдельные советы про чеки и скриншоты, но нет единой предметной матрицы для старых, подержанных, подаренных и уникальных вещей.",
+        "sourceBasis": "paid-practice-and-current-law",
+        "sourceIds": ["C-122", "K-068", "SEO-20260805-SERP-YA-C122", "SEO-20260805-SERP-GO-C122", "PF-20260805-C122"],
+        "placement": "Самостоятельный H2 после раздела о подтверждении стоимости без чеков",
+        "verifiedAgainstSerp": true
+      }
+    ],
+    "cannibalizationChecked": true,
+    "overOptimizationRisk": "low"
+  },
+  "editorialChecks": {
+    "factsSeparatedFromHypotheses": true,
+    "paidWorkSeparatedFromPaymentDetails": true,
+    "workProcedureAndCaseResultsSeparated": true,
+    "legalSourcesVerified": true,
+    "anonymizationVerified": true,
+    "criticalSourceErrorsResolved": true
+  },
+  "contentChanges": [
+    {"path":"site.config.mjs","kind":"article-route","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
+    {"path":"src/editorial-data.mjs","kind":"article-registry","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
+    {"path":"src/editorial-render-base.mjs","kind":"related-service-links","contentId":"yandex-delivery-lost-parcel","action":"updated","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"},
+    {"path":"src/yandex-delivery-lost-parcel-data.mjs","kind":"article","contentId":"yandex-delivery-lost-parcel","action":"created","expectedUrl":"https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"}
+  ],
+  "plannedChecks": [
+    "npm run check",
+    "npm run test:live",
+    "node scripts/live-all-publications-smoke.mjs",
+    "node scripts/live-public-copy-regression-test.mjs"
+  ],
+  "publication": {
+    "expectedUrls": ["https://yuristshevchuk.com/razbory/yandeks-dostavka-poteryala-posylku/"],
+    "notes": "CI, deployment and production checks are reported after merge. SEO checkpoints: 19.08, 04.09, 04.10 and 03.11.2026."
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-05T16:41:43.252Z",
+  "generated_at": "2026-08-05T17:10:45.758Z",
   "period": {
     "date1": "2026-07-07",
     "date2": "2026-08-05"
@@ -2095,15 +2095,15 @@
       "contact_whatsapp": 0,
       "metrica_page_attribution": "viewed_page_url",
       "metrica_goal_attribution": "event_url_action_goal",
-      "google_impressions": 0,
+      "google_impressions": 4,
       "google_clicks": 0,
       "google_ctr": 0,
-      "google_avg_position": 0,
+      "google_avg_position": 8.5,
       "google_queries": [],
-      "combined_search_impressions": 0,
+      "combined_search_impressions": 4,
       "combined_search_clicks": 0,
       "combined_search_ctr": 0,
-      "combined_search_avg_position": 0
+      "combined_search_avg_position": 8.5
     },
     {
       "period": "2026-07-07—2026-08-05",
@@ -2222,15 +2222,15 @@
       "contact_whatsapp": 1,
       "metrica_page_attribution": "viewed_page_url",
       "metrica_goal_attribution": "event_url_action_goal",
-      "google_impressions": 0,
+      "google_impressions": 2,
       "google_clicks": 0,
       "google_ctr": 0,
-      "google_avg_position": 0,
+      "google_avg_position": 6.5,
       "google_queries": [],
-      "combined_search_impressions": 0,
+      "combined_search_impressions": 2,
       "combined_search_clicks": 0,
       "combined_search_ctr": 0,
-      "combined_search_avg_position": 0
+      "combined_search_avg_position": 6.5
     },
     {
       "period": "2026-07-07—2026-08-05",
@@ -2812,15 +2812,15 @@
       "contact_whatsapp": 0,
       "metrica_page_attribution": "viewed_page_url",
       "metrica_goal_attribution": "event_url_action_goal",
-      "google_impressions": 0,
+      "google_impressions": 3,
       "google_clicks": 0,
       "google_ctr": 0,
-      "google_avg_position": 0,
+      "google_avg_position": 6.33,
       "google_queries": [],
-      "combined_search_impressions": 0,
+      "combined_search_impressions": 3,
       "combined_search_clicks": 0,
       "combined_search_ctr": 0,
-      "combined_search_avg_position": 0
+      "combined_search_avg_position": 6.33
     },
     {
       "period": "2026-07-07—2026-08-05",
@@ -3750,15 +3750,15 @@
       "contact_whatsapp": 0,
       "metrica_page_attribution": "viewed_page_url",
       "metrica_goal_attribution": "event_url_action_goal",
-      "google_impressions": 0,
+      "google_impressions": 6,
       "google_clicks": 0,
       "google_ctr": 0,
-      "google_avg_position": 0,
+      "google_avg_position": 7.67,
       "google_queries": [],
-      "combined_search_impressions": 0,
+      "combined_search_impressions": 6,
       "combined_search_clicks": 0,
       "combined_search_ctr": 0,
-      "combined_search_avg_position": 0
+      "combined_search_avg_position": 7.67
     },
     {
       "period": "2026-07-07—2026-08-05",
@@ -3818,15 +3818,15 @@
       "contact_whatsapp": 0,
       "metrica_page_attribution": "viewed_page_url",
       "metrica_goal_attribution": "event_url_action_goal",
-      "google_impressions": 0,
+      "google_impressions": 6,
       "google_clicks": 0,
       "google_ctr": 0,
-      "google_avg_position": 0,
+      "google_avg_position": 8.67,
       "google_queries": [],
-      "combined_search_impressions": 0,
+      "combined_search_impressions": 6,
       "combined_search_clicks": 0,
       "combined_search_ctr": 0,
-      "combined_search_avg_position": 0
+      "combined_search_avg_position": 8.67
     }
   ],
   "clusters": [
@@ -4104,21 +4104,21 @@
           "contact_whatsapp": 0,
           "metrica_page_attribution": "viewed_page_url",
           "metrica_goal_attribution": "event_url_action_goal",
-          "google_impressions": 0,
+          "google_impressions": 6,
           "google_clicks": 0,
           "google_ctr": 0,
-          "google_avg_position": 0,
+          "google_avg_position": 7.67,
           "google_queries": [],
-          "combined_search_impressions": 0,
+          "combined_search_impressions": 6,
           "combined_search_clicks": 0,
           "combined_search_ctr": 0,
-          "combined_search_avg_position": 0
+          "combined_search_avg_position": 7.67
         }
       ],
       "totals": {
         "pages": 4,
         "pages_in_search": 4,
-        "shows": 1,
+        "shows": 7,
         "clicks": 1,
         "visits": 2,
         "cta_clicks": 0,
@@ -4126,7 +4126,7 @@
         "contact_conversions": 0,
         "yandex_shows": 1,
         "yandex_clicks": 1,
-        "google_impressions": 0,
+        "google_impressions": 6,
         "google_clicks": 0,
         "pageviews": 19
       }
@@ -4193,15 +4193,15 @@
           "contact_whatsapp": 0,
           "metrica_page_attribution": "viewed_page_url",
           "metrica_goal_attribution": "event_url_action_goal",
-          "google_impressions": 0,
+          "google_impressions": 4,
           "google_clicks": 0,
           "google_ctr": 0,
-          "google_avg_position": 0,
+          "google_avg_position": 8.5,
           "google_queries": [],
-          "combined_search_impressions": 0,
+          "combined_search_impressions": 4,
           "combined_search_clicks": 0,
           "combined_search_ctr": 0,
-          "combined_search_avg_position": 0
+          "combined_search_avg_position": 8.5
         },
         {
           "period": "2026-07-07—2026-08-05",
@@ -4261,15 +4261,15 @@
           "contact_whatsapp": 1,
           "metrica_page_attribution": "viewed_page_url",
           "metrica_goal_attribution": "event_url_action_goal",
-          "google_impressions": 0,
+          "google_impressions": 2,
           "google_clicks": 0,
           "google_ctr": 0,
-          "google_avg_position": 0,
+          "google_avg_position": 6.5,
           "google_queries": [],
-          "combined_search_impressions": 0,
+          "combined_search_impressions": 2,
           "combined_search_clicks": 0,
           "combined_search_ctr": 0,
-          "combined_search_avg_position": 0
+          "combined_search_avg_position": 6.5
         },
         {
           "period": "2026-07-07—2026-08-05",
@@ -4397,21 +4397,21 @@
           "contact_whatsapp": 0,
           "metrica_page_attribution": "viewed_page_url",
           "metrica_goal_attribution": "event_url_action_goal",
-          "google_impressions": 0,
+          "google_impressions": 6,
           "google_clicks": 0,
           "google_ctr": 0,
-          "google_avg_position": 0,
+          "google_avg_position": 8.67,
           "google_queries": [],
-          "combined_search_impressions": 0,
+          "combined_search_impressions": 6,
           "combined_search_clicks": 0,
           "combined_search_ctr": 0,
-          "combined_search_avg_position": 0
+          "combined_search_avg_position": 8.67
         }
       ],
       "totals": {
         "pages": 4,
         "pages_in_search": 4,
-        "shows": 0,
+        "shows": 12,
         "clicks": 0,
         "visits": 2,
         "cta_clicks": 2,
@@ -4419,7 +4419,7 @@
         "contact_conversions": 1,
         "yandex_shows": 0,
         "yandex_clicks": 0,
-        "google_impressions": 0,
+        "google_impressions": 12,
         "google_clicks": 0,
         "pageviews": 50
       }
@@ -4445,9 +4445,253 @@
     "google_access_token_saved": false
   },
   "google_search_console": {
-    "available": false,
-    "status": "not_configured",
-    "error": "Нужен секрет GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON и доступ сервисного аккаунта к ресурсу Search Console",
-    "pages": []
+    "available": true,
+    "status": "ok",
+    "site_url": "sc-domain:yuristshevchuk.com",
+    "permission_level": "siteFullUser",
+    "period": {
+      "date1": "2026-07-07",
+      "date2": "2026-08-05"
+    },
+    "data_state": "final",
+    "pages": [
+      {
+        "path": "/razbory/chto-delat-posle-otkaza-policii/",
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 8.5,
+        "queries": []
+      },
+      {
+        "path": "/razbory/vernut-dolg-bez-raspiski/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/politsiya-ne-otvechaet-na-zayavlenie/",
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 6.5,
+        "queries": []
+      },
+      {
+        "path": "/razbory/garantiynyy-remont-avtomobilya-bolshe-45-dney/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/rabotal-bez-dogovora-ne-vyplatili-zarplatu/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/plokho-pokrasili-mashinu-v-avtoservise/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/spisali-dengi-po-sudebnomu-prikazu/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/tovar-ne-postavlen-posle-oplaty-scheta/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/dolg-po-raspiske-prikaz-ili-isk/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/dengi-v-dolg-na-chuzhuyu-kartu/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/srok-vozvrata-dolga-ne-ukazan/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/prodavets-propal-posle-perevoda/",
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 6.33,
+        "queries": []
+      },
+      {
+        "path": "/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/pretenziya-za-tovarnyy-znak-na-marketpleyse/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/zayavlenie-v-politsiyu-o-moshennichestve/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/vernut-dengi-za-otmenennuyu-bron-otelya/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/dengi-za-kontraktnyy-dvigatel-bez-raspiski/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/ozon-poteryal-tovar-ili-nachislil-lishnyuyu-logistiku/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/skrytyy-defekt-poderzhannogo-avtomobilya/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/vrachebnaya-oshibka-pri-rodah-s-chego-nachat/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/pristav-perechislyaet-malo-s-pensii-dolzhnika/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/razbory/dogovor-s-dizaynerom-peredacha-prav-na-infografiku/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske/",
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0,
+        "queries": []
+      },
+      {
+        "path": "/uslugi/vozvrat-deneg/",
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 7.67,
+        "queries": []
+      },
+      {
+        "path": "/uslugi/zhaloby-i-obrashcheniya/",
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 8.67,
+        "queries": []
+      }
+    ],
+    "popular_queries": [],
+    "limitations": [
+      "Search Console API возвращает верхние строки и не гарантирует полный перечень низкочастотных запросов.",
+      "Даты Search Console рассчитываются в часовом поясе Pacific Time."
+    ]
   }
 }

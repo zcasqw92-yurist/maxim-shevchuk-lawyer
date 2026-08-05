@@ -23,6 +23,7 @@ import { medicalErrorFirstStepsArticles } from "./medical-error-first-steps-data
 import { bailiffSmallPensionPaymentsArticles } from "./bailiff-small-pension-payments-data.mjs";
 import { designerInfographicExclusiveRightsArticles } from "./designer-infographic-exclusive-rights-data.mjs";
 import { yandexDeliveryLostParcelArticles } from "./yandex-delivery-lost-parcel-data.mjs";
+import { houseConstructionContractorRefundArticles } from "./house-construction-contractor-refund-data.mjs";
 
 const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((article) => ({
   ...article,
@@ -41,6 +42,7 @@ export const articles = [
   ...bailiffSmallPensionPaymentsArticles,
   ...designerInfographicExclusiveRightsArticles,
   ...yandexDeliveryLostParcelArticles,
+  ...houseConstructionContractorRefundArticles,
 ];
 
 export const findArticleBySlug = (slug) => articles.find((item) => item.slug === slug);

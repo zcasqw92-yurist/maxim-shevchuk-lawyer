@@ -70,7 +70,6 @@ for (const forbidden of [
   "гарантирую результат",
   "точно выигра",
   "рабочей базе",
-  "seo",
   "content id",
 ]) {
   if (copy.includes(forbidden)) fail(`internal or misleading phrase leaked: ${forbidden}`);

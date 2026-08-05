@@ -17,6 +17,9 @@ if (article !== sourceArticle) fail("registry must use the dedicated source obje
 if (article.status !== "published") fail("article status must be published");
 if (article.slug !== "podryadchik-ne-postroil-dom-posle-oplaty") fail("unexpected slug");
 if (!article.title.includes("как отказаться от договора и вернуть деньги")) fail("H1 does not answer the primary intent");
+if (!article.description || article.description.length < 70 || article.description.length > 170) {
+  fail(`description length must be 70-170 characters, got ${article.description?.length ?? 0}`);
+}
 if (!article.lead.includes("зафиксируйте фактическое состояние участка")) fail("lead lacks the immediate first action");
 if (!article.lead.includes("не просить подрядчика «расторгнуть договор»")) fail("lead lacks the refusal-versus-termination distinction");
 

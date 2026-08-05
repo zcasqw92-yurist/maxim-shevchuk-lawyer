@@ -1,7 +1,7 @@
 import { articles } from "../src/editorial-data.mjs";
 
 const fail = (article, message) => {
-  throw new Error(`Commercial editorial gate (${article.contentId || article.id}): ${message}`);
+  throw new Error(`Commercial editorial gate (${article.id}): ${message}`);
 };
 
 const normalizedText = (value) => String(value || "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -14,7 +14,7 @@ for (const article of gatedArticles) {
   const text = articleText(article);
   const sectionIds = article.sections.map((section) => section.id);
 
-  if (!article.contentId) fail(article, "Content ID is required");
+  if (Object.hasOwn(article, "contentId")) fail(article, "internal Content ID leaked into public article");
   if (!article.ctaTitle || !article.ctaDescription || !article.ctaButtonLabel) {
     fail(article, "specific CTA title, description and button label are required");
   }

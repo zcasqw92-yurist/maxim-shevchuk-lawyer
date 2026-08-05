@@ -62,7 +62,7 @@
     "test:core-web-vitals": "node scripts/core-web-vitals-test.mjs",
     "test:cross-browser": "node scripts/cross-browser-test.mjs",
     "test:visual": "node --import ./scripts/playwright-consent-isolation-preload.mjs scripts/visual-direct-contact-test.mjs",
-    "test:content-governance": "node scripts/content-governance-test.mjs",
+    "test:content-governance": "node scripts/seo-preflight-governance-test.mjs && node scripts/content-governance-test.mjs",
     "test:seo-data-pipeline": "node scripts/seo-data-pipeline-test.mjs",
     "lock:indexing": "node scripts/lock-indexing.mjs",
     "test:indexing-lock": "node scripts/indexing-lock-test.mjs",

@@ -1,0 +1,101 @@
+name: C-122 live production audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/c122-live-production-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      SITE_URL: https://yuristshevchuk.com
+      ARTICLE_PATH: /razbory/yandeks-dostavka-poteryala-posylku/
+      EXPECTED_BUILD_SHA: 666123de74dbdaac32c6750a984a12ec00f77d52
+    steps:
+      - name: Audit deployed C-122 page
+        shell: bash
+        run: |
+          node <<'NODE'
+          const base = process.env.SITE_URL;
+          const articlePath = process.env.ARTICLE_PATH;
+          const expectedSha = process.env.EXPECTED_BUILD_SHA;
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const fetchText = async (path, attempt) => {
+            const url = new URL(path, `${base}/`);
+            url.searchParams.set('live_audit', `${expectedSha.slice(0, 12)}-${attempt}-${Date.now()}`);
+            const response = await fetch(url, {
+              redirect: 'follow',
+              cache: 'no-store',
+              headers: { 'cache-control': 'no-cache, no-store, max-age=0', pragma: 'no-cache' },
+              signal: AbortSignal.timeout(25000),
+            });
+            const body = await response.text();
+            return { response, body };
+          };
+
+          let deployed = false;
+          for (let attempt = 1; attempt <= 24; attempt += 1) {
+            try {
+              const { response, body } = await fetchText('/build-info.json', attempt);
+              if (!response.ok) throw new Error(`build-info HTTP ${response.status}`);
+              const info = JSON.parse(body);
+              console.log(`Deployment attempt ${attempt}: ${info.sha || 'missing SHA'}`);
+              if (info.sha === expectedSha) {
+                deployed = true;
+                break;
+              }
+            } catch (error) {
+              console.log(`Deployment attempt ${attempt}: ${error.message}`);
+            }
+            await sleep(15000);
+          }
+          if (!deployed) throw new Error(`Public build did not reach expected SHA ${expectedSha}`);
+
+          const article = await fetchText(articlePath, 100);
+          const html = article.body;
+          const expectedCanonical = `${base}${articlePath}`;
+          const checks = {
+            articleHttp200: article.response.status === 200,
+            finalOrigin: new URL(article.response.url).origin === new URL(base).origin,
+            h1: html.includes('Яндекс Доставка потеряла посылку: как получить компенсацию, если чеков нет'),
+            canonical: html.includes(`<link rel="canonical" href="${expectedCanonical}">`) || html.includes(`<link href="${expectedCanonical}" rel="canonical">`),
+            indexFollow: /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*index[^"']*follow/i.test(html) || /<meta[^>]+content=["'][^"']*index[^"']*follow[^"']*["'][^>]+name=["']robots/i.test(html),
+            noNoindex: !/noindex/i.test(html),
+            buildMeta: html.includes(`name="site-build-sha" content="${expectedSha}"`) || html.includes(`content="${expectedSha}" name="site-build-sha"`),
+            articleSchema: html.includes('"@type":"Article"') || html.includes('"@type": "Article"'),
+            publishedDate: html.includes('2026-08-05'),
+            evidenceMatrix: html.includes('Матрица доказательств: пять вопросов по каждой вещи'),
+            shortAnswer: html.includes('Короткий ответ'),
+            officialSources: html.includes('Официальные источники'),
+            faq: html.includes('Частые вопросы'),
+            refundLink: html.includes('/uslugi/vozvrat-deneg/'),
+            complaintsLink: html.includes('/uslugi/zhaloby-i-obrashcheniya/'),
+            messengerCta: html.includes('Написать юристу'),
+            noForms: !/<form\b/i.test(html) && !/<input\b/i.test(html) && !/<textarea\b/i.test(html),
+            noInternalPaidWorkPhrase: !html.includes('оплаченных юридических работ'),
+            noArtificialChainPhrase: !html.includes('доказательственную цепочку'),
+          };
+
+          const sitemap = await fetchText('/sitemap-articles.xml', 101);
+          checks.sitemapHttp200 = sitemap.response.status === 200;
+          checks.sitemapContainsArticle = sitemap.body.includes(expectedCanonical);
+
+          const feed = await fetchText('/feed.xml', 102);
+          checks.feedHttp200 = feed.response.status === 200;
+          checks.feedContainsArticle = feed.body.includes(expectedCanonical) || feed.body.includes('yandeks-dostavka-poteryala-posylku');
+
+          const index = await fetchText('/razbory/', 103);
+          checks.indexHttp200 = index.response.status === 200;
+          checks.indexContainsArticle = index.body.includes(articlePath) && index.body.includes('Яндекс Доставка потеряла посылку');
+
+          console.log(JSON.stringify({ expectedSha, expectedCanonical, checks }, null, 2));
+          const failed = Object.entries(checks).filter(([, passed]) => !passed);
+          if (failed.length) throw new Error(`Live audit failed: ${failed.map(([name]) => name).join(', ')}`);
+          console.log(`C-122 LIVE AUDIT PASSED: ${Object.keys(checks).length} checks · ${expectedSha}`);
+          NODE

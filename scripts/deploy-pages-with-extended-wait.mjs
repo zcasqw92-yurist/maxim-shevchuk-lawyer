@@ -19,6 +19,15 @@ const FINAL_ERROR_STATUSES = new Map([
 ]);
 const RETRYABLE_HTTP_STATUSES = new Set([408, 409, 425, 429, 500, 502, 503, 504]);
 
+class HttpRequestError extends Error {
+  constructor(message, { status = 0, retryable = false } = {}) {
+    super(message);
+    this.name = "HttpRequestError";
+    this.status = status;
+    this.retryable = retryable;
+  }
+}
+
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 const requiredEnv = (name) => {
   const value = String(process.env[name] || "").trim();
@@ -28,6 +37,11 @@ const requiredEnv = (name) => {
 const positiveInteger = (value, fallback, minimum = 1) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= minimum ? Math.floor(parsed) : fallback;
+};
+const normalizePageUrl = (value) => {
+  const clean = String(value || "").trim().replace(/[\r\n]/g, "");
+  if (!clean) return "";
+  return /^https?:\/\//iu.test(clean) ? clean : `https://${clean.replace(/^\/+/, "")}`;
 };
 const responsePayload = async (response) => {
   const text = await response.text();
@@ -41,6 +55,9 @@ const errorMessage = (payload, fallback) => String(
   || payload?.errors?.map?.((item) => item?.message || item).filter(Boolean).join("; ")
   || fallback,
 );
+const isRetryableNetworkError = (error) => error?.name === "AbortError"
+  || error?.name === "TimeoutError"
+  || error instanceof TypeError;
 
 export const selectPagesArtifact = (payload, expectedSha) => {
   const artifacts = Array.isArray(payload?.artifacts) ? payload.artifacts : [];
@@ -86,8 +103,9 @@ const request = async (url, {
 } = {}) => {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    let response;
     try {
-      const response = await fetch(url, {
+      response = await fetch(url, {
         method,
         headers: {
           Accept: "application/vnd.github+json",
@@ -98,17 +116,31 @@ const request = async (url, {
         body: body === undefined ? undefined : JSON.stringify(body),
         signal: AbortSignal.timeout(30_000),
       });
-      const payload = await responsePayload(response);
-      if (response.ok) return payload;
-      const message = `${label}: HTTP ${response.status}: ${errorMessage(payload, response.statusText)}`;
-      if (!retryableStatuses.has(response.status) || attempt === attempts) throw new Error(message);
-      lastError = new Error(message);
     } catch (error) {
+      if (!isRetryableNetworkError(error) || attempt === attempts) throw error;
       lastError = error;
-      if (attempt === attempts) throw error;
+      const delay = Math.min(30_000, 1_500 * (2 ** (attempt - 1)));
+      console.warn(`${label}: network failure, retry ${attempt}/${attempts} after ${delay} ms`);
+      await sleep(delay);
+      continue;
     }
-    const delay = Math.min(30_000, 1_500 * (2 ** (attempt - 1)));
-    console.warn(`${label}: temporary request failure, retry ${attempt}/${attempts} after ${delay} ms`);
+
+    const payload = await responsePayload(response);
+    if (response.ok) return payload;
+
+    const retryable = retryableStatuses.has(response.status);
+    const failure = new HttpRequestError(
+      `${label}: HTTP ${response.status}: ${errorMessage(payload, response.statusText)}`,
+      { status: response.status, retryable },
+    );
+    if (!retryable || attempt === attempts) throw failure;
+
+    lastError = failure;
+    const retryAfterSeconds = Number(response.headers.get("retry-after"));
+    const delay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+      ? Math.min(60_000, retryAfterSeconds * 1000)
+      : Math.min(30_000, 1_500 * (2 ** (attempt - 1)));
+    console.warn(`${label}: HTTP ${response.status}, retry ${attempt}/${attempts} after ${delay} ms`);
     await sleep(delay);
   }
   throw lastError || new Error(`${label}: request failed`);
@@ -134,8 +166,7 @@ const requestOidcToken = async () => {
 
 const writeOutputs = async ({ pageUrl, status }) => {
   const outputPath = requiredEnv("GITHUB_OUTPUT");
-  const safePageUrl = String(pageUrl || "").replace(/[\r\n]/g, "");
-  await appendFile(outputPath, `page_url=${safePageUrl}\nstatus=${status}\n`, "utf8");
+  await appendFile(outputPath, `page_url=${normalizePageUrl(pageUrl)}\nstatus=${status}\n`, "utf8");
 };
 
 export const deployPages = async () => {
@@ -163,18 +194,20 @@ export const deployPages = async () => {
     token: githubToken,
     body: {
       artifact_id: Number(artifact.id),
+      environment: "github-pages",
       pages_build_version: buildSha,
       oidc_token: oidcToken,
     },
-    attempts: 6,
+    attempts: 3,
     label: "Create Pages deployment",
   });
 
   const deploymentId = deploymentIdOf(deployment, buildSha);
-  const pageUrl = String(deployment?.page_url || "").trim();
+  const pageUrl = normalizePageUrl(deployment?.page_url || process.env.SITE_URL);
   console.log(`Created Pages deployment ${deploymentId}; waiting up to ${Math.round(timeoutMs / 60_000)} minutes`);
 
   let finished = false;
+  let interrupted = false;
   let consecutiveStatusErrors = 0;
   const cancelDeployment = async (reason) => {
     if (finished) return;
@@ -193,8 +226,9 @@ export const deployPages = async () => {
   };
 
   const signalHandler = (signal) => {
+    interrupted = true;
     cancelDeployment(`received ${signal}`)
-      .finally(() => process.exitCode = 1);
+      .finally(() => { process.exitCode = 1; });
   };
   process.once("SIGINT", signalHandler);
   process.once("SIGTERM", signalHandler);
@@ -203,6 +237,8 @@ export const deployPages = async () => {
   try {
     while (Date.now() - startedAt < timeoutMs) {
       await sleep(intervalMs);
+      if (interrupted) throw new Error(`Pages deployment ${deploymentId} interrupted`);
+
       let statusPayload;
       try {
         statusPayload = await githubRequest(
@@ -230,9 +266,10 @@ export const deployPages = async () => {
       const state = deploymentState(statusPayload?.status);
       if (state.kind === "success") {
         finished = true;
-        await writeOutputs({ pageUrl: statusPayload?.page_url || pageUrl, status: state.status });
-        console.log(`Pages deployment ${deploymentId} succeeded`);
-        return { deploymentId, pageUrl: statusPayload?.page_url || pageUrl, status: state.status };
+        const finalPageUrl = normalizePageUrl(statusPayload?.page_url || pageUrl || process.env.SITE_URL);
+        await writeOutputs({ pageUrl: finalPageUrl, status: state.status });
+        console.log(`Pages deployment ${deploymentId} succeeded at ${finalPageUrl}`);
+        return { deploymentId, pageUrl: finalPageUrl, status: state.status };
       }
       if (state.kind === "failure") {
         finished = true;

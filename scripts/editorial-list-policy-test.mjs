@@ -6,6 +6,7 @@ import { articles } from "../src/editorial-data.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const renderer = await readFile(join(root, "src", "editorial-render-base.mjs"), "utf8");
 const styles = await readFile(join(root, "src", "editorial-semantic-lists.css"), "utf8");
+const rhythm = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 const errors = [];
 const semanticFields = ["checklist", "avoid", "bullets", "dashes"];
 const requiredPolicyArticleIds = new Set(["contractor-repair-quality-claim-response"]);
@@ -65,6 +66,16 @@ for (const marker of [
 }
 
 for (const marker of [
+  '--editorial-marker-indent: 26px',
+  '--editorial-marker-width: 18px',
+  '--editorial-marker-item-gap: 10px',
+  '--editorial-marker-block-gap: 18px',
+  ':is(.editorial-checklist, .editorial-list)',
+  'gap: var(--editorial-marker-item-gap)',
+  'margin: var(--editorial-marker-block-gap) 0 0',
+  'padding: 0 0 0 var(--editorial-marker-indent)',
+  'width: var(--editorial-marker-width)',
+  '.article-section .editorial-checklist li::before',
   '.editorial-list--cross li::before',
   'content: "×"',
   'color: var(--gold-text)',
@@ -78,9 +89,13 @@ for (const marker of [
   if (!styles.includes(marker)) errors.push(`editorial-semantic-lists.css: отсутствует обязательный контракт ${marker}`);
 }
 
+if (rhythm.includes(".article-page .editorial-checklist") || rhythm.includes(".case-page .editorial-checklist")) {
+  errors.push("editorial-rhythm.css: для галочек остался отдельный отступ, который нарушает единый ритм маркеров");
+}
+
 if (errors.length) {
   console.error(["Проверка смысловых маркеров списков не пройдена:", ...errors.map((item) => `- ${item}`)].join("\n"));
   process.exit(1);
 }
 
-console.log("Editorial list policy passed: checks confirm actions, crosses mark prohibitions, neutral bullets keep text color");
+console.log("Editorial list policy passed: marker meaning, colors, indentation and compact spacing are unified");

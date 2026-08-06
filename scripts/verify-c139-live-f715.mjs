@@ -6,49 +6,67 @@ const expectedSha = "f715849f12ed5242b550aefae68fdcba40f3f6cf";
 const targetSlug = "zakazchik-trebuet-vernut-dengi-za-remont";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const request = async (pathname, attempt = 1) => {
+const request = async (pathname, attempt = 1, cacheBust = true) => {
   const url = new URL(pathname, base);
-  url.searchParams.set("verify_c139", `${expectedSha.slice(0, 12)}-${attempt}-${Date.now()}`);
+  if (cacheBust) url.searchParams.set("verify_c139", `${expectedSha.slice(0, 12)}-${attempt}-${Date.now()}`);
   const response = await fetch(url, {
     headers: {
       "cache-control": "no-cache, no-store, max-age=0",
       pragma: "no-cache",
+      accept: pathname.endsWith(".json") ? "application/json,text/plain;q=0.9,*/*;q=0.8" : "text/html,*/*;q=0.8",
     },
     cache: "no-store",
     redirect: "follow",
     signal: AbortSignal.timeout(20_000),
   });
-  return { response, text: await response.text() };
+  return {
+    response,
+    text: await response.text(),
+    contentType: response.headers.get("content-type") || "",
+  };
 };
 
+const readMetaSha = (html = "") => html.match(/<meta\s+name=["']site-build-sha["']\s+content=["']([^"']+)["'][^>]*>/i)?.[1]
+  || html.match(/<meta\s+content=["']([^"']+)["']\s+name=["']site-build-sha["'][^>]*>/i)?.[1]
+  || "";
+
 let live = false;
-let lastSha = "";
-for (let attempt = 1; attempt <= 60; attempt += 1) {
+let lastDiagnostic = "none";
+for (let attempt = 1; attempt <= 30; attempt += 1) {
   try {
-    const { response, text } = await request("build-info.json", attempt);
-    if (response.ok) {
-      const info = JSON.parse(text);
-      lastSha = info.sha || "";
-      if (lastSha === expectedSha) {
-        live = true;
-        console.log(`Live SHA confirmed on attempt ${attempt}: ${expectedSha.slice(0, 12)}`);
-        break;
-      }
+    const home = await request("", attempt, true);
+    const homeSha = readMetaSha(home.text);
+    const build = await request("build-info.json", attempt, false);
+    let buildSha = "";
+    try {
+      buildSha = JSON.parse(build.text).sha || "";
+    } catch {
+      buildSha = "invalid-json";
+    }
+    lastDiagnostic = `home=${home.response.status}/${homeSha || "missing"}; build=${build.response.status}/${build.contentType}/${buildSha}`;
+    console.log(`Production attempt ${attempt}/30: ${lastDiagnostic}`);
+    if (home.response.ok && homeSha === expectedSha && build.response.ok && buildSha === expectedSha) {
+      live = true;
+      break;
     }
   } catch (error) {
-    console.log(`Live SHA attempt ${attempt}: ${error.message}`);
+    lastDiagnostic = error.message;
+    console.log(`Production attempt ${attempt}/30: ${lastDiagnostic}`);
   }
-  if (attempt < 60) await sleep(10_000);
+  if (attempt < 30) await sleep(15_000);
 }
 
-if (!live) throw new Error(`Expected live SHA ${expectedSha}; last received ${lastSha || "none"}`);
+if (!live) throw new Error(`Expected live SHA ${expectedSha}; ${lastDiagnostic}`);
+console.log(`Live SHA confirmed: ${expectedSha.slice(0, 12)}`);
 
 const target = articles.find((article) => article.slug === targetSlug);
 if (!target) throw new Error(`Target article ${targetSlug} is absent from registry`);
 
 for (const article of articles) {
-  const { response, text: html } = await request(`razbory/${article.slug}/`);
+  const { response, text: html } = await request(`razbory/${article.slug}/`, 1, true);
   if (!response.ok) throw new Error(`${article.slug}: live page returned ${response.status}`);
+  const pageSha = readMetaSha(html);
+  if (pageSha !== expectedSha) throw new Error(`${article.slug}: live page SHA ${pageSha || "missing"} differs from expected`);
   const visible = visibleMainText(html);
   const findings = findPublicCopyFindings([visible]);
   if (findings.length) {

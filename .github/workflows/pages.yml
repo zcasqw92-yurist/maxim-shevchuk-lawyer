@@ -45,7 +45,7 @@ env:
 jobs:
   build:
     name: Build and validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 40
     steps:
       - name: Checkout
@@ -112,7 +112,7 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 45
     environment:
       name: github-pages
@@ -143,7 +143,7 @@ jobs:
     name: Verify published site
     needs: deploy
     if: needs.deploy.outputs.status == 'succeed'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 35
     steps:
       - name: Checkout

@@ -13,6 +13,36 @@ const targetId = "contractor-repair-quality-claim-response";
 const targetSelector = `data-article-id="${targetId}"`;
 const negativeChecklistPattern = /^(?:не\b|нельзя\b|проигнорир|отказат|признат|пообещат|спорит|ошибк)/iu;
 
+const splitSelectorList = (prelude) => {
+  const selectors = [];
+  let current = "";
+  let parenthesesDepth = 0;
+
+  for (const character of prelude) {
+    if (character === "(") parenthesesDepth += 1;
+    if (character === ")") parenthesesDepth = Math.max(0, parenthesesDepth - 1);
+
+    if (character === "," && parenthesesDepth === 0) {
+      if (current.trim()) selectors.push(current.replace(/\s+/g, " ").trim());
+      current = "";
+      continue;
+    }
+    current += character;
+  }
+
+  if (current.trim()) selectors.push(current.replace(/\s+/g, " ").trim());
+  return selectors;
+};
+
+const extractSelectorPreludes = (css) => [...css
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .matchAll(/([^{}]+)\{/g)]
+  .map((match) => match[1].replace(/\s+/g, " ").trim())
+  .filter((prelude) => prelude && !prelude.startsWith("@"));
+
+const styleSelectorPreludes = extractSelectorPreludes(styles);
+const styleSelectors = styleSelectorPreludes.flatMap(splitSelectorList);
+
 const usesNewPolicy = (article) => article.listPolicyVersion !== undefined
   || (article.sections || []).some((section) => section.avoid !== undefined
     || section.bullets !== undefined
@@ -102,13 +132,18 @@ for (const marker of [
   if (!rhythm.includes(marker)) errors.push(`editorial-rhythm.css: отсутствует обязательный контракт ${marker}`);
 }
 
-if (/^\s*\.article-page,\s*\n\s*\.case-page\s*\{/m.test(styles)) {
+if (styleSelectorPreludes.some((prelude) => {
+  const selectors = splitSelectorList(prelude);
+  return selectors.length === 2
+    && selectors.includes(".article-page")
+    && selectors.includes(".case-page");
+})) {
   errors.push("editorial-semantic-lists.css: новые переменные снова применены ко всем статьям и кейсам");
 }
-if (/^\s*\.article-section\s+:is\(/m.test(styles)) {
+if (styleSelectors.some((selector) => selector.startsWith(".article-section :is("))) {
   errors.push("editorial-semantic-lists.css: найден глобальный селектор новых отступов без привязки к C-139");
 }
-if (/^\s*\.editorial-list--(?:cross|dot|dash)\s+li::before/m.test(styles)) {
+if (styleSelectors.some((selector) => /^\.editorial-list--(?:cross|dot|dash)\s+li::before/.test(selector))) {
   errors.push("editorial-semantic-lists.css: смысловой маркер действует глобально, а не только внутри C-139");
 }
 if (/^\s*\.article-page\s+\.editorial-body\s*>\s*\.article-section\s*\{[^}]*var\(--editorial-c139-/ms.test(rhythm)) {

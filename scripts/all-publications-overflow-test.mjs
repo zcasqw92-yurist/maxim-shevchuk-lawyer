@@ -91,24 +91,24 @@ try {
       ...(engineName === "Chromium" ? { args: ["--no-sandbox"] } : {}),
     });
     try {
-      for (const route of routes) {
-        const context = await browser.newContext({
-          viewport: { width: route.width, height: 844 },
-          locale: "ru-RU",
-          reducedMotion: "reduce",
-        });
-        await context.addInitScript(() => {
-          localStorage.setItem("analytics_consent", "denied");
-          sessionStorage.setItem("site_engagement_nudge_shown", "true");
-        });
-        const page = await context.newPage();
-        try {
+      const context = await browser.newContext({
+        viewport: { width: 320, height: 844 },
+        locale: "ru-RU",
+        reducedMotion: "reduce",
+      });
+      await context.addInitScript(() => {
+        localStorage.setItem("analytics_consent", "denied");
+        sessionStorage.setItem("site_engagement_nudge_shown", "true");
+      });
+      const page = await context.newPage();
+      try {
+        for (const route of routes) {
+          await page.setViewportSize({ width: route.width, height: 844 });
           const response = await page.goto(`${origin}${route.path}`, { waitUntil: "domcontentloaded", timeout: 45_000 });
           if (!response?.ok()) {
             errors.push(`${engineName} ${route.path}: navigation returned ${response?.status() || "no response"}`);
             continue;
           }
-          await page.waitForLoadState("networkidle", { timeout: 8_000 }).catch(() => {});
           await page.evaluate(async () => {
             await document.fonts?.ready;
             await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -117,10 +117,10 @@ try {
           if (state.overflow > 1.5) {
             errors.push(`${engineName} ${route.kind} ${route.path}: horizontal overflow ${state.overflow}px\n${JSON.stringify(state.offenders, null, 2)}`);
           }
-        } finally {
-          await page.close();
-          await context.close();
         }
+      } finally {
+        await page.close();
+        await context.close();
       }
     } finally {
       await browser.close();

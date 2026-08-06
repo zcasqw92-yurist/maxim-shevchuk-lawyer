@@ -9,6 +9,7 @@ on:
     - cron: '17 3 * * 1'
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -75,6 +76,7 @@ jobs:
           node --check scripts/live-all-publications-smoke.mjs
           node --check scripts/live-public-copy-regression-test.mjs
           node --check scripts/verify-custom-domain-sha.mjs
+          node --check scripts/deploy-pages-with-extended-wait.mjs
           npm run check 2>&1 | tee check.log
 
       - name: Verify Yandex Metrica goals and funnels
@@ -118,13 +120,23 @@ jobs:
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout deployment client
+        uses: actions/checkout@v6
+
+      - name: Setup deployment Node.js
+        uses: actions/setup-node@v6
         with:
-          # Стандартные 10 минут оказались недостаточны при очереди Pages.
-          timeout: '1800000'
-          reporting_interval: '10000'
+          node-version: '22.17.0'
+          package-manager-cache: false
+
+      - name: Deploy to GitHub Pages with extended wait
+        id: deployment
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PAGES_DEPLOYMENT_TIMEOUT_MS: '2100000'
+          PAGES_STATUS_INTERVAL_MS: '10000'
+          PAGES_STATUS_ERROR_LIMIT: '18'
+        run: node scripts/deploy-pages-with-extended-wait.mjs
 
   verify:
     name: Verify published site

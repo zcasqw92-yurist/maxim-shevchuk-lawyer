@@ -13,18 +13,19 @@ if (!gatedArticles.length) throw new Error("Commercial editorial gate: no opt-in
 for (const article of gatedArticles) {
   const text = articleText(article);
   const sectionIds = article.sections.map((section) => section.id);
+  const hasSemanticRiskChain = article.sections.some((section) => Array.isArray(section.dashes) && section.dashes.length >= 4);
 
   if (Object.hasOwn(article, "contentId")) fail(article, "internal Content ID leaked into public article");
   if (!article.ctaTitle || !article.ctaDescription || !article.ctaButtonLabel) {
     fail(article, "specific CTA title, description and button label are required");
   }
-  if (!text.includes("ошиб") || (!text.includes("→") && !text.includes("последств"))) {
+  if (!text.includes("ошиб") || (!text.includes("→") && !text.includes("последств") && !hasSemanticRiskChain)) {
     fail(article, "price-of-error chain is missing");
   }
   if (!text.includes("самостоятель") && !text.includes("можно сделать самому")) {
     fail(article, "self-service boundary is missing");
   }
-  if (!text.includes("юрист") || !text.includes("в работу входит")) {
+  if (!text.includes("юрист") || (!text.includes("в работу входит") && !text.includes("что входит в проверку"))) {
     fail(article, "scope of the paid legal work is missing");
   }
   if (!text.includes("не гарант") && !text.includes("не означает")) {

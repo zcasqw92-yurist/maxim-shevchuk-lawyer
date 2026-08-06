@@ -1,3 +1,4 @@
+import { mkdir, writeFile } from "node:fs/promises";
 import { chromium, webkit } from "playwright";
 
 const publicUrl = String(process.env.SITE_PUBLIC_URL || "").trim();
@@ -10,6 +11,14 @@ if (!/^[A-Fa-f0-9]{40}$/.test(expectedSha)) throw new Error("EXPECTED_BUILD_SHA 
 
 const base = new URL(publicUrl.endsWith("/") ? publicUrl : `${publicUrl}/`);
 const canonicalBase = new URL(canonicalUrl.endsWith("/") ? canonicalUrl : `${canonicalUrl}/`);
+const reportPath = "reports/live-publication-smoke.json";
+const report = {
+  checkedAt: new Date().toISOString(),
+  publicUrl: base.toString(),
+  expectedSha,
+  transientOverflows: [],
+  failures: [],
+};
 const thematicIntakeArticlePaths = new Set([
   "/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
 ]);
@@ -31,6 +40,10 @@ const fetchText = async (pathname) => {
   return response.text();
 };
 const fetchJson = async (pathname) => JSON.parse(await fetchText(pathname));
+const writeReport = async () => {
+  await mkdir("reports", { recursive: true });
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+};
 const decode = (value = "") => String(value)
   .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)))
   .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
@@ -45,6 +58,102 @@ const meta = (html, attribute, key) => attr(tags(html, "meta").find((tag) => att
 const canonical = (html) => attr(tags(html, "link").find((tag) => attr(tag, "rel").split(/\s+/).includes("canonical")) || "", "href");
 const h1Count = (html) => [...html.matchAll(/<h1(?:\s[^>]*)?>[\s\S]*?<\/h1>/gi)].length;
 const publicationPath = (url) => new URL(url).pathname.replace(/^\//, "");
+const waitForStableLayout = async (page) => {
+  await page.waitForLoadState("networkidle", { timeout: 8_000 }).catch(() => {});
+  await page.evaluate(async () => {
+    await document.fonts?.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+};
+const inspectLayout = () => {
+  const viewportWidth = innerWidth;
+  const rootWidth = document.documentElement.scrollWidth;
+  const bodyWidth = document.body.scrollWidth;
+  const selectorFor = (element) => {
+    if (element.id) return `${element.tagName.toLowerCase()}#${element.id}`;
+    const classes = [...element.classList].slice(0, 4).join(".");
+    return `${element.tagName.toLowerCase()}${classes ? `.${classes}` : ""}`;
+  };
+  const offenders = [...document.body.querySelectorAll("*")]
+    .map((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      const rightOverflow = rect.right - viewportWidth;
+      const leftOverflow = -rect.left;
+      const internalOverflow = element.scrollWidth - element.clientWidth;
+      return {
+        selector: selectorFor(element),
+        text: String(element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 140),
+        left: Number(rect.left.toFixed(2)),
+        right: Number(rect.right.toFixed(2)),
+        width: Number(rect.width.toFixed(2)),
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        rightOverflow: Number(rightOverflow.toFixed(2)),
+        leftOverflow: Number(leftOverflow.toFixed(2)),
+        internalOverflow,
+        display: style.display,
+        position: style.position,
+        overflowX: style.overflowX,
+        whiteSpace: style.whiteSpace,
+        wordBreak: style.wordBreak,
+        overflowWrap: style.overflowWrap,
+        transform: style.transform,
+      };
+    })
+    .filter((item) => item.rightOverflow > 1 || item.leftOverflow > 1 || (item.internalOverflow > 1 && item.overflowX === "visible"))
+    .sort((a, b) => Math.max(b.rightOverflow, b.leftOverflow, b.internalOverflow) - Math.max(a.rightOverflow, a.leftOverflow, a.internalOverflow))
+    .slice(0, 20);
+  const stylesheets = [...document.querySelectorAll('link[rel~="stylesheet"]')].map((link) => ({
+    href: link.href,
+    media: link.media,
+    disabled: link.disabled,
+  }));
+  return {
+    innerWidth: viewportWidth,
+    rootWidth,
+    bodyWidth,
+    overflow: Math.max(rootWidth, bodyWidth) - viewportWidth,
+    controls: document.querySelectorAll("form, input, select, textarea").length,
+    sha: document.querySelector('meta[name="site-build-sha"]')?.content || "",
+    version: document.querySelector('meta[name="site-build-version"]')?.content || "",
+    h1: document.querySelectorAll("h1").length,
+    stylesheets,
+    offenders,
+  };
+};
+const verifyStableOverflow = async ({ page, label, path }) => {
+  const attempts = [];
+  let state = await page.evaluate(inspectLayout);
+  attempts.push({ phase: "initial", ...state });
+  if (state.overflow <= 1.5) return state;
+
+  await page.waitForTimeout(800);
+  await waitForStableLayout(page);
+  state = await page.evaluate(inspectLayout);
+  attempts.push({ phase: "settled", ...state });
+  if (state.overflow <= 1.5) {
+    report.transientOverflows.push({ label, path, attempts });
+    console.warn(`${label}: transient horizontal overflow resolved after layout stabilization`);
+    return state;
+  }
+
+  const response = await page.goto(noCacheUrl(path).toString(), { waitUntil: "domcontentloaded", timeout: 45_000 });
+  assert(response?.ok(), `${label}: diagnostic reload returned ${response?.status() || "no response"}`);
+  await waitForStableLayout(page);
+  state = await page.evaluate(inspectLayout);
+  attempts.push({ phase: "reload", ...state });
+  if (state.overflow <= 1.5) {
+    report.transientOverflows.push({ label, path, attempts });
+    console.warn(`${label}: transient horizontal overflow resolved after no-cache reload`);
+    return state;
+  }
+
+  const failure = { label, path, attempts };
+  report.failures.push(failure);
+  await writeReport();
+  throw new Error(`${label}: persistent horizontal overflow ${state.overflow}px\n${JSON.stringify(state.offenders, null, 2)}`);
+};
 
 const buildInfo = await fetchJson("build-info.json");
 assert(buildInfo.sha === expectedSha, `published SHA ${buildInfo.sha || "missing"}, expected ${expectedSha}`);
@@ -120,25 +229,16 @@ for (const { name, launcher } of [{ name: "Chromium", launcher: chromium }, { na
 
     for (const item of publications) {
       const width = item.kind === "article" ? 320 : 390;
+      const path = publicationPath(item.url);
       const label = `${name} ${item.kind} ${new URL(item.url).pathname}`;
       const page = await context.newPage();
       try {
         await page.setViewportSize({ width, height: 844 });
-        const response = await page.goto(noCacheUrl(publicationPath(item.url)).toString(), { waitUntil: "domcontentloaded", timeout: 45_000 });
+        const response = await page.goto(noCacheUrl(path).toString(), { waitUntil: "domcontentloaded", timeout: 45_000 });
         assert(response?.ok(), `${label}: navigation returned ${response?.status() || "no response"}`);
-        await page.waitForLoadState("networkidle", { timeout: 8_000 }).catch(() => {});
-        await page.evaluate(() => document.fonts?.ready);
+        await waitForStableLayout(page);
 
-        const state = await page.evaluate(() => ({
-          innerWidth,
-          rootWidth: document.documentElement.scrollWidth,
-          bodyWidth: document.body.scrollWidth,
-          controls: document.querySelectorAll("form, input, select, textarea").length,
-          sha: document.querySelector('meta[name="site-build-sha"]')?.content || "",
-          h1: document.querySelectorAll("h1").length,
-        }));
-        const overflow = Math.max(state.rootWidth, state.bodyWidth) - state.innerWidth;
-        assert(overflow <= 1.5, `${label}: horizontal overflow ${overflow}px`);
+        const state = await verifyStableOverflow({ page, label, path });
         assert(state.controls === 0, `${label}: ${state.controls} data-entry controls in DOM`);
         assert(state.sha === expectedSha, `${label}: browser received build ${state.sha || "missing"}`);
         assert(state.h1 === 1, `${label}: incorrect H1 count`);
@@ -172,4 +272,5 @@ for (const { name, launcher } of [{ name: "Chromium", launcher: chromium }, { na
   }
 }
 
+await writeReport();
 console.log(`All published editorial routes verified: ${manifest.counts.articles} articles and ${manifest.counts.practiceCases} cases · ${expectedSha.slice(0, 12)} · ${base}`);

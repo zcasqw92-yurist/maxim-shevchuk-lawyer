@@ -34,7 +34,7 @@ const usedCarHiddenDefectPublicationArticles = usedCarHiddenDefectArticles.map((
 const contractorRepairQualityClaimResponsePublicationArticles = contractorRepairQualityClaimResponseArticles.map(
   ({ contentId: _internalContentId, ...article }) => ({
     ...article,
-    intakeQuestionsTitle: "В работу юриста входит",
+    intakeQuestionsTitle: "В работу входит",
   }),
 );
 

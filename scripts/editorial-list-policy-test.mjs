@@ -7,18 +7,21 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const renderer = await readFile(join(root, "src", "editorial-render-base.mjs"), "utf8");
 const styles = await readFile(join(root, "src", "editorial-semantic-lists.css"), "utf8");
 const errors = [];
-const policyStart = "2026-08-06";
 const semanticFields = ["checklist", "avoid", "bullets", "dashes"];
+const requiredPolicyArticleIds = new Set(["contractor-repair-quality-claim-response"]);
 const negativeChecklistPattern = /^(?:не\b|нельзя\b|проигнорир|отказат|признат|пообещат|спорит|ошибк)/iu;
 
 for (const article of articles) {
-  const governed = [article.publishedAt, article.modifiedAt]
-    .filter(Boolean)
-    .some((date) => date >= policyStart);
-  if (!governed) continue;
+  const usesSemanticPolicy = requiredPolicyArticleIds.has(article.id)
+    || article.listPolicyVersion !== undefined
+    || (article.sections || []).some((section) => section.avoid !== undefined
+      || section.bullets !== undefined
+      || section.dashes !== undefined
+      || section.microCta !== undefined);
+  if (!usesSemanticPolicy) continue;
 
   if (article.listPolicyVersion !== 1) {
-    errors.push(`${article.slug}: для новой или существенно изменённой статьи не включена listPolicyVersion=1`);
+    errors.push(`${article.slug}: статья использует новые смысловые списки, но listPolicyVersion=1 не включена`);
     continue;
   }
 
@@ -42,6 +45,12 @@ for (const article of articles) {
       }
     }
   }
+}
+
+for (const requiredId of requiredPolicyArticleIds) {
+  const article = articles.find((item) => item.id === requiredId);
+  if (!article) errors.push(`обязательная статья ${requiredId} отсутствует в реестре`);
+  else if (article.listPolicyVersion !== 1) errors.push(`${article.slug}: обязательное правило смысловых маркеров отключено`);
 }
 
 for (const marker of [

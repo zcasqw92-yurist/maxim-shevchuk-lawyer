@@ -14,11 +14,11 @@ permissions:
   pages: write
   id-token: write
 
-# Для production важен только последний коммит main. Новый запуск отменяет
-# устаревшую сборку или deployment; deployment-клиент при SIGTERM отдельно
-# отменяет уже созданную публикацию Pages, чтобы backend не оставался занят.
+# Все production-запуски используют прежнюю общую группу pages. Поэтому новый
+# коммит main отменяет не только будущие устаревшие сборки, но и старую очередь,
+# созданную предыдущей версией workflow.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: pages
   cancel-in-progress: true
 
 env:

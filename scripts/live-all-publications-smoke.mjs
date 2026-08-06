@@ -10,6 +10,10 @@ if (!/^[A-Fa-f0-9]{40}$/.test(expectedSha)) throw new Error("EXPECTED_BUILD_SHA 
 
 const base = new URL(publicUrl.endsWith("/") ? publicUrl : `${publicUrl}/`);
 const canonicalBase = new URL(canonicalUrl.endsWith("/") ? canonicalUrl : `${canonicalUrl}/`);
+const thematicIntakeArticlePaths = new Set([
+  "/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
+]);
+const usesThematicIntake = (item) => thematicIntakeArticlePaths.has(new URL(item.url).pathname);
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const noCacheUrl = (pathname) => {
   const url = new URL(pathname, base);
@@ -88,8 +92,19 @@ for (const item of publications) {
   }), `${label}: Article JSON-LD is missing`);
 
   if (item.kind === "article") {
-    for (const marker of ['id="self-check"', 'id="message-guide"', 'id="faq"', "faq-item"]) {
+    for (const marker of ['id="self-check"', 'id="faq"', "faq-item"]) {
       assert(html.includes(marker), `${label}: missing ${marker}`);
+    }
+
+    if (usesThematicIntake(item)) {
+      for (const marker of ["Что передать на проверку", "В работу входит", "Передать претензию на проверку"]) {
+        assert(html.includes(marker), `${label}: thematic intake is missing ${marker}`);
+      }
+      for (const forbidden of ['id="message-guide"', "Проверить свою ситуацию", "Что написать юристу"]) {
+        assert(!html.includes(forbidden), `${label}: removed generic block returned: ${forbidden}`);
+      }
+    } else {
+      assert(html.includes('id="message-guide"'), `${label}: missing id="message-guide"`);
     }
   }
 }
@@ -135,7 +150,17 @@ for (const { name, launcher } of [{ name: "Chromium", launcher: chromium }, { na
         if (item.kind === "article") {
           assert(await page.locator(".faq-item").count() > 0, `${label}: FAQ is missing`);
           assert(await page.locator("#self-check").isVisible(), `${label}: self-check is not visible`);
-          assert(await page.locator("#message-guide").isVisible(), `${label}: message guide is not visible`);
+
+          if (usesThematicIntake(item)) {
+            assert(await page.locator("#message-guide").count() === 0, `${label}: generic message guide returned`);
+            assert(await page.getByText("Что передать на проверку", { exact: true }).isVisible(), `${label}: thematic intake title is not visible`);
+            assert(await page.getByText("В работу входит", { exact: true }).isVisible(), `${label}: paid-work heading is not visible`);
+            assert(await page.getByRole("button", { name: "Передать претензию на проверку", exact: true }).isVisible(), `${label}: thematic intake button is not visible`);
+            assert(await page.getByText("Проверить свою ситуацию", { exact: true }).count() === 0, `${label}: generic intake CTA returned`);
+            assert(await page.getByText("Что написать юристу", { exact: true }).count() === 0, `${label}: duplicate message guide returned`);
+          } else {
+            assert(await page.locator("#message-guide").isVisible(), `${label}: message guide is not visible`);
+          }
         }
       } finally {
         await page.close();

@@ -1,29 +1,52 @@
 @layer components {
-  .editorial-list {
+  .article-page,
+  .case-page {
+    --editorial-marker-indent: 26px;
+    --editorial-marker-width: 18px;
+    --editorial-marker-item-gap: 10px;
+    --editorial-marker-block-gap: 18px;
+  }
+
+  .article-section :is(.editorial-checklist, .editorial-list) {
     display: grid;
-    gap: 12px;
-    margin: 0;
+    gap: var(--editorial-marker-item-gap);
+    margin: var(--editorial-marker-block-gap) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .editorial-list li {
+  .article-section :is(.editorial-checklist, .editorial-list)
+    + :is(.editorial-checklist, .editorial-list) {
+    margin-top: var(--editorial-marker-item-gap);
+  }
+
+  .article-section :is(.editorial-checklist, .editorial-list) li {
     position: relative;
-    padding-left: 28px;
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 0 var(--editorial-marker-indent);
     color: var(--ink-soft);
     font-size: 1rem;
     line-height: 1.75;
   }
 
-  .editorial-list li::before {
+  .article-section :is(.editorial-checklist, .editorial-list) li::before {
     position: absolute;
     top: 0;
     left: 0;
-    width: 20px;
+    width: var(--editorial-marker-width);
+    height: auto;
+    border: 0;
     font-family: var(--sans);
     font-weight: 800;
     line-height: 1.75;
     text-align: center;
+  }
+
+  .article-section .editorial-checklist li::before {
+    color: var(--gold-text);
+    content: "✓";
+    font-size: 1.05rem;
   }
 
   .editorial-list--cross li::before {
@@ -85,8 +108,12 @@
 
 @media (max-width: 390px) {
   @layer components {
-    .editorial-list li {
-      padding-left: 25px;
+    .article-page,
+    .case-page {
+      --editorial-marker-indent: 24px;
+      --editorial-marker-width: 16px;
+      --editorial-marker-item-gap: 8px;
+      --editorial-marker-block-gap: 16px;
     }
 
     .editorial-micro-cta {

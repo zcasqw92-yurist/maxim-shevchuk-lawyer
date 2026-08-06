@@ -14,12 +14,12 @@ permissions:
   pages: write
   id-token: write
 
-# Production-публикации выполняются последовательно. Новый push не должен
-# отменять уже созданный или ожидающий Pages deployment.
+# Для production важен только последний коммит main. Новый запуск отменяет
+# устаревшую сборку или deployment; deployment-клиент при SIGTERM отдельно
+# отменяет уже созданную публикацию Pages, чтобы backend не оставался занят.
 concurrency:
-  group: pages
-  cancel-in-progress: false
-  queue: max
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   SITE_PRODUCTION: 'true'
@@ -119,6 +119,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
+      status: ${{ steps.deployment.outputs.status }}
     steps:
       - name: Checkout deployment client
         uses: actions/checkout@v6
@@ -141,6 +142,7 @@ jobs:
   verify:
     name: Verify published site
     needs: deploy
+    if: needs.deploy.outputs.status == 'succeed'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

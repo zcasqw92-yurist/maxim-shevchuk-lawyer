@@ -36,8 +36,16 @@
     line-height: 1.75;
   }
 
-  /* Новая система применяется только к статье C-139. */
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"],
+  /* Компактная единая сетка применяется только к статье C-139. */
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+    --editorial-c139-space: 16px;
+    --editorial-c139-section-space: 24px;
+    --editorial-marker-indent: 26px;
+    --editorial-marker-width: 18px;
+    --editorial-marker-item-gap: var(--editorial-c139-space);
+    --editorial-marker-block-gap: var(--editorial-c139-space);
+  }
+
   .case-page {
     --editorial-marker-indent: 26px;
     --editorial-marker-width: 18px;
@@ -119,8 +127,8 @@
 
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
     .editorial-micro-cta {
-    margin-top: 24px;
-    padding: 20px 22px;
+    margin-top: var(--editorial-c139-space);
+    padding: var(--editorial-c139-space);
     border-left: 3px solid var(--gold);
     background: var(--surface-highlight);
   }
@@ -165,17 +173,16 @@
 
 @media (max-width: 390px) {
   @layer components {
-    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"],
+    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+      --editorial-marker-indent: 24px;
+      --editorial-marker-width: 16px;
+    }
+
     .case-page {
       --editorial-marker-indent: 24px;
       --editorial-marker-width: 16px;
       --editorial-marker-item-gap: 8px;
       --editorial-marker-block-gap: 16px;
-    }
-
-    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-      .editorial-micro-cta {
-      padding: 18px;
     }
   }
 }

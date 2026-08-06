@@ -56,7 +56,7 @@ if (pagesCheckIndex < 0 || pagesUploadIndex < 0 || pagesDeployIndex < 0 || !(pag
 }
 
 requirePattern("pages", workflows.pages, /permissions:[\s\S]*actions:\s*read[\s\S]*contents:\s*read[\s\S]*pages:\s*write[\s\S]*id-token:\s*write/, "deployment client должен читать artifact и получать OIDC-токен с минимальными правами");
-requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*\$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}[\s\S]*cancel-in-progress:\s*true/, "production-публикация должна использовать latest-wins и отменять устаревший запуск");
+requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*true/, "production-публикация должна сохранять общую группу pages и отменять всю старую очередь");
 requirePattern("pages", workflows.pages, /build:[\s\S]*deploy:[\s\S]*needs:\s*build[\s\S]*verify:[\s\S]*needs:\s*deploy/, "сборка, deploy и live-проверка должны быть разделены на последовательные jobs");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/checkout@v6/, "Pages workflow должен использовать Node 24-совместимый checkout@v6");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/setup-node@v6/, "Pages workflow должен использовать Node 24-совместимый setup-node@v6");
@@ -69,6 +69,9 @@ requirePattern("pages", workflows.pages, /verify:[\s\S]*needs:\s*deploy[\s\S]*if
 requirePattern("pages", workflows.pages, /SITE_PUBLIC_URL:\s*\$\{\{ needs\.deploy\.outputs\.page_url \}\}/, "live-проверка должна получать URL из отдельного deploy job");
 if (/queue:\s*max/.test(workflows.pages)) {
   errors.push("pages: FIFO-очередь устаревших коммитов не должна задерживать публикацию последнего main");
+}
+if (/group:\s*\$\{\{ github\.workflow/.test(workflows.pages)) {
+  errors.push("pages: новая concurrency-группа не должна оставлять старую группу pages без отмены");
 }
 if (/actions\/deploy-pages@/.test(workflows.pages)) {
   errors.push("pages: официальный deploy-pages ограничивает ожидание десятью минутами и не должен использоваться для этой очереди");
@@ -150,4 +153,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Workflow contract passed: latest main supersedes stale runs, Pages may wait 35 minutes, and setup-only infrastructure failures retry safely");
+console.log("Workflow contract passed: newest main cancels the legacy pages queue, deployment may wait 35 minutes, and setup-only failures retry safely");

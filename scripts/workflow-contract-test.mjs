@@ -7,6 +7,7 @@ const workflows = {
   ci: await readFile(join(root, ".github", "workflows", "ci.yml"), "utf8"),
   pages: await readFile(join(root, ".github", "workflows", "pages.yml"), "utf8"),
 };
+const retryWorkflow = await readFile(join(root, ".github", "workflows", "pages-infrastructure-retry.yml"), "utf8");
 
 const errors = [];
 const requirePattern = (label, content, pattern, message) => {
@@ -53,9 +54,22 @@ requirePattern("pages", workflows.pages, /uses:\s*actions\/deploy-pages@v4[\s\S]
 requirePattern("pages", workflows.pages, /reporting_interval:\s*['"]10000['"]/, "опрос статуса Pages должен выполняться с устойчивым интервалом");
 requirePattern("pages", workflows.pages, /outputs:[\s\S]*page_url:[\s\S]*needs\.deploy\.outputs\.page_url/, "live-проверка должна получать URL из отдельного deploy job");
 
+requirePattern("pages-retry", retryWorkflow, /workflow_run:[\s\S]*workflows:\s*\["Deploy GitHub Pages"\][\s\S]*types:\s*\[completed\]/, "автоповтор должен запускаться только после завершения Pages workflow");
+requirePattern("pages-retry", retryWorkflow, /permissions:[\s\S]*actions:\s*write[\s\S]*contents:\s*read/, "для точечного rerun нужны actions:write и только чтение содержимого");
+requirePattern("pages-retry", retryWorkflow, /conclusion == 'failure'[\s\S]*head_branch == 'main'/, "повтор разрешён только для неудачной публикации main");
+requirePattern("pages-retry", retryWorkflow, /attempt >= 3/, "автоповтор должен останавливаться после трёх попыток");
+requirePattern("pages-retry", retryWorkflow, /\.steps \| length\) == 1[\s\S]*Set up job[\s\S]*setup_only_count/, "повтор допустим только при падении на подготовке runner до запуска кода");
+requirePattern("pages-retry", retryWorkflow, /rerun-failed-jobs/, "автоповтор должен использовать штатный endpoint failed jobs");
+if (/^\s*uses:/m.test(retryWorkflow)) {
+  errors.push("pages-retry: аварийный workflow не должен зависеть от скачивания внешних Actions");
+}
+if (/conclusion == 'cancelled'/.test(retryWorkflow)) {
+  errors.push("pages-retry: отменённые проверки нельзя перезапускать как инфраструктурный сбой");
+}
+
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("Workflow contract passed: PR and deploy use the same pinned production check with isolated and queue-tolerant Pages deployment");
+console.log("Workflow contract passed: PR and deploy use the same production gate, Pages deployment is queue-tolerant, and setup-only infrastructure failures retry safely");

@@ -54,16 +54,38 @@ for (const marker of [
 for (const item of articles) {
   const route = `/razbory/${item.slug}/`;
   const html = await readFile(pageFile(route), "utf8");
-  for (const marker of [
-    'id="self-check"',
-    'id="message-guide"',
-    "Перед сообщением юристу",
-    "Проверить свою ситуацию",
-    "Что написать юристу",
-    'class="editorial-cta"',
-  ]) {
-    if (!html.includes(marker)) errors.push(`${route}: согласованный повторяющийся CTA повреждён, отсутствует ${marker}`);
+
+  if (item.hideMessageGuide) {
+    for (const marker of [
+      'id="self-check"',
+      item.intakeEyebrow || "Перед подготовкой ответа",
+      item.intakeTitle || "Что передать на проверку",
+      item.intakeQuestionsTitle || "В работу входит",
+      item.intakeButtonLabel || "Передать претензию на проверку",
+      'class="editorial-cta"',
+    ]) {
+      if (!html.includes(marker)) errors.push(`${route}: тематический intake повреждён, отсутствует ${marker}`);
+    }
+    for (const forbidden of [
+      'id="message-guide"',
+      "Проверить свою ситуацию",
+      "Что написать юристу",
+    ]) {
+      if (html.includes(forbidden)) errors.push(`${route}: вернулся удалённый общий повторяющийся блок ${forbidden}`);
+    }
+  } else {
+    for (const marker of [
+      'id="self-check"',
+      'id="message-guide"',
+      "Перед сообщением юристу",
+      "Проверить свою ситуацию",
+      "Что написать юристу",
+      'class="editorial-cta"',
+    ]) {
+      if (!html.includes(marker)) errors.push(`${route}: согласованный повторяющийся CTA повреждён, отсутствует ${marker}`);
+    }
   }
+
   if (html.includes("Обратная связь без персональных данных")) errors.push(`${route}: осталась техническая подпись блока оценки`);
 }
 

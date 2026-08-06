@@ -80,7 +80,7 @@ if (article.relatedArticleMode !== "explicit" || article.relatedArticleLimit !==
 }
 if (!article.hideMessageGuide) fail("duplicate generic message guide must stay disabled");
 if (!article.intakeTitle?.includes("передать на проверку")) fail("intake is not tied to document review");
-if (article.intakeQuestionsTitle !== "В работу входит") fail("public registry must retain the approved client-facing intake heading");
+if (article.intakeQuestionsTitle !== "Что входит в проверку") fail("intake heading must describe the document review in plain language");
 if (!article.intakeButtonLabel?.includes("Передать претензию")) fail("intake CTA is generic");
 
 const copy = JSON.stringify(article).toLowerCase();

@@ -44,9 +44,18 @@ if (pagesCheckIndex < 0 || pagesUploadIndex < 0 || pagesDeployIndex < 0 || !(pag
   errors.push("pages: проверка должна завершаться до упаковки и публикации артефакта");
 }
 
+requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*false/, "начатый production-deploy нельзя отменять новым push");
+requirePattern("pages", workflows.pages, /build:[\s\S]*deploy:[\s\S]*needs:\s*build[\s\S]*verify:[\s\S]*needs:\s*deploy/, "сборка, deploy и live-проверка должны быть разделены на последовательные jobs");
+requirePattern("pages", workflows.pages, /uses:\s*actions\/checkout@v6/, "Pages workflow должен использовать Node 24-совместимый checkout@v6");
+requirePattern("pages", workflows.pages, /uses:\s*actions\/setup-node@v6/, "Pages workflow должен использовать Node 24-совместимый setup-node@v6");
+requirePattern("pages", workflows.pages, /uses:\s*actions\/upload-pages-artifact@v4/, "Pages artifact должен загружаться актуальным upload-pages-artifact@v4");
+requirePattern("pages", workflows.pages, /uses:\s*actions\/deploy-pages@v4[\s\S]*timeout:\s*['"]1800000['"]/, "deploy-pages должен ждать очередь Pages до 30 минут");
+requirePattern("pages", workflows.pages, /reporting_interval:\s*['"]10000['"]/, "опрос статуса Pages должен выполняться с устойчивым интервалом");
+requirePattern("pages", workflows.pages, /outputs:[\s\S]*page_url:[\s\S]*needs\.deploy\.outputs\.page_url/, "live-проверка должна получать URL из отдельного deploy job");
+
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("Workflow contract passed: PR and deploy use the same pinned production check with full diagnostics");
+console.log("Workflow contract passed: PR and deploy use the same pinned production check with isolated and queue-tolerant Pages deployment");

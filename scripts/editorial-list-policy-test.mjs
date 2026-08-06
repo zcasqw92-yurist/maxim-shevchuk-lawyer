@@ -6,24 +6,31 @@ import { articles } from "../src/editorial-data.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const renderer = await readFile(join(root, "src", "editorial-render-base.mjs"), "utf8");
 const styles = await readFile(join(root, "src", "editorial-semantic-lists.css"), "utf8");
-const rhythm = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 const errors = [];
 const semanticFields = ["checklist", "avoid", "bullets", "dashes"];
-const requiredPolicyArticleIds = new Set(["contractor-repair-quality-claim-response"]);
+const targetId = "contractor-repair-quality-claim-response";
+const targetSelector = `data-article-id="${targetId}"`;
 const negativeChecklistPattern = /^(?:не\b|нельзя\b|проигнорир|отказат|признат|пообещат|спорит|ошибк)/iu;
 
-for (const article of articles) {
-  const usesSemanticPolicy = requiredPolicyArticleIds.has(article.id)
-    || article.listPolicyVersion !== undefined
-    || (article.sections || []).some((section) => section.avoid !== undefined
-      || section.bullets !== undefined
-      || section.dashes !== undefined
-      || section.microCta !== undefined);
-  if (!usesSemanticPolicy) continue;
+const usesNewPolicy = (article) => article.listPolicyVersion !== undefined
+  || (article.sections || []).some((section) => section.avoid !== undefined
+    || section.bullets !== undefined
+    || section.dashes !== undefined
+    || section.microCta !== undefined);
 
+const optedIn = articles.filter(usesNewPolicy);
+for (const article of optedIn) {
+  if (article.id !== targetId) {
+    errors.push(`${article.slug}: новая система маркеров включена без отдельного решения; сейчас она разрешена только для C-139`);
+  }
+}
+
+const article = articles.find((item) => item.id === targetId);
+if (!article) {
+  errors.push(`обязательная статья ${targetId} отсутствует в реестре`);
+} else {
   if (article.listPolicyVersion !== 1) {
-    errors.push(`${article.slug}: статья использует новые смысловые списки, но listPolicyVersion=1 не включена`);
-    continue;
+    errors.push(`${article.slug}: обязательное правило смысловых маркеров отключено`);
   }
 
   for (const section of article.sections || []) {
@@ -48,49 +55,44 @@ for (const article of articles) {
   }
 }
 
-for (const requiredId of requiredPolicyArticleIds) {
-  const article = articles.find((item) => item.id === requiredId);
-  if (!article) errors.push(`обязательная статья ${requiredId} отсутствует в реестре`);
-  else if (article.listPolicyVersion !== 1) errors.push(`${article.slug}: обязательное правило смысловых маркеров отключено`);
-}
-
 for (const marker of [
   'semanticList(section.avoid, "cross")',
   'semanticList(section.bullets, "dot")',
   'semanticList(section.dashes, "dash")',
   'class="editorial-micro-cta"',
-  'editorial-list editorial-list--dash',
-  'editorial-list editorial-list--dot',
 ]) {
   if (!renderer.includes(marker)) errors.push(`renderer: отсутствует обязательный контракт ${marker}`);
 }
 
 for (const marker of [
+  targetSelector,
   '--editorial-marker-indent: 26px',
   '--editorial-marker-width: 18px',
   '--editorial-marker-item-gap: 10px',
   '--editorial-marker-block-gap: 18px',
-  ':is(.editorial-checklist, .editorial-list)',
   'gap: var(--editorial-marker-item-gap)',
   'margin: var(--editorial-marker-block-gap) 0 0',
   'padding: 0 0 0 var(--editorial-marker-indent)',
   'width: var(--editorial-marker-width)',
-  '.article-section .editorial-checklist li::before',
-  '.editorial-list--cross li::before',
+  'content: "✓"',
   'content: "×"',
-  'color: var(--gold-text)',
-  '.editorial-list--dot li::before',
   'content: "•"',
-  '.editorial-list--dash li::before',
   'content: "—"',
-  'color: var(--ink-soft)',
-  '.editorial-micro-cta',
+  '.editorial-article:not([data-article-id="contractor-repair-quality-claim-response"])',
+  'gap: 12px',
+  'padding: 0 0 0 28px',
 ]) {
   if (!styles.includes(marker)) errors.push(`editorial-semantic-lists.css: отсутствует обязательный контракт ${marker}`);
 }
 
-if (rhythm.includes(".article-page .editorial-checklist") || rhythm.includes(".case-page .editorial-checklist")) {
-  errors.push("editorial-rhythm.css: для галочек остался отдельный отступ, который нарушает единый ритм маркеров");
+if (/^\s*\.article-page,\s*\n\s*\.case-page\s*\{/m.test(styles)) {
+  errors.push("editorial-semantic-lists.css: новые переменные снова применены ко всем статьям и кейсам");
+}
+if (/^\s*\.article-section\s+:is\(/m.test(styles)) {
+  errors.push("editorial-semantic-lists.css: найден глобальный селектор новых отступов без привязки к C-139");
+}
+if (/^\s*\.editorial-list--(?:cross|dot|dash)\s+li::before/m.test(styles)) {
+  errors.push("editorial-semantic-lists.css: смысловой маркер действует глобально, а не только внутри C-139");
 }
 
 if (errors.length) {
@@ -98,4 +100,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial list policy passed: marker meaning, colors, indentation and compact spacing are unified");
+console.log("Editorial list policy passed: C-139 uses semantic markers and unified spacing; earlier articles keep their previous list presentation");

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   deploymentIdOf,
   deploymentState,
+  revisionState,
   selectPagesArtifact,
 } from "./deploy-pages-with-extended-wait.mjs";
 
@@ -55,7 +56,7 @@ if (pagesCheckIndex < 0 || pagesUploadIndex < 0 || pagesDeployIndex < 0 || !(pag
 }
 
 requirePattern("pages", workflows.pages, /permissions:[\s\S]*actions:\s*read[\s\S]*contents:\s*read[\s\S]*pages:\s*write[\s\S]*id-token:\s*write/, "deployment client должен читать artifact и получать OIDC-токен с минимальными правами");
-requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*false[\s\S]*queue:\s*max/, "начатые и ожидающие production-deploy должны сохраняться в последовательной очереди");
+requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*\$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}[\s\S]*cancel-in-progress:\s*true/, "production-публикация должна использовать latest-wins и отменять устаревший запуск");
 requirePattern("pages", workflows.pages, /build:[\s\S]*deploy:[\s\S]*needs:\s*build[\s\S]*verify:[\s\S]*needs:\s*deploy/, "сборка, deploy и live-проверка должны быть разделены на последовательные jobs");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/checkout@v6/, "Pages workflow должен использовать Node 24-совместимый checkout@v6");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/setup-node@v6/, "Pages workflow должен использовать Node 24-совместимый setup-node@v6");
@@ -63,7 +64,12 @@ requirePattern("pages", workflows.pages, /uses:\s*actions\/upload-pages-artifact
 requirePattern("pages", workflows.pages, /node --check scripts\/deploy-pages-with-extended-wait\.mjs/, "расширенный deployment client должен проходить синтаксическую проверку до публикации");
 requirePattern("pages", workflows.pages, /PAGES_DEPLOYMENT_TIMEOUT_MS:\s*['"]2100000['"]/, "Pages deployment должен ждать backend до 35 минут");
 requirePattern("pages", workflows.pages, /PAGES_STATUS_INTERVAL_MS:\s*['"]10000['"]/, "статус Pages должен опрашиваться с устойчивым интервалом");
-requirePattern("pages", workflows.pages, /outputs:[\s\S]*page_url:[\s\S]*needs\.deploy\.outputs\.page_url/, "live-проверка должна получать URL из отдельного deploy job");
+requirePattern("pages", workflows.pages, /outputs:[\s\S]*page_url:[\s\S]*status:\s*\$\{\{ steps\.deployment\.outputs\.status \}\}/, "deploy job должен передавать URL и итоговый статус");
+requirePattern("pages", workflows.pages, /verify:[\s\S]*needs:\s*deploy[\s\S]*if:\s*needs\.deploy\.outputs\.status == 'succeed'/, "live-проверка должна запускаться только после подтверждённой публикации");
+requirePattern("pages", workflows.pages, /SITE_PUBLIC_URL:\s*\$\{\{ needs\.deploy\.outputs\.page_url \}\}/, "live-проверка должна получать URL из отдельного deploy job");
+if (/queue:\s*max/.test(workflows.pages)) {
+  errors.push("pages: FIFO-очередь устаревших коммитов не должна задерживать публикацию последнего main");
+}
 if (/actions\/deploy-pages@/.test(workflows.pages)) {
   errors.push("pages: официальный deploy-pages ограничивает ожидание десятью минутами и не должен использоваться для этой очереди");
 }
@@ -71,10 +77,14 @@ if (/actions\/deploy-pages@/.test(workflows.pages)) {
 for (const marker of [
   "/actions/runs/${encodeURIComponent(runId)}/artifacts?name=github-pages&per_page=100",
   "ACTIONS_ID_TOKEN_REQUEST_URL",
+  '"/git/ref/heads/main"',
   '"/pages/deployments"',
   "/pages/deployments/${encodeURIComponent(deploymentId)}",
   "/pages/deployments/${encodeURIComponent(deploymentId)}/cancel",
   'environment: "github-pages"',
+  "Skipping stale Pages build",
+  'status: "skipped"',
+  "Lookup Pages deployment after ambiguous create",
   "2_100_000",
   "PAGES_STATUS_ERROR_LIMIT",
   "writeOutputs",
@@ -86,6 +96,19 @@ if (deploymentClient.includes("MAX_TIMEOUT = 600000")) {
 }
 
 const sampleSha = "a".repeat(40);
+const newerSha = "b".repeat(40);
+try {
+  const currentRevision = revisionState(sampleSha, sampleSha);
+  assert(currentRevision.current === true, "актуальный main ошибочно признан устаревшим");
+  const staleRevision = revisionState(sampleSha, newerSha);
+  assert(staleRevision.current === false, "устаревший build не распознан");
+} catch (error) {
+  errors.push(`pages-client: проверка актуальности SHA завершилась ошибкой: ${error.message}`);
+}
+try {
+  revisionState("short", sampleSha);
+  errors.push("pages-client: некорректный SHA сборки не был отклонён");
+} catch {}
 try {
   const artifact = selectPagesArtifact({ artifacts: [{
     id: 42,
@@ -127,4 +150,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Workflow contract passed: all Pages runs remain queued, deployment may wait 35 minutes, and setup-only infrastructure failures retry safely");
+console.log("Workflow contract passed: latest main supersedes stale runs, Pages may wait 35 minutes, and setup-only infrastructure failures retry safely");

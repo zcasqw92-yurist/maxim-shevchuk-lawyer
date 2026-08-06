@@ -2,6 +2,7 @@ import { appendFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 const SUCCESS_STATUS = "succeed";
+const SHA_PATTERN = /^[a-f0-9]{40}$/iu;
 const TEMPORARY_STATUSES = new Set([
   "queued",
   "pending",
@@ -58,6 +59,18 @@ const errorMessage = (payload, fallback) => String(
 const isRetryableNetworkError = (error) => error?.name === "AbortError"
   || error?.name === "TimeoutError"
   || error instanceof TypeError;
+
+export const revisionState = (buildSha, currentSha) => {
+  const build = String(buildSha || "").trim();
+  const current = String(currentSha || "").trim();
+  if (!SHA_PATTERN.test(build)) throw new Error(`Invalid build SHA: ${build || "empty"}`);
+  if (!SHA_PATTERN.test(current)) throw new Error(`Invalid main SHA: ${current || "empty"}`);
+  return {
+    buildSha: build,
+    currentSha: current,
+    current: build === current,
+  };
+};
 
 export const selectPagesArtifact = (payload, expectedSha) => {
   const artifacts = Array.isArray(payload?.artifacts) ? payload.artifacts : [];
@@ -169,15 +182,98 @@ const writeOutputs = async ({ pageUrl, status }) => {
   await appendFile(outputPath, `page_url=${normalizePageUrl(pageUrl)}\nstatus=${status}\n`, "utf8");
 };
 
+const currentMainSha = async ({ apiUrl, repository, token }) => {
+  const ref = await githubRequest(apiUrl, repository, "/git/ref/heads/main", {
+    token,
+    attempts: 6,
+    label: "Current main revision",
+  });
+  return String(ref?.object?.sha || "").trim();
+};
+
+const lookupDeployment = async ({ apiUrl, repository, token, deploymentId }) => {
+  try {
+    return await githubRequest(
+      apiUrl,
+      repository,
+      `/pages/deployments/${encodeURIComponent(deploymentId)}`,
+      {
+        token,
+        attempts: 1,
+        retryableStatuses: new Set(),
+        label: "Lookup Pages deployment after ambiguous create",
+      },
+    );
+  } catch (error) {
+    if (error instanceof HttpRequestError && error.status === 404) return null;
+    throw error;
+  }
+};
+
+const createPagesDeployment = async ({
+  apiUrl,
+  repository,
+  token,
+  artifactId,
+  buildSha,
+  oidcToken,
+}) => {
+  let lastError;
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      return await githubRequest(apiUrl, repository, "/pages/deployments", {
+        method: "POST",
+        token,
+        body: {
+          artifact_id: Number(artifactId),
+          environment: "github-pages",
+          pages_build_version: buildSha,
+          oidc_token: oidcToken,
+        },
+        attempts: 1,
+        label: "Create Pages deployment",
+      });
+    } catch (error) {
+      lastError = error;
+      const retryable = isRetryableNetworkError(error)
+        || (error instanceof HttpRequestError && error.retryable);
+      if (!retryable) throw error;
+
+      const existing = await lookupDeployment({
+        apiUrl,
+        repository,
+        token,
+        deploymentId: buildSha,
+      }).catch((lookupError) => {
+        console.warn(`Deployment lookup failed after ambiguous create: ${lookupError.message}`);
+        return null;
+      });
+      if (existing) {
+        console.log(`Recovered existing Pages deployment for ${buildSha}`);
+        return existing;
+      }
+      if (attempt === 6) break;
+
+      const delay = Math.min(60_000, 3_000 * attempt);
+      console.warn(`Create Pages deployment failed temporarily, retry ${attempt}/6 after ${delay} ms`);
+      await sleep(delay);
+    }
+  }
+  throw lastError || new Error("Create Pages deployment failed");
+};
+
 export const deployPages = async () => {
   const apiUrl = String(process.env.GITHUB_API_URL || "https://api.github.com").replace(/\/$/, "");
   const repository = requiredEnv("GITHUB_REPOSITORY");
   const runId = requiredEnv("GITHUB_RUN_ID");
   const buildSha = requiredEnv("GITHUB_SHA");
   const githubToken = requiredEnv("GITHUB_TOKEN");
+  const siteUrl = normalizePageUrl(process.env.SITE_URL);
   const timeoutMs = positiveInteger(process.env.PAGES_DEPLOYMENT_TIMEOUT_MS, 2_100_000, 60_000);
   const intervalMs = positiveInteger(process.env.PAGES_STATUS_INTERVAL_MS, 10_000, 1_000);
   const maxStatusErrors = positiveInteger(process.env.PAGES_STATUS_ERROR_LIMIT, 18, 1);
+
+  revisionState(buildSha, buildSha);
 
   const artifactPayload = await githubRequest(
     apiUrl,
@@ -189,21 +285,32 @@ export const deployPages = async () => {
   console.log(`Found github-pages artifact ${artifact.id}, ${artifact.size_in_bytes || 0} bytes`);
 
   const oidcToken = await requestOidcToken();
-  const deployment = await githubRequest(apiUrl, repository, "/pages/deployments", {
-    method: "POST",
+  const mainState = revisionState(buildSha, await currentMainSha({
+    apiUrl,
+    repository,
     token: githubToken,
-    body: {
-      artifact_id: Number(artifact.id),
-      environment: "github-pages",
-      pages_build_version: buildSha,
-      oidc_token: oidcToken,
-    },
-    attempts: 3,
-    label: "Create Pages deployment",
+  }));
+  if (!mainState.current) {
+    await writeOutputs({ pageUrl: siteUrl, status: "skipped" });
+    console.log(`Skipping stale Pages build ${mainState.buildSha}; main is ${mainState.currentSha}`);
+    return {
+      deploymentId: "",
+      pageUrl: siteUrl,
+      status: "skipped",
+    };
+  }
+
+  const deployment = await createPagesDeployment({
+    apiUrl,
+    repository,
+    token: githubToken,
+    artifactId: artifact.id,
+    buildSha,
+    oidcToken,
   });
 
   const deploymentId = deploymentIdOf(deployment, buildSha);
-  const pageUrl = normalizePageUrl(deployment?.page_url || process.env.SITE_URL);
+  const pageUrl = normalizePageUrl(deployment?.page_url || siteUrl);
   console.log(`Created Pages deployment ${deploymentId}; waiting up to ${Math.round(timeoutMs / 60_000)} minutes`);
 
   let finished = false;
@@ -266,7 +373,7 @@ export const deployPages = async () => {
       const state = deploymentState(statusPayload?.status);
       if (state.kind === "success") {
         finished = true;
-        const finalPageUrl = normalizePageUrl(statusPayload?.page_url || pageUrl || process.env.SITE_URL);
+        const finalPageUrl = normalizePageUrl(statusPayload?.page_url || pageUrl || siteUrl);
         await writeOutputs({ pageUrl: finalPageUrl, status: state.status });
         console.log(`Pages deployment ${deploymentId} succeeded at ${finalPageUrl}`);
         return { deploymentId, pageUrl: finalPageUrl, status: state.status };

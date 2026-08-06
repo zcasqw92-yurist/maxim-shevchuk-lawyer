@@ -11,34 +11,38 @@ import { servicePageContent } from "../src/service-content.mjs";
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const usesSparticuzChromium = process.platform === "linux";
 const browserDir = join(root, ".browser-bin");
 const browserPath = join(browserDir, "chromium");
 const browserPackage = join(root, "node_modules", "@sparticuz", "chromium", "bin");
-await mkdir(browserDir, { recursive: true });
 
-if (!(await access(browserPath).then(() => true).catch(() => false))) {
-  await pipeline(createReadStream(join(browserPackage, "chromium.br")), createBrotliDecompress(), createWriteStream(browserPath));
-  await chmod(browserPath, 0o755);
+if (usesSparticuzChromium) {
+  await mkdir(browserDir, { recursive: true });
+
+  if (!(await access(browserPath).then(() => true).catch(() => false))) {
+    await pipeline(createReadStream(join(browserPackage, "chromium.br")), createBrotliDecompress(), createWriteStream(browserPath));
+    await chmod(browserPath, 0o755);
+  }
+
+  const extractTarBrotli = async (archive) => {
+    const tar = spawn("tar", ["--no-same-owner", "-xf", "-", "-C", browserDir], { stdio: ["pipe", "ignore", "pipe"] });
+    let stderr = "";
+    tar.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    await Promise.all([
+      pipeline(createReadStream(join(browserPackage, archive)), createBrotliDecompress(), tar.stdin),
+      new Promise((resolve, reject) => tar.on("exit", (code) => code === 0 ? resolve() : reject(new Error(stderr || `tar exited: ${code}`)))),
+    ]);
+  };
+
+  if (!(await access(join(browserDir, "libGLESv2.so")).then(() => true).catch(() => false))) await extractTarBrotli("swiftshader.tar.br");
+  if (!(await access(join(browserDir, "fonts.conf")).then(() => true).catch(() => false))) await extractTarBrotli("fonts.tar.br");
+  await mkdir(join(browserDir, "cache"), { recursive: true });
+  await mkdir(join(browserDir, "home"), { recursive: true });
+  process.env.HOME = join(browserDir, "home");
+  process.env.XDG_CACHE_HOME = join(browserDir, "cache");
+  process.env.FONTCONFIG_FILE = "/etc/fonts/fonts.conf";
+  process.env.LD_LIBRARY_PATH = [browserDir, process.env.LD_LIBRARY_PATH].filter(Boolean).join(":");
 }
-
-const extractTarBrotli = async (archive) => {
-  const tar = spawn("tar", ["--no-same-owner", "-xf", "-", "-C", browserDir], { stdio: ["pipe", "ignore", "pipe"] });
-  let stderr = "";
-  tar.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
-  await Promise.all([
-    pipeline(createReadStream(join(browserPackage, archive)), createBrotliDecompress(), tar.stdin),
-    new Promise((resolve, reject) => tar.on("exit", (code) => code === 0 ? resolve() : reject(new Error(stderr || `tar exited: ${code}`)))),
-  ]);
-};
-
-if (!(await access(join(browserDir, "libGLESv2.so")).then(() => true).catch(() => false))) await extractTarBrotli("swiftshader.tar.br");
-if (!(await access(join(browserDir, "fonts.conf")).then(() => true).catch(() => false))) await extractTarBrotli("fonts.tar.br");
-await mkdir(join(browserDir, "cache"), { recursive: true });
-await mkdir(join(browserDir, "home"), { recursive: true });
-process.env.HOME = join(browserDir, "home");
-process.env.XDG_CACHE_HOME = join(browserDir, "cache");
-process.env.FONTCONFIG_FILE = "/etc/fonts/fonts.conf";
-process.env.LD_LIBRARY_PATH = [browserDir, process.env.LD_LIBRARY_PATH].filter(Boolean).join(":");
 
 const server = spawn(process.execPath, [join(root, "scripts", "server.mjs")], {
   cwd: root,
@@ -69,7 +73,7 @@ const inRange = (value, [min, max]) => value >= min && value <= max;
 
 try {
   browser = await chromium.launch({
-    executablePath: browserPath,
+    ...(usesSparticuzChromium ? { executablePath: browserPath } : {}),
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-background-networking", "--disable-extensions"],
   });

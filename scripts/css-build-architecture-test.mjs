@@ -7,6 +7,7 @@ const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"
 const buildScript = await readFile(join(root, "scripts", "build-site.mjs"), "utf8");
 const bundle = await readFile(join(root, "dist", "assets", "styles.css"), "utf8");
 const editorialBase = await readFile(join(root, "src", "editorial.css"), "utf8");
+const editorialContainment = await readFile(join(root, "src", "editorial-containment.css"), "utf8");
 const moduleIds = [
   "styles",
   "site-enhancements",
@@ -22,6 +23,7 @@ const moduleIds = [
   "editorial-publication",
   "editorial-cards",
   "cta-system",
+  "editorial-containment",
   "editorial-rhythm",
 ];
 const errors = [];
@@ -64,6 +66,17 @@ if (!bundle.startsWith("/* source:styles */")) {
 }
 if (!bundle.trimEnd().endsWith((await readFile(join(root, "src", "editorial-rhythm.css"), "utf8")).trim())) {
   errors.push("Слой вертикального ритма должен завершать CSS bundle");
+}
+
+for (const snippet of [
+  ".article-page :is(",
+  "overflow-wrap: anywhere",
+  "@media (max-width: 390px)",
+  "@media (prefers-reduced-motion: reduce)",
+]) {
+  if (!editorialContainment.includes(snippet)) {
+    errors.push(`editorial-containment.css: отсутствует обязательный контракт ${snippet}`);
+  }
 }
 
 const forbiddenLegacyRules = [

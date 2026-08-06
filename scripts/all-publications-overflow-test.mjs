@@ -104,11 +104,14 @@ try {
       try {
         for (const route of routes) {
           await page.setViewportSize({ width: route.width, height: 844 });
-          const response = await page.goto(`${origin}${route.path}`, { waitUntil: "domcontentloaded", timeout: 45_000 });
+          const url = new URL(route.path, origin);
+          url.searchParams.set("all_publications_check", `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+          const response = await page.goto(url.toString(), { waitUntil: "domcontentloaded", timeout: 45_000 });
           if (!response?.ok()) {
             errors.push(`${engineName} ${route.path}: navigation returned ${response?.status() || "no response"}`);
             continue;
           }
+          await page.waitForLoadState("networkidle", { timeout: 8_000 }).catch(() => {});
           await page.evaluate(async () => {
             await document.fonts?.ready;
             await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));

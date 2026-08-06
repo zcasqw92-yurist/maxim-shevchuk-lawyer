@@ -167,18 +167,6 @@
     color: var(--ink-deep);
   }
 
-  .editorial-checklist {
-    display: grid;
-    gap: 12px;
-    padding: 0;
-    list-style: none;
-  }
-
-  .editorial-checklist li {
-    position: relative;
-    padding-left: 28px;
-  }
-
   .editorial-options {
     display: grid;
     gap: 14px;

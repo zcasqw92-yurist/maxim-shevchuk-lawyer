@@ -1,16 +1,26 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  deploymentIdOf,
+  deploymentState,
+  selectPagesArtifact,
+} from "./deploy-pages-with-extended-wait.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const workflows = {
   ci: await readFile(join(root, ".github", "workflows", "ci.yml"), "utf8"),
   pages: await readFile(join(root, ".github", "workflows", "pages.yml"), "utf8"),
 };
+const retryWorkflow = await readFile(join(root, ".github", "workflows", "pages-infrastructure-retry.yml"), "utf8");
+const deploymentClient = await readFile(join(root, "scripts", "deploy-pages-with-extended-wait.mjs"), "utf8");
 
 const errors = [];
 const requirePattern = (label, content, pattern, message) => {
   if (!pattern.test(content)) errors.push(`${label}: ${message}`);
+};
+const assert = (condition, message) => {
+  if (!condition) errors.push(`pages-client: ${message}`);
 };
 
 for (const [label, content] of Object.entries(workflows)) {
@@ -39,23 +49,82 @@ if (forbiddenCiCommands.length) {
 
 const pagesCheckIndex = workflows.pages.indexOf("npm run check");
 const pagesUploadIndex = workflows.pages.indexOf("actions/upload-pages-artifact");
-const pagesDeployIndex = workflows.pages.indexOf("actions/deploy-pages");
+const pagesDeployIndex = workflows.pages.indexOf("node scripts/deploy-pages-with-extended-wait.mjs");
 if (pagesCheckIndex < 0 || pagesUploadIndex < 0 || pagesDeployIndex < 0 || !(pagesCheckIndex < pagesUploadIndex && pagesUploadIndex < pagesDeployIndex)) {
-  errors.push("pages: проверка должна завершаться до упаковки и публикации артефакта");
+  errors.push("pages: проверка должна завершаться до упаковки и запуска Pages deployment");
 }
 
-requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*false/, "начатый production-deploy нельзя отменять новым push");
+requirePattern("pages", workflows.pages, /permissions:[\s\S]*actions:\s*read[\s\S]*contents:\s*read[\s\S]*pages:\s*write[\s\S]*id-token:\s*write/, "deployment client должен читать artifact и получать OIDC-токен с минимальными правами");
+requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*false[\s\S]*queue:\s*max/, "начатые и ожидающие production-deploy должны сохраняться в последовательной очереди");
 requirePattern("pages", workflows.pages, /build:[\s\S]*deploy:[\s\S]*needs:\s*build[\s\S]*verify:[\s\S]*needs:\s*deploy/, "сборка, deploy и live-проверка должны быть разделены на последовательные jobs");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/checkout@v6/, "Pages workflow должен использовать Node 24-совместимый checkout@v6");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/setup-node@v6/, "Pages workflow должен использовать Node 24-совместимый setup-node@v6");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/upload-pages-artifact@v4/, "Pages artifact должен загружаться актуальным upload-pages-artifact@v4");
-requirePattern("pages", workflows.pages, /uses:\s*actions\/deploy-pages@v4[\s\S]*timeout:\s*['"]1800000['"]/, "deploy-pages должен ждать очередь Pages до 30 минут");
-requirePattern("pages", workflows.pages, /reporting_interval:\s*['"]10000['"]/, "опрос статуса Pages должен выполняться с устойчивым интервалом");
+requirePattern("pages", workflows.pages, /node --check scripts\/deploy-pages-with-extended-wait\.mjs/, "расширенный deployment client должен проходить синтаксическую проверку до публикации");
+requirePattern("pages", workflows.pages, /PAGES_DEPLOYMENT_TIMEOUT_MS:\s*['"]2100000['"]/, "Pages deployment должен ждать backend до 35 минут");
+requirePattern("pages", workflows.pages, /PAGES_STATUS_INTERVAL_MS:\s*['"]10000['"]/, "статус Pages должен опрашиваться с устойчивым интервалом");
 requirePattern("pages", workflows.pages, /outputs:[\s\S]*page_url:[\s\S]*needs\.deploy\.outputs\.page_url/, "live-проверка должна получать URL из отдельного deploy job");
+if (/actions\/deploy-pages@/.test(workflows.pages)) {
+  errors.push("pages: официальный deploy-pages ограничивает ожидание десятью минутами и не должен использоваться для этой очереди");
+}
+
+for (const marker of [
+  "/actions/runs/${encodeURIComponent(runId)}/artifacts?name=github-pages&per_page=100",
+  "ACTIONS_ID_TOKEN_REQUEST_URL",
+  '"/pages/deployments"',
+  "/pages/deployments/${encodeURIComponent(deploymentId)}",
+  "/pages/deployments/${encodeURIComponent(deploymentId)}/cancel",
+  'environment: "github-pages"',
+  "2_100_000",
+  "PAGES_STATUS_ERROR_LIMIT",
+  "writeOutputs",
+]) {
+  if (!deploymentClient.includes(marker)) errors.push(`pages-client: отсутствует обязательный контракт ${marker}`);
+}
+if (deploymentClient.includes("MAX_TIMEOUT = 600000")) {
+  errors.push("pages-client: вернулось жёсткое десятиминутное ограничение deploy-pages");
+}
+
+const sampleSha = "a".repeat(40);
+try {
+  const artifact = selectPagesArtifact({ artifacts: [{
+    id: 42,
+    name: "github-pages",
+    expired: false,
+    workflow_run: { head_sha: sampleSha },
+  }] }, sampleSha);
+  assert(artifact.id === 42, "выбран неверный artifact");
+} catch (error) {
+  errors.push(`pages-client: корректный artifact отклонён: ${error.message}`);
+}
+try {
+  selectPagesArtifact({ artifacts: [
+    { id: 1, name: "github-pages", expired: false },
+    { id: 2, name: "github-pages", expired: false },
+  ] }, sampleSha);
+  errors.push("pages-client: два активных artifact не были отклонены");
+} catch {}
+assert(deploymentIdOf({ status_url: "https://api.github.com/pages/deployments/abc" }, sampleSha) === "abc", "deployment id не извлекается из status_url");
+assert(deploymentState("succeed").kind === "success", "успешный статус не распознан");
+assert(deploymentState("deployment_failed").kind === "failure", "финальная ошибка не распознана");
+assert(deploymentState("deployment_in_progress").kind === "pending", "промежуточный статус не распознан");
+
+requirePattern("pages-retry", retryWorkflow, /workflow_run:[\s\S]*workflows:\s*\["Deploy GitHub Pages"\][\s\S]*types:\s*\[completed\]/, "автоповтор должен запускаться только после завершения Pages workflow");
+requirePattern("pages-retry", retryWorkflow, /permissions:[\s\S]*actions:\s*write[\s\S]*contents:\s*read/, "для точечного rerun нужны actions:write и только чтение содержимого");
+requirePattern("pages-retry", retryWorkflow, /conclusion == 'failure'[\s\S]*head_branch == 'main'/, "повтор разрешён только для неудачной публикации main");
+requirePattern("pages-retry", retryWorkflow, /attempt >= 3/, "автоповтор должен останавливаться после трёх попыток");
+requirePattern("pages-retry", retryWorkflow, /\.steps \| length\) == 1[\s\S]*Set up job[\s\S]*setup_only_count/, "повтор допустим только при падении на подготовке runner до запуска кода");
+requirePattern("pages-retry", retryWorkflow, /rerun-failed-jobs/, "автоповтор должен использовать штатный endpoint failed jobs");
+if (/^\s*uses:/m.test(retryWorkflow)) {
+  errors.push("pages-retry: аварийный workflow не должен зависеть от скачивания внешних Actions");
+}
+if (/conclusion == 'cancelled'/.test(retryWorkflow)) {
+  errors.push("pages-retry: отменённые проверки нельзя перезапускать как инфраструктурный сбой");
+}
 
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("Workflow contract passed: PR and deploy use the same pinned production check with isolated and queue-tolerant Pages deployment");
+console.log("Workflow contract passed: all Pages runs remain queued, deployment may wait 35 minutes, and setup-only infrastructure failures retry safely");

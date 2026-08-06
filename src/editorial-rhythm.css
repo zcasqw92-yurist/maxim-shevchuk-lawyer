@@ -90,6 +90,62 @@
     margin-bottom: var(--editorial-flow-sm);
   }
 
+  /* C-139: единый компактный ритм внутри статьи. */
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-body > .article-section,
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-body > .editorial-answer + .article-section {
+    margin-top: var(--editorial-c139-section-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-related + .editorial-related,
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-body > .editorial-author {
+    margin-top: var(--editorial-c139-section-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .article-section h2 {
+    margin-bottom: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .article-section p + p {
+    margin-top: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    :is(.editorial-options, .editorial-note) {
+    margin-top: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-options {
+    gap: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    :is(.editorial-answer, .editorial-options article, .editorial-note, .editorial-intake, .editorial-intake__questions, .editorial-author) {
+    padding: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    :is(.editorial-intake__grid, .editorial-author) {
+    gap: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-intake__questions ul {
+    margin-top: var(--editorial-c139-space);
+    margin-bottom: var(--editorial-c139-space);
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-related > p > a[href^="/uslugi/"] {
+    padding: var(--editorial-c139-space);
+  }
+
   /* Index pages use a full-width closing band, but its content follows the same site grid. */
   .editorial-index-page .editorial-index-hero + .section {
     padding-bottom: clamp(54px, 5.5vw, 78px);

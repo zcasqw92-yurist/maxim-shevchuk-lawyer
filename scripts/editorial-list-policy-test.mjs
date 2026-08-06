@@ -6,6 +6,7 @@ import { articles } from "../src/editorial-data.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const renderer = await readFile(join(root, "src", "editorial-render-base.mjs"), "utf8");
 const styles = await readFile(join(root, "src", "editorial-semantic-lists.css"), "utf8");
+const rhythm = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 const errors = [];
 const semanticFields = ["checklist", "avoid", "bullets", "dashes"];
 const targetId = "contractor-repair-quality-claim-response";
@@ -66,10 +67,12 @@ for (const marker of [
 
 for (const marker of [
   targetSelector,
+  '--editorial-c139-space: 16px',
+  '--editorial-c139-section-space: 24px',
   '--editorial-marker-indent: 26px',
   '--editorial-marker-width: 18px',
-  '--editorial-marker-item-gap: 10px',
-  '--editorial-marker-block-gap: 18px',
+  '--editorial-marker-item-gap: var(--editorial-c139-space)',
+  '--editorial-marker-block-gap: var(--editorial-c139-space)',
   'gap: var(--editorial-marker-item-gap)',
   'margin: var(--editorial-marker-block-gap) 0 0',
   'padding: 0 0 0 var(--editorial-marker-indent)',
@@ -78,11 +81,25 @@ for (const marker of [
   'content: "×"',
   'content: "•"',
   'content: "—"',
+  'margin-top: var(--editorial-c139-space)',
+  'padding: var(--editorial-c139-space)',
   '.editorial-article:not([data-article-id="contractor-repair-quality-claim-response"])',
   'gap: 12px',
   'padding: 0 0 0 28px',
 ]) {
   if (!styles.includes(marker)) errors.push(`editorial-semantic-lists.css: отсутствует обязательный контракт ${marker}`);
+}
+
+for (const marker of [
+  targetSelector,
+  'margin-top: var(--editorial-c139-section-space)',
+  'margin-bottom: var(--editorial-c139-space)',
+  'margin-top: var(--editorial-c139-space)',
+  'gap: var(--editorial-c139-space)',
+  'padding: var(--editorial-c139-space)',
+  '.editorial-related > p > a[href^="/uslugi/"]',
+]) {
+  if (!rhythm.includes(marker)) errors.push(`editorial-rhythm.css: отсутствует обязательный контракт ${marker}`);
 }
 
 if (/^\s*\.article-page,\s*\n\s*\.case-page\s*\{/m.test(styles)) {
@@ -94,10 +111,13 @@ if (/^\s*\.article-section\s+:is\(/m.test(styles)) {
 if (/^\s*\.editorial-list--(?:cross|dot|dash)\s+li::before/m.test(styles)) {
   errors.push("editorial-semantic-lists.css: смысловой маркер действует глобально, а не только внутри C-139");
 }
+if (/^\s*\.article-page\s+\.editorial-body\s*>\s*\.article-section\s*\{[^}]*var\(--editorial-c139-/ms.test(rhythm)) {
+  errors.push("editorial-rhythm.css: компактный ритм C-139 применён глобально к статьям");
+}
 
 if (errors.length) {
-  console.error(["Проверка смысловых маркеров списков не пройдена:", ...errors.map((item) => `- ${item}`)].join("\n"));
+  console.error(["Проверка смысловых маркеров и ритма C-139 не пройдена:", ...errors.map((item) => `- ${item}`)].join("\n"));
   process.exit(1);
 }
 
-console.log("Editorial list policy passed: C-139 uses semantic markers and unified spacing; earlier articles keep their previous list presentation");
+console.log("Editorial list policy passed: C-139 uses semantic markers and a compact unified spacing grid; earlier articles keep their previous presentation");

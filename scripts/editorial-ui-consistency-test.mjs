@@ -118,18 +118,29 @@ try {
           const response = await page.goto(`${origin}${route}`, { waitUntil: "networkidle" });
           if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route}: status ${response?.status()}`);
 
-          const marker = await page.locator(".editorial-checklist li").first().evaluate((element) => {
-            const style = getComputedStyle(element, "::before");
+          const isCase = route === caseRoute;
+          const markerSelector = isCase ? ".editorial-list--dot li" : ".editorial-checklist li";
+          const marker = await page.locator(markerSelector).first().evaluate((element) => {
+            const itemStyle = getComputedStyle(element);
+            const markerStyle = getComputedStyle(element, "::before");
             return {
-              content: style.content,
-              borderStyle: style.borderStyle,
-              borderWidth: style.borderWidth,
-              width: style.width,
-              height: style.height,
+              content: markerStyle.content,
+              color: markerStyle.color,
+              itemColor: itemStyle.color,
+              borderStyle: markerStyle.borderStyle,
+              borderWidth: markerStyle.borderWidth,
+              width: markerStyle.width,
+              height: markerStyle.height,
             };
           });
-          if (!marker.content.includes("✓")) errors.push(`${engineName} ${viewport.width}px ${route}: checklist marker is not a check ${JSON.stringify(marker)}`);
-          if (marker.borderStyle !== "none" || marker.borderWidth !== "0px") errors.push(`${engineName} ${viewport.width}px ${route}: checkbox border remains ${JSON.stringify(marker)}`);
+
+          if (isCase) {
+            if (!marker.content.includes("•")) errors.push(`${engineName} ${viewport.width}px ${route}: neutral conclusion marker is not a dot ${JSON.stringify(marker)}`);
+            if (marker.color !== marker.itemColor) errors.push(`${engineName} ${viewport.width}px ${route}: neutral dot color ${marker.color} differs from text ${marker.itemColor}`);
+          } else {
+            if (!marker.content.includes("✓")) errors.push(`${engineName} ${viewport.width}px ${route}: positive-action marker is not a check ${JSON.stringify(marker)}`);
+          }
+          if (marker.borderStyle !== "none" || marker.borderWidth !== "0px") errors.push(`${engineName} ${viewport.width}px ${route}: marker border remains ${JSON.stringify(marker)}`);
           if (marker.width === "10px" && marker.height === "10px") errors.push(`${engineName} ${viewport.width}px ${route}: legacy square marker remains`);
 
           const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -242,7 +253,7 @@ try {
             checks: [
               { selector: ".editorial-article__header h1", family: "serif", weight: 500 },
               { selector: ".article-section h2", family: "serif", weight: 500 },
-              { selector: ".editorial-checklist li", family: "sans" },
+              { selector: ".editorial-list--dot li", family: "sans" },
               { selector: ".editorial-author strong", family: "serif", weight: 500 },
             ],
           },
@@ -268,4 +279,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial UI consistency passed: checklist markers, FAQ interactions and branded typography in Chromium and WebKit");
+console.log("Editorial UI consistency passed: semantic list markers, FAQ interactions and branded typography in Chromium and WebKit");

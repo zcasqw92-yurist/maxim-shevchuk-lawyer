@@ -116,9 +116,24 @@ jobs:
         env:
           SITE_PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
           EXPECTED_BUILD_SHA: ${{ github.sha }}
+        shell: bash
         run: |
-          npm run test:live
-          node scripts/live-all-publications-smoke.mjs
+          set -o pipefail
+          {
+            npm run test:live
+            node scripts/live-all-publications-smoke.mjs
+          } 2>&1 | tee live-verify.log
+
+      - name: Upload live verification diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-verification-diagnostics-${{ github.run_id }}
+          path: |
+            live-verify.log
+            reports/live-publication-smoke.json
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Verify SHA through custom domain
         env:
@@ -142,6 +157,8 @@ jobs:
           path: |
             reports/custom-domain-sha-verification.json
             reports/public-copy-regression.json
+            reports/live-publication-smoke.json
+            live-verify.log
           if-no-files-found: ignore
           retention-days: 7
 

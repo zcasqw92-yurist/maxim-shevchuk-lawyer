@@ -110,14 +110,27 @@ const caseCard = (item) => `
     <a class="card-link" href="/praktika/${item.slug}/">Открыть кейс</a>
   </article>`;
 
-const articleSection = (section) => `
+const semanticList = (items, kind) => items?.length
+  ? `<ul class="editorial-list editorial-list--${kind}">${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`
+  : "";
+
+const articleSection = (section) => {
+  const microCta = section.microCta
+    ? `<aside class="editorial-micro-cta"><strong>${esc(section.microCta.title)}</strong><p>${esc(section.microCta.text)}</p><a href="${esc(section.microCta.href || "#self-check")}">${esc(section.microCta.label)}</a></aside>`
+    : "";
+  return `
   <section class="article-section" id="${esc(section.id)}" data-article-section="${esc(section.id)}">
     <h2>${esc(section.title)}</h2>
     ${(section.paragraphs || []).map((paragraph) => `<p>${esc(paragraph)}</p>`).join("")}
     ${section.checklist?.length ? `<ul class="editorial-checklist">${section.checklist.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
+    ${semanticList(section.avoid, "cross")}
+    ${semanticList(section.bullets, "dot")}
+    ${semanticList(section.dashes, "dash")}
     ${section.options?.length ? `<div class="editorial-options">${section.options.map((item) => `<article><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p></article>`).join("")}</div>` : ""}
     ${section.note ? `<aside class="editorial-note"><strong>Практический комментарий</strong><p>${esc(section.note)}</p></aside>` : ""}
+    ${microCta}
   </section>`;
+};
 
 const articleSchema = (article) => {
   const url = `${rootUrl}/razbory/${article.slug}/`;
@@ -239,7 +252,7 @@ export const renderArticlePage = (articleOrSlug) => {
             <section class="article-section" id="sources"><h2>Официальные источники</h2><ol class="editorial-sources">${article.sources.map((source) => `<li><a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a></li>`).join("")}</ol></section>
             <section class="article-section" id="faq"><h2>Частые вопросы</h2><div class="faq-list">${article.faq.map((item, index) => `<details class="faq-item"${index === 0 ? " open" : ""}><summary><span>${esc(item.question)}</span></summary><div class="faq-item__body"><p>${esc(item.answer)}</p></div></details>`).join("")}</div></section>
             ${linkedCases.length ? `<section class="article-section editorial-related"><h2>Похожая задача из практики</h2>${linkedCases.map(caseCard).join("")}</section>` : ""}
-            <section class="article-section editorial-related"><h2>Связанные направления</h2><ul class="editorial-checklist">${linkedServices.map((item) => `<li><a href="/uslugi/${esc(item.slug)}/">${esc(item.label)}</a></li>`).join("")}</ul></section>
+            <section class="article-section editorial-related"><h2>Связанные направления</h2><ul class="editorial-list editorial-list--dash">${linkedServices.map((item) => `<li><a href="/uslugi/${esc(item.slug)}/">${esc(item.label)}</a></li>`).join("")}</ul></section>
             ${authorCard()}
           </div>
         </div>
@@ -288,7 +301,7 @@ export const renderPracticeCasePage = (caseOrSlug) => {
             <section class="article-section"><h2>Какие материалы изучены</h2><p>${esc(item.materials)}</p></section>
             <section class="article-section"><h2>Что было подготовлено</h2><p>${esc(item.work)}</p></section>
             <section class="article-section editorial-status"><h2>Текущий статус</h2><p>${esc(item.next)}</p></section>
-            <section class="article-section"><h2>Практические выводы</h2><ul class="editorial-checklist">${item.lessons.map((lesson) => `<li>${esc(lesson)}</li>`).join("")}</ul></section>
+            <section class="article-section"><h2>Практические выводы</h2><ul class="editorial-list editorial-list--dot">${item.lessons.map((lesson) => `<li>${esc(lesson)}</li>`).join("")}</ul></section>
             ${linkedArticles.length ? `<section class="article-section editorial-related"><h2>Разбор по этой теме</h2>${linkedArticles.map(articleCard).join("")}</section>` : ""}
             ${authorCard()}
           </div>

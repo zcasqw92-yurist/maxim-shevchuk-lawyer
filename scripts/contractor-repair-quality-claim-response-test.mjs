@@ -22,18 +22,22 @@ if (!article.title.includes("как подрядчику ответить на �
 if (!article.description || article.description.length < 70 || article.description.length > 170) {
   fail(`description length must be 70-170 characters, got ${article.description?.length ?? 0}`);
 }
+if (article.listPolicyVersion !== 1) fail("semantic list policy is not enabled");
 
 const expectedSections = [
   "first-actions",
+  "dangerous-messages",
   "consumer-or-business",
   "claim-breakdown",
   "acceptance-act",
   "guarantee-and-proof",
   "inspection-access",
+  "evidence-loss",
   "expert-evidence",
   "response-options",
   "response-content",
   "response-deadlines",
+  "high-risk-cases",
   "lawyer-work",
   "common-errors",
 ];
@@ -45,6 +49,29 @@ for (let index = 0; index < expectedSections.length; index += 1) {
   }
 }
 
+const sections = Object.fromEntries(article.sections.map((section) => [section.id, section]));
+if ((sections["first-actions"].checklist || []).length < 3) fail("positive first actions must use gold checks");
+if ((sections["first-actions"].avoid || []).length < 3) fail("first-action prohibitions must use gold crosses");
+if ((sections["dangerous-messages"].avoid || []).length < 5) fail("dangerous messages need a cross-marked warning list");
+if (sections["dangerous-messages"].microCta?.href !== "#self-check") fail("first soft CTA must lead to document intake");
+if ((sections["evidence-loss"].dashes || []).length < 5) fail("evidence-loss sequence must use neutral dashes");
+if (sections["evidence-loss"].microCta?.href !== "#self-check") fail("urgent soft CTA must lead to document intake");
+if ((sections["high-risk-cases"].bullets || []).length < 8) fail("high-risk signs must use neutral dots");
+if ((sections["common-errors"].avoid || []).length < 7) fail("contractor errors must use gold crosses");
+if (sections["common-errors"].checklist?.length) fail("contractor errors may not use check marks");
+
+const negativeChecklistPattern = /^(?:не\b|нельзя\b|проигнорир|отказат|признат|пообещат|спорит)/iu;
+for (const section of article.sections) {
+  for (const field of ["checklist", "avoid", "bullets", "dashes"]) {
+    if (section[field] !== undefined && (!Array.isArray(section[field]) || section[field].some((item) => typeof item !== "string" || !item.trim()))) {
+      fail(`${section.id}: invalid semantic list ${field}`);
+    }
+  }
+  for (const item of section.checklist || []) {
+    if (negativeChecklistPattern.test(item.trim())) fail(`${section.id}: prohibition or error incorrectly marked with a check: ${item}`);
+  }
+}
+
 if (!Array.isArray(article.faq) || article.faq.length < 8) fail("FAQ coverage is insufficient");
 if (!Array.isArray(article.sources) || article.sources.length < 8) fail("legal source coverage is insufficient");
 if (article.editorialGateVersion !== 1) fail("commercial editorial gate is not enabled");
@@ -53,24 +80,25 @@ if (article.relatedArticleMode !== "explicit" || article.relatedArticleLimit !==
 }
 if (!article.hideMessageGuide) fail("duplicate generic message guide must stay disabled");
 if (!article.intakeTitle?.includes("передать на проверку")) fail("intake is not tied to document review");
+if (article.intakeQuestionsTitle !== "Что входит в проверку") fail("intake heading must describe the document review in plain language");
 if (!article.intakeButtonLabel?.includes("Передать претензию")) fail("intake CTA is generic");
 
 const copy = JSON.stringify(article).toLowerCase();
 for (const required of [
-  "возвращать всю стоимость ремонта автоматически не нужно",
-  "признать требование полностью или частично",
-  "подписанный акт",
-  "скрытые",
-  "гарантийн",
-  "предложите осмотр",
+  "само получение претензии не означает",
+  "одно сообщение может выглядеть как признание дефекта",
+  "что нельзя писать заказчику до проверки",
+  "объект уже собираются переделывать",
+  "как подрядчик теряет возможность доказать свою позицию",
+  "признать полностью",
+  "предложить осмотр",
   "десятиднев",
-  "лишних признаний",
   "ошибки подрядчика и их цена",
-  "мотивированный ответ",
-  "пример логики ответа",
-  "перечень приложений и инструкция по отправке",
+  "мотивированном ответе",
+  "проверьте ответ до того, как он станет доказательством",
+  "формулировки ответа без лишних признаний",
 ]) {
-  if (!copy.includes(required)) fail(`required legal or commercial boundary is missing: ${required}`);
+  if (!copy.includes(required)) fail(`required legal, risk or commercial boundary is missing: ${required}`);
 }
 
 for (const forbidden of [
@@ -82,15 +110,17 @@ for (const forbidden of [
   "рабочей базе",
   "content id",
   "проверить свою ситуацию",
+  "автоматическ",
+  "механическ",
 ]) {
-  if (copy.includes(forbidden)) fail(`internal, generic or misleading phrase leaked: ${forbidden}`);
+  if (copy.includes(forbidden)) fail(`internal, generic, unnatural or misleading phrase leaked: ${forbidden}`);
 }
 
-if (!article.ctaTitle?.includes("ответ подрядчика")) fail("CTA title is not tied to the target document");
+if (!article.ctaTitle?.includes("до того, как он станет доказательством")) fail("CTA title does not communicate the irreversible risk");
 if (!article.ctaDescription?.includes("претензию, договор, смету, акты")) fail("CTA does not name the input documents");
 if (!article.ctaButtonLabel?.includes("Передать претензию")) fail("CTA button is generic");
 if (!(article.relatedArticleSlugs || []).includes("zakazchik-ne-oplatil-rabotu-bez-dogovora")) {
   fail("mandatory related contractor article is missing");
 }
 
-console.log("C-139 publication contract passed");
+console.log("C-139 publication contract passed: stronger risk path, soft CTAs, conversational copy and semantic list markers locked");

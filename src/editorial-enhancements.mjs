@@ -77,37 +77,51 @@ const applyPublicationMetadata = (html, context, pathname) => {
 };
 
 const articleIntake = (article) => {
-  const items = [
-    "что произошло и когда",
-    "что вы уже сделали и какой получили ответ",
-    "какого результата хотите добиться",
-  ];
+  const items = article.intakeItems?.length
+    ? article.intakeItems
+    : [
+      "что произошло и когда",
+      "что вы уже сделали и какой получили ответ",
+      "какого результата хотите добиться",
+    ];
+  const questions = article.intakeQuestions?.length
+    ? article.intakeQuestions
+    : [
+      "достаточно ли имеющихся доказательств",
+      "что лучше сделать сначала",
+      "есть ли важные сроки",
+      "какой документ нужен первым",
+    ];
   const topic = article.topic || article.title;
-  return `
-    <section class="article-section editorial-intake" id="self-check" data-article-section="self-check">
-      <div class="editorial-intake__grid">
-        <div>
-          <span class="editorial-intake__eyebrow">Перед сообщением юристу</span>
-          <h2>Что кратко описать</h2>
-          <p>Юридические термины не нужны. Напишите обычными словами:</p>
-          <ul class="editorial-checklist">${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
-        </div>
-        <aside class="editorial-intake__questions">
-          <strong>Что можно спросить у юриста</strong>
-          <ul>
-            <li>достаточно ли имеющихся доказательств;</li>
-            <li>что лучше сделать сначала;</li>
-            <li>есть ли важные сроки;</li>
-            <li>какой документ нужен первым.</li>
-          </ul>
-          <button class="button button--gold" type="button" data-dialog-open data-topic="${esc(topic)}">Проверить свою ситуацию</button>
-        </aside>
-      </div>
-    </section>
+  const eyebrow = article.intakeEyebrow || "Перед сообщением юристу";
+  const title = article.intakeTitle || "Что кратко описать";
+  const intro = article.intakeIntro || "Юридические термины не нужны. Напишите обычными словами:";
+  const questionsTitle = article.intakeQuestionsTitle || "Что можно спросить у юриста";
+  const buttonLabel = article.intakeButtonLabel || "Проверить свою ситуацию";
+  const messageGuide = article.hideMessageGuide
+    ? ""
+    : `
     <section class="article-section editorial-message-guide" id="message-guide" data-article-section="message-guide">
       <h2>Что написать юристу</h2>
       <p>Укажите в нескольких предложениях: что произошло, даты, участников, какие документы сохранились, что уже предпринималось и какой результат нужен. Этого достаточно, чтобы понять, с чего начинать проверку.</p>
     </section>`;
+
+  return `
+    <section class="article-section editorial-intake" id="self-check" data-article-section="self-check">
+      <div class="editorial-intake__grid">
+        <div>
+          <span class="editorial-intake__eyebrow">${esc(eyebrow)}</span>
+          <h2>${esc(title)}</h2>
+          <p>${esc(intro)}</p>
+          <ul class="editorial-checklist">${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
+        </div>
+        <aside class="editorial-intake__questions">
+          <strong>${esc(questionsTitle)}</strong>
+          <ul>${questions.map((item) => `<li>${esc(item)};</li>`).join("")}</ul>
+          <button class="button button--gold" type="button" data-dialog-open data-topic="${esc(topic)}">${esc(buttonLabel)}</button>
+        </aside>
+      </div>
+    </section>${messageGuide}`;
 };
 
 const helpfulness = (id, kind) => `

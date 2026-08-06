@@ -57,14 +57,20 @@ const serviceMaterialsBlock = ({ service, articles, practiceCases, html }) => {
 };
 
 const relatedMaterialsBlock = ({ current, articles, practiceCases, html, kind }) => {
-  const sameServiceArticles = articles.filter((item) => item.serviceSlug === current.serviceSlug && item.slug !== current.slug).sort(byFreshness);
+  const explicitOnly = current.relatedArticleMode === "explicit";
+  const sameServiceArticles = explicitOnly
+    ? []
+    : articles.filter((item) => item.serviceSlug === current.serviceSlug && item.slug !== current.slug).sort(byFreshness);
   const explicitArticles = (current.relatedArticleSlugs || [])
     .map((slug) => articles.find((item) => item.slug === slug))
     .filter(Boolean);
+  const limit = Number.isInteger(current.relatedArticleLimit)
+    ? Math.max(0, current.relatedArticleLimit)
+    : 4;
   const relatedArticles = uniqueBy([...explicitArticles, ...sameServiceArticles], "slug")
     .filter((item) => !hasHref(html, articlePath(item)))
-    .slice(0, 4);
-  const relatedCases = kind === "article"
+    .slice(0, limit);
+  const relatedCases = kind === "article" && !explicitOnly
     ? practiceCases.filter((item) => item.serviceSlug === current.serviceSlug && !hasHref(html, casePath(item))).sort(byFreshness).slice(0, 2)
     : [];
   if (!relatedArticles.length && !relatedCases.length) return "";

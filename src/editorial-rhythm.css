@@ -61,8 +61,6 @@
     margin-top: var(--editorial-flow-xs);
   }
 
-  .article-page .editorial-checklist,
-  .case-page .editorial-checklist,
   .article-page .editorial-options,
   .article-page .editorial-note {
     margin-top: var(--editorial-flow-sm);

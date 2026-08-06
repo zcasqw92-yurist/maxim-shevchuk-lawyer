@@ -14,10 +14,11 @@ permissions:
   id-token: write
 
 # Production-публикации выполняются последовательно. Новый push не должен
-# отменять уже созданный Pages deployment и оставлять очередь в подвешенном состоянии.
+# отменять уже созданный или ожидающий Pages deployment.
 concurrency:
   group: pages
   cancel-in-progress: false
+  queue: max
 
 env:
   SITE_PRODUCTION: 'true'

@@ -178,11 +178,11 @@ jobs:
           EXPECTED_BUILD_SHA: ${{ github.sha }}
         run: node scripts/live-public-copy-regression-test.mjs
 
-      - name: Upload live verification diagnostics on failure
+      - name: Upload custom-domain and public-copy diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v5
         with:
-          name: live-verification-diagnostics-${{ github.run_id }}
+          name: custom-domain-sha-diagnostics-${{ github.run_id }}
           path: |
             live-verify.log
             reports/live-publication-smoke.json

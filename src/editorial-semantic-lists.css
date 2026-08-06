@@ -37,7 +37,8 @@
   }
 
   /* Новая система применяется только к статье C-139. */
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"],
+  .case-page {
     --editorial-marker-indent: 26px;
     --editorial-marker-width: 18px;
     --editorial-marker-item-gap: 10px;
@@ -45,7 +46,8 @@
   }
 
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .article-section :is(.editorial-checklist, .editorial-list) {
+    .article-section :is(.editorial-checklist, .editorial-list),
+  .case-page .article-section .editorial-list--dot {
     display: grid;
     gap: var(--editorial-marker-item-gap);
     margin: var(--editorial-marker-block-gap) 0 0;
@@ -60,7 +62,8 @@
   }
 
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .article-section :is(.editorial-checklist, .editorial-list) li {
+    .article-section :is(.editorial-checklist, .editorial-list) li,
+  .case-page .article-section .editorial-list--dot li {
     position: relative;
     min-width: 0;
     margin: 0;
@@ -71,7 +74,8 @@
   }
 
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .article-section :is(.editorial-checklist, .editorial-list) li::before {
+    .article-section :is(.editorial-checklist, .editorial-list) li::before,
+  .case-page .article-section .editorial-list--dot li::before {
     position: absolute;
     top: 0;
     left: 0;
@@ -99,7 +103,8 @@
   }
 
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-list--dot li::before {
+    .editorial-list--dot li::before,
+  .case-page .article-section .editorial-list--dot li::before {
     color: var(--ink-soft);
     content: "•";
     font-size: 1rem;
@@ -160,7 +165,8 @@
 
 @media (max-width: 390px) {
   @layer components {
-    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"],
+    .case-page {
       --editorial-marker-indent: 24px;
       --editorial-marker-width: 16px;
       --editorial-marker-item-gap: 8px;

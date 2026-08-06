@@ -12,8 +12,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const workflows = {
   ci: await readFile(join(root, ".github", "workflows", "ci.yml"), "utf8"),
   pages: await readFile(join(root, ".github", "workflows", "pages.yml"), "utf8"),
+  fallback: await readFile(join(root, ".github", "workflows", "pages-macos-fallback.yml"), "utf8"),
 };
-const retryWorkflow = await readFile(join(root, ".github", "workflows", "pages-infrastructure-retry.yml"), "utf8");
 const deploymentClient = await readFile(join(root, "scripts", "deploy-pages-with-extended-wait.mjs"), "utf8");
 
 const errors = [];
@@ -23,6 +23,7 @@ const requirePattern = (label, content, pattern, message) => {
 const assert = (condition, message) => {
   if (!condition) errors.push(`pages-client: ${message}`);
 };
+const count = (content, pattern) => (content.match(pattern) || []).length;
 
 for (const [label, content] of Object.entries(workflows)) {
   requirePattern(label, content, /SITE_PRODUCTION:\s*['"]true['"]/, "SITE_PRODUCTION должен быть включён");
@@ -31,16 +32,25 @@ for (const [label, content] of Object.entries(workflows)) {
   requirePattern(label, content, /SITE_ANALYTICS_ENABLED:\s*['"]true['"]/, "production-проверка должна включать аналитику и баннер согласия");
   requirePattern(label, content, /CROSS_BROWSER_REQUIRED:\s*['"]true['"]/, "обязательная cross-browser проверка должна быть включена");
   requirePattern(label, content, /node-version:\s*['"]22\.17\.0['"]/, "версия Node.js должна быть одинаково закреплена");
-  requirePattern(label, content, /npx playwright install --with-deps chromium firefox webkit/, "должны устанавливаться все проверяемые браузеры");
   requirePattern(label, content, /npm run check 2>&1 \| tee check\.log/, "должен запускаться единый npm run check с сохранением полного журнала");
   requirePattern(label, content, /check\.log/, "check.log должен входить в диагностический артефакт");
   requirePattern(label, content, /if-no-files-found:\s*ignore/, "при ошибке должны сохраняться диагностические артефакты без вторичного падения");
 }
 
+for (const [label, content] of [["ci", workflows.ci], ["pages", workflows.pages]]) {
+  requirePattern(label, content, /npx playwright install --with-deps chromium firefox webkit/, "Linux workflow должен устанавливать браузеры и системные зависимости");
+  if (/runs-on:\s*ubuntu-latest/.test(content)) {
+    errors.push(`${label}: плавающий ubuntu-latest запрещён после повторных ошибок выделения runner; используйте закреплённый образ`);
+  }
+}
+requirePattern("ci", workflows.ci, /runs-on:\s*ubuntu-22\.04/, "CI должен использовать закреплённый Ubuntu 22.04");
+if (count(workflows.pages, /runs-on:\s*ubuntu-22\.04/g) !== 3) {
+  errors.push("pages: build, deploy и verify должны использовать закреплённый Ubuntu 22.04");
+}
+
 if (!/pull_request:[\s\S]*branches:[\s\S]*- main/.test(workflows.ci)) {
   errors.push("ci: полная production-проверка должна выполняться до слияния PR в main");
 }
-
 const forbiddenCiCommands = workflows.ci
   .split("\n")
   .filter((line) => /npm run (?:build|validate|audit:seo|test:)/.test(line) && !/npm run check/.test(line));
@@ -67,15 +77,32 @@ requirePattern("pages", workflows.pages, /PAGES_STATUS_INTERVAL_MS:\s*['"]10000[
 requirePattern("pages", workflows.pages, /outputs:[\s\S]*page_url:[\s\S]*status:\s*\$\{\{ steps\.deployment\.outputs\.status \}\}/, "deploy job должен передавать URL и итоговый статус");
 requirePattern("pages", workflows.pages, /verify:[\s\S]*needs:\s*deploy[\s\S]*if:\s*needs\.deploy\.outputs\.status == 'succeed'/, "live-проверка должна запускаться только после подтверждённой публикации");
 requirePattern("pages", workflows.pages, /SITE_PUBLIC_URL:\s*\$\{\{ needs\.deploy\.outputs\.page_url \}\}/, "live-проверка должна получать URL из отдельного deploy job");
-if (/queue:\s*max/.test(workflows.pages)) {
-  errors.push("pages: FIFO-очередь устаревших коммитов не должна задерживать публикацию последнего main");
+if (/queue:\s*max/.test(workflows.pages)) errors.push("pages: FIFO-очередь устаревших коммитов не должна задерживать публикацию последнего main");
+if (/group:\s*\$\{\{ github\.workflow/.test(workflows.pages)) errors.push("pages: новая concurrency-группа не должна оставлять старую группу pages без отмены");
+if (/actions\/deploy-pages@/.test(workflows.pages)) errors.push("pages: официальный deploy-pages ограничивает ожидание десятью минутами и не должен использоваться для этой очереди");
+
+const fallbackCheckIndex = workflows.fallback.indexOf("npm run check");
+const fallbackUploadIndex = workflows.fallback.indexOf("actions/upload-pages-artifact");
+const fallbackDeployIndex = workflows.fallback.indexOf("node scripts/deploy-pages-with-extended-wait.mjs");
+if (fallbackCheckIndex < 0 || fallbackUploadIndex < 0 || fallbackDeployIndex < 0 || !(fallbackCheckIndex < fallbackUploadIndex && fallbackUploadIndex < fallbackDeployIndex)) {
+  errors.push("fallback: проверка должна завершаться до упаковки и Pages deployment");
 }
-if (/group:\s*\$\{\{ github\.workflow/.test(workflows.pages)) {
-  errors.push("pages: новая concurrency-группа не должна оставлять старую группу pages без отмены");
+requirePattern("fallback", workflows.fallback, /workflow_run:[\s\S]*workflows:\s*\["Deploy GitHub Pages"\][\s\S]*types:\s*\[completed\]/, "fallback должен получать завершение основного Pages workflow");
+requirePattern("fallback", workflows.fallback, /workflow_dispatch:/, "fallback должен допускать независимый ручной запуск");
+requirePattern("fallback", workflows.fallback, /conclusion == 'failure'[\s\S]*head_branch == 'main'/, "автоматический fallback разрешён только после ошибки публикации main");
+requirePattern("fallback", workflows.fallback, /actions\/runs\/\$\{SOURCE_RUN_ID\}\/jobs\?filter=latest&per_page=100/, "gate должен проверять реальные jobs исходного запуска");
+requirePattern("fallback", workflows.fallback, /Set up job[\s\S]*setup_only_count/, "fallback должен отличать сбой runner от ошибки кода");
+requirePattern("fallback", workflows.fallback, /needs:\s*gate[\s\S]*if:\s*needs\.gate\.outputs\.allowed == 'true'/, "production-сборка должна быть заблокирована решением gate");
+requirePattern("fallback", workflows.fallback, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*true/, "fallback должен использовать общую production-группу и отменять зависший Linux run");
+requirePattern("fallback", workflows.fallback, /npx playwright install chromium firefox webkit/, "macOS fallback должен устанавливать все три браузера без Linux-only зависимостей");
+requirePattern("fallback", workflows.fallback, /uses:\s*actions\/upload-pages-artifact@v4/, "fallback должен создавать стандартный github-pages artifact");
+requirePattern("fallback", workflows.fallback, /PAGES_DEPLOYMENT_TIMEOUT_MS:\s*['"]2100000['"]/, "fallback должен использовать тот же устойчивый deployment client");
+requirePattern("fallback", workflows.fallback, /verify:[\s\S]*needs:\s*deploy[\s\S]*if:\s*needs\.deploy\.outputs\.status == 'succeed'/, "fallback должен проверять сайт только после подтверждённого deployment");
+if (count(workflows.fallback, /runs-on:\s*macos-14/g) !== 4) {
+  errors.push("fallback: gate, build, deploy и verify должны выполняться в независимом пуле macOS 14");
 }
-if (/actions\/deploy-pages@/.test(workflows.pages)) {
-  errors.push("pages: официальный deploy-pages ограничивает ожидание десятью минутами и не должен использоваться для этой очереди");
-}
+if (/runs-on:\s*ubuntu-/.test(workflows.fallback)) errors.push("fallback: аварийный маршрут не должен зависеть от Linux runner");
+if (/actions\/deploy-pages@/.test(workflows.fallback)) errors.push("fallback: должен использовать расширенный deployment client, а не короткий deploy-pages timeout");
 
 for (const marker of [
   "/actions/runs/${encodeURIComponent(runId)}/artifacts?name=github-pages&per_page=100",
@@ -94,17 +121,13 @@ for (const marker of [
 ]) {
   if (!deploymentClient.includes(marker)) errors.push(`pages-client: отсутствует обязательный контракт ${marker}`);
 }
-if (deploymentClient.includes("MAX_TIMEOUT = 600000")) {
-  errors.push("pages-client: вернулось жёсткое десятиминутное ограничение deploy-pages");
-}
+if (deploymentClient.includes("MAX_TIMEOUT = 600000")) errors.push("pages-client: вернулось жёсткое десятиминутное ограничение deploy-pages");
 
 const sampleSha = "a".repeat(40);
 const newerSha = "b".repeat(40);
 try {
-  const currentRevision = revisionState(sampleSha, sampleSha);
-  assert(currentRevision.current === true, "актуальный main ошибочно признан устаревшим");
-  const staleRevision = revisionState(sampleSha, newerSha);
-  assert(staleRevision.current === false, "устаревший build не распознан");
+  assert(revisionState(sampleSha, sampleSha).current === true, "актуальный main ошибочно признан устаревшим");
+  assert(revisionState(sampleSha, newerSha).current === false, "устаревший build не распознан");
 } catch (error) {
   errors.push(`pages-client: проверка актуальности SHA завершилась ошибкой: ${error.message}`);
 }
@@ -135,22 +158,9 @@ assert(deploymentState("succeed").kind === "success", "успешный стат
 assert(deploymentState("deployment_failed").kind === "failure", "финальная ошибка не распознана");
 assert(deploymentState("deployment_in_progress").kind === "pending", "промежуточный статус не распознан");
 
-requirePattern("pages-retry", retryWorkflow, /workflow_run:[\s\S]*workflows:\s*\["Deploy GitHub Pages"\][\s\S]*types:\s*\[completed\]/, "автоповтор должен запускаться только после завершения Pages workflow");
-requirePattern("pages-retry", retryWorkflow, /permissions:[\s\S]*actions:\s*write[\s\S]*contents:\s*read/, "для точечного rerun нужны actions:write и только чтение содержимого");
-requirePattern("pages-retry", retryWorkflow, /conclusion == 'failure'[\s\S]*head_branch == 'main'/, "повтор разрешён только для неудачной публикации main");
-requirePattern("pages-retry", retryWorkflow, /attempt >= 3/, "автоповтор должен останавливаться после трёх попыток");
-requirePattern("pages-retry", retryWorkflow, /\.steps \| length\) == 1[\s\S]*Set up job[\s\S]*setup_only_count/, "повтор допустим только при падении на подготовке runner до запуска кода");
-requirePattern("pages-retry", retryWorkflow, /rerun-failed-jobs/, "автоповтор должен использовать штатный endpoint failed jobs");
-if (/^\s*uses:/m.test(retryWorkflow)) {
-  errors.push("pages-retry: аварийный workflow не должен зависеть от скачивания внешних Actions");
-}
-if (/conclusion == 'cancelled'/.test(retryWorkflow)) {
-  errors.push("pages-retry: отменённые проверки нельзя перезапускать как инфраструктурный сбой");
-}
-
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("Workflow contract passed: newest main cancels the legacy pages queue, deployment may wait 35 minutes, and setup-only failures retry safely");
+console.log("Workflow contract passed: primary Pages uses pinned Ubuntu 22.04 and setup-only failures switch to an independent macOS 14 deployment path");

@@ -1,0 +1,55 @@
+@layer components {
+  .article-page :is(
+    .editorial-article__header,
+    .editorial-layout,
+    .editorial-body,
+    .editorial-toc,
+    .article-section,
+    .editorial-options,
+    .editorial-options article,
+    .editorial-checklist,
+    .editorial-checklist li,
+    .editorial-sources,
+    .editorial-sources li,
+    .editorial-related,
+    .editorial-related > *,
+    .editorial-author,
+    .editorial-message-guide,
+    .editorial-intake
+  ) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .article-page :is(
+    .editorial-article__header h1,
+    .editorial-lead,
+    .editorial-toc a,
+    .article-section h2,
+    .article-section h3,
+    .article-section p,
+    .article-section li,
+    .editorial-sources a,
+    .editorial-related a,
+    .editorial-message-guide,
+    .editorial-author p
+  ) {
+    overflow-wrap: anywhere;
+  }
+}
+
+@layer responsive {
+  @media (max-width: 390px) {
+    .article-page .editorial-related > p > a[href^="/uslugi/"]::after {
+      max-width: 100%;
+      white-space: normal;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-page .editorial-related > p > a[href^="/uslugi/"]::after,
+    .case-page .editorial-case-aside > a[href^="/uslugi/"]::after {
+      transform: none;
+    }
+  }
+}

@@ -81,6 +81,8 @@ for (const snippet of [
 }
 
 const forbiddenLegacyRules = [
+  [".editorial-checklist {", "старые отдельные интервалы списка с галочками"],
+  [".editorial-checklist li {", "старый отдельный левый отступ галочек"],
   [".editorial-checklist li::before", "старый квадратный маркер списка"],
   ["margin-top: 46px", "старый фиксированный интервал разделов"],
   ["margin-top: 54px", "старый фиксированный интервал авторского блока"],

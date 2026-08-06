@@ -6,6 +6,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 const messengerTest = await readFile(join(root, "scripts", "messenger-intents-interaction-test.mjs"), "utf8");
 const heroConsentTest = await readFile(join(root, "scripts", "hero-consent-contract-test.mjs"), "utf8");
+const servicePagesInteractionTest = await readFile(join(root, "scripts", "service-pages-interaction-test.mjs"), "utf8");
 const consentPreload = await readFile(join(root, "scripts", "playwright-consent-isolation-preload.mjs"), "utf8");
 const errors = [];
 
@@ -44,10 +45,19 @@ if (!messengerTest.includes("captureFailure") || !messengerTest.includes("page.s
 if (!heroConsentTest.includes("screenshot")) {
   errors.push("специализированный consent-тест должен сохранять визуальные подтверждения");
 }
+if (!servicePagesInteractionTest.includes('const usesSparticuzChromium = process.platform === "linux";')) {
+  errors.push("тест страниц услуг должен ограничивать Linux-only Chromium пакетом платформы Linux");
+}
+if (!servicePagesInteractionTest.includes("...(usesSparticuzChromium ? { executablePath: browserPath } : {})")) {
+  errors.push("на macOS тест страниц услуг должен запускать установленный браузер Playwright без Linux executablePath");
+}
+if (servicePagesInteractionTest.includes("executablePath: browserPath,\n    headless")) {
+  errors.push("Linux executablePath снова применяется безусловно и сломает macOS fallback");
+}
 
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("Browser test contract passed: consent has a dedicated Chromium/WebKit test and feature scenarios are isolated without forced clicks");
+console.log("Browser test contract passed: consent is isolated and service interaction tests select a platform-compatible Chromium");

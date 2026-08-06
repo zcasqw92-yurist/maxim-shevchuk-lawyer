@@ -45,7 +45,7 @@ if (pagesCheckIndex < 0 || pagesUploadIndex < 0 || pagesDeployIndex < 0 || !(pag
   errors.push("pages: проверка должна завершаться до упаковки и публикации артефакта");
 }
 
-requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*false/, "начатый production-deploy нельзя отменять новым push");
+requirePattern("pages", workflows.pages, /concurrency:[\s\S]*group:\s*pages[\s\S]*cancel-in-progress:\s*false[\s\S]*queue:\s*max/, "начатые и ожидающие production-deploy должны сохраняться в последовательной очереди");
 requirePattern("pages", workflows.pages, /build:[\s\S]*deploy:[\s\S]*needs:\s*build[\s\S]*verify:[\s\S]*needs:\s*deploy/, "сборка, deploy и live-проверка должны быть разделены на последовательные jobs");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/checkout@v6/, "Pages workflow должен использовать Node 24-совместимый checkout@v6");
 requirePattern("pages", workflows.pages, /uses:\s*actions\/setup-node@v6/, "Pages workflow должен использовать Node 24-совместимый setup-node@v6");
@@ -72,4 +72,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Workflow contract passed: PR and deploy use the same production gate, Pages deployment is queue-tolerant, and setup-only infrastructure failures retry safely");
+console.log("Workflow contract passed: PR and deploy use the same production gate, pending Pages runs stay queued, and setup-only infrastructure failures retry safely");

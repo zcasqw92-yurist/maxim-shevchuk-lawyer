@@ -48,9 +48,17 @@ for (let index = 0; index < expectedSections.length; index += 1) {
 if (!Array.isArray(article.faq) || article.faq.length < 8) fail("FAQ coverage is insufficient");
 if (!Array.isArray(article.sources) || article.sources.length < 8) fail("legal source coverage is insufficient");
 if (article.editorialGateVersion !== 1) fail("commercial editorial gate is not enabled");
+if (article.relatedArticleMode !== "explicit" || article.relatedArticleLimit !== 1) {
+  fail("related materials must stay limited to one explicitly selected article");
+}
+if (!article.hideMessageGuide) fail("duplicate generic message guide must stay disabled");
+if (!article.intakeTitle?.includes("передать на проверку")) fail("intake is not tied to document review");
+if (!article.intakeButtonLabel?.includes("Передать претензию")) fail("intake CTA is generic");
 
 const copy = JSON.stringify(article).toLowerCase();
 for (const required of [
+  "возвращать всю стоимость ремонта автоматически не нужно",
+  "признать требование полностью или частично",
   "подписанный акт",
   "скрытые",
   "гарантийн",
@@ -59,6 +67,8 @@ for (const required of [
   "лишних признаний",
   "ошибки подрядчика и их цена",
   "мотивированный ответ",
+  "пример логики ответа",
+  "перечень приложений и инструкция по отправке",
 ]) {
   if (!copy.includes(required)) fail(`required legal or commercial boundary is missing: ${required}`);
 }
@@ -71,13 +81,14 @@ for (const forbidden of [
   "точно выигра",
   "рабочей базе",
   "content id",
+  "проверить свою ситуацию",
 ]) {
-  if (copy.includes(forbidden)) fail(`internal or misleading phrase leaked: ${forbidden}`);
+  if (copy.includes(forbidden)) fail(`internal, generic or misleading phrase leaked: ${forbidden}`);
 }
 
 if (!article.ctaTitle?.includes("ответ подрядчика")) fail("CTA title is not tied to the target document");
 if (!article.ctaDescription?.includes("претензию, договор, смету, акты")) fail("CTA does not name the input documents");
-if (!article.ctaButtonLabel?.includes("Передать документы")) fail("CTA button is generic");
+if (!article.ctaButtonLabel?.includes("Передать претензию")) fail("CTA button is generic");
 if (!(article.relatedArticleSlugs || []).includes("zakazchik-ne-oplatil-rabotu-bez-dogovora")) {
   fail("mandatory related contractor article is missing");
 }

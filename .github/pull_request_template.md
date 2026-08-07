@@ -7,11 +7,11 @@
 - [ ] Работа выполнена в отдельной ветке, не напрямую в `main`.
 - [ ] Перед изменением открыты `00_Старт` и живой `29_Публикационный_шлюз`; указаны scope, branch/PR и текущий head SHA.
 - [ ] Доказательства пунктов шлюза внесены только по фактическим command/run/SHA/result; статусы не выставлялись по предположению.
-- [ ] Предmerge-блокеры `29_Публикационный_шлюз` закрыты, итоговый статус — `ПУБЛИКАЦИЯ РАЗРЕШЕНА`.
+- [ ] Предmerge-блокеры `29_Публикационный_шлюз` закрыты, B2 = `MERGE РАЗРЕШЕН`.
 - [ ] `node scripts/publication-readiness-test.mjs` и `node scripts/publication-sheet-gate-contract-test.mjs` завершены без ошибок.
 - [ ] Не возвращены технические retry-коммиты, альтернативный Pages writer, browser-heavy deploy fallback или `cancel-in-progress:true` для production Pages.
-- [ ] Если менялась публикационная инфраструктура, соответствующий класс PF-001…PF-013 сохранён закрытым machine regression-контролем.
-- [ ] Если обнаружен новый PF, он получил следующий PF-ID, root cause, evidence и machine regression/recovery; после исправления весь шлюз повторён.
+- [ ] Если менялась публикационная инфраструктура, соответствующий класс PF-001…PF-014 сохранён закрытым machine regression-контролем.
+- [ ] Если обнаружен новый PF-015+, он получил следующий PF-ID, root cause, evidence и machine regression/recovery; после исправления весь шлюз повторён.
 - [ ] Полный PR CI с Chromium/Firefox/WebKit относится к текущему состоянию PR и завершён успешно до merge.
 
 ## Контентный шлюз
@@ -48,6 +48,8 @@
 - После merge проверить штатный `Deploy GitHub Pages`, затем дождаться `Verify Published Site` для точного production SHA. Browser-heavy `npm run test:live` и `scripts/live-all-publications-smoke.mjs` после deploy вручную не повторяются: они обязаны пройти до merge.
 - Проверен `https://yuristshevchuk.com/deployments/<full-SHA>.json`, затем `build-info.json` и `site-build-sha`.
 - После подтверждения SHA выполнены production HTTP и `node scripts/live-public-copy-regression-test.mjs` без замечаний.
+- IndexNow завершён корректно после exact production SHA.
+- После post-deploy доказательств `29_Публикационный_шлюз!L2` = `ПУБЛИКАЦИЯ ЗАВЕРШЕНА`.
 - В `ЖУРНАЛ РЕЛИЗОВ` таблицы внесены head/merge/production SHA, HTTP/public-copy, IndexNow и итог/новый PF.
 - Результат контрольной проверки всех прежних статей после подтверждения production SHA:
 - Найденные нюансы, исправления и повторная проверка, либо отметка «замечаний не найдено»:

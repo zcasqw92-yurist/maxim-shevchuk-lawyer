@@ -13,16 +13,21 @@
 - высший приоритет внутри редакционного процесса;
 - обязательный живой просмотр всех вкладок перед каждой контентной сессией.
 
+Для любой статьи, правки сайта, SEO или инфраструктуры дополнительно обязателен жёсткий gate живой таблицы: `29_Публикационный_шлюз`, gid `290000290`. Его контракт хранится в `config/publication-sheet-gate.json`. До merge бот обязан занести scope, branch/PR/head SHA и реальные доказательства проверок. Итог `29_Публикационный_шлюз!B2` должен быть `ПУБЛИКАЦИЯ РАЗРЕШЕНА`; выставлять пункты без фактического run/SHA/result запрещено.
+
+Если появляется неизвестная ошибка, публикация блокируется, пока она не оформлена как следующий `PF-014+`: root cause, evidence, machine regression или строго ограниченный recovery. После закрытия причины весь шлюз повторяется. После exact production SHA, HTTP/public-copy и IndexNow результат добавляется в `ЖУРНАЛ РЕЛИЗОВ` живой таблицы.
+
 Полный договор процесса находится в `AGENTS.md`, `docs/content-governance.md` и `config/content-governance.json`. При изменении контентного файла в том же наборе изменений обязателен `reports/content-sessions/latest.json`.
 
 Контракты проверяются командами:
 
 ```bash
 node scripts/publication-readiness-test.mjs
+node scripts/publication-sheet-gate-contract-test.mjs
 npm run test:content-governance
 ```
 
-Если таблица недоступна, вкладка пропущена, один из трёх шлюзов кластера не заполнен, manifest отсутствует либо publication-readiness выявил возврат известной аварийной схемы, материал не переносится в production.
+Если таблица недоступна, вкладка пропущена, `29_Публикационный_шлюз` не пройден, один из трёх шлюзов кластера не заполнен, manifest отсутствует либо publication-readiness выявил возврат известной аварийной схемы, материал не переносится в production.
 
 ## Где хранится контент
 
@@ -71,15 +76,15 @@ npm run test:content-governance
 ## Обязательный путь бота до production
 
 1. Создать рабочую ветку. Новые правки не вносятся напрямую в `main`.
-2. Пройти актуальную таблицу, evidence/SEO/content governance и обновить session manifest.
-3. Выполнить `node scripts/publication-readiness-test.mjs`. Этот gate проверяет PF-001…PF-013: единственность Pages writer, shallow Git, exact SHA marker, browser placement, recovery/watchdog, IndexNow и отсутствие старых fallback-схем.
-4. Выполнить полный `npm run check` с Chromium/Firefox/WebKit до merge.
-5. Создать PR. Merge разрешён только для точного head SHA, на котором полный PR CI зелёный.
+2. Открыть живую таблицу: `00_Старт` → `29_Публикационный_шлюз`; зафиксировать scope/branch/PR/head SHA. Для контента дополнительно пройти все динамически обнаруженные вкладки, evidence/SEO/content governance и обновить session manifest.
+3. Выполнить `node scripts/publication-readiness-test.mjs` и `node scripts/publication-sheet-gate-contract-test.mjs`. Эти gates защищают PF-001…PF-013 и обязательность живого табличного шлюза.
+4. Выполнить полный `npm run check` с Chromium/Firefox/WebKit до merge. Доказательства соответствующих PUB-пунктов заносятся в таблицу только по факту успешного run.
+5. Создать PR. Merge разрешён только для точного head SHA, на котором полный PR CI зелёный, а предmerge-блокеры таблицы закрыты до `ПУБЛИКАЦИЯ РАЗРЕШЕНА`.
 6. После merge запускается единственный `Deploy GitHub Pages`: быстрый deterministic `release-check`, artifact и официальный `actions/deploy-pages`. Полный browser-heavy `npm run check` после merge повторно не запускается.
 7. После успешного deploy отдельный `Verify Published Site` checkout-ит точный deployed SHA и ждёт `https://yuristshevchuk.com/deployments/<SHA>.json`.
 8. Затем сверяются `build-info.json`, meta `site-build-sha`, production HTTP surface и public-copy regression всех публикаций.
 9. Только после доказанного production SHA запускается IndexNow с production sitemap.
-10. Завершить сессию отчётом с PR/head/merge SHA, CI, deploy, production SHA и URL.
+10. Внести merge SHA, production SHA, HTTP/public-copy и IndexNow в `29_Публикационный_шлюз` и добавить строку в `ЖУРНАЛ РЕЛИЗОВ`; затем завершить сессию отчётом.
 
 ## Автоматическое восстановление: что разрешено
 
@@ -103,7 +108,8 @@ npm run test:content-governance
 4. `deployments/<full-sha>.json` существует на основном домене и содержит тот же SHA;
 5. `build-info.json` содержит тот же SHA;
 6. главная страница содержит тот же `site-build-sha`;
-7. HTTP/public-copy regression проходит для всех опубликованных материалов.
+7. HTTP/public-copy regression проходит для всех опубликованных материалов;
+8. результат отражён в `ЖУРНАЛ РЕЛИЗОВ` живой таблицы.
 
 Наличие commit в `main`, зелёный build либо merge сами по себе не доказывают публикацию.
 
@@ -121,8 +127,10 @@ npm run test:content-governance
 
 ## Публикационный шлюз остановит работу, если
 
-- текущая сессия не подтверждена manifest;
-- manifest не содержит все вкладки таблицы;
+- живой `29_Публикационный_шлюз` не открыт или его обязательные пункты не подтверждены доказательствами;
+- итоговый статус таблицы не равен `ПУБЛИКАЦИЯ РАЗРЕШЕНА`;
+- текущая контентная сессия не подтверждена manifest;
+- manifest не содержит все динамически обнаруженные вкладки таблицы, включая `29_Публикационный_шлюз`;
 - не назначена единственная страница-владелец;
 - отсутствуют исключённые запросы или проверенные конкурирующие URL;
 - отсутствует слепок Яндекса или Google;
@@ -134,5 +142,6 @@ npm run test:content-governance
 - не пройдены юридическая, фактическая или анонимизационная проверки;
 - `dist` изменён вручную;
 - publication-readiness обнаружил старую аварийную архитектуру;
+- возник новый сбой, но он не получил новый PF, root cause и machine regression/recovery;
 - `npm run check` завершён с ошибкой;
 - PR head SHA не имеет зелёного полного CI.

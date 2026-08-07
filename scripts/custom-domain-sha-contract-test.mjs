@@ -34,6 +34,10 @@ for (const marker of [
   "CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '30'",
   "CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'",
   "node scripts/verify-custom-domain-sha.mjs",
+  "Verify published release over HTTP",
+  "node scripts/live-http-release-verify.mjs",
+  "Recheck all published articles",
+  "node scripts/live-public-copy-regression-test.mjs",
   "reports/custom-domain-sha-verification.json",
   "live-site-diagnostics-${{ github.run_id }}",
   "if: env.SOURCE_EVENT != 'schedule'",
@@ -42,10 +46,13 @@ for (const marker of [
 }
 
 const verifyIndex = verifyWorkflow.indexOf("- name: Wait for custom domain to expose deployed SHA");
-const smokeIndex = verifyWorkflow.indexOf("- name: Verify published build");
+const httpIndex = verifyWorkflow.indexOf("- name: Verify published release over HTTP");
+const regressionIndex = verifyWorkflow.indexOf("- name: Recheck all published articles");
 const indexNowIndex = verifyWorkflow.indexOf("- name: Notify IndexNow about changed pages");
-assert(verifyIndex >= 0 && smokeIndex > verifyIndex, "custom-domain SHA verification must run before live smoke");
-assert(indexNowIndex > verifyIndex, "custom-domain SHA verification must run before IndexNow");
+assert(verifyIndex >= 0 && httpIndex > verifyIndex, "custom-domain SHA verification must run before production HTTP verification");
+assert(regressionIndex > httpIndex, "public-copy regression must run after production HTTP verification");
+assert(indexNowIndex > regressionIndex, "IndexNow must run only after verified SHA and production regressions");
 assert(verifyWorkflow.includes("SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}"), "post-deploy verification must use the exact deployed revision");
+assert(!/playwright|test:live|live-all-publications-smoke/.test(verifyWorkflow), "post-deploy SHA verification must not depend on browser-heavy smoke tests");
 
-console.log("Custom-domain SHA verification contract passed: exact deployed SHA is verified in isolated post-deploy workflow");
+console.log("Custom-domain SHA verification contract passed: exact deployed SHA gates lightweight production HTTP and public-copy checks");

@@ -56,6 +56,13 @@ jobs:
       - name: Установить зависимости
         run: npm ci
 
+      - name: Проверить production release-путь без браузеров
+        shell: bash
+        run: |
+          set -o pipefail
+          node --check scripts/release-check.mjs
+          node scripts/release-check.mjs 2>&1 | tee release-check.log
+
       - name: Восстановить кэш Playwright
         uses: actions/cache@v5
         with:
@@ -85,6 +92,7 @@ jobs:
         with:
           name: site-check-diagnostics-${{ github.run_id }}
           path: |
+            release-check.log
             check.log
             reports
             test-results

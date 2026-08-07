@@ -54,7 +54,8 @@ for (const marker of [
   "не входит в обычную команду `npm run check`",
   "INDEXNOW_CHANGED_DATE=2026-07-27 npm run submit:indexnow",
   "npm run check:preview-indexing-lock",
-  "Production workflow запускает именно `npm run check`",
+  "PR CI запускает полный `npm run check`",
+  "Production workflow использует быстрый `scripts/release-check.mjs`",
   "редакционный шлюз публикации",
   "editorial-publications.json",
   "sitemap-articles.xml",
@@ -69,6 +70,7 @@ for (const obsolete of [
   "удаляет ключ IndexNow",
   "npm run test:live-indexing-lock подтвердил блокировку",
   "формы, квиз, диалоги и мессенджеры",
+  "Production workflow запускает именно `npm run check`",
 ]) {
   if (current.includes(obsolete)) errors.push(`current-production-state.md: осталось устаревшее утверждение «${obsolete}»`);
 }
@@ -146,8 +148,10 @@ if (!packageJson.scripts?.check?.includes("test:publication-pipeline")) errors.p
 if (!packageJson.scripts?.["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельный preview-контур должен сохранять indexing lock");
 
 for (const marker of [
-  "npm run check",
-  "playwright install --with-deps chromium firefox webkit",
+  "node scripts/release-check.mjs",
+  "actions/deploy-pages@v5",
+  "cancel-in-progress: false",
+  "queue: single",
   "CROSS_BROWSER_REQUIRED: 'true'",
   "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
   "if: github.event_name != 'schedule'",
@@ -156,6 +160,7 @@ for (const marker of [
 }
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production workflow не должен выполнять indexing lock");
 if (workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: production workflow не должен проверять закрытый режим");
+if (workflow.includes("deploy-pages-with-extended-wait")) errors.push("pages.yml: самописный Pages API client не должен использоваться");
 
 for (const relativePath of [
   "docs/current-production-state.md",
@@ -169,6 +174,7 @@ for (const relativePath of [
   "scripts/direct-contact-model-test.mjs",
   "scripts/conversion-analytics-test.mjs",
   "scripts/publication-pipeline-test.mjs",
+  "scripts/release-check.mjs",
 ]) {
   try {
     await access(join(root, relativePath));
@@ -182,4 +188,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, traffic attribution standard, conversion analytics, publication pipeline, open indexing and automatic IndexNow are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, full PR gate, lean release gate, direct messenger model, open indexing and automatic IndexNow are current`);

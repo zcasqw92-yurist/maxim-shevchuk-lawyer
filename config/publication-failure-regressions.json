@@ -139,6 +139,26 @@
       "rootCause": "fetch-depth: 0 использовался ради одного BASE_SHA diff.",
       "preventiveControls": ["shallow-checkout", "targeted-base-sha-fetch", "postdeploy-shallow-checkout"],
       "recovery": "Получать HEAD и только требуемый base/deployed SHA, не все refs."
+    },
+    {
+      "id": "PF-014",
+      "date": "2026-08-07",
+      "class": "publication-gate-stage-deadlock",
+      "symptom": "Первая версия табличного шлюза одной формулой требовала и pre-merge, и post-deploy доказательства, поэтому exact production SHA становился условием самого merge.",
+      "evidence": ["PR #196", "29_Публикационный_шлюз", "scripts/publication-sheet-gate-contract-test.mjs"],
+      "rootCause": "Pre-merge разрешение и post-deploy подтверждение завершённой публикации были ошибочно объединены в один статус вместо двух последовательных стадий.",
+      "preventiveControls": ["publication-readiness-gate", "behavioral-not-incidental-contracts", "ordered-invariant-checks"],
+      "recovery": "До merge разделить статусы: B2 проверяет только pre-merge blockers, L2 подтверждает post-deploy completion; затем повторить полный gate на новом head SHA."
+    },
+    {
+      "id": "PF-015",
+      "date": "2026-08-07",
+      "class": "premerge-browser-dependency-timeout",
+      "symptom": "PR #196 CI #764 прошёл deterministic release gate, но шаг playwright install-deps был принудительно остановлен ровно через 6 минут во время медленной загрузки пакетов с Azure Ubuntu mirror.",
+      "evidence": ["PR #196", "CI #764 / run 31182943727", "job 92880492884", "scripts/browser-bootstrap-contract-test.mjs"],
+      "rootCause": "Обязательный pre-merge browser bootstrap зависел от внешнего apt mirror, не имел явной APT retry/timeout policy и был ограничен слишком коротким фиксированным окном 6 минут, поэтому нормальная сетевая деградация становилась ложным CI failure.",
+      "preventiveControls": ["full-pr-ci", "cross-browser-before-merge", "deterministic-release-gate"],
+      "recovery": "Не сливать PR. Настроить bounded APT retries, реалистичное ограниченное окно системных зависимостей и отдельный machine contract; затем прогнать полный CI на новом exact head SHA."
     }
   ]
 }

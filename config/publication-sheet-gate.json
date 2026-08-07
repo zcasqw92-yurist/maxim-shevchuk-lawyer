@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "ruleId": "canonical-publication-sheet-gate",
+  "spreadsheetId": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
+  "entryTab": "00_Старт",
+  "entryGid": "83276506",
+  "gateTab": "29_Публикационный_шлюз",
+  "gateGid": "290000290",
+  "mergeStatusCell": "B2",
+  "requiredMergeAllowedValue": "MERGE РАЗРЕШЕН",
+  "finalStatusCell": "L2",
+  "requiredFinalValue": "ПУБЛИКАЦИЯ ЗАВЕРШЕНА",
+  "unknownFailureCell": "J2",
+  "unresolvedUnknownFailureValue": "Да — не закрыт",
+  "resolvedUnknownFailureValue": "Да — закрыт regression",
+  "releaseLogHeaderRow": 49,
+  "releaseLogFirstDataRow": 50,
+  "appliesTo": [
+    "article",
+    "site-change",
+    "seo",
+    "infrastructure"
+  ],
+  "requirements": {
+    "liveReadBeforeEveryChange": true,
+    "mustBeAllowedBeforeMerge": true,
+    "mustKeepPostDeployCompletionSeparateFromMerge": true,
+    "mustRecordEvidenceForPassedChecks": true,
+    "mustRecordBranchPrAndHeadSha": true,
+    "mustRecordMergeSha": true,
+    "mustVerifyExactProductionSha": true,
+    "mustRecordProductionHttpAndPublicCopy": true,
+    "mustRecordIndexNowOutcome": true,
+    "mustAppendReleaseLog": true
+  },
+  "unknownFailurePolicy": {
+    "nextIdStartsAt": "PF-016",
+    "blockUntilRootCauseKnown": true,
+    "requireEvidence": true,
+    "requireMachineRegressionOrBoundedRecovery": true,
+    "requireFullGateRerun": true,
+    "forbidClosingSessionWhileUnresolved": true
+  },
+  "prohibitions": [
+    "self-asserting passed status without evidence",
+    "requiring post-deploy evidence as a precondition of merge",
+    "treating pre-merge approval as proof of publication",
+    "treating merge as proof of publication",
+    "technical retry commits",
+    "alternate Pages writers",
+    "browser-heavy post-deploy checks",
+    "closing an unknown failure without a new PF regression"
+  ]
+}

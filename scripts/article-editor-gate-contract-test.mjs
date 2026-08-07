@@ -91,7 +91,12 @@ for (const marker of [
   if (!workflowDoc.includes(marker)) errors.push(`article editor workflow doc is missing marker: ${marker}`);
 }
 
-if (!releaseCheck.includes('"scripts/article-editor-gate-contract-test.mjs"')) errors.push("release-check must execute article-editor-gate-contract-test before release packaging");
+for (const script of [
+  "scripts/article-editor-gate-contract-test.mjs",
+  "scripts/article-approval-manifest-test.mjs",
+]) {
+  if (!releaseCheck.includes(`\"${script}\"`)) errors.push(`release-check must execute ${script} before release packaging`);
+}
 for (const marker of ["createHash", "sha256", "normalizeArticleEditorRows", "fingerprintArticleEditorRows"]) {
   if (!fingerprintSource.includes(marker)) errors.push(`fingerprint implementation is missing marker: ${marker}`);
 }
@@ -99,6 +104,8 @@ for (const marker of ["createHash", "sha256", "normalizeArticleEditorRows", "fin
 if (approvalTemplate) {
   if (approvalTemplate.schemaVersion !== 1) errors.push("approval manifest template schemaVersion must remain 1");
   if (approvalTemplate.editorTab !== "34_Редактор_статей_сайта") errors.push("approval manifest template must point to canonical editor tab");
+  if (approvalTemplate.approvalEvidence !== "explicit-user-chat-command-after-review") errors.push("approval manifest template must require explicit user chat approval");
+  if (approvalTemplate.finalPreflight !== "passed-after-user-command") errors.push("approval manifest template must require final preflight after the user command");
   if (approvalTemplate.fingerprintAlgorithm !== "sha256") errors.push("approval manifest template must use sha256");
 }
 
@@ -129,4 +136,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Article editor gate contract passed: live editor source, explicit chat approval, post-command preflight, snapshot SHA-256 and drift invalidation remain mandatory before article merge");
+console.log("Article editor gate contract passed: live editor source, explicit chat approval, post-command preflight, approval manifest, snapshot SHA-256 and drift invalidation remain mandatory before article merge");

@@ -12,11 +12,11 @@ permissions:
   pages: write
   id-token: write
 
-# Резервный маршрут запускается только после завершённого инфраструктурного
-# сбоя основного Pages workflow либо вручную. Периодический watchdog запрещён:
-# при общей concurrency-группе он мог отменять долгую production-сборку.
+# Fallback получает собственную concurrency-группу. Это критично: workflow_run
+# создаётся после любого завершения основного Pages workflow, в том числе после
+# отменённого устаревшего run, и не должен сам отменять более новый основной deploy.
 concurrency:
-  group: pages
+  group: pages-fallback
   cancel-in-progress: true
 
 env:

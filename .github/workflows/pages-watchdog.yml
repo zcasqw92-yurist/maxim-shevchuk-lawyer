@@ -10,15 +10,16 @@ permissions:
   actions: write
   contents: read
 
-# Watchdog не имеет Pages permissions и не публикует сам. При доказанном drift
-# он только dispatch-ит единственный штатный Deploy GitHub Pages workflow.
+# Watchdog не имеет Pages permissions и не публикует сам. Он сначала требует
+# надёжный ответ production, затем учитывает историю Pages runs для текущего SHA.
+# Один и тот же SHA не должен порождать бесконечные reconciliation deployments.
 concurrency:
   group: pages-production-watchdog
   cancel-in-progress: true
 
 jobs:
   reconcile:
-    name: Compare main with production and request normal deploy on drift
+    name: Compare main with production and request bounded normal deploy on drift
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     env:
@@ -32,39 +33,80 @@ jobs:
           api="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}"
           auth=(-H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
 
-          main_sha="$(curl --fail-with-body --silent --show-error "${auth[@]}" "${api}/git/ref/heads/main" | jq -r '.object.sha')"
+          main_sha="$(curl --fail-with-body --silent --show-error --retry 2 --retry-delay 2 \
+            "${auth[@]}" "${api}/git/ref/heads/main" | jq -r '.object.sha')"
           if [[ ! "$main_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
             echo "Cannot resolve current main SHA" >&2
             exit 1
           fi
 
-          production_sha="$(curl --fail-with-body --silent --show-error \
-            -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
-            "${SITE_URL}/build-info.json?watchdog=$(date +%s)" \
-            | jq -r '.sha // empty' 2>/dev/null || true)"
+          marker_file="$(mktemp)"
+          trap 'rm -f "$marker_file"' EXIT
+          marker_url="${SITE_URL}/deployments/${main_sha}.json?watchdog=$(date +%s)"
 
-          if [[ "$production_sha" == "$main_sha" ]]; then
-            echo "Production matches main: ${main_sha}"
+          set +e
+          marker_status="$(curl --silent --show-error --location --retry 2 --retry-delay 2 \
+            --connect-timeout 10 --max-time 25 \
+            -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
+            -H 'Accept: application/json' \
+            --output "$marker_file" --write-out '%{http_code}' "$marker_url")"
+          marker_curl_status=$?
+          set -e
+
+          if (( marker_curl_status != 0 )); then
+            echo "Production could not be reached reliably; watchdog will not request a deploy." >&2
+            exit 1
+          fi
+
+          if [[ "$marker_status" == "200" ]]; then
+            production_sha="$(jq -r '.sha // empty' "$marker_file" 2>/dev/null || true)"
+            if [[ "$production_sha" == "$main_sha" ]]; then
+              echo "Production immutable marker matches main: ${main_sha}"
+              exit 0
+            fi
+            echo "Production marker exists but is inconsistent for ${main_sha}; automatic redeploy is blocked." >&2
+            cat "$marker_file" >&2 || true
+            exit 1
+          fi
+
+          if [[ "$marker_status" != "404" ]]; then
+            echo "Production marker returned HTTP ${marker_status}; this is not proven SHA drift, so watchdog will not deploy." >&2
+            exit 1
+          fi
+
+          echo "Immutable marker for current main is absent: ${main_sha}. Checking Pages run history before recovery."
+
+          runs_json="$(curl --fail-with-body --silent --show-error --retry 2 --retry-delay 2 \
+            "${auth[@]}" "${api}/actions/workflows/pages.yml/runs?branch=main&per_page=50")"
+
+          active_current="$(jq --arg sha "$main_sha" '[.workflow_runs[] | select(.head_sha == $sha and (.status == "queued" or .status == "in_progress"))] | length' <<<"$runs_json")"
+          if (( active_current > 0 )); then
+            echo "A Pages run for current main SHA is already queued/in progress; watchdog will wait."
             exit 0
           fi
 
-          echo "Production drift detected: main=${main_sha}; production=${production_sha:-missing}"
+          current_runs="$(jq --arg sha "$main_sha" '[.workflow_runs[] | select(.head_sha == $sha)] | length' <<<"$runs_json")"
+          current_failures="$(jq --arg sha "$main_sha" '[.workflow_runs[] | select(.head_sha == $sha and .status == "completed" and (.conclusion != "success"))] | length' <<<"$runs_json")"
+          current_successes="$(jq --arg sha "$main_sha" '[.workflow_runs[] | select(.head_sha == $sha and .status == "completed" and .conclusion == "success")] | length' <<<"$runs_json")"
 
-          active=0
-          for state in in_progress queued; do
-            count="$(curl --fail-with-body --silent --show-error "${auth[@]}" \
-              "${api}/actions/workflows/pages.yml/runs?branch=main&status=${state}&per_page=1" | jq '.total_count')"
-            if (( count > 0 )); then
-              active=1
-              echo "Deploy GitHub Pages already has ${state} run; watchdog will not create another request."
-            fi
-          done
-          if (( active > 0 )); then
-            exit 0
+          if (( current_failures > 0 )); then
+            echo "Pages already has a failed completed run for current SHA. Automatic drift dispatch is blocked; setup-only recovery or a real fix must handle it." >&2
+            exit 1
+          fi
+
+          if (( current_successes >= 2 )); then
+            echo "Two or more successful Pages runs already attempted this SHA while the immutable marker is still absent. Automatic loop is stopped." >&2
+            exit 1
+          fi
+
+          if (( current_runs == 0 )); then
+            reason="no Pages run exists for current main SHA"
+          else
+            reason="one successful Pages run exists but production marker is still absent"
           fi
 
           curl --fail-with-body --silent --show-error -X POST "${auth[@]}" \
             -H 'Content-Type: application/json' \
             "${api}/actions/workflows/pages.yml/dispatches" \
             -d '{"ref":"main"}'
-          echo "Requested normal Deploy GitHub Pages workflow for current main; no Git commit was created."
+          echo "Requested one bounded normal Deploy GitHub Pages reconciliation because ${reason}; no Git commit was created."

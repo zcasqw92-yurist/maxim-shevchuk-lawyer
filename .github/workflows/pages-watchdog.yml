@@ -74,7 +74,27 @@ jobs:
             exit 1
           fi
 
-          echo "Immutable marker for current main is absent: ${main_sha}. Checking Pages run history before recovery."
+          # build-info здесь только диагностика старой видимой версии. Он не может
+          # заменить SHA-specific marker как доказательство готовности production.
+          production_sha="$(curl --fail-with-body --silent --show-error --retry 2 --retry-delay 2 \
+            -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
+            "${SITE_URL}/build-info.json?watchdog=$(date +%s)" \
+            | jq -r '.sha // empty')" || {
+              echo "Production build-info could not be read reliably; watchdog will not request a deploy." >&2
+              exit 1
+            }
+          echo "Immutable marker for current main is absent: ${main_sha}; currently visible build-info SHA=${production_sha:-missing}."
+
+          # Любой уже активный Pages run использует тот же production resource.
+          # Не создаём параллельный request даже если active run относится к предыдущему SHA.
+          for state in queued in_progress; do
+            active_state="$(curl --fail-with-body --silent --show-error --retry 2 --retry-delay 2 \
+              "${auth[@]}" "${api}/actions/workflows/pages.yml/runs?branch=main&status=${state}&per_page=1" | jq '.total_count')"
+            if (( active_state > 0 )); then
+              echo "Deploy GitHub Pages already has ${state} run; watchdog will wait before reconciling ${main_sha}."
+              exit 0
+            fi
+          done
 
           runs_json="$(curl --fail-with-body --silent --show-error --retry 2 --retry-delay 2 \
             "${auth[@]}" "${api}/actions/workflows/pages.yml/runs?branch=main&per_page=50")"

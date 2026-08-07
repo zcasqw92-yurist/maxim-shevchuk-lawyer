@@ -55,7 +55,10 @@ const baseSha = process.env.CONTENT_GOVERNANCE_BASE_SHA?.trim();
 if (baseSha) {
   let changedFiles = [];
   try {
-    const { stdout } = await execFileAsync("git", ["diff", "--name-only", `${baseSha}...HEAD`], { cwd: root });
+    // PF-013: CI deliberately uses shallow checkout and fetches only BASE_SHA.
+    // Compare the two available trees directly; triple-dot requires merge-base ancestry
+    // and would incorrectly force full Git history into an otherwise bounded gate.
+    const { stdout } = await execFileAsync("git", ["diff", "--name-only", baseSha, "HEAD", "--"], { cwd: root });
     changedFiles = stdout.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   } catch (error) {
     errors.push(`cannot determine changed files from CONTENT_GOVERNANCE_BASE_SHA=${baseSha}: ${error.message}`);
@@ -80,6 +83,6 @@ if (errors.length) {
 }
 
 const enforcement = baseSha
-  ? "changed editorial source modules are approval-manifest gated"
+  ? "changed editorial source modules are approval-manifest gated with shallow-safe tree diff"
   : "manifest structure validated; changed-file enforcement awaits CONTENT_GOVERNANCE_BASE_SHA";
 console.log(`Article approval manifest contract passed: ${enforcement}`);

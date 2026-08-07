@@ -49,23 +49,24 @@ assert(liveRegression.includes("reportsDir"), "Live regression must write a diag
 assert(liveRegression.includes("GITHUB_STEP_SUMMARY"), "Live regression must publish a workflow summary");
 
 assert(pages.includes("actions/deploy-pages@v5"), "Pages workflow must use the official deployment action");
-assert(!pages.includes("live-public-copy-regression-test.mjs"), "Browser/public-copy live regression must not hold the Pages deployment workflow open");
+assert(!pages.includes("live-public-copy-regression-test.mjs"), "Public-copy live regression must not hold the Pages deployment workflow open");
 
-const shaStep = verifyWorkflow.indexOf("Wait for custom domain to expose deployed SHA");
-const regressionStep = verifyWorkflow.indexOf("Recheck all published articles");
-assert(shaStep >= 0, "Post-deploy workflow is missing custom-domain SHA verification");
-assert(regressionStep > shaStep, "All published articles must be rechecked after custom-domain SHA verification");
-assert(verifyWorkflow.includes("node scripts/live-public-copy-regression-test.mjs"), "Post-deploy workflow is missing live public-copy regression");
+const shaStep = verifyWorkflow.indexOf("node scripts/verify-custom-domain-sha.mjs");
+const regressionStep = verifyWorkflow.indexOf("node scripts/live-public-copy-regression-test.mjs");
+assert(shaStep >= 0, "Post-deploy workflow is missing exact-SHA/immutable-marker verification");
+assert(regressionStep > shaStep, "All published articles must be rechecked only after exact production SHA is verified");
+assert(verifyWorkflow.includes("CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '72'"), "Post-deploy exact-SHA gate must tolerate propagation delay");
 assert(verifyWorkflow.includes("reports/public-copy-regression.json"), "Post-deploy workflow is missing public-copy diagnostics");
 assert(verifyWorkflow.includes("live-site-diagnostics-${{ github.run_id }}"), "Post-deploy diagnostics artifact must be preserved");
 assert(verifyWorkflow.includes("SOURCE_SHA"), "Post-deploy verification must be pinned to the deployed revision");
+assert(!/playwright|npm ci|test:live/.test(verifyWorkflow), "Public-copy post-deploy regression must remain dependency-light");
 
 for (const marker of [
   "npm run test:public-copy",
-  "node scripts/live-public-copy-regression-test.mjs",
+  "publication-readiness",
   "все ранее опубликованные статьи",
-  "каждый найденный URL",
-]) assert(agents.includes(marker), `AGENTS.md is missing public-copy rule: ${marker}`);
+  "каждый URL",
+]) assert(agents.includes(marker), `AGENTS.md is missing public-copy/publication rule: ${marker}`);
 
 for (const marker of [
   "Новая или изменённая статья прошла `npm run test:public-copy`",
@@ -77,4 +78,4 @@ for (const marker of ["До публикации", "После публикац�
   assert(documentation.includes(marker), `Public-copy documentation is missing: ${marker}`);
 }
 
-console.log("Public-copy control contract passed: pre-publication block, verified post-deploy regression and user disclosure remain mandatory without blocking Pages deployment");
+console.log("Public-copy control contract passed: pre-publication block, immutable-SHA-gated post-deploy regression and user disclosure remain mandatory without blocking Pages deployment");

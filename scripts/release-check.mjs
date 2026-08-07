@@ -1,6 +1,11 @@
 import { spawn } from "node:child_process";
 
 const commands = [
+  ["node", ["--check", "scripts/verify-custom-domain-sha.mjs"]],
+  ["node", ["--check", "scripts/live-http-release-verify.mjs"]],
+  ["node", ["--check", "scripts/live-public-copy-regression-test.mjs"]],
+  ["node", ["--check", "scripts/metrica-state-test.mjs"]],
+  ["node", ["--check", "scripts/submit-indexnow.mjs"]],
   ["npm", ["run", "test:content-governance"]],
   ["npm", ["run", "test:public-copy"]],
   ["npm", ["run", "test:editorial-list-policy"]],

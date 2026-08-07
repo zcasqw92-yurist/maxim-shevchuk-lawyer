@@ -18,6 +18,7 @@ const [
   indexingPolicy,
   packageText,
   workflow,
+  verifyWorkflow,
   conversionAnalytics,
   privacyImplementation,
   trafficAttribution,
@@ -32,6 +33,7 @@ const [
   read("INDEXING_POLICY.md"),
   read("package.json"),
   read(".github/workflows/pages.yml"),
+  read(".github/workflows/pages-verify.yml"),
   read("docs/conversion-analytics.md"),
   read("docs/privacy-implementation-note.md"),
   read("docs/traffic-attribution-standard.md"),
@@ -153,14 +155,23 @@ for (const marker of [
   "cancel-in-progress: false",
   "queue: single",
   "CROSS_BROWSER_REQUIRED: 'true'",
-  "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
-  "if: github.event_name != 'schedule'",
 ]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует production-маркер ${marker}`);
+}
+for (const marker of [
+  "workflows: [\"Deploy GitHub Pages\"]",
+  "Checkout exact deployed revision",
+  "SOURCE_SHA",
+  "verify-custom-domain-sha.mjs",
+  "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
+  "if: env.SOURCE_EVENT != 'schedule'",
+]) {
+  if (!verifyWorkflow.includes(marker)) errors.push(`pages-verify.yml: отсутствует post-deploy маркер ${marker}`);
 }
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production workflow не должен выполнять indexing lock");
 if (workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: production workflow не должен проверять закрытый режим");
 if (workflow.includes("deploy-pages-with-extended-wait")) errors.push("pages.yml: самописный Pages API client не должен использоваться");
+if (workflow.includes("playwright install")) errors.push("pages.yml: browser-heavy live checks должны выполняться отдельно после deployment");
 
 for (const relativePath of [
   "docs/current-production-state.md",
@@ -175,6 +186,7 @@ for (const relativePath of [
   "scripts/conversion-analytics-test.mjs",
   "scripts/publication-pipeline-test.mjs",
   "scripts/release-check.mjs",
+  ".github/workflows/pages-verify.yml",
 ]) {
   try {
     await access(join(root, relativePath));
@@ -188,4 +200,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} routes, full PR gate, lean release gate, direct messenger model, open indexing and automatic IndexNow are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, full PR gate, lean Pages deploy and isolated post-deploy verification are current`);

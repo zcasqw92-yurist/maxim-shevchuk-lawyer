@@ -2,6 +2,14 @@
 
 - 
 
+## Publication-readiness
+
+- [ ] Работа выполнена в отдельной ветке, не напрямую в `main`.
+- [ ] `node scripts/publication-readiness-test.mjs` завершён без ошибок.
+- [ ] Не возвращены технические retry-коммиты, альтернативный Pages writer, browser-heavy deploy fallback или `cancel-in-progress:true` для production Pages.
+- [ ] Если менялась публикационная инфраструктура, соответствующий класс PF-001…PF-013 сохранён закрытым machine regression-контролем.
+- [ ] Полный PR CI с Chromium/Firefox/WebKit относится к текущему состоянию PR и завершён успешно до merge.
+
 ## Контентный шлюз
 
 - [ ] Изменение не затрагивает видимый контент сайта; либо выполнены все пункты ниже.
@@ -21,7 +29,7 @@
 - [ ] Тем же тестом повторно проверены исходные данные всех ранее опубликованных статей.
 - [ ] В публичном тексте отсутствуют внутренняя SEO-терминология, редакционные комментарии, служебные ID, описание источников подготовки и черновые артефакты.
 - [ ] `dist` не редактировался вручную.
-- [ ] `npm run check` завершён без ошибок.
+- [ ] `npm run check` завершён без ошибок до merge.
 
 ## Публикация
 
@@ -32,7 +40,9 @@
 - Оригинальный практический элемент:
 - Результат предпубликационной проверки публичного текста:
 - Ожидаемые URL:
-- После merge проверить GitHub Pages, `npm run test:live`, `node scripts/live-all-publications-smoke.mjs` и `node scripts/live-public-copy-regression-test.mjs`.
+- После merge проверить штатный `Deploy GitHub Pages`, затем дождаться `Verify Published Site` для точного production SHA. Browser-heavy `npm run test:live` и `scripts/live-all-publications-smoke.mjs` после deploy вручную не повторяются: они обязаны пройти до merge.
+- Проверен `https://yuristshevchuk.com/deployments/<full-SHA>.json`, затем `build-info.json` и `site-build-sha`.
+- После подтверждения SHA выполнены production HTTP и `node scripts/live-public-copy-regression-test.mjs` без замечаний.
 - Результат контрольной проверки всех прежних статей после подтверждения production SHA:
 - Найденные нюансы, исправления и повторная проверка, либо отметка «замечаний не найдено»:
-- Итоговый отчёт с commit SHA и результатами live-проверки передан в чат.
+- Итоговый отчёт с merge SHA, production SHA и результатами live-проверки передан в чат.

@@ -138,16 +138,22 @@ for (const marker of [
   "name: Watch production SHA drift",
   "cron: '37 * * * *'",
   "actions: write",
-  "build-info.json?watchdog=",
+  "deployments/${main_sha}.json?watchdog=",
   "main_sha",
-  "production_sha",
+  "marker_status",
+  "active_current",
+  "current_failures",
+  "current_successes >= 2",
   "pages.yml/dispatches",
-  "status=${state}",
+  "no Git commit was created",
 ]) {
-  if (!watchdog.includes(marker)) errors.push(`pages-watchdog.yml: отсутствует условный production-recovery маркер ${marker}`);
+  if (!watchdog.includes(marker)) errors.push(`pages-watchdog.yml: отсутствует bounded production-recovery маркер ${marker}`);
 }
 if (/pages:\s*write|id-token:\s*write|actions\/deploy-pages|actions\/upload-pages-artifact/.test(watchdog)) {
   errors.push("pages-watchdog.yml: watchdog не должен быть вторым Pages deployer");
+}
+if (!watchdog.includes("Production could not be reached reliably; watchdog will not request a deploy.")) {
+  errors.push("pages-watchdog.yml: network outage должен отличаться от доказанного SHA drift");
 }
 
 const verifyWorkflow = await readFile(join(root, ".github", "workflows", "pages-verify.yml"), "utf8");
@@ -180,4 +186,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: production indexing, exact-SHA verification, conditional drift watchdog and post-deploy IndexNow are configured");
+console.log("Search visibility checks passed: production indexing, immutable-SHA verification, bounded drift watchdog and post-deploy IndexNow are configured");

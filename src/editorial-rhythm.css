@@ -91,6 +91,15 @@
   }
 
   /* C-139: единый компактный ритм внутри статьи. */
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+    --editorial-c139-content-inset: 16px;
+  }
+
+  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
+    .editorial-body > .article-section {
+    padding-inline: var(--editorial-c139-content-inset);
+  }
+
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
     .editorial-body > .article-section,
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
@@ -183,6 +192,10 @@
     .article-page .editorial-article__header,
     .case-page .editorial-article__header {
       padding-bottom: 30px;
+    }
+
+    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+      --editorial-c139-content-inset: 12px;
     }
 
     .editorial-index-page .editorial-index-hero + .section {

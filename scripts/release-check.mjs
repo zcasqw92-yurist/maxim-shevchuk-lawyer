@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 
 const commands = [
   ["node", ["scripts/publication-readiness-test.mjs"]],
+  ["node", ["scripts/pages-recovery-contract-test.mjs"]],
   ["node", ["--check", "scripts/verify-custom-domain-sha.mjs"]],
   ["node", ["--check", "scripts/live-http-release-verify.mjs"]],
   ["node", ["--check", "scripts/live-public-copy-regression-test.mjs"]],

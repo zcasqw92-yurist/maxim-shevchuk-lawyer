@@ -44,6 +44,7 @@
     --editorial-marker-width: 18px;
     --editorial-marker-item-gap: 12px;
     --editorial-marker-block-gap: 14px;
+    --editorial-list-edge-inset: 12px;
   }
 
   .case-page {
@@ -51,6 +52,7 @@
     --editorial-marker-width: 18px;
     --editorial-marker-item-gap: 10px;
     --editorial-marker-block-gap: 18px;
+    --editorial-list-edge-inset: 0px;
   }
 
   .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
@@ -59,7 +61,7 @@
     display: grid;
     gap: var(--editorial-marker-item-gap);
     margin: var(--editorial-marker-block-gap) 0 0;
-    padding: 0;
+    padding: 0 var(--editorial-list-edge-inset);
     list-style: none;
   }
 

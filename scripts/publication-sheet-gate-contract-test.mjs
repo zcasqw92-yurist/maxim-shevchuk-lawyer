@@ -69,7 +69,7 @@ if (gate) {
   ]) {
     if (gate.unknownFailurePolicy?.[field] !== true) errors.push(`unknown failure policy must remain enabled: ${field}`);
   }
-  if (gate.unknownFailurePolicy?.nextIdStartsAt !== "PF-014") errors.push("new unknown failures must start at PF-014 and continue sequentially");
+  if (gate.unknownFailurePolicy?.nextIdStartsAt !== "PF-015") errors.push("new unknown failures must start at PF-015 because PF-014 is already registered");
 }
 
 if (contentGovernance) {
@@ -95,8 +95,8 @@ if (!pf014) {
 }
 
 for (const [label, text, markers] of [
-  ["AGENTS.md", agents, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-014+", "ЖУРНАЛ РЕЛИЗОВ", "не может быть выставлен по предположению"]],
-  ["docs/PUBLISHING.md", publishing, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-014+", "ЖУРНАЛ РЕЛИЗОВ", "живой таблицы"]],
+  ["AGENTS.md", agents, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-015+", "ЖУРНАЛ РЕЛИЗОВ", "не может быть выставлен по предположению"]],
+  ["docs/PUBLISHING.md", publishing, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-015+", "ЖУРНАЛ РЕЛИЗОВ", "живой таблицы"]],
   [".github/pull_request_template.md", prTemplate, [requiredGateTab, requiredMergeValue, requiredFinalValue, "новый PF", "Доказательства пунктов шлюза"]],
 ]) {
   for (const marker of markers) if (!text.includes(marker)) errors.push(`${label}: publication sheet gate marker is missing: ${marker}`);
@@ -111,4 +111,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Publication sheet gate contract passed: pre-merge B2 and post-deploy L2 are separated, live table review is mandatory, and PF-014 protects against stage deadlock");
+console.log("Publication sheet gate contract passed: pre-merge B2 and post-deploy L2 are separated, live table review is mandatory, PF-014 protects stage separation, and the next unknown class starts at PF-015");

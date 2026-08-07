@@ -99,10 +99,10 @@ for (const marker of [
   targetSelector,
   '--editorial-c139-space: 16px',
   '--editorial-c139-section-space: 24px',
-  '--editorial-marker-indent: 26px',
+  '--editorial-marker-indent: 30px',
   '--editorial-marker-width: 18px',
-  '--editorial-marker-item-gap: var(--editorial-c139-space)',
-  '--editorial-marker-block-gap: var(--editorial-c139-space)',
+  '--editorial-marker-item-gap: 12px',
+  '--editorial-marker-block-gap: 14px',
   'gap: var(--editorial-marker-item-gap)',
   'margin: var(--editorial-marker-block-gap) 0 0',
   'padding: 0 0 0 var(--editorial-marker-indent)',
@@ -155,4 +155,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial list policy passed: C-139 uses semantic markers and a compact unified spacing grid; earlier articles keep their previous presentation");
+console.log("Editorial list policy passed: C-139 uses deeper list indentation with tighter item spacing; earlier articles keep their previous presentation");

@@ -123,17 +123,34 @@ for (const marker of [
   "INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}",
   "schedule:",
   "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)",
-  "npm run check",
-  "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
+  "node scripts/release-check.mjs",
+  "actions/deploy-pages@v5",
 ]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует настройка ${marker}`);
 }
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production-сайт не должен снова закрываться от индексации");
+if (workflow.includes("npm run check")) errors.push("pages.yml: полный browser-heavy npm run check должен выполняться до merge, а не удерживать production deployment");
 if (/if:\s*\$\{\{\s*env\.INDEXNOW_KEY/.test(workflow)) errors.push("pages.yml: IndexNow не должен зависеть от необязательного секрета");
+
+const verifyWorkflow = await readFile(join(root, ".github", "workflows", "pages-verify.yml"), "utf8");
+for (const marker of [
+  'workflows: ["Deploy GitHub Pages"]',
+  "workflow_run.conclusion == 'success'",
+  "SOURCE_SHA",
+  "node scripts/verify-custom-domain-sha.mjs",
+  'INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow',
+]) {
+  if (!verifyWorkflow.includes(marker)) errors.push(`pages-verify.yml: отсутствует настройка ${marker}`);
+}
+const verifyShaIndex = verifyWorkflow.indexOf("node scripts/verify-custom-domain-sha.mjs");
+const indexNowIndex = verifyWorkflow.indexOf('INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow');
+if (verifyShaIndex < 0 || indexNowIndex <= verifyShaIndex) errors.push("pages-verify.yml: IndexNow должен запускаться только после подтверждения опубликованного SHA");
+if (/if:\s*\$\{\{\s*env\.INDEXNOW_KEY/.test(verifyWorkflow)) errors.push("pages-verify.yml: IndexNow не должен зависеть от необязательного секрета");
 
 const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 if (/lock:indexing/.test(packageJson.scripts.check || "")) errors.push("package.json: npm run check не должен менять production-индексацию");
 if (!packageJson.scripts["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельная проверка закрытого preview должна сохраниться");
+if (!packageJson.scripts.check?.includes("test:search-visibility")) errors.push("package.json: полный PR-check должен сохранять search visibility контроль");
 
 const indexNow = await readFile(join(root, "scripts", "submit-indexnow.mjs"), "utf8");
 for (const marker of ["INDEXNOW_CHANGED_DATE", "lastmod", "--all", "нет URL с содержательным обновлением"]) {
@@ -145,4 +162,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: pretrial specialization, debt recovery cluster, production indexing, geography and automatic IndexNow are configured");
+console.log("Search visibility checks passed: pretrial specialization, debt recovery cluster, production indexing and post-deploy IndexNow are configured");

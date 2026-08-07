@@ -12,6 +12,20 @@ for (const field of ["sha", "version", "builtAt", "contentLastModified"]) {
 }
 if (!/^\d{4}-\d{2}-\d{2}T/.test(info.builtAt)) errors.push("build-info.json: builtAt must be ISO date-time");
 
+const markerName = /^[A-Fa-f0-9]{40}$/.test(String(info.sha || "")) ? info.sha : "local";
+let marker;
+try {
+  marker = JSON.parse(await readFile(join(dist, "deployments", `${markerName}.json`), "utf8"));
+} catch (error) {
+  errors.push(`deployment marker ${markerName}.json is missing or invalid: ${error.message}`);
+}
+if (marker) {
+  if (marker.schemaVersion !== 1) errors.push("deployment marker: schemaVersion must be 1");
+  for (const field of ["sha", "version", "builtAt", "contentLastModified", "production"]) {
+    if (marker[field] !== info[field]) errors.push(`deployment marker: ${field} does not match build-info.json`);
+  }
+}
+
 for (const pagePath of [
   "index.html",
   join("uslugi", "index.html"),
@@ -53,4 +67,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Deployment observability checks passed · build ${info.version} · analytics events ready`);
+console.log(`Deployment observability checks passed · build ${info.version} · immutable marker ${markerName}.json · analytics events ready`);

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-07-31T12:02:00.000Z",
+  "providers": {
+    "serpapi": {
+      "cycleId": "2026-07",
+      "cycleResetPolicy": "manual",
+      "limit": 250,
+      "hardStopAt": 240,
+      "knownUsed": 6,
+      "remainingToProviderLimit": 244,
+      "remainingToProjectHardStop": 234,
+      "baselineSource": "SerpApi dashboard screenshot supplied by user after Google-only test",
+      "requests": [
+        {
+          "at": "2026-07-31T11:57:37.000Z",
+          "clusterId": "refund-services",
+          "engine": "google",
+          "count": 6,
+          "queryIds": [
+            "refund-lawyer-commercial",
+            "service-not-rendered",
+            "service-contract-refusal",
+            "service-prepayment-refund",
+            "imposed-service-refund",
+            "refund-after-claim-deadline"
+          ],
+          "reason": "Initial successful Google SERP gate",
+          "workflowCommit": "8e013251ad082b8d6e6a7bc0ad87c44148b0b2d7"
+        }
+      ]
+    },
+    "yandexSearchApi": {
+      "cycleId": "2026-07",
+      "cycleResetPolicy": "manual",
+      "knownUsed": null,
+      "baselineSource": "Prior usage total is not reliably available; repeated requests are prevented by cache from this point onward",
+      "requests": []
+    }
+  }
+}

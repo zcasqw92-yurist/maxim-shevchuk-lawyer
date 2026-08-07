@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "clusterId": "refund-services",
+  "clusterTitle": "Возврат денег за услуги и навязанные договоры",
+  "checkedRegion": {
+    "yandexRegionId": "213",
+    "label": "Москва",
+    "googleCountry": "ru",
+    "googleLanguage": "ru"
+  },
+  "minimumOrganicResultsPerEngine": 5,
+  "excludeSponsoredResultsFromMinimum": true,
+  "queries": [
+    {
+      "id": "refund-lawyer-commercial",
+      "query": "юрист по возврату денег за услуги",
+      "candidateOwner": "/uslugi/vozvrat-deneg/",
+      "candidatePageType": "service",
+      "decisionQuestion": "Подтвердить, что широкий коммерческий интент принадлежит существующей странице услуги."
+    },
+    {
+      "id": "service-not-rendered",
+      "query": "как вернуть деньги за неоказанную услугу",
+      "candidateOwner": "/razbory/vernut-dengi-za-neokazannuyu-uslugu/",
+      "candidatePageType": "article",
+      "decisionQuestion": "Нужен ли самостоятельный разбор для полного или частичного неоказания услуги."
+    },
+    {
+      "id": "service-contract-refusal",
+      "query": "отказ от договора оказания услуг вернуть деньги",
+      "candidateOwner": "/razbory/otkaz-ot-dogovora-okazaniya-uslug/",
+      "candidatePageType": "article",
+      "decisionQuestion": "Отделяет ли выдача добровольный отказ заказчика от нарушения исполнителя."
+    },
+    {
+      "id": "service-prepayment-refund",
+      "query": "как вернуть предоплату за услугу",
+      "candidateOwner": null,
+      "candidatePageType": "undecided",
+      "decisionQuestion": "Является ли возврат предоплаты самостоятельным интентом или подразделом владельца неоказанной услуги либо отказа от договора."
+    },
+    {
+      "id": "imposed-service-refund",
+      "query": "возврат денег за навязанную услугу",
+      "candidateOwner": "/razbory/vernut-dengi-za-navyazannuyu-uslugu/",
+      "candidatePageType": "article",
+      "decisionQuestion": "Подтвердить самостоятельность спора о навязанной дополнительной услуге и платёжной цепочке."
+    },
+    {
+      "id": "refund-after-claim-deadline",
+      "query": "срок возврата денег после претензии за услугу",
+      "candidateOwner": null,
+      "candidatePageType": "undecided",
+      "decisionQuestion": "Нужна ли отдельная страница о сроке возврата или достаточно H2 и FAQ внутри основного владельца."
+    }
+  ]
+}

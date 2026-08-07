@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "cacheTtlDays": 14,
+  "neverRefreshAutomatically": true,
+  "requireExplicitPaidApproval": true,
+  "requireApprovedQueryIds": true,
+  "maxPaidRequestsPerRun": 3,
+  "providers": {
+    "serpapi": {
+      "monthlyLimit": 250,
+      "warningAt": 200,
+      "hardStopAt": 240,
+      "reserve": 10,
+      "cycleResetPolicy": "manual"
+    },
+    "yandexSearchApi": {
+      "monthlyLimit": null,
+      "warningAt": null,
+      "hardStopAt": null,
+      "cycleResetPolicy": "manual"
+    }
+  }
+}

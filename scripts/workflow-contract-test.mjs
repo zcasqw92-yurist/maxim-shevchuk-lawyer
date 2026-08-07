@@ -58,7 +58,7 @@ forbidPattern("pages", pages, /cancel-in-progress:\s*true/, "production deployme
 forbidPattern("pages", pages, /queue:\s*max/, "накопительная FIFO-очередь deployment запрещена");
 forbidPattern("pages", pages, /playwright install/, "основной Pages workflow не должен скачивать браузеры");
 forbidPattern("pages", pages, /npm run check(?:\s|$)/m, "release build не должен второй раз гонять полный browser-heavy npm run check");
-forbidPattern("pages", pages, /Verify published site/, "post-deploy browser audit должен жить в отдельном workflow");
+forbidPattern("pages", pages, /Verify published site/, "post-deploy аудит должен жить в отдельном workflow");
 forbidPattern("pages", pages, /actions\/upload-pages-artifact@v[1-4]\b/, "устаревший upload-pages-artifact не должен возвращаться");
 
 requirePattern("verify", verify, /workflow_run:[\s\S]*workflows:\s*\["Deploy GitHub Pages"\][\s\S]*types:\s*\[completed\]/, "live-аудит должен запускаться после завершения Pages workflow");
@@ -66,15 +66,16 @@ requirePattern("verify", verify, /workflow_run\.conclusion == 'success'[\s\S]*wo
 requirePattern("verify", verify, /group:\s*pages-live-verify[\s\S]*cancel-in-progress:\s*true/, "устаревший post-deploy аудит можно безопасно отменять новой опубликованной версией");
 requirePattern("verify", verify, /ref:\s*\$\{\{ env\.SOURCE_SHA \}\}/, "live-аудит должен checkout-ить точный SHA исходного deployment");
 requirePattern("verify", verify, /SOURCE_SHA:\s*\$\{\{ github\.event\.workflow_run\.head_sha \|\| github\.sha \}\}/, "workflow_run должен сохранять точный SHA опубликованного release");
-requirePattern("verify", verify, /uses:\s*actions\/cache@v5/, "live browser binaries должны кэшироваться");
+requirePattern("verify", verify, /uses:\s*actions\/setup-node@v6/, "post-deploy проверка должна использовать закреплённый Node.js без локальных browser binaries");
 requirePattern("verify", verify, /uses:\s*actions\/upload-artifact@v7/, "live diagnostics должны использовать upload-artifact@v7");
-requirePattern("verify", verify, /npx playwright install-deps chromium webkit/, "live browser dependencies должны иметь отдельный шаг");
-requirePattern("verify", verify, /npx playwright install chromium webkit/, "live-аудиту достаточно Chromium и WebKit");
-requirePattern("verify", verify, /CUSTOM_DOMAIN_VERIFY_ATTEMPTS:\s*['"]30['"][\s\S]*verify-custom-domain-sha\.mjs/, "до live-smoke нужно дождаться точного SHA на custom domain");
-requirePattern("verify", verify, /SITE_PUBLIC_URL:\s*\$\{\{ env\.SITE_URL \}\}[\s\S]*EXPECTED_BUILD_SHA:\s*\$\{\{ env\.SOURCE_SHA \}\}/, "live-smoke должен проверять custom domain и точный deployed SHA");
+requirePattern("verify", verify, /CUSTOM_DOMAIN_VERIFY_ATTEMPTS:\s*['"]30['"][\s\S]*verify-custom-domain-sha\.mjs/, "до HTTP-проверки нужно дождаться точного SHA на custom domain");
+requirePattern("verify", verify, /SITE_PUBLIC_URL:\s*\$\{\{ env\.SITE_URL \}\}[\s\S]*EXPECTED_BUILD_SHA:\s*\$\{\{ env\.SOURCE_SHA \}\}[\s\S]*live-http-release-verify\.mjs/, "post-deploy должен проверять production по HTTP и точный deployed SHA");
+requirePattern("verify", verify, /live-public-copy-regression-test\.mjs/, "после подтверждения SHA должен выполняться regression публичных статей");
+requirePattern("verify", verify, /reports\/live-http-release-verification\.json/, "ошибка HTTP-проверки должна сохранять диагностический отчёт");
 requirePattern("verify", verify, /continue-on-error:\s*true[\s\S]*metrica-state-test\.mjs/, "внешний API Метрики не должен блокировать опубликованный сайт");
-requirePattern("verify", verify, /if:\s*env\.SOURCE_EVENT != 'schedule'[\s\S]*submit:indexnow/, "IndexNow должен запускаться после live-аудита и не по расписанию");
+requirePattern("verify", verify, /if:\s*env\.SOURCE_EVENT != 'schedule'[\s\S]*submit-indexnow/, "IndexNow должен запускаться после live-аудита и не по расписанию");
 forbidPattern("verify", verify, /pages:\s*write/, "post-deploy аудит не должен иметь права на новый Pages deployment");
+forbidPattern("verify", verify, /playwright|actions\/cache|npm ci|test:live|live-all-publications-smoke/, "post-deploy critical path не должен повторять browser-heavy PR CI");
 
 for (const required of ["test:content-governance","test:public-copy","test:editorial-list-policy","test:editorial-single-source","test:editorial-commercial-gate","test:seo-data-pipeline","build","test:css-architecture","validate","audit:seo","test:seo-metadata","test:documentation","test:workflow-contract","test:deployment-observability","test:custom-domain-sha"]) {
   if (!releaseGate.includes(`\"${required}\"`)) errors.push(`release-gate: отсутствует обязательная deterministic проверка ${required}`);
@@ -95,4 +96,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Workflow contract passed: full browser CI before merge, lean build/deploy workflow, current artifact actions, one non-cancelling Pages queue and isolated post-deploy verification");
+console.log("Workflow contract passed: full browser CI before merge, lean Pages deploy, and dependency-free HTTP verification after publication");

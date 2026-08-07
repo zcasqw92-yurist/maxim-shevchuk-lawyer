@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "productionWorkflow": "Deploy GitHub Pages",
+    "verificationWorkflow": "Verify Published Site",
+    "recoveryWorkflow": "Recover Pages infrastructure failure",
+    "watchdogWorkflow": "Watch production SHA drift",
+    "maximumAutomaticRetryAttempt": 3,
+    "productionUrl": "https://yuristshevchuk.com",
+    "rule": "Каждый известный класс сбоя обязан иметь блокирующий предпубликационный контроль либо безопасный ограниченный recovery-маршрут без технических retry-коммитов."
+  },
+  "incidents": [
+    {
+      "id": "PF-001",
+      "date": "2026-07-31",
+      "class": "stale-custom-domain-sha",
+      "symptom": "После merge основной домен продолжал отдавать предыдущий SHA; для повторного push был создан служебный commit.",
+      "evidence": ["reports/deploy-retries/2026-07-31-case-service-card.md", "PR #96", "commit f85386c921a807cc617ec5a5c7b81ad075fe339a"],
+      "rootCause": "Production-состояние не было доказано уникальным маркером конкретной сборки, а штатного drift-recovery не существовало.",
+      "preventiveControls": ["immutable-sha-marker", "custom-domain-exact-sha", "production-drift-watchdog"],
+      "recovery": "Проверить SHA-specific marker; при drift запустить тот же штатный Pages workflow через workflow_dispatch. Не создавать пустой commit."
+    },
+    {
+      "id": "PF-002",
+      "date": "2026-07-31",
+      "class": "late-content-gate",
+      "symptom": "Исправленный исходник статьи не был опубликован: production-запуск остановился на контентном шлюзе, после чего понадобился служебный retrigger.",
+      "evidence": ["reports/deploy-triggers/2026-07-31-remove-public-seo-note.md", "commit f992539a75b84aa100a4b01f1159bf7252b7f1bd"],
+      "rootCause": "Ошибка, которую можно было определить до merge, дошла до production workflow.",
+      "preventiveControls": ["full-pr-ci", "deterministic-release-gate", "publication-readiness-gate"],
+      "recovery": "Ошибки проекта не повторять автоматически; исправлять в отдельной ветке и заново проходить PR CI."
+    },
+    {
+      "id": "PF-003",
+      "date": "2026-08-01",
+      "class": "production-propagation-timeout",
+      "symptom": "После зелёного PR-CI основной домен не показал новую сборку в первом 35-минутном окне; был создан технический retry commit.",
+      "evidence": ["reports/deployment-retries/2026-08-01-refund-imposed-service.md", "commit 3aebe121a4adf709ba598040f608ca6d03be7b3e"],
+      "rootCause": "Deployment backend/custom-domain propagation и контроль публикации были связаны с жёстким окном и не имели отдельного eventual-consistency watchdog.",
+      "preventiveControls": ["official-pages-deployer", "immutable-sha-marker", "extended-custom-domain-verification", "production-drift-watchdog"],
+      "recovery": "После успешного deploy ожидать точный marker/SHA; если production отстаёт, watchdog повторно запускает только штатный workflow."
+    },
+    {
+      "id": "PF-004",
+      "date": "2026-08-06",
+      "class": "hosted-runner-acquisition",
+      "symptom": "Pages run завершился до запуска кода проекта: GitHub-hosted runner не был выдан.",
+      "evidence": ["reports/deployment-retries/2026-08-06-c139-runner-retry.md", "commit 80570fa97fb7242d2c404dec4586bfafcca1c224", "runs #308-#311"],
+      "rootCause": "Внешний GitHub-hosted runner infrastructure failure; проектный код не исполнялся.",
+      "preventiveControls": ["pinned-runner", "setup-only-recovery", "bounded-same-run-retry"],
+      "recovery": "Автоматически rerun failed jobs того же run/SHA только если падение setup-only и run_attempt < 3."
+    },
+    {
+      "id": "PF-005",
+      "date": "2026-08-06",
+      "class": "false-postdeploy-contract",
+      "symptom": "C-139 уже был развёрнут и прошёл основной live-test, но общий smoke требовал намеренно удалённый generic message-guide.",
+      "evidence": ["PR #175", "commit da658fb6fdaecd354ceac20a2682db111c510f0a"],
+      "rootCause": "Тест был привязан к конкретной реализации старых статей, а не к допустимому контракту страницы.",
+      "preventiveControls": ["source-contract-before-merge", "behavioral-not-incidental-contracts", "publication-variant-contract"],
+      "recovery": "Исправлять контракт до merge; post-deploy не должен впервые обнаруживать известную допустимую вариацию."
+    },
+    {
+      "id": "PF-006",
+      "date": "2026-08-06",
+      "class": "webkit-narrow-overflow",
+      "symptom": "После deploy выявлялось горизонтальное переполнение статей в WebKit при 320 px, в том числе длинные H2 и статья о договоре с дизайнером.",
+      "evidence": ["PR #146", "PR #176", "PR #177", "commit 15dddccb16f108cc9669549685a6d60e22d6a140"],
+      "rootCause": "Pre-merge CI проверял не все публикации на тех же движках и узких viewport, что post-deploy.",
+      "preventiveControls": ["all-publications-overflow-before-merge", "cross-browser-before-merge", "no-overflow-masking"],
+      "recovery": "Исправлять источник layout overflow; не увеличивать порог и не использовать глобальный overflow:hidden."
+    },
+    {
+      "id": "PF-007",
+      "date": "2026-08-06",
+      "class": "pages-backend-queue-timeout",
+      "symptom": "Pages deployment был создан, но оставался deployment_queued дольше action timeout; action отменял ожидание при исправной сборке.",
+      "evidence": ["PR #178", "commit ca0bbe20f7bb75e0e204b3c9524392d66a7d495d"],
+      "rootCause": "Временная очередь GitHub Pages backend была ошибочно трактована как дефект сборки и пересекалась с timeout/cancellation логикой.",
+      "preventiveControls": ["official-pages-deployer", "non-cancelling-active-deploy", "single-pending-pages-queue", "bounded-deploy-timeout"],
+      "recovery": "Повторять тот же штатный deployment path; не создавать второй deployer и не пересобирать контент без причины."
+    },
+    {
+      "id": "PF-008",
+      "date": "2026-08-06",
+      "class": "competing-or-cancelled-deployers",
+      "symptom": "Новые push могли отменять активный Pages workflow, а отдельный fallback/custom REST client могли создавать второй deployment в том же backend.",
+      "evidence": ["PR #191", "commit 0c53166d7bb0a803818d66fbe5359dde4b5bb21e", "reports/deploy-recovery/force-pages-2026-08-07.md"],
+      "rootCause": "Несколько механизмов управляли одним production resource; cancellation пересекалась с уже созданным server-side deployment.",
+      "preventiveControls": ["single-official-deployer", "non-cancelling-active-deploy", "no-alternate-pages-writer"],
+      "recovery": "Recovery может только rerun/dispatch штатный Pages workflow; ему запрещены pages:write и deploy actions."
+    },
+    {
+      "id": "PF-009",
+      "date": "2026-08-06",
+      "class": "cross-platform-browser-binary",
+      "symptom": "macOS fallback получил spawn ENOEXEC при попытке запустить Linux .browser-bin/chromium.",
+      "evidence": ["site-check diagnostics", "scripts/service-pages-interaction-test.mjs", "scripts/browser-test-contract.mjs"],
+      "rootCause": "Linux-specific Chromium binary применялся на другой ОС.",
+      "preventiveControls": ["platform-compatible-browser-contract", "no-browser-deploy-fallback"],
+      "recovery": "Browser tests выбирают platform-compatible binary; recovery deployment не запускает browser-heavy альтернативный pipeline."
+    },
+    {
+      "id": "PF-010",
+      "date": "2026-08-07",
+      "class": "browser-heavy-postdeploy-noise",
+      "symptom": "После уже успешной публикации Verify Published Site повторно ставил браузеры и мог стать красным из-за Playwright/apt/CDN.",
+      "evidence": ["PR #191", "PR #192", "commit 3578f227e8d144d1075490bb4c5a7745ca620d58"],
+      "rootCause": "Mutable browser dependencies были продублированы после deployment и смешивали статус сайта со статусом диагностики.",
+      "preventiveControls": ["browser-ci-before-merge-only", "dependency-light-postdeploy", "separate-deploy-and-verify"],
+      "recovery": "Post-deploy проверяет только production HTTP/SHA/public copy; browser regressions обязаны пройти до merge."
+    },
+    {
+      "id": "PF-011",
+      "date": "2026-08-07",
+      "class": "postdeploy-local-dist-dependency",
+      "symptom": "После изоляции Verify Published Site IndexNow по старой логике ожидал локальный dist/sitemap.xml, которого в отдельном workflow нет.",
+      "evidence": ["PR #192", "scripts/submit-indexnow.mjs"],
+      "rootCause": "Post-deploy script имел скрытую зависимость от артефакта предыдущего job/workflow.",
+      "preventiveControls": ["production-sitemap-indexnow", "postdeploy-script-syntax-gate", "no-local-dist-postdeploy"],
+      "recovery": "IndexNow читает sitemap только с уже проверенного production origin."
+    },
+    {
+      "id": "PF-012",
+      "date": "2026-08-07",
+      "class": "brittle-regression-contract",
+      "symptom": "Старые тесты падали на имени diagnostic artifact, точной форме IndexNow вызова и старом названии browser smoke вместо проверки требуемого поведения.",
+      "evidence": ["PR #105", "PR #192", "scripts/workflow-contract-test.mjs", "scripts/custom-domain-sha-contract-test.mjs"],
+      "rootCause": "Regression tests фиксировали случайные детали реализации и устаревали вместе с архитектурой.",
+      "preventiveControls": ["behavioral-not-incidental-contracts", "ordered-invariant-checks", "publication-readiness-gate"],
+      "recovery": "Контракты проверяют права, порядок, единственность deployer и обязательные гарантии, а не косметическое форматирование YAML."
+    },
+    {
+      "id": "PF-013",
+      "date": "2026-08-07",
+      "class": "excessive-git-history",
+      "symptom": "CI/Pages скачивали полную историю и множество старых agent/* refs, увеличивая сеть, логи и поверхность инфраструктурных сбоев.",
+      "evidence": ["PR #194", "commit b0b6af3969725dce8482589930167bfaf8bebd29"],
+      "rootCause": "fetch-depth: 0 использовался ради одного BASE_SHA diff.",
+      "preventiveControls": ["shallow-checkout", "targeted-base-sha-fetch", "postdeploy-shallow-checkout"],
+      "recovery": "Получать HEAD и только требуемый base/deployed SHA, не все refs."
+    }
+  ]
+}

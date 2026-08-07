@@ -19,6 +19,7 @@ const commands = [
   ["npm", ["run", "test:content-dates"]],
   ["npm", ["run", "test:geography"]],
   ["npm", ["run", "test:composition-contract"]],
+  ["npm", ["run", "test:search-visibility"]],
   ["npm", ["run", "test:documentation"]],
   ["npm", ["run", "test:workflow-contract"]],
   ["npm", ["run", "test:source-form-residue"]],

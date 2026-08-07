@@ -31,7 +31,7 @@
 3. Убедиться, что полный PR CI относится к точному head SHA и завершён зелёным. Нельзя сливать более новый непроверенный head.
 4. Не ослаблять tests, thresholds, permissions и production invariants ради прохождения конкретной правки.
 5. Не добавлять второй Pages deployer, fallback с `pages: write`, собственный Pages REST client или `cancel-in-progress:true` для production Pages.
-6. Не переносить browser-heavy проверки после deploy: Chromium/Firefox/WebKit должны доказать поведение до merge.
+6. Не переносить browser-heavy проверки после deploy: Chromium/Firefox/WebKit должны доказать поведение до merge. Полный PR-CI сохраняет `scripts/live-all-publications-smoke.mjs` как all-publications browser regression до merge, но этот smoke не запускается повторно после публикации.
 7. Не использовать технический retry-коммит или пустой файл для повторного запуска публикации.
 
 Если публикация не прошла, бот сначала классифицирует сбой:

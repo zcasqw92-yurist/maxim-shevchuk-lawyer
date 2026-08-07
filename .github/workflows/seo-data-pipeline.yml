@@ -18,6 +18,7 @@ on:
       - 'scripts/seo-data-pipeline-test.mjs'
       - 'scripts/seo-feedback-enrichment-test.mjs'
       - 'scripts/seo-metrica-event-goals-test.mjs'
+      - 'scripts/seo-workflow-runtime-test.mjs'
       - 'src/editorial-data.mjs'
       - 'src/metrica-goals.mjs'
       - 'public/assets/editorial-analytics.mjs'
@@ -86,6 +87,7 @@ jobs:
 
       - name: Run contract tests
         run: |
+          node scripts/seo-workflow-runtime-test.mjs
           node scripts/seo-data-pipeline-test.mjs
           node scripts/seo-feedback-enrichment-test.mjs
           node scripts/seo-metrica-event-goals-test.mjs

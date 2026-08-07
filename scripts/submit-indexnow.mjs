@@ -7,6 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dryRun = process.argv.includes("--dry-run");
 const submitAll = process.argv.includes("--all");
 const changedDate = String(process.env.INDEXNOW_CHANGED_DATE || "").trim();
+const sitemapUrl = String(process.env.INDEXNOW_SITEMAP_URL || "").trim();
 const explicitUrls = String(process.env.INDEXNOW_URLS || "")
   .split(",")
   .map((value) => value.trim())
@@ -23,7 +24,32 @@ if (changedDate && !/^\d{4}-\d{2}-\d{2}$/.test(changedDate)) {
   throw new Error("INDEXNOW_CHANGED_DATE должен быть датой YYYY-MM-DD");
 }
 
-const sitemap = await readFile(join(root, "dist", "sitemap.xml"), "utf8");
+const productionOrigin = new URL(site.siteUrl).origin;
+const readProductionSitemap = async (urlValue) => {
+  const url = new URL(urlValue);
+  if (url.origin !== productionOrigin) throw new Error(`INDEXNOW_SITEMAP_URL относится к другому домену: ${url}`);
+  url.searchParams.set("indexnow_release", `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const response = await fetch(url, {
+    headers: {
+      "cache-control": "no-cache, no-store, max-age=0",
+      pragma: "no-cache",
+      accept: "application/xml, text/xml, */*",
+    },
+    cache: "no-store",
+    redirect: "follow",
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) throw new Error(`Не удалось получить production sitemap для IndexNow: HTTP ${response.status}`);
+  const finalUrl = new URL(response.url);
+  if (finalUrl.origin !== productionOrigin) throw new Error(`Production sitemap перенаправлен на другой домен: ${finalUrl.origin}`);
+  const body = await response.text();
+  if (!body.includes("<urlset")) throw new Error("Production sitemap не содержит urlset");
+  return body;
+};
+
+const sitemap = sitemapUrl
+  ? await readProductionSitemap(sitemapUrl)
+  : await readFile(join(root, "dist", "sitemap.xml"), "utf8");
 const entries = [...sitemap.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<lastmod>([^<]+)<\/lastmod>[\s\S]*?<\/url>/g)]
   .map((match) => ({ url: match[1], lastmod: match[2] }))
   .filter((entry) => !entry.url.includes("/assets/"));

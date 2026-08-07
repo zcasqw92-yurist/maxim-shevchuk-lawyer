@@ -8,10 +8,11 @@
 - [ ] Перед изменением открыты `00_Старт` и живой `29_Публикационный_шлюз`; указаны scope, branch/PR и текущий head SHA.
 - [ ] Доказательства пунктов шлюза внесены только по фактическим command/run/SHA/result; статусы не выставлялись по предположению.
 - [ ] Предmerge-блокеры `29_Публикационный_шлюз` закрыты, B2 = `MERGE РАЗРЕШЕН`.
-- [ ] `node scripts/publication-readiness-test.mjs` и `node scripts/publication-sheet-gate-contract-test.mjs` завершены без ошибок.
+- [ ] `node scripts/publication-readiness-test.mjs`, `node scripts/publication-sheet-gate-contract-test.mjs` и `node scripts/browser-bootstrap-contract-test.mjs` завершены без ошибок.
 - [ ] Не возвращены технические retry-коммиты, альтернативный Pages writer, browser-heavy deploy fallback или `cancel-in-progress:true` для production Pages.
-- [ ] Если менялась публикационная инфраструктура, соответствующий класс PF-001…PF-014 сохранён закрытым machine regression-контролем.
-- [ ] Если обнаружен новый PF-015+, он получил следующий PF-ID, root cause, evidence и machine regression/recovery; после исправления весь шлюз повторён.
+- [ ] Если менялась публикационная инфраструктура, соответствующий класс PF-001…PF-015 сохранён закрытым machine regression-контролем.
+- [ ] Browser bootstrap не вернул PF-015: сохранены bounded APT retries/timeouts и реалистичные ограниченные окна; Chromium/Firefox/WebKit полностью прошли до merge.
+- [ ] Если обнаружен новый PF-016+, он получил следующий PF-ID, root cause, evidence и machine regression/recovery; после исправления весь шлюз повторён.
 - [ ] Полный PR CI с Chromium/Firefox/WebKit относится к текущему состоянию PR и завершён успешно до merge.
 
 ## Контентный шлюз

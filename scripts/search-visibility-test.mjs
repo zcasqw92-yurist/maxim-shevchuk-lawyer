@@ -121,16 +121,34 @@ for (const marker of [
   "GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}",
   "YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}",
   "INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}",
-  "schedule:",
+  "workflow_dispatch:",
   "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)",
   "node scripts/release-check.mjs",
   "actions/deploy-pages@v5",
 ]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует настройка ${marker}`);
 }
+if (workflow.includes("schedule:")) errors.push("pages.yml: слепой плановый redeploy запрещён; production reconciliation должен зависеть от фактического SHA drift");
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production-сайт не должен снова закрываться от индексации");
 if (workflow.includes("npm run check")) errors.push("pages.yml: полный browser-heavy npm run check должен выполняться до merge, а не удерживать production deployment");
 if (/if:\s*\$\{\{\s*env\.INDEXNOW_KEY/.test(workflow)) errors.push("pages.yml: IndexNow не должен зависеть от необязательного секрета");
+
+const watchdog = await readFile(join(root, ".github", "workflows", "pages-watchdog.yml"), "utf8");
+for (const marker of [
+  "name: Watch production SHA drift",
+  "cron: '37 * * * *'",
+  "actions: write",
+  "build-info.json?watchdog=",
+  "main_sha",
+  "production_sha",
+  "pages.yml/dispatches",
+  "status=${state}",
+]) {
+  if (!watchdog.includes(marker)) errors.push(`pages-watchdog.yml: отсутствует условный production-recovery маркер ${marker}`);
+}
+if (/pages:\s*write|id-token:\s*write|actions\/deploy-pages|actions\/upload-pages-artifact/.test(watchdog)) {
+  errors.push("pages-watchdog.yml: watchdog не должен быть вторым Pages deployer");
+}
 
 const verifyWorkflow = await readFile(join(root, ".github", "workflows", "pages-verify.yml"), "utf8");
 for (const marker of [
@@ -162,4 +180,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Search visibility checks passed: pretrial specialization, debt recovery cluster, production indexing and post-deploy IndexNow are configured");
+console.log("Search visibility checks passed: production indexing, exact-SHA verification, conditional drift watchdog and post-deploy IndexNow are configured");

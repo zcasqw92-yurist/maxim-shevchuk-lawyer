@@ -43,6 +43,7 @@ if (gate) {
   if (gate.mergeStatusCell !== "B2" || gate.requiredMergeAllowedValue !== requiredMergeValue) errors.push("pre-merge gate must remain B2 = MERGE РАЗРЕШЕН");
   if (gate.finalStatusCell !== "L2" || gate.requiredFinalValue !== requiredFinalValue) errors.push("post-deploy completion must remain separately proven by L2 = ПУБЛИКАЦИЯ ЗАВЕРШЕНА");
   if (gate.mergeStatusCell === gate.finalStatusCell) errors.push("PF-014 regression: merge and publication completion may not share one status cell");
+  if (gate.releaseLogHeaderRow !== 49 || gate.releaseLogFirstDataRow !== 50) errors.push("release log row contract must follow PF-015 history row");
   if (gate.unknownFailureCell !== "J2" || gate.unresolvedUnknownFailureValue !== "Да — не закрыт") errors.push("unknown failure blocker must remain tied to J2");
   if (gate.resolvedUnknownFailureValue !== "Да — закрыт regression") errors.push("unknown failure may be resolved only after regression control exists");
   if (!sameMembers(gate.appliesTo || [], ["article", "site-change", "seo", "infrastructure"])) errors.push("publication gate must apply to articles, site changes, SEO and infrastructure");
@@ -69,7 +70,7 @@ if (gate) {
   ]) {
     if (gate.unknownFailurePolicy?.[field] !== true) errors.push(`unknown failure policy must remain enabled: ${field}`);
   }
-  if (gate.unknownFailurePolicy?.nextIdStartsAt !== "PF-015") errors.push("new unknown failures must start at PF-015 because PF-014 is already registered");
+  if (gate.unknownFailurePolicy?.nextIdStartsAt !== "PF-016") errors.push("new unknown failures must start at PF-016 because PF-014 and PF-015 are already registered");
 }
 
 if (contentGovernance) {
@@ -94,16 +95,24 @@ if (!pf014) {
   if (!String(pf014.rootCause || "").toLowerCase().includes("pre-merge") || !String(pf014.rootCause || "").toLowerCase().includes("post-deploy")) errors.push("PF-014 root cause must preserve the pre-merge/post-deploy distinction");
 }
 
+const pf015 = failureRegistry?.incidents?.find((item) => item.id === "PF-015");
+if (!pf015) {
+  errors.push("PF-015 must remain in the publication failure registry as the regression for pre-merge browser dependency timeout");
+} else {
+  if (!String(pf015.class || "").toLowerCase().includes("browser")) errors.push("PF-015 class must describe browser bootstrap/dependency failure");
+  if (!String(pf015.rootCause || "").toLowerCase().includes("apt") || !String(pf015.rootCause || "").includes("6")) errors.push("PF-015 root cause must preserve the APT/6-minute timeout evidence");
+}
+
 for (const [label, text, markers] of [
-  ["AGENTS.md", agents, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-015+", "ЖУРНАЛ РЕЛИЗОВ", "не может быть выставлен по предположению"]],
-  ["docs/PUBLISHING.md", publishing, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-015+", "ЖУРНАЛ РЕЛИЗОВ", "живой таблицы"]],
+  ["AGENTS.md", agents, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-016+", "ЖУРНАЛ РЕЛИЗОВ", "не может быть выставлен по предположению"]],
+  ["docs/PUBLISHING.md", publishing, [requiredGateTab, requiredMergeValue, requiredFinalValue, "PF-016+", "ЖУРНАЛ РЕЛИЗОВ", "живой таблицы"]],
   [".github/pull_request_template.md", prTemplate, [requiredGateTab, requiredMergeValue, requiredFinalValue, "новый PF", "Доказательства пунктов шлюза"]],
 ]) {
   for (const marker of markers) if (!text.includes(marker)) errors.push(`${label}: publication sheet gate marker is missing: ${marker}`);
 }
 
-if (!releaseGate.includes('"scripts/publication-sheet-gate-contract-test.mjs"')) {
-  errors.push("release-check must execute the publication sheet gate contract before packing a release");
+for (const script of ["scripts/publication-sheet-gate-contract-test.mjs", "scripts/browser-bootstrap-contract-test.mjs"]) {
+  if (!releaseGate.includes(`\"${script}\"`)) errors.push(`release-check must execute ${script} before packing a release`);
 }
 
 if (errors.length) {
@@ -111,4 +120,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Publication sheet gate contract passed: pre-merge B2 and post-deploy L2 are separated, live table review is mandatory, PF-014 protects stage separation, and the next unknown class starts at PF-015");
+console.log("Publication sheet gate contract passed: staged B2/L2 is protected, PF-014 and PF-015 remain registered, and the next unknown class starts at PF-016");

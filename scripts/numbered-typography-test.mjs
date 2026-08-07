@@ -87,42 +87,19 @@ const inspectGroup = async ({ page, selector }) => page.locator(selector).evalua
   };
 }));
 
-const server = spawn(process.execPath, [join(root, "scripts", "server.mjs")], {
-  cwd: root,
-  env: { ...process.env, PORT: port },
-  stdio: ["ignore", "pipe", "pipe"],
-});
+const isTransientBrowserClosure = (error) => /(?:target page, context or browser has been closed|browser has been closed|browser closed|target closed|browser has disconnected)/i
+  .test(String(error?.message || error));
 
-await new Promise((resolve, reject) => {
-  const timer = setTimeout(() => reject(new Error("Numbered typography preview server timeout")), 8_000);
-  server.stdout.on("data", (chunk) => {
-    if (chunk.toString().includes("Preview:")) {
-      clearTimeout(timer);
-      resolve();
-    }
+const runEngineChecks = async ({ engineName, engine }) => {
+  const browser = await engine.launch({
+    headless: true,
+    ...(engineName === "Chromium" ? { args: ["--no-sandbox"] } : {}),
   });
-  server.on("exit", (code) => reject(new Error(`Numbered typography preview server exited: ${code}`)));
-});
 
-try {
-  for (const [engineName, engine] of [["Chromium", chromium], ["WebKit", webkit]]) {
-    const executablePath = engine.executablePath();
-    const installed = await access(executablePath).then(() => true).catch(() => false);
-    if (!installed) {
-      const message = `${engineName}: browser binary is not installed at ${executablePath}`;
-      if (requireBrowsers) errors.push(message);
-      else skipped.push(message);
-      continue;
-    }
-
-    const browser = await engine.launch({
-      headless: true,
-      ...(engineName === "Chromium" ? { args: ["--no-sandbox"] } : {}),
-    });
-
-    try {
-      for (const viewport of viewports) {
-        const context = await browser.newContext({ viewport, locale: "ru-RU" });
+  try {
+    for (const viewport of viewports) {
+      const context = await browser.newContext({ viewport, locale: "ru-RU" });
+      try {
         await context.addInitScript(() => localStorage.setItem("analytics_consent", "denied"));
         const page = await context.newPage();
 
@@ -175,11 +152,54 @@ try {
           const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
           if (overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route}: ${overflow}px horizontal overflow after typography update`);
         }
-
-        await context.close();
+      } finally {
+        await context.close().catch(() => {});
       }
-    } finally {
-      await browser.close();
+    }
+  } finally {
+    await browser.close().catch(() => {});
+  }
+};
+
+const server = spawn(process.execPath, [join(root, "scripts", "server.mjs")], {
+  cwd: root,
+  env: { ...process.env, PORT: port },
+  stdio: ["ignore", "pipe", "pipe"],
+});
+
+await new Promise((resolve, reject) => {
+  const timer = setTimeout(() => reject(new Error("Numbered typography preview server timeout")), 8_000);
+  server.stdout.on("data", (chunk) => {
+    if (chunk.toString().includes("Preview:")) {
+      clearTimeout(timer);
+      resolve();
+    }
+  });
+  server.on("exit", (code) => reject(new Error(`Numbered typography preview server exited: ${code}`)));
+});
+
+try {
+  for (const [engineName, engine] of [["Chromium", chromium], ["WebKit", webkit]]) {
+    const executablePath = engine.executablePath();
+    const installed = await access(executablePath).then(() => true).catch(() => false);
+    if (!installed) {
+      const message = `${engineName}: browser binary is not installed at ${executablePath}`;
+      if (requireBrowsers) errors.push(message);
+      else skipped.push(message);
+      continue;
+    }
+
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        await runEngineChecks({ engineName, engine });
+        break;
+      } catch (error) {
+        if (attempt === 1 && isTransientBrowserClosure(error)) {
+          console.warn(`${engineName}: browser process closed unexpectedly; retrying the typography check once with a fresh browser`);
+          continue;
+        }
+        throw error;
+      }
     }
   }
 } finally {

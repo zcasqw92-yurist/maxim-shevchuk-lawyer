@@ -13,8 +13,8 @@
   "unknownFailureCell": "J2",
   "unresolvedUnknownFailureValue": "Да — не закрыт",
   "resolvedUnknownFailureValue": "Да — закрыт regression",
-  "releaseLogHeaderRow": 48,
-  "releaseLogFirstDataRow": 49,
+  "releaseLogHeaderRow": 49,
+  "releaseLogFirstDataRow": 50,
   "appliesTo": [
     "article",
     "site-change",
@@ -34,7 +34,7 @@
     "mustAppendReleaseLog": true
   },
   "unknownFailurePolicy": {
-    "nextIdStartsAt": "PF-015",
+    "nextIdStartsAt": "PF-016",
     "blockUntilRootCauseKnown": true,
     "requireEvidence": true,
     "requireMachineRegressionOrBoundedRecovery": true,

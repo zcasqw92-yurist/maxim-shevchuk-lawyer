@@ -1,0 +1,70 @@
+name: Watch production SHA drift
+
+on:
+  schedule:
+    # Не на границе часа: scheduled Actions чаще задерживаются в начале часа.
+    - cron: '37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+# Watchdog не имеет Pages permissions и не публикует сам. При доказанном drift
+# он только dispatch-ит единственный штатный Deploy GitHub Pages workflow.
+concurrency:
+  group: pages-production-watchdog
+  cancel-in-progress: true
+
+jobs:
+  reconcile:
+    name: Compare main with production and request normal deploy on drift
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SITE_URL: 'https://yuristshevchuk.com'
+    steps:
+      - name: Reconcile production SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}"
+          auth=(-H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          main_sha="$(curl --fail-with-body --silent --show-error "${auth[@]}" "${api}/git/ref/heads/main" | jq -r '.object.sha')"
+          if [[ ! "$main_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "Cannot resolve current main SHA" >&2
+            exit 1
+          fi
+
+          production_sha="$(curl --fail-with-body --silent --show-error \
+            -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
+            "${SITE_URL}/build-info.json?watchdog=$(date +%s)" \
+            | jq -r '.sha // empty' 2>/dev/null || true)"
+
+          if [[ "$production_sha" == "$main_sha" ]]; then
+            echo "Production matches main: ${main_sha}"
+            exit 0
+          fi
+
+          echo "Production drift detected: main=${main_sha}; production=${production_sha:-missing}"
+
+          active=0
+          for state in in_progress queued; do
+            count="$(curl --fail-with-body --silent --show-error "${auth[@]}" \
+              "${api}/actions/workflows/pages.yml/runs?branch=main&status=${state}&per_page=1" | jq '.total_count')"
+            if (( count > 0 )); then
+              active=1
+              echo "Deploy GitHub Pages already has ${state} run; watchdog will not create another request."
+            fi
+          done
+          if (( active > 0 )); then
+            exit 0
+          fi
+
+          curl --fail-with-body --silent --show-error -X POST "${auth[@]}" \
+            -H 'Content-Type: application/json' \
+            "${api}/actions/workflows/pages.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "Requested normal Deploy GitHub Pages workflow for current main; no Git commit was created."

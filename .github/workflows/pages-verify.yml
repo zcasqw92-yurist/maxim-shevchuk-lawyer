@@ -104,4 +104,4 @@ jobs:
 
       - name: Notify IndexNow about changed pages
         if: env.SOURCE_EVENT != 'schedule'
-        run: INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" node scripts/submit-indexnow.mjs
+        run: INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow

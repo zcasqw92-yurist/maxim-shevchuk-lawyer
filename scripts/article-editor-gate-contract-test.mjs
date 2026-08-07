@@ -7,12 +7,13 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFile(join(root, path), "utf8");
 const errors = [];
 
-const [editorText, publicationText, workflowDoc, releaseCheck, fingerprintSource, approvalTemplateText] = await Promise.all([
+const [editorText, publicationText, workflowDoc, releaseCheck, fingerprintSource, approvalManifestSource, approvalTemplateText] = await Promise.all([
   read("config/article-editor-gate.json"),
   read("config/publication-sheet-gate.json"),
   read("docs/ARTICLE_EDITOR_WORKFLOW.md"),
   read("scripts/release-check.mjs"),
   read("scripts/article-editor-fingerprint.mjs"),
+  read("scripts/article-approval-manifest-test.mjs"),
   read("reports/article-approvals/template.json"),
 ]);
 
@@ -101,6 +102,11 @@ for (const marker of ["createHash", "sha256", "normalizeArticleEditorRows", "fin
   if (!fingerprintSource.includes(marker)) errors.push(`fingerprint implementation is missing marker: ${marker}`);
 }
 
+// PF-013 invariant: approval gating must remain compatible with fetch-depth:1 + targeted BASE_SHA.
+// A triple-dot diff requires merge-base ancestry that shallow CI intentionally does not fetch.
+if (approvalManifestSource.includes("...HEAD")) errors.push("PF-013 regression: article approval manifest gate may not require merge-base ancestry via triple-dot diff");
+if (!approvalManifestSource.includes('["diff", "--name-only", baseSha, "HEAD", "--"]')) errors.push("article approval manifest gate must compare the explicitly fetched BASE_SHA tree directly with HEAD");
+
 if (approvalTemplate) {
   if (approvalTemplate.schemaVersion !== 1) errors.push("approval manifest template schemaVersion must remain 1");
   if (approvalTemplate.editorTab !== "34_Редактор_статей_сайта") errors.push("approval manifest template must point to canonical editor tab");
@@ -136,4 +142,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Article editor gate contract passed: live editor source, explicit chat approval, post-command preflight, approval manifest, snapshot SHA-256 and drift invalidation remain mandatory before article merge");
+console.log("Article editor gate contract passed: live editor source, explicit chat approval, post-command preflight, shallow-safe approval manifest, snapshot SHA-256 and drift invalidation remain mandatory before article merge");

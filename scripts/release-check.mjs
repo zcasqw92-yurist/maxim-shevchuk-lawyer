@@ -4,6 +4,7 @@ const commands = [
   ["node", ["scripts/publication-readiness-test.mjs"]],
   ["node", ["scripts/publication-sheet-gate-contract-test.mjs"]],
   ["node", ["scripts/article-editor-gate-contract-test.mjs"]],
+  ["node", ["scripts/article-approval-manifest-test.mjs"]],
   ["node", ["scripts/browser-bootstrap-contract-test.mjs"]],
   ["node", ["scripts/pages-recovery-contract-test.mjs"]],
   ["node", ["--check", "scripts/verify-custom-domain-sha.mjs"]],

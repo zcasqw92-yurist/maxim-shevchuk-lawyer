@@ -2,9 +2,9 @@
 
 Дата системного аудита: 2026-08-07.
 
-Этот документ разбирает известные неудачные или ложно-красные публикационные циклы проекта PF-001…PF-014 и фиксирует правило: **историческая ошибка считается закрытой только тогда, когда её причина представлена машинным regression-контролем либо безопасным ограниченным recovery-маршрутом**.
+Этот документ разбирает известные неудачные или ложно-красные публикационные циклы проекта PF-001…PF-015 и фиксирует правило: **историческая ошибка считается закрытой только тогда, когда её причина представлена машинным regression-контролем либо безопасным ограниченным recovery-маршрутом**.
 
-Машинный источник: `config/publication-failure-regressions.json`. Блокирующие тесты: `scripts/publication-readiness-test.mjs` и `scripts/publication-sheet-gate-contract-test.mjs`. Живой обязательный контроль каждой новой статьи, правки сайта, SEO или инфраструктуры находится во вкладке `29_Публикационный_шлюз` канонической Google-таблицы.
+Машинный источник: `config/publication-failure-regressions.json`. Блокирующие тесты: `scripts/publication-readiness-test.mjs`, `scripts/publication-sheet-gate-contract-test.mjs` и `scripts/browser-bootstrap-contract-test.mjs`. Живой обязательный контроль каждой новой статьи, правки сайта, SEO или инфраструктуры находится во вкладке `29_Публикационный_шлюз` канонической Google-таблицы.
 
 ## Граница доказательств
 
@@ -144,22 +144,35 @@
 
 **Неисправность:** два разных состояния жизненного цикла — разрешение на merge и доказательство завершённой production-публикации — были ошибочно объединены в один итоговый статус.
 
-**Постоянная защита:** staged model фиксирована машинным контрактом. `B2` отвечает только за pre-merge блокеры и допускает merge лишь при `MERGE РАЗРЕШЕН`; `L2` отдельно подтверждает финал только при `ПУБЛИКАЦИЯ ЗАВЕРШЕНА` после exact production SHA, HTTP/public-copy и IndexNow. Контракт запрещает использовать один status cell для двух стадий. Следующий неизвестный класс начинается с PF-015.
+**Постоянная защита:** staged model фиксирована машинным контрактом. `B2` отвечает только за pre-merge блокеры и допускает merge лишь при `MERGE РАЗРЕШЕН`; `L2` отдельно подтверждает финал только при `ПУБЛИКАЦИЯ ЗАВЕРШЕНА` после exact production SHA, HTTP/public-copy и IndexNow. Контракт запрещает использовать один status cell для двух стадий.
+
+## PF-015 — 07.08.2026: browser dependency bootstrap ложно упал на жёстком 6-минутном окне
+
+**Свидетельство:** PR #196, CI #764 / run `31182943727`, job `92880492884`, `scripts/browser-bootstrap-contract-test.mjs`.
+
+Точный head сначала успешно прошёл весь deterministic release-path, включая publication-readiness и PF-014 staged gate. Затем `npx playwright install-deps chromium firefox webkit` корректно начал загружать системные пакеты с Azure Ubuntu mirror, но зеркало резко замедлилось. GitHub остановил шаг ровно по историческому `timeout-minutes: 6`, до запуска browser tests и project browser code.
+
+**Неисправность:** обязательный pre-merge browser bootstrap зависел от внешнего APT mirror без явной bounded retry/timeout policy и имел слишком короткое фиксированное окно. Обычная сетевая деградация превращалась в ложный CI failure, хотя ослаблять или переносить browser проверки после deploy нельзя.
+
+**Постоянная защита:** `ci.yml` сохраняет pinned `ubuntu-22.04`, задаёт APT `Acquire::Retries "5"`, HTTP/HTTPS timeout 60 секунд, отдельное 12-минутное окно системных зависимостей и 10-минутное окно browser binaries при общем bounded job timeout 40 минут. `scripts/browser-bootstrap-contract-test.mjs` не позволяет вернуть старые 6 минут, убрать retries или исключить Chromium/Firefox/WebKit. Полный browser-backed `npm run check` всё равно обязателен до merge.
+
+Следующий ранее неизвестный класс начинается с PF-016.
 
 # Обязательная модель новой публикации
 
 Новая правка больше не должна превращаться в эксперимент над production. Бот обязан работать по конечному автомату:
 
-`live sheet gate → branch → publication readiness → full PR CI → B2 MERGE РАЗРЕШЕН → merge → one official Pages deploy → exact SHA marker → production HTTP/public-copy regression → IndexNow → L2 ПУБЛИКАЦИЯ ЗАВЕРШЕНА → release log`.
+`live sheet gate → branch → publication readiness → deterministic + browser-bootstrap regressions → full PR CI → B2 MERGE РАЗРЕШЕН → merge → one official Pages deploy → exact SHA marker → production HTTP/public-copy regression → IndexNow → L2 ПУБЛИКАЦИЯ ЗАВЕРШЕНА → release log`.
 
 Если этап падает, ошибка классифицируется:
 
 - **project/content/browser test failure** — автоматический retry запрещён; исправление в ветке;
 - **setup-only hosted runner failure** — ограниченные автоматические повторы failed jobs того же run/SHA;
+- **PF-015 pre-merge browser bootstrap infrastructure failure** — merge запрещён; не ослаблять browser coverage, сохранить bounded APT retries/timeouts и реалистичные окна, затем повторить полный CI на текущем exact head без технического retry-коммита;
 - **Pages/backend failure после запуска project code** — не маскировать retry-коммитом; штатный workflow может быть повторно вызван только безопасным recovery-маршрутом;
 - **post-deploy verification failure** — production уже мог быть опубликован; сначала сравнить exact marker/SHA, затем чинить конкретную verification-причину;
 - **Metrica/API telemetry failure** — диагностическая, не должна менять факт опубликованного exact SHA;
-- **новый неизвестный класс** — поставить `Да — не закрыт`, присвоить PF-015+, доказать root cause, добавить machine regression/recovery и повторить весь gate.
+- **новый неизвестный класс** — поставить `Да — не закрыт`, присвоить PF-016+, доказать root cause, добавить machine regression/recovery и повторить весь gate.
 
 # Критерий завершённой публикации
 

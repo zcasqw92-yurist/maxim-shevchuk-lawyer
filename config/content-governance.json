@@ -47,6 +47,17 @@
       ]
     }
   },
+  "publicationSheetGate": {
+    "config": "config/publication-sheet-gate.json",
+    "requiredForEverySiteChange": true,
+    "requiredTab": "29_Публикационный_шлюз",
+    "requiredStatusCell": "B2",
+    "requiredAllowedValue": "ПУБЛИКАЦИЯ РАЗРЕШЕНА",
+    "requireLiveRead": true,
+    "requireEvidence": true,
+    "requireReleaseLog": true,
+    "unknownFailureRequiresNewPfRegression": true
+  },
   "seoKnowledgeBase": {
     "collectionRegistryTab": "17_SEO_сборы",
     "keywordRegistryTab": "18_SEO_база_ключей",
@@ -193,14 +204,19 @@
   },
   "publication": {
     "localFullSiteCheck": "npm run check",
+    "preMergeBrowserChecks": [
+      "npm run check",
+      "node scripts/live-all-publications-smoke.mjs"
+    ],
     "liveChecks": [
-      "npm run test:live",
-      "node scripts/live-all-publications-smoke.mjs",
+      "node scripts/verify-custom-domain-sha.mjs",
+      "node scripts/live-http-release-verify.mjs",
       "node scripts/live-public-copy-regression-test.mjs"
     ],
     "chatReportRequired": true,
     "chatReportFields": [
       "spreadsheet snapshot and reviewed tabs",
+      "29_Публикационный_шлюз final status and evidence",
       "created or updated content",
       "accumulated SEO collections and keyword IDs used",
       "paid SEO collection decision and justification",
@@ -214,10 +230,12 @@
       "detected public-copy findings, fixes and verification result",
       "changed repository files",
       "published public URLs",
-      "commit SHA",
+      "head, merge and production SHA",
       "local check result",
       "CI and deployment result",
-      "live full-site check result",
+      "production HTTP/public-copy result",
+      "IndexNow result",
+      "new PF ID and regression if an unknown failure was found",
       "unpublished items and reasons"
     ]
   }

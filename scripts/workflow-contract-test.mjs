@@ -74,6 +74,7 @@ requirePattern("verify", verify, /live-public-copy-regression-test\.mjs/, "по�
 requirePattern("verify", verify, /reports\/live-http-release-verification\.json/, "ошибка HTTP-проверки должна сохранять диагностический отчёт");
 requirePattern("verify", verify, /continue-on-error:\s*true[\s\S]*metrica-state-test\.mjs/, "внешний API Метрики не должен блокировать опубликованный сайт");
 requirePattern("verify", verify, /if:\s*env\.SOURCE_EVENT\s*!=\s*['"]schedule['"]/, "IndexNow не должен запускаться из планового deployment");
+requirePattern("verify", verify, /INDEXNOW_SITEMAP_URL:\s*\$\{\{ env\.SITE_URL \}\}\/sitemap\.xml/, "post-deploy IndexNow должен читать sitemap уже проверенного production-домена, а не локальный dist");
 forbidPattern("verify", verify, /pages:\s*write/, "post-deploy аудит не должен иметь права на новый Pages deployment");
 forbidPattern("verify", verify, /playwright|actions\/cache|npm ci|test:live|live-all-publications-smoke/, "post-deploy critical path не должен повторять browser-heavy PR CI");
 
@@ -87,6 +88,9 @@ if (!(verifyShaStep >= 0 && verifyHttpStep > verifyShaStep && verifyRegressionSt
 
 for (const required of ["test:content-governance","test:public-copy","test:editorial-list-policy","test:editorial-single-source","test:editorial-commercial-gate","test:seo-data-pipeline","build","test:css-architecture","validate","audit:seo","test:seo-metadata","test:documentation","test:workflow-contract","test:deployment-observability","test:custom-domain-sha"]) {
   if (!releaseGate.includes(`\"${required}\"`)) errors.push(`release-gate: отсутствует обязательная deterministic проверка ${required}`);
+}
+for (const requiredScript of ["verify-custom-domain-sha.mjs","live-http-release-verify.mjs","live-public-copy-regression-test.mjs","metrica-state-test.mjs","submit-indexnow.mjs"]) {
+  if (!releaseGate.includes(requiredScript)) errors.push(`release-gate: отсутствует syntax-check post-deploy скрипта ${requiredScript}`);
 }
 for (const forbidden of ["playwright","test:cta-system","test:numbered-typography","test:accessibility","test:cross-browser","test:all-publications-overflow","test:visual"]) {
   if (releaseGate.includes(forbidden)) errors.push(`release-gate: browser-heavy проверка ${forbidden} должна оставаться только в PR CI`);

@@ -18,6 +18,7 @@ const [
   indexingPolicy,
   packageText,
   workflow,
+  verifyWorkflow,
   conversionAnalytics,
   privacyImplementation,
   trafficAttribution,
@@ -32,6 +33,7 @@ const [
   read("INDEXING_POLICY.md"),
   read("package.json"),
   read(".github/workflows/pages.yml"),
+  read(".github/workflows/pages-verify.yml"),
   read("docs/conversion-analytics.md"),
   read("docs/privacy-implementation-note.md"),
   read("docs/traffic-attribution-standard.md"),
@@ -54,7 +56,9 @@ for (const marker of [
   "не входит в обычную команду `npm run check`",
   "INDEXNOW_CHANGED_DATE=2026-07-27 npm run submit:indexnow",
   "npm run check:preview-indexing-lock",
-  "Production workflow запускает именно `npm run check`",
+  "PR CI запускает полный `npm run check`",
+  "Production workflow использует быстрый `scripts/release-check.mjs`",
+  "workflow `Verify Published Site`",
   "редакционный шлюз публикации",
   "editorial-publications.json",
   "sitemap-articles.xml",
@@ -69,59 +73,22 @@ for (const obsolete of [
   "удаляет ключ IndexNow",
   "npm run test:live-indexing-lock подтвердил блокировку",
   "формы, квиз, диалоги и мессенджеры",
+  "Production workflow запускает именно `npm run check`",
+  "отдельный verify-job",
 ]) {
   if (current.includes(obsolete)) errors.push(`current-production-state.md: осталось устаревшее утверждение «${obsolete}»`);
 }
 
-for (const marker of [
-  "src/editorial-data.mjs",
-  "npm run check",
-  "status: \"published\"",
-  "legalReviewedAt",
-  "editorial-publications.json",
-  "publication_helpfulness",
-  "Будущая админка должна работать поверх этой же схемы",
-]) {
+for (const marker of ["src/editorial-data.mjs","npm run check","status: \"published\"","legalReviewedAt","editorial-publications.json","publication_helpfulness","Будущая админка должна работать поверх этой же схемы"]) {
   if (!publishing.includes(marker)) errors.push(`docs/PUBLISHING.md: отсутствует маркер «${marker}»`);
 }
-
-for (const marker of [
-  "contact_conversion",
-  "messenger_dialog_open",
-  "cta_click",
-  "cta_view",
-  "source_cta_placement",
-  "traffic_attribution_ready",
-  "traffic_utm_source",
-  "traffic_journey_tail",
-  "Текст подготовленного сообщения",
-  "111050150",
-  "docs/traffic-attribution-standard.md",
-]) {
+for (const marker of ["contact_conversion","messenger_dialog_open","cta_click","cta_view","source_cta_placement","traffic_attribution_ready","traffic_utm_source","traffic_journey_tail","Текст подготовленного сообщения","111050150","docs/traffic-attribution-standard.md"]) {
   if (!conversionAnalytics.includes(marker)) errors.push(`docs/conversion-analytics.md: отсутствует маркер «${marker}»`);
 }
-
-for (const marker of [
-  "аналитика только после отдельного согласия пользователя",
-  "Текст черновика, содержание сообщения, документы",
-  "Локальная first-touch атрибуция",
-  "значения `yclid`, `gclid`, `fbclid`",
-  "npm run test:conversion-analytics",
-]) {
+for (const marker of ["аналитика только после отдельного согласия пользователя","Текст черновика, содержание сообщения, документы","Локальная first-touch атрибуция","значения `yclid`, `gclid`, `fbclid`","npm run test:conversion-analytics"]) {
   if (!privacyImplementation.includes(marker)) errors.push(`docs/privacy-implementation-note.md: отсутствует маркер «${marker}»`);
 }
-
-for (const marker of [
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "?utm_source=avito&utm_medium=classified&utm_campaign=vzyskanie_dolga&utm_content=ad_01",
-  "?utm_source=telegram&utm_medium=messenger&utm_campaign=vzyskanie_dolga&utm_content=channel_post_01",
-  "?utm_source=yandex_business&utm_medium=organic_profile&utm_campaign=legal_services&utm_content=profile_link",
-  "Автоматический `yclid` не добавляется вручную",
-  "По запросу в чате «дай UTM-хвост»",
-]) {
+for (const marker of ["utm_source","utm_medium","utm_campaign","utm_content","?utm_source=avito&utm_medium=classified&utm_campaign=vzyskanie_dolga&utm_content=ad_01","?utm_source=telegram&utm_medium=messenger&utm_campaign=vzyskanie_dolga&utm_content=channel_post_01","?utm_source=yandex_business&utm_medium=organic_profile&utm_campaign=legal_services&utm_content=profile_link","Автоматический `yclid` не добавляется вручную","По запросу в чате «дай UTM-хвост»"]) {
   if (!trafficAttribution.includes(marker)) errors.push(`docs/traffic-attribution-standard.md: отсутствует маркер «${marker}»`);
 }
 
@@ -133,7 +100,7 @@ if (!seoLaunch.includes("HOLD: только для будущего запуск
 if (!indexingPolicy.includes("новые страницы услуг")) errors.push("INDEXING_POLICY.md: историческая политика не охватывает новые страницы услуг");
 
 const packageJson = JSON.parse(packageText);
-for (const script of ["test:content-dates", "test:geography", "test:composition-contract", "test:documentation", "test:direct-contact", "test:conversion-analytics", "test:publication-pipeline", "test:cross-browser", "test:indexing-lock", "test:live-indexing-lock", "check:preview-indexing-lock"]) {
+for (const script of ["test:content-dates","test:geography","test:composition-contract","test:documentation","test:direct-contact","test:conversion-analytics","test:publication-pipeline","test:cross-browser","test:indexing-lock","test:live-indexing-lock","check:preview-indexing-lock"]) {
   if (!packageJson.scripts?.[script]) errors.push(`package.json: отсутствует ${script}`);
 }
 for (const removed of ["test:callback", "test:callback-interaction"]) {
@@ -145,36 +112,19 @@ if (!packageJson.scripts?.check?.includes("test:conversion-analytics")) errors.p
 if (!packageJson.scripts?.check?.includes("test:publication-pipeline")) errors.push("package.json: npm run check должен включать редакционный шлюз");
 if (!packageJson.scripts?.["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельный preview-контур должен сохранять indexing lock");
 
-for (const marker of [
-  "npm run check",
-  "playwright install --with-deps chromium firefox webkit",
-  "CROSS_BROWSER_REQUIRED: 'true'",
-  "INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow",
-  "if: github.event_name != 'schedule'",
-]) {
+for (const marker of ["node scripts/release-check.mjs","actions/deploy-pages@v5","actions/upload-pages-artifact@v5","actions/upload-artifact@v7","cancel-in-progress: false","queue: single","CROSS_BROWSER_REQUIRED: 'true'"]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует production-маркер ${marker}`);
+}
+for (const marker of ["workflows: [\"Deploy GitHub Pages\"]","Checkout exact deployed revision","SOURCE_SHA","verify-custom-domain-sha.mjs","actions/upload-artifact@v7","INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow","if: env.SOURCE_EVENT != 'schedule'"]) {
+  if (!verifyWorkflow.includes(marker)) errors.push(`pages-verify.yml: отсутствует post-deploy маркер ${marker}`);
 }
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production workflow не должен выполнять indexing lock");
 if (workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: production workflow не должен проверять закрытый режим");
+if (workflow.includes("deploy-pages-with-extended-wait")) errors.push("pages.yml: самописный Pages API client не должен использоваться");
+if (workflow.includes("playwright install")) errors.push("pages.yml: browser-heavy live checks должны выполняться отдельно после deployment");
 
-for (const relativePath of [
-  "docs/current-production-state.md",
-  "docs/PUBLISHING.md",
-  "docs/conversion-analytics.md",
-  "docs/privacy-implementation-note.md",
-  "docs/traffic-attribution-standard.md",
-  "tests/golden-render-contract.json",
-  "docs/manual-device-qa.md",
-  "INDEXING_POLICY.md",
-  "scripts/direct-contact-model-test.mjs",
-  "scripts/conversion-analytics-test.mjs",
-  "scripts/publication-pipeline-test.mjs",
-]) {
-  try {
-    await access(join(root, relativePath));
-  } catch {
-    errors.push(`Документация ссылается на отсутствующий файл: ${relativePath}`);
-  }
+for (const relativePath of ["docs/current-production-state.md","docs/PUBLISHING.md","docs/conversion-analytics.md","docs/privacy-implementation-note.md","docs/traffic-attribution-standard.md","tests/golden-render-contract.json","docs/manual-device-qa.md","INDEXING_POLICY.md","scripts/direct-contact-model-test.mjs","scripts/conversion-analytics-test.mjs","scripts/publication-pipeline-test.mjs","scripts/release-check.mjs",".github/workflows/pages-verify.yml"]) {
+  try { await access(join(root, relativePath)); } catch { errors.push(`Документация ссылается на отсутствующий файл: ${relativePath}`); }
 }
 
 if (errors.length) {
@@ -182,4 +132,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} routes, direct messenger model, traffic attribution standard, conversion analytics, publication pipeline, open indexing and automatic IndexNow are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, full PR gate, lean Pages deploy and isolated post-deploy verification are current`);

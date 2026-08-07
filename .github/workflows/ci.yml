@@ -35,12 +35,11 @@ jobs:
       SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
       INDEXNOW_KEY: ci-indexnow-key
       CROSS_BROWSER_REQUIRED: 'true'
-      # Проверяем весь PR относительно его базовой ветки, а не только последний коммит.
-      CONTENT_GOVERNANCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      CONTENT_GOVERNANCE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
 
     steps:
       - name: Получить код
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -48,16 +47,37 @@ jobs:
         run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"
 
       - name: Настроить Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22.17.0'
           cache: npm
+          package-manager-cache: false
 
       - name: Установить зависимости
         run: npm ci
 
+      - name: Проверить production release-путь без браузеров
+        shell: bash
+        run: |
+          set -o pipefail
+          node --check scripts/release-check.mjs
+          node scripts/release-check.mjs 2>&1 | tee release-check.log
+
+      - name: Восстановить кэш Playwright
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Установить системные зависимости браузеров
+        timeout-minutes: 6
+        run: npx playwright install-deps chromium firefox webkit
+
       - name: Установить браузеры
-        run: npx playwright install --with-deps chromium firefox webkit
+        timeout-minutes: 6
+        run: npx playwright install chromium firefox webkit
 
       - name: Выполнить полную production-проверку
         shell: bash
@@ -68,10 +88,11 @@ jobs:
 
       - name: Сохранить диагностику при ошибке
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: site-check-diagnostics-${{ github.run_id }}
           path: |
+            release-check.log
             check.log
             reports
             test-results

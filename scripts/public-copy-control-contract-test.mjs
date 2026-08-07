@@ -6,10 +6,11 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFile(join(root, path), "utf8");
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 
-const [configText, packageText, pages, agents, prTemplate, rules, guard, liveRegression, documentation] = await Promise.all([
+const [configText, packageText, pages, verifyWorkflow, agents, prTemplate, rules, guard, liveRegression, documentation] = await Promise.all([
   read("config/content-governance.json"),
   read("package.json"),
   read(".github/workflows/pages.yml"),
+  read(".github/workflows/pages-verify.yml"),
   read("AGENTS.md"),
   read(".github/pull_request_template.md"),
   read("scripts/public-copy-rules.mjs"),
@@ -47,13 +48,17 @@ assert(liveRegression.includes("manifest.articles.filter((item) => item.status =
 assert(liveRegression.includes("reportsDir"), "Live regression must write a diagnostic report");
 assert(liveRegression.includes("GITHUB_STEP_SUMMARY"), "Live regression must publish a workflow summary");
 
-const shaStep = pages.indexOf("Verify SHA through custom domain");
-const regressionStep = pages.indexOf("Recheck all published articles after verified deployment");
-assert(shaStep >= 0, "Pages workflow is missing custom-domain SHA verification");
+assert(pages.includes("actions/deploy-pages@v5"), "Pages workflow must use the official deployment action");
+assert(!pages.includes("live-public-copy-regression-test.mjs"), "Browser/public-copy live regression must not hold the Pages deployment workflow open");
+
+const shaStep = verifyWorkflow.indexOf("Wait for custom domain to expose deployed SHA");
+const regressionStep = verifyWorkflow.indexOf("Recheck all published articles");
+assert(shaStep >= 0, "Post-deploy workflow is missing custom-domain SHA verification");
 assert(regressionStep > shaStep, "All published articles must be rechecked after custom-domain SHA verification");
-assert(pages.includes("node scripts/live-public-copy-regression-test.mjs"), "Pages workflow is missing live public-copy regression");
-assert(pages.includes("reports/public-copy-regression.json"), "Pages workflow is missing public-copy diagnostics");
-assert(pages.includes("custom-domain-sha-diagnostics-${{ github.run_id }}"), "Existing custom-domain diagnostic artifact contract must be preserved");
+assert(verifyWorkflow.includes("node scripts/live-public-copy-regression-test.mjs"), "Post-deploy workflow is missing live public-copy regression");
+assert(verifyWorkflow.includes("reports/public-copy-regression.json"), "Post-deploy workflow is missing public-copy diagnostics");
+assert(verifyWorkflow.includes("live-site-diagnostics-${{ github.run_id }}"), "Post-deploy diagnostics artifact must be preserved");
+assert(verifyWorkflow.includes("SOURCE_SHA"), "Post-deploy verification must be pinned to the deployed revision");
 
 for (const marker of [
   "npm run test:public-copy",
@@ -72,4 +77,4 @@ for (const marker of ["До публикации", "После публикац�
   assert(documentation.includes(marker), `Public-copy documentation is missing: ${marker}`);
 }
 
-console.log("Public-copy control contract passed: pre-publication block, full historical regression, verified live recheck and user disclosure are mandatory");
+console.log("Public-copy control contract passed: pre-publication block, verified post-deploy regression and user disclosure remain mandatory without blocking Pages deployment");

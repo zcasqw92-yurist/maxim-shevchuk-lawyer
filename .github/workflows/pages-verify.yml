@@ -1,0 +1,136 @@
+name: Verify Published Site
+
+on:
+  workflow_run:
+    workflows: ["Deploy GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Post-deploy аудит не управляет Pages backend, поэтому его можно безопасно
+# отменить при появлении более новой опубликованной версии.
+concurrency:
+  group: pages-live-verify
+  cancel-in-progress: true
+
+env:
+  SITE_PRODUCTION: 'true'
+  SITE_URL: 'https://yuristshevchuk.com'
+  SITE_BASE_PATH: ''
+  GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+  YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
+  SITE_ANALYTICS_ENABLED: 'true'
+  GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
+  YANDEX_METRICA_ID: '111050150'
+  YANDEX_METRICA_OAUTH_TOKEN: ${{ secrets.YANDEX_METRICA_OAUTH_TOKEN }}
+  SITE_VIDEO_ENABLED: ${{ vars.SITE_VIDEO_ENABLED || 'false' }}
+  SITE_VIDEO_TITLE: ${{ vars.SITE_VIDEO_TITLE }}
+  SITE_VIDEO_DURATION: ${{ vars.SITE_VIDEO_DURATION }}
+  SITE_VIDEO_POSTER: ${{ vars.SITE_VIDEO_POSTER }}
+  SITE_VIDEO_WEBM: ${{ vars.SITE_VIDEO_WEBM }}
+  SITE_VIDEO_MP4: ${{ vars.SITE_VIDEO_MP4 }}
+  SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
+  INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+  CROSS_BROWSER_REQUIRED: 'true'
+
+jobs:
+  verify:
+    name: Verify published SHA and live site
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 22
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      SOURCE_EVENT: ${{ github.event.workflow_run.event || 'workflow_dispatch' }}
+    steps:
+      - name: Checkout exact deployed revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          fetch-depth: 0
+
+      - name: Set automated review date
+        run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.17.0'
+          cache: npm
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore Playwright cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-live-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-live-${{ runner.os }}-
+            playwright-${{ runner.os }}-
+
+      - name: Install live browser dependencies
+        timeout-minutes: 6
+        run: npx playwright install-deps chromium webkit
+
+      - name: Install live verification browsers
+        timeout-minutes: 6
+        run: npx playwright install chromium webkit
+
+      - name: Wait for custom domain to expose deployed SHA
+        env:
+          SITE_CUSTOM_DOMAIN_URL: ${{ env.SITE_URL }}
+          EXPECTED_BUILD_SHA: ${{ env.SOURCE_SHA }}
+          CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '30'
+          CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
+        run: node scripts/verify-custom-domain-sha.mjs
+
+      - name: Verify published build
+        env:
+          SITE_PUBLIC_URL: ${{ env.SITE_URL }}
+          EXPECTED_BUILD_SHA: ${{ env.SOURCE_SHA }}
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            npm run test:live
+            node scripts/live-all-publications-smoke.mjs
+          } 2>&1 | tee live-verify.log
+
+      - name: Recheck all published articles
+        env:
+          SITE_PUBLIC_URL: ${{ env.SITE_URL }}
+          EXPECTED_BUILD_SHA: ${{ env.SOURCE_SHA }}
+        run: node scripts/live-public-copy-regression-test.mjs
+
+      - name: Verify Yandex Metrica goals and funnels
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/metrica-state-test.mjs 2>&1 | tee metrica-state.log
+
+      - name: Upload live diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: live-site-diagnostics-${{ github.run_id }}
+          path: |
+            live-verify.log
+            metrica-state.log
+            reports/live-publication-smoke.json
+            reports/custom-domain-sha-verification.json
+            reports/public-copy-regression.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Notify IndexNow about changed pages
+        if: env.SOURCE_EVENT != 'schedule'
+        run: INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow

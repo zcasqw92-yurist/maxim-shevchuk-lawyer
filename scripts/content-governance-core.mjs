@@ -136,10 +136,12 @@ if (template && config) {
 
 if (!packageJson?.scripts?.["test:content-governance"]) errors.push("package.json: test:content-governance is missing");
 if (!packageJson?.scripts?.check?.startsWith("npm run test:content-governance")) errors.push("package.json: content governance must be the first full-check gate");
-if (!workflow.includes("fetch-depth: 0")) errors.push("pages.yml: full history is required to compare a multi-commit publication session");
-if (!workflow.includes("CONTENT_GOVERNANCE_BASE_SHA")) errors.push("pages.yml: publication base SHA is not passed to governance test");
-if (!ciWorkflow.includes("fetch-depth: 0")) errors.push("ci.yml: full PR history is required for the content governance diff");
-if (!ciWorkflow.includes("CONTENT_GOVERNANCE_BASE_SHA")) errors.push("ci.yml: PR base SHA is not passed to governance test");
+for (const [label, workflowText] of [["pages.yml", workflow], ["ci.yml", ciWorkflow]]) {
+  if (!workflowText.includes("fetch-depth: 1")) errors.push(`${label}: checkout должен получать только текущий commit`);
+  if (!workflowText.includes('git fetch --no-tags --depth=1 origin "$BASE_SHA"')) errors.push(`${label}: должен точечно загружаться CONTENT_GOVERNANCE_BASE_SHA`);
+  if (workflowText.includes("fetch-depth: 0")) errors.push(`${label}: полная история всех refs больше не должна загружаться`);
+  if (!workflowText.includes("CONTENT_GOVERNANCE_BASE_SHA")) errors.push(`${label}: base SHA должен передаваться governance test`);
+}
 
 let changedFiles = [];
 try {

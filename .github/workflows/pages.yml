@@ -48,7 +48,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+
+      - name: Fetch only content-governance base commit
+        shell: bash
+        env:
+          BASE_SHA: ${{ env.CONTENT_GOVERNANCE_BASE_SHA }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ || "$BASE_SHA" == "$GITHUB_SHA" ]]; then
+            echo "No additional content-governance base commit is required"
+            exit 0
+          fi
+          if ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          fi
+          git cat-file -e "${BASE_SHA}^{commit}"
+          echo "Content-governance base is available: $BASE_SHA"
 
       - name: Set automated review date
         run: echo "SITE_REVIEW_DATE=$(TZ=Europe/Moscow date +%F)" >> "$GITHUB_ENV"

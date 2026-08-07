@@ -9,8 +9,8 @@ on:
 permissions:
   contents: read
 
-# Post-deploy аудит не управляет Pages backend, поэтому его можно безопасно
-# отменить при появлении более новой опубликованной версии.
+# Post-deploy аудит не управляет Pages backend. Более новая публикация может
+# безопасно отменить проверку уже устаревшей версии.
 concurrency:
   group: pages-live-verify
   cancel-in-progress: true
@@ -33,17 +33,16 @@ env:
   SITE_VIDEO_MP4: ${{ vars.SITE_VIDEO_MP4 }}
   SITE_VIDEO_CAPTIONS: ${{ vars.SITE_VIDEO_CAPTIONS }}
   INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
-  CROSS_BROWSER_REQUIRED: 'true'
 
 jobs:
   verify:
-    name: Verify published SHA and live site
+    name: Verify production SHA and HTTP release
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-22.04
-    timeout-minutes: 22
+    timeout-minutes: 12
     env:
       SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
       SOURCE_EVENT: ${{ github.event.workflow_run.event || 'workflow_dispatch' }}
@@ -61,28 +60,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22.17.0'
-          cache: npm
           package-manager-cache: false
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Restore Playwright cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-live-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            playwright-live-${{ runner.os }}-
-            playwright-${{ runner.os }}-
-
-      - name: Install live browser dependencies
-        timeout-minutes: 6
-        run: npx playwright install-deps chromium webkit
-
-      - name: Install live verification browsers
-        timeout-minutes: 6
-        run: npx playwright install chromium webkit
 
       - name: Wait for custom domain to expose deployed SHA
         env:
@@ -92,17 +70,11 @@ jobs:
           CUSTOM_DOMAIN_VERIFY_DELAY_MS: '10000'
         run: node scripts/verify-custom-domain-sha.mjs
 
-      - name: Verify published build
+      - name: Verify published release over HTTP
         env:
           SITE_PUBLIC_URL: ${{ env.SITE_URL }}
           EXPECTED_BUILD_SHA: ${{ env.SOURCE_SHA }}
-        shell: bash
-        run: |
-          set -o pipefail
-          {
-            npm run test:live
-            node scripts/live-all-publications-smoke.mjs
-          } 2>&1 | tee live-verify.log
+        run: node scripts/live-http-release-verify.mjs
 
       - name: Recheck all published articles
         env:
@@ -123,9 +95,8 @@ jobs:
         with:
           name: live-site-diagnostics-${{ github.run_id }}
           path: |
-            live-verify.log
             metrica-state.log
-            reports/live-publication-smoke.json
+            reports/live-http-release-verification.json
             reports/custom-domain-sha-verification.json
             reports/public-copy-regression.json
           if-no-files-found: ignore
@@ -133,4 +104,4 @@ jobs:
 
       - name: Notify IndexNow about changed pages
         if: env.SOURCE_EVENT != 'schedule'
-        run: INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow
+        run: INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" node scripts/submit-indexnow.mjs

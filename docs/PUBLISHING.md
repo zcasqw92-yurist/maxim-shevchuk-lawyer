@@ -15,7 +15,7 @@
 
 Для любой статьи, правки сайта, SEO или инфраструктуры дополнительно обязателен жёсткий gate живой таблицы: `29_Публикационный_шлюз`, gid `290000290`. Его контракт хранится в `config/publication-sheet-gate.json`. До merge бот обязан занести scope, branch/PR/head SHA и реальные доказательства проверок. Pre-merge статус `29_Публикационный_шлюз!B2` должен быть `MERGE РАЗРЕШЕН`; выставлять пункты без фактического run/SHA/result запрещено. После merge работа считается полностью опубликованной только при `29_Публикационный_шлюз!L2 = ПУБЛИКАЦИЯ ЗАВЕРШЕНА` после exact production SHA, HTTP/public-copy и IndexNow.
 
-PF-014 закрепляет именно это разделение стадий: post-deploy доказательства не могут быть условием merge, а `MERGE РАЗРЕШЕН` не доказывает публикацию. Если появляется следующая неизвестная ошибка, работа блокируется, пока она не оформлена как следующий `PF-015+`: root cause, evidence, machine regression или строго ограниченный recovery. После закрытия причины весь шлюз повторяется. Результат завершённого релиза добавляется в `ЖУРНАЛ РЕЛИЗОВ` живой таблицы.
+PF-014 закрепляет разделение стадий: post-deploy доказательства не могут быть условием merge, а `MERGE РАЗРЕШЕН` не доказывает публикацию. PF-015 закрепляет устойчивый обязательный browser bootstrap до merge: временное замедление APT/CDN не должно превращаться в ложный отказ из-за исторического 6-минутного окна, но Chromium/Firefox/WebKit всё равно обязаны пройти до merge. Если появляется следующая неизвестная ошибка, работа блокируется, пока она не оформлена как следующий `PF-016+`: root cause, evidence, machine regression или строго ограниченный recovery. После закрытия причины весь шлюз повторяется. Результат завершённого релиза добавляется в `ЖУРНАЛ РЕЛИЗОВ` живой таблицы.
 
 Полный договор процесса находится в `AGENTS.md`, `docs/content-governance.md` и `config/content-governance.json`. При изменении контентного файла в том же наборе изменений обязателен `reports/content-sessions/latest.json`.
 
@@ -24,6 +24,7 @@ PF-014 закрепляет именно это разделение стади�
 ```bash
 node scripts/publication-readiness-test.mjs
 node scripts/publication-sheet-gate-contract-test.mjs
+node scripts/browser-bootstrap-contract-test.mjs
 npm run test:content-governance
 ```
 
@@ -77,8 +78,8 @@ npm run test:content-governance
 
 1. Создать рабочую ветку. Новые правки не вносятся напрямую в `main`.
 2. Открыть живую таблицу: `00_Старт` → `29_Публикационный_шлюз`; зафиксировать scope/branch/PR/head SHA. Для контента дополнительно пройти все динамически обнаруженные вкладки, evidence/SEO/content governance и обновить session manifest.
-3. Выполнить `node scripts/publication-readiness-test.mjs` и `node scripts/publication-sheet-gate-contract-test.mjs`. Эти gates защищают PF-001…PF-014 и обязательность живого staged-шлюза таблицы.
-4. Выполнить полный `npm run check` с Chromium/Firefox/WebKit до merge. Доказательства соответствующих PUB-пунктов заносятся в таблицу только по факту успешного run.
+3. Выполнить `node scripts/publication-readiness-test.mjs`, `node scripts/publication-sheet-gate-contract-test.mjs` и `node scripts/browser-bootstrap-contract-test.mjs`. Эти gates защищают PF-001…PF-015 и обязательность живого staged-шлюза таблицы.
+4. Выполнить полный `npm run check` с Chromium/Firefox/WebKit до merge. Подготовка системных зависимостей браузеров использует bounded APT retries/timeouts и отдельные ограниченные окна PF-015; сетевую деградацию нельзя лечить удалением browser checks. Доказательства PUB-пунктов заносятся в таблицу только по факту успешного run.
 5. Создать PR. Merge разрешён только для точного head SHA, на котором полный PR CI зелёный, а B2 живого шлюза равен `MERGE РАЗРЕШЕН`. Post-deploy пункты в этот pre-merge статус не входят.
 6. После merge запускается единственный `Deploy GitHub Pages`: быстрый deterministic `release-check`, artifact и официальный `actions/deploy-pages`. Полный browser-heavy `npm run check` после merge повторно не запускается.
 7. После успешного deploy отдельный `Verify Published Site` checkout-ит точный deployed SHA и ждёт `https://yuristshevchuk.com/deployments/<SHA>.json`.
@@ -91,6 +92,7 @@ npm run test:content-governance
 Система должна исправлять внешние сбои без изменения исходников:
 
 - **setup-only runner failure**: `Recover Pages infrastructure failure` может сделать `rerun-failed-jobs` исходного run на том же SHA; только если project code не запускался и `run_attempt < 3`;
+- **PF-015 browser dependency bootstrap**: если deterministic release-path зелёный, но внешний APT/CDN не успел подготовить browser environment, merge блокируется; сохраняются bounded retries/timeouts и полный exact-head CI повторяется после диагностики. Технический commit только ради повторного запуска запрещён;
 - **production drift**: `Watch production SHA drift` раз в час сравнивает `main` и production. Если SHA различаются и штатного Pages run нет в очереди/работе, watchdog делает `workflow_dispatch` существующего `pages.yml`;
 - recovery и watchdog не имеют `pages: write`, не содержат deploy-pages и не являются альтернативными deployers.
 
@@ -145,6 +147,7 @@ npm run test:content-governance
 - не пройдены юридическая, фактическая или анонимизационная проверки;
 - `dist` изменён вручную;
 - publication-readiness обнаружил старую аварийную архитектуру;
-- возник новый сбой PF-015+, но он не получил root cause и machine regression/recovery;
+- PF-015 вернулся как хрупкий 6-минутный browser dependency bootstrap или browser checks были ослаблены;
+- возник новый сбой PF-016+, но он не получил root cause и machine regression/recovery;
 - `npm run check` завершён с ошибкой;
 - PR head SHA не имеет зелёного полного CI.

@@ -18,6 +18,7 @@ on:
       - 'scripts/seo-data-pipeline-test.mjs'
       - 'scripts/seo-feedback-enrichment-test.mjs'
       - 'scripts/seo-metrica-event-goals-test.mjs'
+      - 'scripts/seo-workflow-runtime-test.mjs'
       - 'src/editorial-data.mjs'
       - 'src/metrica-goals.mjs'
       - 'public/assets/editorial-analytics.mjs'
@@ -53,7 +54,7 @@ jobs:
   collect:
     name: Collect normalized SEO feedback
     environment: seo-api
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     env:
       PIPELINE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'feedback' }}
@@ -69,22 +70,24 @@ jobs:
 
     steps:
       - name: Checkout pipeline code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout persistent SEO state
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: seo-data
           path: .seo-state
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22.17.0'
+          package-manager-cache: false
 
       - name: Run contract tests
         run: |
+          node scripts/seo-workflow-runtime-test.mjs
           node scripts/seo-data-pipeline-test.mjs
           node scripts/seo-feedback-enrichment-test.mjs
           node scripts/seo-metrica-event-goals-test.mjs
@@ -143,7 +146,7 @@ jobs:
           git push origin HEAD:seo-data
 
       - name: Upload sheet-ready reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: seo-data-${{ github.run_id }}
           path: .seo-state/reports/seo-data

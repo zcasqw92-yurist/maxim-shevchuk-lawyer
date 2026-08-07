@@ -6,6 +6,7 @@ const commands = [
   ["node", ["--check", "scripts/live-public-copy-regression-test.mjs"]],
   ["node", ["--check", "scripts/metrica-state-test.mjs"]],
   ["node", ["--check", "scripts/submit-indexnow.mjs"]],
+  ["node", ["scripts/seo-workflow-runtime-test.mjs"]],
   ["npm", ["run", "test:content-governance"]],
   ["npm", ["run", "test:public-copy"]],
   ["npm", ["run", "test:editorial-list-policy"]],

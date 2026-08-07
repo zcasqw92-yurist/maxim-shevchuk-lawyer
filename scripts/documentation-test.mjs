@@ -10,6 +10,7 @@ const read = (path) => readFile(join(root, path), "utf8");
 const [
   current,
   publishing,
+  failureAudit,
   readme,
   deployment,
   quality,
@@ -19,12 +20,15 @@ const [
   packageText,
   workflow,
   verifyWorkflow,
+  recoveryWorkflow,
+  watchdogWorkflow,
   conversionAnalytics,
   privacyImplementation,
   trafficAttribution,
 ] = await Promise.all([
   read("docs/current-production-state.md"),
   read("docs/PUBLISHING.md"),
+  read("docs/publication-failure-audit.md"),
   read("README.md"),
   read("DEPLOYMENT.md"),
   read("QUALITY_REPORT.md"),
@@ -34,6 +38,8 @@ const [
   read("package.json"),
   read(".github/workflows/pages.yml"),
   read(".github/workflows/pages-verify.yml"),
+  read(".github/workflows/pages-recovery.yml"),
+  read(".github/workflows/pages-watchdog.yml"),
   read("docs/conversion-analytics.md"),
   read("docs/privacy-implementation-note.md"),
   read("docs/traffic-attribution-standard.md"),
@@ -56,9 +62,13 @@ for (const marker of [
   "не входит в обычную команду `npm run check`",
   "INDEXNOW_CHANGED_DATE=2026-07-27 npm run submit:indexnow",
   "npm run check:preview-indexing-lock",
-  "PR CI запускает полный `npm run check`",
-  "Production workflow использует быстрый `scripts/release-check.mjs`",
-  "workflow `Verify Published Site`",
+  "PR CI запускает `scripts/release-check.mjs` как ранний deterministic gate",
+  "Production workflow использует тот же быстрый `scripts/release-check.mjs`",
+  "После успешного deployment отдельный `Verify Published Site`",
+  "immutable marker `deployments/<full-SHA>.json`",
+  "scripts/publication-readiness-test.mjs",
+  "Recover Pages infrastructure failure",
+  "Watch production SHA drift",
   "редакционный шлюз публикации",
   "editorial-publications.json",
   "sitemap-articles.xml",
@@ -75,12 +85,32 @@ for (const obsolete of [
   "формы, квиз, диалоги и мессенджеры",
   "Production workflow запускает именно `npm run check`",
   "отдельный verify-job",
+  "`Verify Published Site` устанавливает только Chromium и WebKit",
+  "`npm run test:live` прошёл на опубликованном URL",
+  "`node scripts/live-all-publications-smoke.mjs` проверил все публичные материалы",
 ]) {
   if (current.includes(obsolete)) errors.push(`current-production-state.md: осталось устаревшее утверждение «${obsolete}»`);
 }
 
-for (const marker of ["src/editorial-data.mjs","npm run check","status: \"published\"","legalReviewedAt","editorial-publications.json","publication_helpfulness","Будущая админка должна работать поверх этой же схемы"]) {
-  if (!publishing.includes(marker)) errors.push(`docs/PUBLISHING.md: отсутствует маркер «${marker}»`);
+for (const marker of [
+  "src/editorial-data.mjs",
+  "publication-readiness",
+  "npm run check",
+  "status: \"published\"",
+  "legalReviewedAt",
+  "editorial-publications.json",
+  "publication_helpfulness",
+  "deployments/<full-sha>.json",
+  "setup-only runner failure",
+  "Retry-коммит",
+  "Будущая админка должна работать поверх этой же схемы",
+]) {
+  if (!publishing.toLocaleLowerCase("ru-RU").includes(marker.toLocaleLowerCase("ru-RU"))) {
+    errors.push(`docs/PUBLISHING.md: отсутствует маркер «${marker}»`);
+  }
+}
+for (const marker of ["PF-001", "PF-004", "PF-007", "PF-010", "PF-013", "Критерий завершённой публикации"]) {
+  if (!failureAudit.includes(marker)) errors.push(`docs/publication-failure-audit.md: отсутствует маркер «${marker}»`);
 }
 for (const marker of ["contact_conversion","messenger_dialog_open","cta_click","cta_view","source_cta_placement","traffic_attribution_ready","traffic_utm_source","traffic_journey_tail","Текст подготовленного сообщения","111050150","docs/traffic-attribution-standard.md"]) {
   if (!conversionAnalytics.includes(marker)) errors.push(`docs/conversion-analytics.md: отсутствует маркер «${marker}»`);
@@ -112,18 +142,51 @@ if (!packageJson.scripts?.check?.includes("test:conversion-analytics")) errors.p
 if (!packageJson.scripts?.check?.includes("test:publication-pipeline")) errors.push("package.json: npm run check должен включать редакционный шлюз");
 if (!packageJson.scripts?.["check:preview-indexing-lock"]?.includes("lock:indexing")) errors.push("package.json: отдельный preview-контур должен сохранять indexing lock");
 
-for (const marker of ["node scripts/release-check.mjs","actions/deploy-pages@v5","actions/upload-pages-artifact@v5","actions/upload-artifact@v7","cancel-in-progress: false","queue: single","CROSS_BROWSER_REQUIRED: 'true'"]) {
+for (const marker of ["node scripts/release-check.mjs","actions/deploy-pages@v5","actions/upload-pages-artifact@v5","actions/upload-artifact@v7","cancel-in-progress: false","queue: single","CROSS_BROWSER_REQUIRED: 'true'","workflow_dispatch:"]) {
   if (!workflow.includes(marker)) errors.push(`pages.yml: отсутствует production-маркер ${marker}`);
 }
-for (const marker of ["workflows: [\"Deploy GitHub Pages\"]","Checkout exact deployed revision","SOURCE_SHA","verify-custom-domain-sha.mjs","actions/upload-artifact@v7","INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow","if: env.SOURCE_EVENT != 'schedule'"]) {
-  if (!verifyWorkflow.includes(marker)) errors.push(`pages-verify.yml: отсутствует post-deploy маркер ${marker}`);
+if (workflow.includes("schedule:")) errors.push("pages.yml: слепой scheduled redeploy не должен возвращаться");
+for (const marker of ["workflows: [\"Deploy GitHub Pages\"]","Checkout exact deployed revision","SOURCE_SHA","fetch-depth: 1","verify-custom-domain-sha.mjs","CUSTOM_DOMAIN_VERIFY_ATTEMPTS: '72'","actions/upload-artifact@v7","INDEXNOW_CHANGED_DATE=\"$SITE_REVIEW_DATE\" npm run submit:indexnow","if: env.SOURCE_EVENT != 'schedule'"]) {
+  if (!verifyWorkflow.includes(marker)) errors.push(`pages-verify.yml: отсутствует dependency-light post-deploy маркер ${marker}`);
+}
+for (const marker of ["actions: write","source run is stale","attempt >= 3","setup_only_count","rerun-failed-jobs","cron: '52 * * * *'"]) {
+  if (!recoveryWorkflow.includes(marker)) errors.push(`pages-recovery.yml: отсутствует recovery-маркер ${marker}`);
+}
+for (const marker of ["actions: write","deployments/${main_sha}.json?watchdog=","current_failures","current_successes >= 2","pages.yml/dispatches","cron: '37 * * * *'"]) {
+  if (!watchdogWorkflow.includes(marker)) errors.push(`pages-watchdog.yml: отсутствует watchdog-маркер ${marker}`);
+}
+for (const [label, content] of [["pages-recovery.yml", recoveryWorkflow], ["pages-watchdog.yml", watchdogWorkflow]]) {
+  if (/pages:\s*write|id-token:\s*write|actions\/deploy-pages|actions\/upload-pages-artifact/.test(content)) {
+    errors.push(`${label}: recovery control не должен становиться альтернативным Pages writer`);
+  }
 }
 if (workflow.includes("npm run lock:indexing")) errors.push("pages.yml: production workflow не должен выполнять indexing lock");
 if (workflow.includes("npm run test:live-indexing-lock")) errors.push("pages.yml: production workflow не должен проверять закрытый режим");
 if (workflow.includes("deploy-pages-with-extended-wait")) errors.push("pages.yml: самописный Pages API client не должен использоваться");
-if (workflow.includes("playwright install")) errors.push("pages.yml: browser-heavy live checks должны выполняться отдельно после deployment");
+if (workflow.includes("playwright install")) errors.push("pages.yml: browser-heavy проверки должны выполняться до merge, а не в production deployment");
+if (/playwright|npm ci|test:live|live-all-publications-smoke/.test(verifyWorkflow)) errors.push("pages-verify.yml: browser-heavy зависимости не должны возвращаться в post-deploy verification");
 
-for (const relativePath of ["docs/current-production-state.md","docs/PUBLISHING.md","docs/conversion-analytics.md","docs/privacy-implementation-note.md","docs/traffic-attribution-standard.md","tests/golden-render-contract.json","docs/manual-device-qa.md","INDEXING_POLICY.md","scripts/direct-contact-model-test.mjs","scripts/conversion-analytics-test.mjs","scripts/publication-pipeline-test.mjs","scripts/release-check.mjs",".github/workflows/pages-verify.yml"]) {
+for (const relativePath of [
+  "docs/current-production-state.md",
+  "docs/PUBLISHING.md",
+  "docs/publication-failure-audit.md",
+  "config/publication-failure-regressions.json",
+  "docs/conversion-analytics.md",
+  "docs/privacy-implementation-note.md",
+  "docs/traffic-attribution-standard.md",
+  "tests/golden-render-contract.json",
+  "docs/manual-device-qa.md",
+  "INDEXING_POLICY.md",
+  "scripts/direct-contact-model-test.mjs",
+  "scripts/conversion-analytics-test.mjs",
+  "scripts/publication-pipeline-test.mjs",
+  "scripts/publication-readiness-test.mjs",
+  "scripts/pages-recovery-contract-test.mjs",
+  "scripts/release-check.mjs",
+  ".github/workflows/pages-verify.yml",
+  ".github/workflows/pages-recovery.yml",
+  ".github/workflows/pages-watchdog.yml",
+]) {
   try { await access(join(root, relativePath)); } catch { errors.push(`Документация ссылается на отсутствующий файл: ${relativePath}`); }
 }
 
@@ -132,4 +195,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Documentation contract passed: ${canonicalCount} routes, full PR gate, lean Pages deploy and isolated post-deploy verification are current`);
+console.log(`Documentation contract passed: ${canonicalCount} routes, publication-readiness, pre-merge browser gate, one Pages writer, exact-SHA verification and bounded recovery are current`);

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "articleId": "example-article-id",
+  "version": "v1",
+  "editorTab": "34_Редактор_статей_сайта",
+  "sourceRange": "A6:N20",
+  "approvedAt": "2026-08-07T00:00:00+03:00",
+  "approvalEvidence": "explicit-user-chat-command-after-review",
+  "fingerprintAlgorithm": "sha256",
+  "approvedFingerprint": "replace-with-64-lowercase-hex",
+  "rows": [],
+  "sourceModule": "src/example-article-data.mjs",
+  "headSha": null,
+  "mergeSha": null,
+  "publishedSha": null,
+  "status": "template"
+}

@@ -5,16 +5,20 @@
 ## Publication-readiness
 
 - [ ] Работа выполнена в отдельной ветке, не напрямую в `main`.
-- [ ] `node scripts/publication-readiness-test.mjs` завершён без ошибок.
+- [ ] Перед изменением открыты `00_Старт` и живой `29_Публикационный_шлюз`; указаны scope, branch/PR и текущий head SHA.
+- [ ] Доказательства пунктов шлюза внесены только по фактическим command/run/SHA/result; статусы не выставлялись по предположению.
+- [ ] Предmerge-блокеры `29_Публикационный_шлюз` закрыты, итоговый статус — `ПУБЛИКАЦИЯ РАЗРЕШЕНА`.
+- [ ] `node scripts/publication-readiness-test.mjs` и `node scripts/publication-sheet-gate-contract-test.mjs` завершены без ошибок.
 - [ ] Не возвращены технические retry-коммиты, альтернативный Pages writer, browser-heavy deploy fallback или `cancel-in-progress:true` для production Pages.
 - [ ] Если менялась публикационная инфраструктура, соответствующий класс PF-001…PF-013 сохранён закрытым machine regression-контролем.
+- [ ] Если обнаружен новый PF, он получил следующий PF-ID, root cause, evidence и machine regression/recovery; после исправления весь шлюз повторён.
 - [ ] Полный PR CI с Chromium/Firefox/WebKit относится к текущему состоянию PR и завершён успешно до merge.
 
 ## Контентный шлюз
 
 - [ ] Изменение не затрагивает видимый контент сайта; либо выполнены все пункты ниже.
 - [ ] Актуальная таблица `1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24` прочитана в этой сессии.
-- [ ] Динамически получен и проверен полный список вкладок, включая служебные и контрольные.
+- [ ] Динамически получен и проверен полный список вкладок, включая `29_Публикационный_шлюз`, служебные и контрольные вкладки.
 - [ ] Обновлён `reports/content-sessions/latest.json`.
 - [ ] Факты отделены от гипотез; платная работа, платёж и результат дела не смешаны.
 - [ ] Для каждого самостоятельного интента назначена единственная страница-владелец.
@@ -39,10 +43,12 @@
 - Рекламные размещения и коммерческий фон:
 - Оригинальный практический элемент:
 - Результат предпубликационной проверки публичного текста:
+- Доказательства пунктов шлюза / CI run / head SHA:
 - Ожидаемые URL:
 - После merge проверить штатный `Deploy GitHub Pages`, затем дождаться `Verify Published Site` для точного production SHA. Browser-heavy `npm run test:live` и `scripts/live-all-publications-smoke.mjs` после deploy вручную не повторяются: они обязаны пройти до merge.
 - Проверен `https://yuristshevchuk.com/deployments/<full-SHA>.json`, затем `build-info.json` и `site-build-sha`.
 - После подтверждения SHA выполнены production HTTP и `node scripts/live-public-copy-regression-test.mjs` без замечаний.
+- В `ЖУРНАЛ РЕЛИЗОВ` таблицы внесены head/merge/production SHA, HTTP/public-copy, IndexNow и итог/новый PF.
 - Результат контрольной проверки всех прежних статей после подтверждения production SHA:
 - Найденные нюансы, исправления и повторная проверка, либо отметка «замечаний не найдено»:
 - Итоговый отчёт с merge SHA, production SHA и результатами live-проверки передан в чат.

@@ -40,9 +40,10 @@ requirePattern("ci", ci, /git fetch --no-tags --depth=1 origin "\$BASE_SHA"/, "C
 requirePattern("ci", ci, /uses:\s*actions\/setup-node@v6/, "CI должен использовать setup-node@v6");
 requirePattern("ci", ci, /uses:\s*actions\/cache@v5/, "Playwright cache должен использовать actions/cache@v5");
 requirePattern("ci", ci, /uses:\s*actions\/upload-artifact@v7/, "CI diagnostics должны использовать upload-artifact@v7");
-requirePattern("ci", ci, /npx playwright install-deps chromium firefox webkit/, "browser system dependencies должны устанавливаться отдельным шагом");
-requirePattern("ci", ci, /npx playwright install chromium firefox webkit/, "Chromium, Firefox и WebKit должны быть установлены до полной проверки");
-requirePattern("ci", ci, /timeout-minutes:\s*6[\s\S]*playwright install-deps/, "browser dependency install должен иметь короткий timeout");
+requirePattern("ci", ci, /timeout-minutes:\s*40/, "PF-015: общий browser CI должен оставаться bounded, но иметь достаточное окно");
+requirePattern("ci", ci, /timeout-minutes:\s*12[\s\S]*Acquire::Retries "5";[\s\S]*Acquire::http::Timeout "60";[\s\S]*Acquire::https::Timeout "60";[\s\S]*npx playwright install-deps chromium firefox webkit/, "PF-015: browser dependency bootstrap должен иметь bounded 12-minute window, APT retries/timeouts и все три движка");
+requirePattern("ci", ci, /timeout-minutes:\s*10[\s\S]*npx playwright install chromium firefox webkit/, "PF-015: browser binaries должны иметь отдельное bounded окно и включать Chromium, Firefox и WebKit");
+forbidPattern("ci", ci, /timeout-minutes:\s*6[\s\S]{0,180}playwright install-deps/, "PF-015: исторический 6-минутный timeout browser dependencies запрещён");
 requirePattern("ci", ci, /node scripts\/release-check\.mjs 2>&1 \| tee release-check\.log/, "deterministic release path должен проверяться до browser-heavy CI");
 requirePattern("ci", ci, /npm run check 2>&1 \| tee check\.log/, "PR должен выполнять полный npm run check");
 forbidPattern("ci", ci, /actions\/(?:checkout|setup-node)@v[1-5]\b/, "старые checkout/setup-node major запрещены");
@@ -108,8 +109,8 @@ if (!(readinessIndex >= 0 && contentIndex > readinessIndex)) errors.push("releas
 for (const required of ["test:content-governance","test:public-copy","test:editorial-list-policy","test:editorial-single-source","test:editorial-commercial-gate","test:seo-data-pipeline","build","test:css-architecture","validate","audit:seo","test:seo-metadata","test:documentation","test:workflow-contract","test:deployment-observability","test:custom-domain-sha"]) {
   if (!releaseGate.includes(`\"${required}\"`)) errors.push(`release-gate: отсутствует deterministic check ${required}`);
 }
-for (const requiredScript of ["verify-custom-domain-sha.mjs","live-http-release-verify.mjs","live-public-copy-regression-test.mjs","metrica-state-test.mjs","submit-indexnow.mjs"]) {
-  if (!releaseGate.includes(requiredScript)) errors.push(`release-gate: отсутствует syntax-check post-deploy script ${requiredScript}`);
+for (const requiredScript of ["publication-sheet-gate-contract-test.mjs","browser-bootstrap-contract-test.mjs","verify-custom-domain-sha.mjs","live-http-release-verify.mjs","live-public-copy-regression-test.mjs","metrica-state-test.mjs","submit-indexnow.mjs"]) {
+  if (!releaseGate.includes(requiredScript)) errors.push(`release-gate: отсутствует обязательный deterministic/syntax contract ${requiredScript}`);
 }
 for (const forbidden of ["test:cta-system","test:numbered-typography","test:accessibility","test:cross-browser","test:all-publications-overflow","test:visual"]) {
   if (releaseGate.includes(`\"${forbidden}\"`)) errors.push(`release-gate: browser-heavy check ${forbidden} должен оставаться в full PR CI`);
@@ -127,4 +128,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Workflow contract passed: full pre-merge browser CI, one Pages writer, immutable SHA post-deploy verification, bounded setup-only recovery and drift watchdog");
+console.log("Workflow contract passed: full pre-merge browser CI with PF-015 bootstrap resilience, one Pages writer, immutable SHA post-deploy verification, bounded setup-only recovery and drift watchdog");

@@ -13,8 +13,17 @@
   "unknownFailureCell": "J2",
   "unresolvedUnknownFailureValue": "Да — не закрыт",
   "resolvedUnknownFailureValue": "Да — закрыт regression",
-  "releaseLogHeaderRow": 49,
-  "releaseLogFirstDataRow": 50,
+  "releaseLogHeaderRow": 54,
+  "releaseLogFirstDataRow": 55,
+  "articleEditor": {
+    "configPath": "config/article-editor-gate.json",
+    "editorTab": "34_Редактор_статей_сайта",
+    "editorGid": "340000340",
+    "historyTab": "_35_Версии_статей_сайта",
+    "historyGid": "350000350",
+    "premergeCheckIds": ["PUB-025", "PUB-026", "PUB-027", "PUB-028", "PUB-029"],
+    "requiredForChangeType": "Статья"
+  },
   "appliesTo": [
     "article",
     "site-change",
@@ -31,7 +40,8 @@
     "mustVerifyExactProductionSha": true,
     "mustRecordProductionHttpAndPublicCopy": true,
     "mustRecordIndexNowOutcome": true,
-    "mustAppendReleaseLog": true
+    "mustAppendReleaseLog": true,
+    "mustEnforceArticleEditorApprovalGate": true
   },
   "unknownFailurePolicy": {
     "nextIdStartsAt": "PF-016",
@@ -49,6 +59,10 @@
     "technical retry commits",
     "alternate Pages writers",
     "browser-heavy post-deploy checks",
-    "closing an unknown failure without a new PF regression"
+    "closing an unknown failure without a new PF regression",
+    "publishing an article outside the canonical article editor",
+    "publishing an article without explicit user chat approval",
+    "silently correcting final-preflight findings",
+    "publishing after approved article fingerprint drift"
   ]
 }

@@ -10,6 +10,11 @@ const requiredGateTab = "29_Публикационный_шлюз";
 const requiredGateGid = "290000290";
 const requiredMergeValue = "MERGE РАЗРЕШЕН";
 const requiredFinalValue = "ПУБЛИКАЦИЯ ЗАВЕРШЕНА";
+const requiredEditorTab = "34_Редактор_статей_сайта";
+const requiredEditorGid = "340000340";
+const requiredHistoryTab = "_35_Версии_статей_сайта";
+const requiredHistoryGid = "350000350";
+const requiredArticleGateIds = ["PUB-025", "PUB-026", "PUB-027", "PUB-028", "PUB-029"];
 
 const [gateText, contentGovernanceText, failureRegistryText, agents, publishing, prTemplate, releaseGate] = await Promise.all([
   read("config/publication-sheet-gate.json"),
@@ -43,10 +48,15 @@ if (gate) {
   if (gate.mergeStatusCell !== "B2" || gate.requiredMergeAllowedValue !== requiredMergeValue) errors.push("pre-merge gate must remain B2 = MERGE РАЗРЕШЕН");
   if (gate.finalStatusCell !== "L2" || gate.requiredFinalValue !== requiredFinalValue) errors.push("post-deploy completion must remain separately proven by L2 = ПУБЛИКАЦИЯ ЗАВЕРШЕНА");
   if (gate.mergeStatusCell === gate.finalStatusCell) errors.push("PF-014 regression: merge and publication completion may not share one status cell");
-  if (gate.releaseLogHeaderRow !== 49 || gate.releaseLogFirstDataRow !== 50) errors.push("release log row contract must follow PF-015 history row");
+  if (gate.releaseLogHeaderRow !== 54 || gate.releaseLogFirstDataRow !== 55) errors.push("release log row contract must follow PUB-025…PUB-029 and PF-001…PF-015");
   if (gate.unknownFailureCell !== "J2" || gate.unresolvedUnknownFailureValue !== "Да — не закрыт") errors.push("unknown failure blocker must remain tied to J2");
   if (gate.resolvedUnknownFailureValue !== "Да — закрыт regression") errors.push("unknown failure may be resolved only after regression control exists");
   if (!sameMembers(gate.appliesTo || [], ["article", "site-change", "seo", "infrastructure"])) errors.push("publication gate must apply to articles, site changes, SEO and infrastructure");
+  if (gate.articleEditor?.configPath !== "config/article-editor-gate.json") errors.push("publication gate must point to the article editor machine contract");
+  if (gate.articleEditor?.editorTab !== requiredEditorTab || gate.articleEditor?.editorGid !== requiredEditorGid) errors.push("publication gate must preserve the canonical article editor tab/gid");
+  if (gate.articleEditor?.historyTab !== requiredHistoryTab || gate.articleEditor?.historyGid !== requiredHistoryGid) errors.push("publication gate must preserve the immutable article snapshot history tab/gid");
+  if (!sameMembers(gate.articleEditor?.premergeCheckIds || [], requiredArticleGateIds)) errors.push("publication gate must preserve PUB-025…PUB-029 article approval checks");
+  if (gate.articleEditor?.requiredForChangeType !== "Статья") errors.push("article editor checks must become mandatory for change type Статья");
   for (const field of [
     "liveReadBeforeEveryChange",
     "mustBeAllowedBeforeMerge",
@@ -58,6 +68,7 @@ if (gate) {
     "mustRecordProductionHttpAndPublicCopy",
     "mustRecordIndexNowOutcome",
     "mustAppendReleaseLog",
+    "mustEnforceArticleEditorApprovalGate",
   ]) {
     if (gate.requirements?.[field] !== true) errors.push(`publication gate requirement must remain enabled: ${field}`);
   }
@@ -111,7 +122,7 @@ for (const [label, text, markers] of [
   for (const marker of markers) if (!text.includes(marker)) errors.push(`${label}: publication sheet gate marker is missing: ${marker}`);
 }
 
-for (const script of ["scripts/publication-sheet-gate-contract-test.mjs", "scripts/browser-bootstrap-contract-test.mjs"]) {
+for (const script of ["scripts/publication-sheet-gate-contract-test.mjs", "scripts/article-editor-gate-contract-test.mjs", "scripts/browser-bootstrap-contract-test.mjs"]) {
   if (!releaseGate.includes(`\"${script}\"`)) errors.push(`release-check must execute ${script} before packing a release`);
 }
 
@@ -120,4 +131,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Publication sheet gate contract passed: staged B2/L2 is protected, PF-014 and PF-015 remain registered, and the next unknown class starts at PF-016");
+console.log("Publication sheet gate contract passed: staged B2/L2 and PUB-025…PUB-029 article approval controls are protected; PF-014/PF-015 remain registered and the next unknown class starts at PF-016");

@@ -73,9 +73,17 @@ requirePattern("verify", verify, /SITE_PUBLIC_URL:\s*\$\{\{ env\.SITE_URL \}\}[\
 requirePattern("verify", verify, /live-public-copy-regression-test\.mjs/, "после подтверждения SHA должен выполняться regression публичных статей");
 requirePattern("verify", verify, /reports\/live-http-release-verification\.json/, "ошибка HTTP-проверки должна сохранять диагностический отчёт");
 requirePattern("verify", verify, /continue-on-error:\s*true[\s\S]*metrica-state-test\.mjs/, "внешний API Метрики не должен блокировать опубликованный сайт");
-requirePattern("verify", verify, /if:\s*env\.SOURCE_EVENT != 'schedule'[\s\S]*submit-indexnow/, "IndexNow должен запускаться после live-аудита и не по расписанию");
+requirePattern("verify", verify, /if:\s*env\.SOURCE_EVENT\s*!=\s*['"]schedule['"]/, "IndexNow не должен запускаться из планового deployment");
 forbidPattern("verify", verify, /pages:\s*write/, "post-deploy аудит не должен иметь права на новый Pages deployment");
 forbidPattern("verify", verify, /playwright|actions\/cache|npm ci|test:live|live-all-publications-smoke/, "post-deploy critical path не должен повторять browser-heavy PR CI");
+
+const verifyShaStep = verify.indexOf("node scripts/verify-custom-domain-sha.mjs");
+const verifyHttpStep = verify.indexOf("node scripts/live-http-release-verify.mjs");
+const verifyRegressionStep = verify.indexOf("node scripts/live-public-copy-regression-test.mjs");
+const verifyIndexNowStep = verify.indexOf('INDEXNOW_CHANGED_DATE="$SITE_REVIEW_DATE" npm run submit:indexnow');
+if (!(verifyShaStep >= 0 && verifyHttpStep > verifyShaStep && verifyRegressionStep > verifyHttpStep && verifyIndexNowStep > verifyRegressionStep)) {
+  errors.push("verify: порядок post-deploy должен быть SHA → HTTP production → public-copy regression → IndexNow");
+}
 
 for (const required of ["test:content-governance","test:public-copy","test:editorial-list-policy","test:editorial-single-source","test:editorial-commercial-gate","test:seo-data-pipeline","build","test:css-architecture","validate","audit:seo","test:seo-metadata","test:documentation","test:workflow-contract","test:deployment-observability","test:custom-domain-sha"]) {
   if (!releaseGate.includes(`\"${required}\"`)) errors.push(`release-gate: отсутствует обязательная deterministic проверка ${required}`);

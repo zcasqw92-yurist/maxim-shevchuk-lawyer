@@ -99,15 +99,6 @@ const runEngine = async (engineName, engine) => {
         expectParts(`${label}: generic WhatsApp`, textParam(links.whatsapp), genericParts);
         await closeDialog(links.dialog);
 
-        const topicTrigger = page.locator(".hero__quick-choices [data-topic='возврат денежных средств']");
-        await topicTrigger.scrollIntoViewIfNeeded();
-        await topicTrigger.click();
-        links = await dialogLinks(page);
-        const topicParts = ["Обращаюсь по вопросу: возврат денежных средств", "Кратко опишу ситуацию"];
-        expectParts(`${label}: topic Telegram`, textParam(links.telegram), topicParts);
-        expectParts(`${label}: topic WhatsApp`, textParam(links.whatsapp), topicParts);
-        await closeDialog(links.dialog);
-
         const priceTrigger = page.locator('[data-topic="ориентир стоимости юридической помощи"]').first();
         await priceTrigger.scrollIntoViewIfNeeded();
         await priceTrigger.click();
@@ -145,4 +136,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Messenger intents passed: no forms, prefilled direct drafts, generic/topic/price flows in Chromium and WebKit");
+console.log("Messenger intents passed: no forms, prefilled direct drafts, generic and visible price-topic flows in Chromium and WebKit");

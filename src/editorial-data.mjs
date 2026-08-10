@@ -13,6 +13,10 @@ import {
   validateFraudPoliceStatementData,
 } from "./fraud-police-statement-data.mjs";
 import {
+  theftPoliceStatementArticles,
+  validateTheftPoliceStatementData,
+} from "./theft-police-statement-data.mjs";
+import {
   hotelBookingRefundArticles,
   validateHotelBookingRefundData,
 } from "./hotel-booking-refund-data.mjs";
@@ -39,6 +43,7 @@ export const articles = [
   ...baseArticles,
   ...trademarkClaimMarketplaceArticles,
   ...fraudPoliceStatementArticles,
+  ...theftPoliceStatementArticles,
   ...hotelBookingRefundArticles,
   ...contractEngineNoReceiptArticles,
   ...ozonLostGoodsLogisticsArticles,
@@ -57,6 +62,7 @@ export const validateEditorialData = () => {
   validateBaseEditorialData();
   validateTrademarkClaimMarketplaceData();
   validateFraudPoliceStatementData();
+  validateTheftPoliceStatementData();
   validateHotelBookingRefundData();
 
   const slugs = new Set();

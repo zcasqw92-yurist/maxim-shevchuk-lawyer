@@ -261,4 +261,17 @@
     .engagement-nudge__write { order: 1; }
     .engagement-nudge__dismiss { order: 2; }
   }
+
+  /* Reference-style home hero keeps the global CTA type scale and weight. */
+  .home .header__actions .button--compact,
+  .home .hero .hero__actions .button--primary,
+  .home .hero .hero__actions .button--secondary,
+  .home .hero .hero__quick-choices button {
+    font-size: var(--cta-font-size);
+    font-weight: var(--cta-font-weight);
+  }
+
+  .home .hero .hero__actions .button--secondary {
+    color: var(--cta-secondary-text);
+  }
 }

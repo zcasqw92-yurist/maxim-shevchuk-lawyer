@@ -194,33 +194,34 @@ try {
       errors.push("traffic attribution: сохранено значение click ID или query-параметр реферера");
     }
 
-    await page.locator(".hero__quick-choices button", { hasText: "Не возвращают деньги" }).scrollIntoViewIfNeeded();
+    const heroPrimary = page.locator(".hero__actions .button--primary[data-dialog-open]").first();
+    await heroPrimary.scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
 
-    const viewEvent = (await events()).find((item) => item.name === "cta_view" && item.params.cta_placement === "hero_quick_choice");
+    const viewEvent = (await events()).find((item) => item.name === "cta_view" && item.params.cta_placement === "hero_primary");
     validateMetadata("cta_view", viewEvent?.params, {
       page_group: "home",
       viewport: "desktop",
-      cta_placement: "hero_quick_choice",
+      cta_placement: "hero_primary",
       traffic_utm_source: "avito",
       traffic_landing_path: "/",
     });
 
-    await page.locator(".hero__quick-choices button", { hasText: "Не возвращают деньги" }).click();
+    await heroPrimary.click();
     await page.locator("#contact-dialog").waitFor({ state: "visible" });
 
     const homeEvents = await events();
-    const ctaClick = homeEvents.find((item) => item.name === "cta_click" && item.params.cta_placement === "hero_quick_choice");
+    const ctaClick = homeEvents.find((item) => item.name === "cta_click" && item.params.cta_placement === "hero_primary");
     validateMetadata("cta_click", ctaClick?.params, {
       page_group: "home",
-      cta_placement: "hero_quick_choice",
-      topic: "возврат денежных средств",
+      cta_placement: "hero_primary",
+      topic: "general",
       traffic_utm_source: "avito",
     });
 
     const legacyOpen = homeEvents.find((item) => item.name === "messenger_dialog_open");
-    if (!legacyOpen || legacyOpen.params.topic !== "возврат денежных средств") {
-      errors.push("messenger_dialog_open: существующая микроконверсия должна сохраняться");
+    if (!legacyOpen || legacyOpen.params.topic !== "general") {
+      errors.push("messenger_dialog_open: микроконверсия видимого CTA первого экрана должна сохраняться");
     }
 
     await page.locator("#contact-dialog [data-track='whatsapp']").click();
@@ -229,9 +230,9 @@ try {
       channel: "whatsapp",
       contact_mode: "dialog",
       cta_placement: "messenger_dialog",
-      origin_cta_placement: "hero_quick_choice",
-      source_cta_placement: "hero_quick_choice",
-      topic: "возврат денежных средств",
+      origin_cta_placement: "hero_primary",
+      source_cta_placement: "hero_primary",
+      topic: "general",
       traffic_utm_source: "avito",
       traffic_journey_depth: 1,
     });
@@ -267,4 +268,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Conversion analytics passed: ${canonicalPaths.length} pages, first-touch source, session journey, CTA views and final conversions without message or click-ID content`);
+console.log(`Conversion analytics passed: ${canonicalPaths.length} pages, first-touch source, session journey, visible hero CTA views and final conversions without message or click-ID content`);

@@ -1,223 +1,124 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260806-1620-c139-risk-cta-bullets",
-  "reviewedAt": "2026-08-06T14:20:00.000Z",
+  "sessionId": "20260810-c170-theft-publication",
+  "reviewedAt": "2026-08-10T16:44:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-06T14:16:37.977Z",
-    "metadataTabCount": 28,
-    "discoveredTabs": [
-      "00_Старт",
-      "01_БПЮ",
-      "02_ЮрДоки",
-      "03_Оплаты",
-      "04_Дашборд",
-      "05_Контроль",
-      "06_Импорт",
-      "_Справочники",
-      "_Журнал",
-      "07_Диалоги_исследование",
-      "08_Банк_реплик",
-      "09_Паттерны_аудитории",
-      "10_Контентные_возможности",
-      "11_Кейсы_для_публикации",
-      "12_Эффективные_ответы",
-      "13_Статистика_контента",
-      "14_Контент_дашборд",
-      "15_Обращения_с_контента",
-      "_Реестр_диалогов",
-      "_Ситуации_и_связи",
-      "_События_воронки",
-      "_Версии_контента",
-      "16_Контроль_данных",
-      "_Импорт_ЮД_151_200",
-      "Статьи_HARANT",
-      "17_SEO_сборы",
-      "18_SEO_база_ключей",
-      "19_SEO_preflight"
-    ]
+    "modifiedTime": "2026-08-10T16:43:02.001Z",
+    "metadataTabCount": 48,
+    "discoveredTabs": ["Команды","00_Старт","01_БПЮ","02_ЮрДоки","03_Оплаты","04_Дашборд_старый","04_Дашборд","04_Дашборд_архив","05_Контроль","06_Импорт","_Справочники","_Журнал","07_Диалоги_исследование","08_Банк_реплик","09_Паттерны_аудитории","10_Контентные_возможности","11_Кейсы_для_публикации","12_Эффективные_ответы","13_Статистика_контента","14_Контент_дашборд","15_Обращения_с_контента","_Реестр_диалогов","_Ситуации_и_связи","_События_воронки","_Версии_контента","16_Контроль_данных","_Импорт_ЮД_151_200","Статьи_HARANT","17_SEO_сборы","18_SEO_база_ключей","19_SEO_preflight","20_HARANT_регламент","21_HARANT_калибровка","22_HARANT_preflight","23_HARANT_SERP","24_HARANT_PAA","25_HARANT_право_условия","26_HARANT_черновик","27_HARANT_контроль","28_HARANT_промпт","29_Публикационный_шлюз","29_HARANT_доказательства","30_HARANT_метрики","31_HARANT_версии","32_HARANT_отклонено","33_HARANT_changelog","34_Редактор_статей_сайта","_35_Версии_статей_сайта"]
   },
   "reviewedTabs": [
-    {"name":"00_Старт","range":"A1:H167","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","new conversational-copy rule","semantic list-marker rule"]},
-    {"name":"01_БПЮ","range":"A1:AC1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["demand","client language"]},
-    {"name":"02_ЮрДоки","range":"A1:AA1004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid work","practice boundaries","ЮД-ИМП-151"]},
-    {"name":"03_Оплаты","range":"A1:M2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed payments only"]},
-    {"name":"04_Дашборд","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["operational context"]},
-    {"name":"05_Контроль","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["data gaps"]},
-    {"name":"06_Импорт","range":"A1:U1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source coverage"]},
-    {"name":"_Справочники","range":"A1:I1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["classification"]},
-    {"name":"_Журнал","range":"A1:K2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["provenance"]},
-    {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-139 source dialog","audience research"]},
-    {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["R-0601","R-0602","client wording"]},
-    {"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["audience patterns"]},
-    {"name":"10_Контентные_возможности","range":"A1:BJ1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-139 brief","risk and CTA update","editorial control"]},
-    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["K-080 evidence","outcome limits"]},
-    {"name":"12_Эффективные_ответы","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["communication patterns"]},
-    {"name":"13_Статистика_контента","range":"A1:AF2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["performance data"]},
-    {"name":"14_Контент_дашборд","range":"A1:R200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["content priorities"]},
-    {"name":"15_Обращения_с_контента","range":"A1:AI2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["lead language","conversion reasons"]},
-    {"name":"_Реестр_диалогов","range":"A1:Q2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source registry"]},
-    {"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["source links","result levels"]},
-    {"name":"_События_воронки","range":"A1:J5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["confirmed funnel events"]},
-    {"name":"_Версии_контента","range":"A1:L1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-139 versions 1 and 2"]},
-    {"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["critical blockers"]},
-    {"name":"_Импорт_ЮД_151_200","range":"A1:T100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["historical source verification"]},
-    {"name":"Статьи_HARANT","range":"A1:R1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["overlap check"]},
-    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO-20260806-SERP-YA-C139","SEO-20260806-SERP-GO-C139"]},
-    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["KW-20260806-C139-YA","KW-20260806-C139-GO"]},
-    {"name":"19_SEO_preflight","range":"A1:S1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["PF-20260806-C139","draft authorization"]}
+    {"name":"Команды","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"00_Старт","range":"A1:Z1001","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","publication route"]},
+    {"name":"01_БПЮ","range":"A1:AC1006","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"02_ЮрДоки","range":"A1:AA1008","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid-work boundary"]},
+    {"name":"03_Оплаты","range":"A1:Z2004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"04_Дашборд_старый","range":"A1:AG300","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"04_Дашборд","range":"A1:AN850","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"04_Дашборд_архив","range":"A1:AG977","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"05_Контроль","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"06_Импорт","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_Справочники","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_Журнал","range":"A1:Z2004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"10_Контентные_возможности","range":"A1:BO1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 brief","Information Gain","risk","CTA plan","legal gate"]},
+    {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"12_Эффективные_ответы","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"13_Статистика_контента","range":"A1:AF2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"14_Контент_дашборд","range":"A1:R200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"15_Обращения_с_контента","range":"A1:AI2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_Реестр_диалогов","range":"A1:Q2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_Ситуации_и_связи","range":"A1:T2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_События_воронки","range":"A1:J4999","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_Версии_контента","range":"A1:L1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"16_Контроль_данных","range":"A1:J1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"_Импорт_ЮД_151_200","range":"A1:T100","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"Статьи_HARANT","range":"A1:AB1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["cross-domain duplicate check"]},
+    {"name":"17_SEO_сборы","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["SEO-20260810-SERP-YA-C170-RESERVE","SEO-20260810-SERP-GO-C170-RESERVE","SEO-20260810-SERP-WEB-C170"]},
+    {"name":"18_SEO_база_ключей","range":"A1:W5000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["KW-20260810-C170-WEB-01–08"]},
+    {"name":"19_SEO_preflight","range":"A1:W1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["PF-20260810-C170-THEFT","separate Yandex/Google reserve IDs"]},
+    {"name":"20_HARANT_регламент","range":"A1:L1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"21_HARANT_калибровка","range":"A1:J500","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"22_HARANT_preflight","range":"A1:BQ1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"23_HARANT_SERP","range":"A1:AO2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"24_HARANT_PAA","range":"A1:U2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"25_HARANT_право_условия","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"26_HARANT_черновик","range":"A1:H200","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"27_HARANT_контроль","range":"A1:H500","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"28_HARANT_промпт","range":"A1:H300","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"29_Публикационный_шлюз","range":"A1:L505","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["PUB-025…PUB-029"]},
+    {"name":"29_HARANT_доказательства","range":"A1:U1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"30_HARANT_метрики","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"31_HARANT_версии","range":"A1:N1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"32_HARANT_отклонено","range":"A1:N1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"33_HARANT_changelog","range":"A1:J500","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
+    {"name":"34_Редактор_статей_сайта","range":"A1:N2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 v0.3 live approved rows","SITE-R-001…013"]},
+    {"name":"_35_Версии_статей_сайта","range":"A1:L2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 approved snapshot","SHA-256 fingerprint"]}
   ],
-  "sourceTrace": {
-    "dialogIds": ["6888a6ac-8cbc-8320-88a4-ed7bb8634faa"],
-    "situationIds": ["SIT-YD-20250729-151"],
-    "workIds": ["ЮД-ИМП-151"],
-    "contentIds": ["C-139"],
-    "caseIds": ["K-080"],
-    "notes": "Only internal IDs; no personal data or full dialog text. The live spreadsheet was updated with the conversational-copy and semantic-list rules, C-139 editorial controls and version records. The approved legal scope and intent owner remain unchanged."
-  },
+  "sourceTrace": {"dialogIds":[],"situationIds":["SIT-YD-20260530-197"],"workIds":[],"contentIds":["C-170"],"caseIds":[],"notes":"No personal data. Paid work confirms work activity only; no theft-case result is claimed."},
   "seoKnowledgeBaseReview": {
     "accumulatedDataChecked": true,
-    "collectionIds": ["SEO-20260806-SERP-YA-C139", "SEO-20260806-SERP-GO-C139"],
-    "keywordIds": ["KW-20260806-C139-YA", "KW-20260806-C139-GO"],
+    "collectionIds": ["SEO-20260810-SERP-YA-C170-RESERVE","SEO-20260810-SERP-GO-C170-RESERVE"],
+    "keywordIds": ["KW-20260810-C170-WEB-01–08"],
     "newPaidCollectionRequired": false,
-    "paidCollectionReason": "The existing current C-139 research already fixes the intent, owner and page type; no paid request could change this editorial refinement.",
-    "preflightId": "PF-20260806-C139",
+    "paidCollectionReason": "A shared free reserve web-SERP established the standalone document intent and gap. The Yandex and Google IDs are transparent logical reserve slots, not direct engine exports; exact positions and Wordstat frequency are not claimed.",
+    "preflightId": "PF-20260810-C170-THEFT",
     "draftAuthorization": "РАЗРЕШЕНО",
     "draftStartedAfterAuthorization": true
   },
   "seoReview": {
     "status": "completed",
-    "checkedAt": "2026-08-05T22:50:00.000Z",
+    "checkedAt": "2026-08-10T16:20:00.000Z",
     "region": "Россия / Москва",
-    "primaryIntent": "Подрядчик получил претензию о недостатках ремонта и должен подготовить мотивированный ответ, не ухудшая доказательственную позицию.",
-    "verifiedCluster": [
-      "заказчик требует вернуть деньги за ремонт что делать подрядчику",
-      "ответ подрядчика на претензию по качеству ремонта",
-      "защита подрядчика от претензий по качеству ремонта"
-    ],
-    "intentMap": [
-      {"intent":"что сделать сразу","target":"лид и first-actions"},
-      {"intent":"что нельзя писать","target":"dangerous-messages"},
-      {"intent":"что означает подписанный акт","target":"acceptance-act"},
-      {"intent":"как сохранить состояние объекта","target":"inspection-access и evidence-loss"},
-      {"intent":"что написать в ответе","target":"response-content"},
-      {"intent":"когда риск высокий","target":"high-risk-cases"}
-    ],
-    "intentOwnership": [
-      {
-        "intent": "Подрядчик получил претензию о недостатках ремонта и должен подготовить мотивированный ответ, не ухудшая доказательственную позицию.",
-        "ownerUrl": "https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
-        "ownerType": "article",
-        "supportingUrls": [
-          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
-          "https://yuristshevchuk.com/uslugi/spory-biznesa/",
-          "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/"
-        ],
-        "supportingCaseIds": ["K-080"],
-        "excludedQueries": [
-          "как заказчику вернуть деньги за некачественный ремонт",
-          "строитель взял аванс и пропал",
-          "подрядчик не построил дом после оплаты",
-          "заказчик не оплатил выполненные работы",
-          "претензия к автосервису по качеству ремонта"
-        ],
-        "existingCompetingUrlsReviewed": [
-          "https://yuristshevchuk.com/razbory/zakazchik-ne-oplatil-rabotu-bez-dogovora/",
-          "https://yuristshevchuk.com/razbory/podryadchik-ne-postroil-dom-posle-oplaty/",
-          "https://yuristshevchuk.com/uslugi/dosudebnoe-uregulirovanie/",
-          "https://yuristshevchuk.com/uslugi/spory-biznesa/"
-        ],
-        "decision": "update-owner",
-        "reason": "The URL already owns the contractor-side stage after receipt of a quality claim; this session improves risk communication, CTA placement and list semantics without expanding the intent."
-      }
-    ],
-    "serpSnapshots": [
-      {
-        "intent": "Подрядчик получил претензию о недостатках ремонта и должен подготовить мотивированный ответ, не ухудшая доказательственную позицию.",
-        "checkedAt": "2026-08-05T22:50:00.000Z",
-        "region": "Россия / Москва",
-        "engines": [
-          {
-            "engine": "Yandex",
-            "query": "заказчик требует вернуть деньги за ремонт что делать подрядчику",
-            "organicResultsReviewed": 10,
-            "sponsoredResultsObserved": 0,
-            "sponsoredResultLabels": [],
-            "sponsoredAdvertiserTypes": [],
-            "sponsoredOfferPatterns": [],
-            "dominantIntent": "Информационно-коммерческий: оценить претензию и подготовить ответ подрядчика",
-            "resultTypes": ["вопросы юристам", "материалы заказчиков", "нормативные источники", "судебные акты"],
-            "localPack": false,
-            "snippetPatterns": ["подписан акт", "требует вернуть деньги", "недостатки ремонта", "ответ на претензию"],
-            "competitorCoverageGaps": ["мало материалов со стороны подрядчика", "не показана цена поспешного признания", "нет цепочки потери доказательств"],
-            "staleOrWeakResults": ["резервная веб-выдача", "единичные ответы без цельной методики"]
-          },
-          {
-            "engine": "Google",
-            "query": "ответ подрядчика на претензию по качеству ремонта",
-            "organicResultsReviewed": 10,
-            "sponsoredResultsObserved": 0,
-            "sponsoredResultLabels": [],
-            "sponsoredAdvertiserTypes": [],
-            "sponsoredOfferPatterns": [],
-            "dominantIntent": "Информационно-коммерческий: проверить требования и составить мотивированный ответ",
-            "resultTypes": ["образцы", "вопросы юристам", "судебная практика", "потребительские статьи"],
-            "localPack": false,
-            "snippetPatterns": ["претензия по качеству", "подрядчик", "осмотр", "акт приёмки"],
-            "competitorCoverageGaps": ["мало конкретики по доступу к объекту", "не показаны опасные фразы подрядчика", "редко описан состав работы юриста"],
-            "staleOrWeakResults": ["резервная веб-выдача", "часть результатов относится к ремонту автомобилей или B2B-подряду"]
-          }
-        ],
-        "pageTypeDecision": "article",
-        "decisionReason": "Интент требует последовательного разъяснения фактов, доказательств, правовых развилок и одного целевого документа.",
-        "canProvideBetterAnswer": true
-      }
-    ],
-    "practicalElements": [
-      {
-        "contentId": "C-139",
-        "targetUrl": "https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/",
-        "type": "risk-map",
-        "title": "Поспешный ответ, изменение объекта и потеря доказательств",
-        "userValue": "Показывает подрядчику, какие действия ещё можно контролировать и после какого события восстановить исходную картину станет сложнее.",
-        "competitorGap": "В выдаче ошибки обычно перечислены без цепочки от сообщения подрядчика до изменения объекта и односторонних доказательств заказчика.",
-        "sourceBasis": "paid-practice-and-original-analysis",
-        "sourceIds": ["ЮД-ИМП-151", "K-080", "R-0601", "R-0602"],
-        "placement": "dangerous-messages, evidence-loss, high-risk-cases and common-errors",
-        "verifiedAgainstSerp": true
-      }
-    ],
+    "primaryIntent": "Потерпевший обнаружил пропажу имущества, считает возможной кражу и готовит первое заявление в полицию до процессуального решения.",
+    "verifiedCluster": ["заявление в полицию о краже","как написать заявление в полицию о краже","заявление о краже имущества","заявление о краже телефона","что приложить к заявлению о краже"],
+    "intentMap": [{"intent":"первое заявление о предполагаемой краже","target":"H1, lead, short answer"},{"intent":"описание имущества","target":"describe-property"},{"intent":"стоимость без чека","target":"ownership-value"},{"intent":"камеры и цифровые следы","target":"cameras-witnesses-digital"},{"intent":"регистрация после подачи","target":"statement-and-registration"}],
+    "intentOwnership": [{
+      "intent": "Потерпевший обнаружил пропажу имущества, считает возможной кражу и готовит первое заявление в полицию до процессуального решения.",
+      "ownerUrl": "https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/",
+      "ownerType": "article",
+      "supportingUrls": ["https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/","https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/","https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"],
+      "supportingCaseIds": [],
+      "excludedQueries": ["мошенничество после добровольной передачи денег","полиция не отвечает на уже поданное заявление","жалоба на отказ в возбуждении уголовного дела","заявление об угрозах или побоях"],
+      "existingCompetingUrlsReviewed": ["https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-moshennichestve/","https://yuristshevchuk.com/razbory/politsiya-ne-otvechaet-na-zayavlenie/","https://yuristshevchuk.com/uslugi/zhaloby-i-obrashcheniya/"],
+      "decision": "new-owner",
+      "reason": "C-170 owns the victim-first pre-filing theft intent; fraud and inactivity remain separate supporting stages."
+    }],
+    "serpSnapshots": [{
+      "intent": "Потерпевший обнаружил пропажу имущества, считает возможной кражу и готовит первое заявление в полицию до процессуального решения.",
+      "checkedAt": "2026-08-10T16:20:00.000Z",
+      "region": "Россия / Москва",
+      "engines": [
+        {"engine":"Yandex","query":"заявление в полицию о краже","organicResultsReviewed":5,"sponsoredResultsObserved":0,"sponsoredResultLabels":[],"sponsoredAdvertiserTypes":[],"sponsoredOfferPatterns":[],"dominantIntent":"Информационный document-intent: форма заявления, содержание и порядок подачи.","resultTypes":["формы и образцы","правовые справочники","юридические инструкции","ответы юристов"],"localPack":false,"snippetPatterns":["образец заявления","порядок подачи","описание имущества","стоимость и приложения"],"competitorCoverageGaps":["мало системной идентификации вещи по IMEI или серийному номеру","слабо раскрыта фиксация быстро исчезающих камер и цифровых данных","редко дана развилка кража, потеря или невозврат"],"staleOrWeakResults":["Reserve web-SERP proxy; direct Yandex positions and ads are not claimed."]},
+        {"engine":"Google","query":"как написать заявление в полицию о краже","organicResultsReviewed":5,"sponsoredResultsObserved":0,"sponsoredResultLabels":[],"sponsoredAdvertiserTypes":[],"sponsoredOfferPatterns":[],"dominantIntent":"Информационный document-intent: форма заявления, сведения, доказательства и подача.","resultTypes":["формы и образцы","юридические статьи","правовые базы","пошаговые инструкции"],"localPack":false,"snippetPatterns":["как написать заявление","описание имущества и ущерба","свидетели и камеры","талон и КУСП"],"competitorCoverageGaps":["обычно перечисляются реквизиты без связки принадлежности и стоимости","слабо показана цена промедления для видеозаписей","мало конкретики при неизвестном точном времени"],"staleOrWeakResults":["Reserve web-SERP proxy; direct Google positions and ads are not claimed."]}
+      ],
+      "pageTypeDecision": "article",
+      "decisionReason": "Запрос требует последовательного объяснения фиксации доказательств, идентификации имущества, содержания заявления и регистрации.",
+      "canProvideBetterAnswer": true
+    }],
+    "practicalElements": [{
+      "contentId":"C-170",
+      "targetUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/",
+      "type":"evidence-matrix",
+      "title":"Идентификация имущества и карта исчезающих источников",
+      "userValue":"Показывает, что сохранить до подачи: признаки вещи, принадлежность и стоимость, камеры, временное окно и цифровые следы.",
+      "competitorGap":"Типовая выдача в основном даёт бланк и реквизиты, но редко связывает факт с доказательством и сроком исчезновения источника.",
+      "sourceBasis":"reserve SERP, verified legal sources and original editorial synthesis",
+      "sourceIds":["SEO-20260810-SERP-WEB-C170","PF-20260810-C170-THEFT","УПК-141-144-145","УК-158"],
+      "placement":"urgent-actions, describe-property, ownership-value, cameras-witnesses-digital",
+      "verifiedAgainstSerp":true
+    }],
     "cannibalizationChecked": true,
     "overOptimizationRisk": "low"
   },
-  "editorialChecks": {
-    "factsSeparatedFromHypotheses": true,
-    "paidWorkSeparatedFromPaymentDetails": true,
-    "workProcedureAndCaseResultsSeparated": true,
-    "legalSourcesVerified": true,
-    "anonymizationVerified": true,
-    "criticalSourceErrorsResolved": true
-  },
+  "editorialChecks": {"factsSeparatedFromHypotheses":true,"paidWorkSeparatedFromPaymentDetails":true,"workProcedureAndCaseResultsSeparated":true,"legalSourcesVerified":true,"anonymizationVerified":true,"criticalSourceErrorsResolved":true},
   "contentChanges": [
-    {
-      "path": "src/editorial-data.mjs",
-      "kind": "registry",
-      "contentId": "C-139",
-      "action": "preserve the plain-language intake heading while stripping the internal Content ID",
-      "expectedUrl": "https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"
-    }
+    {"path":"src/editorial-data.mjs","kind":"registry","contentId":"C-170","action":"register approved C-170 theft police statement article","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"},
+    {"path":"site.config.mjs","kind":"content-date","contentId":"C-170","action":"register truthful 2026-08-10 content date for C-170 and the articles index","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"}
   ],
-  "plannedChecks": [
-    "npm run test:public-copy",
-    "npm run test:editorial-list-policy",
-    "npm run test:contractor-claim-response",
-    "npm run check",
-    "npm run test:live",
-    "node scripts/live-all-publications-smoke.mjs",
-    "node scripts/live-public-copy-regression-test.mjs"
-  ],
-  "publication": {
-    "expectedUrls": ["https://yuristshevchuk.com/razbory/zakazchik-trebuet-vernut-dengi-za-remont/"],
-    "notes": "Publish only after full PR CI, production deployment, custom-domain SHA verification and public-copy regression. The spreadsheet now contains the blocking conversational-copy and semantic-list rules."
-  }
+  "plannedChecks": ["npm run test:content-governance","npm run test:public-copy","npm run check","node scripts/live-all-publications-smoke.mjs","node scripts/live-public-copy-regression-test.mjs"],
+  "publication": {"expectedUrls":["https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"],"notes":"Publish only after full PR CI, final live-editor fingerprint recheck, production deployment and live public-copy verification. Direct engine positions and exact Wordstat frequency are not claimed."}
 }

@@ -94,7 +94,7 @@ const articleIntake = (article) => {
     ];
   const topic = article.topic || article.title;
   const eyebrow = article.intakeEyebrow || "Перед сообщением юристу";
-  const title = article.intakeTitle || "Что кратко описать";
+  const title = article.intakeTitle || "Что описать";
   const intro = article.intakeIntro || "Юридические термины не нужны. Напишите обычными словами:";
   const questionsTitle = article.intakeQuestionsTitle || "Что можно спросить у юриста";
   const buttonLabel = article.intakeButtonLabel || "Проверить свою ситуацию";
@@ -127,9 +127,9 @@ const articleIntake = (article) => {
 const helpfulness = (id, kind) => `
     <section class="editorial-helpfulness" aria-labelledby="editorial-helpfulness-title" data-editorial-helpfulness data-publication-id="${esc(id)}" data-publication-kind="${esc(kind)}">
       <div class="editorial-helpfulness__copy">
-        <h2 id="editorial-helpfulness-title">Статья была полезна?</h2>
+        <h2 id="editorial-helpfulness-title">Удалось найти ответ?</h2>
       </div>
-      <div class="editorial-helpfulness__actions" role="group" aria-label="Оценка полезности материала">
+      <div class="editorial-helpfulness__actions" role="group" aria-label="Оценка материала">
         <button type="button" aria-pressed="false" data-helpfulness-value="yes">Да</button>
         <button type="button" aria-pressed="false" data-helpfulness-value="no">Нет</button>
         <button type="button" aria-pressed="false" data-helpfulness-value="partly">Частично</button>
@@ -162,18 +162,29 @@ export const injectEditorialEnhancements = (html, pathname, context = {}) => {
 
   if (article) {
     if (result.includes("data-editorial-helpfulness")) throw new Error(`Редакционные блоки уже добавлены: ${pathname}`);
-    result = injectBefore(
-      result,
-      '<section class="article-section" id="sources">',
-      articleIntake(article),
-      `${pathname}: перед источниками`,
-    );
-    result = injectBeforePattern(
-      result,
-      /<div class="wrap">\s*<section class="editorial-cta"/,
-      `<div class="wrap">${helpfulness(article.id, "article")}</div>`,
-      `${pathname}: перед итоговым CTA`,
-    );
+
+    if (!article.inlineFinalCta) {
+      result = injectBefore(
+        result,
+        '<section class="article-section" id="sources">',
+        articleIntake(article),
+        `${pathname}: перед источниками`,
+      );
+      result = injectBeforePattern(
+        result,
+        /<div class="wrap">\s*<section class="editorial-cta"/,
+        `<div class="wrap">${helpfulness(article.id, "article")}</div>`,
+        `${pathname}: перед итоговым CTA`,
+      );
+    } else {
+      result = injectBeforePattern(
+        result,
+        /<section class="article-section editorial-final-conversion"/,
+        `<div class="wrap">${helpfulness(article.id, "article")}</div>`,
+        `${pathname}: перед финальным конверсионным блоком`,
+      );
+    }
+
     return result.replace(
       '<article class="editorial-article"',
       '<article class="editorial-article" data-publication-kind="article"',

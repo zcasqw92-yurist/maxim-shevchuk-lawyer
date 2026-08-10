@@ -41,7 +41,7 @@ const articleHtml = await readFile(pageFile(articleRoute), "utf8");
 for (const marker of [
   'id="self-check"',
   'id="message-guide"',
-  "Что кратко описать",
+  "Что описать",
   "Что можно спросить у юриста",
   "Что написать юристу",
   'data-helpfulness-value="yes"',
@@ -55,7 +55,33 @@ for (const item of articles) {
   const route = `/razbory/${item.slug}/`;
   const html = await readFile(pageFile(route), "utf8");
 
-  if (item.hideMessageGuide) {
+  if (item.inlineFinalCta) {
+    const finalId = item.finalSection?.id;
+    const finalButtonLabel = item.finalSection?.buttonLabel || item.ctaButtonLabel || "Написать юристу";
+    const softHref = item.sections?.find((section) => section.softCta)?.softCta?.href;
+    for (const marker of [
+      finalId ? `id="${finalId}"` : null,
+      softHref ? `href="${softHref}"` : null,
+      item.finalSection?.title,
+      item.finalSection?.groups?.[0]?.title,
+      item.finalSection?.groups?.[1]?.title,
+      'class="editorial-inline-cta"',
+      'data-dialog-open',
+      finalButtonLabel,
+    ].filter(Boolean)) {
+      if (!html.includes(marker)) errors.push(`${route}: inline final CTA contract damaged, missing ${marker}`);
+    }
+    for (const forbidden of [
+      'id="self-check"',
+      'id="message-guide"',
+      "Перед сообщением юристу",
+      "Проверить свою ситуацию",
+      "Что написать юристу",
+      '<section class="editorial-cta"',
+    ]) {
+      if (html.includes(forbidden)) errors.push(`${route}: legacy repeating CTA returned into inlineFinalCta article: ${forbidden}`);
+    }
+  } else if (item.hideMessageGuide) {
     for (const marker of [
       'id="self-check"',
       item.intakeEyebrow || "Перед подготовкой ответа",

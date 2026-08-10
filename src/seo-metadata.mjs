@@ -8,6 +8,7 @@ const publicationTitleOverrides = {
     "debt-receipt-order-or-claim": "Долг по расписке: приказ или иск",
     "debt-third-party-card": "Долг на чужой карте: с кого взыскивать",
     "debt-no-return-term": "Долг без срока возврата: что делать",
+    "theft-police-statement": "Заявление в полицию о краже: что указать",
   },
   case: {
     "police-review": "Отмена отказа полиции: дополнительная проверка",

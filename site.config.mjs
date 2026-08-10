@@ -16,7 +16,7 @@ export const site = {
   basePath: normalizeBasePath(process.env.SITE_BASE_PATH),
   // Максимальная дата содержательного обновления. Даты отдельных страниц
   // задаются явно и не меняются от технической пересборки.
-  contentLastModified: "2026-08-06",
+  contentLastModified: "2026-08-10",
   contentLastModifiedByPath: {
     "/": "2026-08-02",
     "/uslugi": "2026-08-02",
@@ -27,7 +27,7 @@ export const site = {
     "/uslugi/iskovoe-zayavlenie": "2026-08-02",
     "/uslugi/spory-biznesa": "2026-08-02",
     "/uslugi/marketpleysy": "2026-08-02",
-    "/razbory": "2026-08-06",
+    "/razbory": "2026-08-10",
     "/razbory/chto-delat-posle-otkaza-policii": "2026-08-02",
     "/razbory/politsiya-ne-otvechaet-na-zayavlenie": "2026-08-02",
     "/razbory/vernut-dolg-bez-raspiski": "2026-08-02",
@@ -56,6 +56,7 @@ export const site = {
     "/razbory/yandeks-dostavka-poteryala-posylku": "2026-08-05",
     "/razbory/podryadchik-ne-postroil-dom-posle-oplaty": "2026-08-06",
     "/razbory/zakazchik-trebuet-vernut-dengi-za-remont": "2026-08-06",
+    "/razbory/zayavlenie-v-politsiyu-o-krazhe": "2026-08-10",
     "/praktika": "2026-08-02",
     "/praktika/otmena-otkazov-policii-i-dopolnitelnaya-proverka": "2026-08-02",
     "/praktika/pretenziya-i-raschet-po-dolgu-po-raspiske": "2026-08-02",

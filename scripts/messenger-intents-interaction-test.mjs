@@ -92,7 +92,7 @@ const runEngine = async (engineName, engine) => {
         if (await page.locator("form, input, select, textarea").count()) errors.push(`${label}: public page contains data-entry controls`);
         if (await page.locator("#callback-dialog, #price-quiz-dialog, [data-callback-open], [data-price-quiz-open]").count()) errors.push(`${label}: removed form or questionnaire UI is still public`);
 
-        await page.locator("[data-header] [data-dialog-open]:visible").first().click();
+        await page.locator("[data-dialog-open]:visible").first().click();
         let links = await dialogLinks(page);
         const genericParts = ["Хочу понять, что можно сделать в моей ситуации", "Кратко опишу"];
         expectParts(`${label}: generic Telegram`, textParam(links.telegram), genericParts);

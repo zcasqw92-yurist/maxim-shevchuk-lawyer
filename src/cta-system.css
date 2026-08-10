@@ -276,3 +276,8 @@
 .home .hero .hero__actions .button--secondary {
   color: var(--cta-secondary-text);
 }
+
+.home .trust-strip__item > span {
+  font-size: 13px;
+  letter-spacing: 0;
+}

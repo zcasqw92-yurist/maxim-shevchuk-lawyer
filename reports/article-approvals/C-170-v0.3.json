@@ -76,8 +76,8 @@
   ],
   "sourceModule": "src/theft-police-statement-data.mjs",
   "editorFingerprintRecheckedBeforeSourceChange": true,
-  "editorFingerprintRecheckedBeforeMerge": false,
-  "headSha": null,
+  "editorFingerprintRecheckedBeforeMerge": true,
+  "headSha": "90ef2c53865132489f3eff1c622ded6eaaa7b420",
   "mergeSha": null,
   "publishedSha": null,
   "status": "approved-for-publish"

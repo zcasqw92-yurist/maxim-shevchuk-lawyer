@@ -8,6 +8,7 @@ const publicationTitleOverrides = {
     "debt-receipt-order-or-claim": "Долг по расписке: приказ или иск",
     "debt-third-party-card": "Долг на чужой карте: с кого взыскивать",
     "debt-no-return-term": "Долг без срока возврата: что делать",
+    "theft-police-statement": "Заявление в полицию о краже: что указать",
   },
   case: {
     "police-review": "Отмена отказа полиции: дополнительная проверка",
@@ -22,10 +23,7 @@ const publicationDescriptionOverrides = {
   },
 };
 
-const brandedTitle = (base) => {
-  const branded = `${base} | ${site.shortName}`;
-  return branded.length <= MAX_TITLE_LENGTH ? branded : base;
-};
+const brandedTitle = (base) => `${base} | ${site.shortName}`;
 
 const assertMetadata = (metadata, id) => {
   if (!metadata.title || !metadata.description) {

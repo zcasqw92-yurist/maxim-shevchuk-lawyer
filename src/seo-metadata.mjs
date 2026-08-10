@@ -22,7 +22,10 @@ const publicationDescriptionOverrides = {
   },
 };
 
-const brandedTitle = (base) => `${base} | ${site.shortName}`;
+const brandedTitle = (base) => {
+  const branded = `${base} | ${site.shortName}`;
+  return branded.length <= MAX_TITLE_LENGTH ? branded : base;
+};
 
 const assertMetadata = (metadata, id) => {
   if (!metadata.title || !metadata.description) {

@@ -19,9 +19,10 @@ for (const marker of [
   "border: 0",
   ".consent-banner__actions [data-consent-accept]",
   "border: 2px solid var(--gold-bright)",
-  ".home .hero__visual::before",
-  ".home .hero__image-wrap",
+  ".home .hero .hero__visual::before",
+  ".home .hero .hero__image-wrap",
   "border-radius: 0",
+  "background: linear-gradient",
 ]) {
   if (!styles.includes(marker)) errors.push(`Compiled styles are missing contract marker: ${marker}`);
 }
@@ -41,7 +42,7 @@ await new Promise((resolve, reject) => {
       resolve();
     }
   });
-  server.on("exit", (code) => reject(new Error(`Hero/consent preview server exited: ${code}`)));
+  server.on("exit", (code) => reject(new Error(`Preview server exited: ${code}`)));
 });
 
 const engines = [["Chromium", chromium], ["WebKit", webkit]];
@@ -114,16 +115,15 @@ try {
           const image = wrap?.querySelector("img");
           const wrapStyle = getComputedStyle(wrap);
           const imageStyle = getComputedStyle(image);
-          const cornerStyle = getComputedStyle(visual, "::before");
+          const fadeStyle = getComputedStyle(visual, "::before");
           const rect = wrap.getBoundingClientRect();
           return {
             wrapRadius: [wrapStyle.borderTopLeftRadius, wrapStyle.borderTopRightRadius, wrapStyle.borderBottomRightRadius, wrapStyle.borderBottomLeftRadius],
             imageRadius: [imageStyle.borderTopLeftRadius, imageStyle.borderTopRightRadius, imageStyle.borderBottomRightRadius, imageStyle.borderBottomLeftRadius],
-            cornerContent: cornerStyle.content,
-            cornerTop: Number.parseFloat(cornerStyle.borderTopWidth),
-            cornerLeft: Number.parseFloat(cornerStyle.borderLeftWidth),
-            cornerWidth: Number.parseFloat(cornerStyle.width),
-            cornerHeight: Number.parseFloat(cornerStyle.height),
+            fadeContent: fadeStyle.content,
+            fadeDisplay: fadeStyle.display,
+            fadeBackgroundImage: fadeStyle.backgroundImage,
+            fadeWidth: Number.parseFloat(fadeStyle.width),
             imageVisible: image.complete && image.naturalWidth > 0 && rect.width > 0 && rect.height > 0,
             overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           };
@@ -131,8 +131,12 @@ try {
         if ([...heroState.wrapRadius, ...heroState.imageRadius].some((value) => Number.parseFloat(value) !== 0)) {
           errors.push(`${engineName} ${viewportName}: hero portrait still has rounded corners ${JSON.stringify(heroState)}`);
         }
-        if (heroState.cornerContent === "none" || heroState.cornerTop < 2 || heroState.cornerLeft < 2 || heroState.cornerWidth < 30 || heroState.cornerHeight < 30) {
-          errors.push(`${engineName} ${viewportName}: gold corner accent is missing ${JSON.stringify(heroState)}`);
+        if (viewportName === "desktop") {
+          if (heroState.fadeContent === "none" || !heroState.fadeBackgroundImage.includes("linear-gradient") || heroState.fadeWidth < 30) {
+            errors.push(`${engineName} ${viewportName}: soft portrait-to-copy fade is missing ${JSON.stringify(heroState)}`);
+          }
+        } else if (heroState.fadeDisplay !== "none") {
+          errors.push(`${engineName} ${viewportName}: desktop portrait fade must be disabled on mobile ${JSON.stringify(heroState)}`);
         }
         if (!heroState.imageVisible) errors.push(`${engineName} ${viewportName}: hero image is not visible`);
         if (heroState.overflow > 1) errors.push(`${engineName} ${viewportName}: horizontal overflow ${heroState.overflow}px`);
@@ -153,4 +157,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Hero and consent contract passed: secondary refusal, primary consent, rectangular portrait and gold corner on desktop/mobile");
+console.log("Hero and consent contract passed: secondary refusal, primary consent, rectangular portrait and reference-style desktop fade with mobile fallback");

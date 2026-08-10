@@ -115,7 +115,10 @@
     "overOptimizationRisk": "low"
   },
   "editorialChecks": {"factsSeparatedFromHypotheses":true,"paidWorkSeparatedFromPaymentDetails":true,"workProcedureAndCaseResultsSeparated":true,"legalSourcesVerified":true,"anonymizationVerified":true,"criticalSourceErrorsResolved":true},
-  "contentChanges": [{"path":"src/editorial-data.mjs","kind":"registry","contentId":"C-170","action":"register approved C-170 theft police statement article","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"}],
+  "contentChanges": [
+    {"path":"src/editorial-data.mjs","kind":"registry","contentId":"C-170","action":"register approved C-170 theft police statement article","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"},
+    {"path":"site.config.mjs","kind":"content-date","contentId":"C-170","action":"register truthful 2026-08-10 content date for C-170 and the articles index","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"}
+  ],
   "plannedChecks": ["npm run test:content-governance","npm run test:public-copy","npm run check","node scripts/live-all-publications-smoke.mjs","node scripts/live-public-copy-regression-test.mjs"],
   "publication": {"expectedUrls":["https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"],"notes":"Publish only after full PR CI, final live-editor fingerprint recheck, production deployment and live public-copy verification. Direct engine positions and exact Wordstat frequency are not claimed."}
 }

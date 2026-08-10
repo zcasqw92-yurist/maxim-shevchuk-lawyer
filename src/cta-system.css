@@ -281,3 +281,59 @@
   font-size: 13px;
   letter-spacing: 0;
 }
+
+@media (max-width: 680px) and (max-height: 620px) {
+  .home .hero .hero__content {
+    padding: 24px 0 28px;
+  }
+
+  .home .hero .hero__content::before {
+    margin-bottom: 10px;
+    font-size: 9px;
+  }
+
+  .home .hero h1 {
+    font-size: 2.15rem;
+    line-height: 1.02;
+  }
+
+  .home .hero h1::after {
+    width: 52px;
+    margin-top: 14px;
+  }
+
+  .home .hero .hero__lead {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.42;
+  }
+
+  .home .hero .hero__actions {
+    order: 1;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .home .hero .hero__actions .button--primary {
+    min-height: 48px;
+  }
+
+  .home .hero .hero__actions .button--secondary {
+    min-height: 44px;
+  }
+
+  .home .hero .hero__assurance {
+    order: 2;
+    gap: 6px;
+    margin-top: 18px;
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .home .hero .hero__assurance svg {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+    padding: 3px;
+  }
+}

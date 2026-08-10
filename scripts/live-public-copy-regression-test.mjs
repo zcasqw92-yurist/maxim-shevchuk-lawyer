@@ -27,20 +27,43 @@ const noCacheUrl = (pathname) => {
   return url;
 };
 
+const transientStatuses = new Set([408, 425, 429, 500, 502, 503, 504]);
+const retryDelaysMs = [0, 750, 1500, 3000];
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const fetchText = async (pathname, accept = "text/html") => {
-  const response = await fetch(noCacheUrl(pathname), {
-    headers: {
-      "cache-control": "no-cache, no-store, max-age=0",
-      pragma: "no-cache",
-      accept,
-    },
-    cache: "no-store",
-    redirect: "follow",
-    signal: AbortSignal.timeout(20_000),
-  });
-  const body = await response.text();
-  if (!response.ok) throw new Error(`${pathname}: HTTP ${response.status}`);
-  return { body, finalUrl: response.url };
+  let lastError = null;
+  for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+    if (retryDelaysMs[attempt]) await sleep(retryDelaysMs[attempt]);
+    try {
+      const response = await fetch(noCacheUrl(pathname), {
+        headers: {
+          "cache-control": "no-cache, no-store, max-age=0",
+          pragma: "no-cache",
+          accept,
+        },
+        cache: "no-store",
+        redirect: "follow",
+        signal: AbortSignal.timeout(20_000),
+      });
+      const body = await response.text();
+      if (response.ok) return { body, finalUrl: response.url };
+
+      const error = new Error(`${pathname}: HTTP ${response.status}`);
+      lastError = error;
+      const canRetry = transientStatuses.has(response.status) && attempt < retryDelaysMs.length - 1;
+      if (!canRetry) throw error;
+      console.warn(`${error.message}; повторная попытка ${attempt + 2}/${retryDelaysMs.length}`);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      const responseStatus = Number(lastError.message.match(/HTTP\s+(\d{3})/)?.[1] || 0);
+      const knownPermanentHttpError = responseStatus && !transientStatuses.has(responseStatus);
+      const canRetry = !knownPermanentHttpError && attempt < retryDelaysMs.length - 1;
+      if (!canRetry) throw lastError;
+      console.warn(`${pathname}: ${lastError.message}; повторная попытка ${attempt + 2}/${retryDelaysMs.length}`);
+    }
+  }
+  throw lastError || new Error(`${pathname}: request failed`);
 };
 
 const buildInfo = JSON.parse((await fetchText("build-info.json", "application/json")).body);

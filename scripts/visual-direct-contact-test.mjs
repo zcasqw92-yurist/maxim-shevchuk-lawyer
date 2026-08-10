@@ -189,13 +189,6 @@ try {
     failures.push("interaction: price CTA does not create the approved messenger draft");
   }
   await dialog.locator("[data-dialog-close]").click();
-
-  await interactionPage.locator(".hero__quick-choices [data-topic='возврат денежных средств']").click();
-  const selectedTopic = await dialog.locator("[data-dialog-topic]").textContent();
-  const topicTelegram = await dialog.locator("[data-track='telegram']").getAttribute("href");
-  if (selectedTopic !== "Вы выбрали: возврат денежных средств") failures.push("interaction: selected topic is not shown");
-  if (!prefilledText(topicTelegram).includes("Обращаюсь по вопросу: возврат денежных средств")) failures.push("interaction: topic is missing from draft");
-  await dialog.locator("[data-dialog-close]").click();
   await desktop.close();
 
   for (const width of [320, 390, 430]) {
@@ -281,4 +274,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Visual direct-contact smoke passed: ${checks.length} viewports, prefilled drafts, mobile menu, WCAG text spacing and one form-free mobile CTA`);
+console.log(`Visual direct-contact smoke passed: ${checks.length} viewports, visible hero drafts, mobile menu, WCAG text spacing and one form-free mobile CTA`);

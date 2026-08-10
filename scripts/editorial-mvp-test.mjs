@@ -58,7 +58,7 @@ for (const source of article.sources) {
   if (!articleHtml.includes(`href="${source.url}"`)) errors.push(`${articleRoute}: official source is not visible: ${source.title}`);
 }
 for (const marker of [
-  "Короткий ответ",
+  "Что делать",
   "Содержание",
   "Проверьте не только вывод, но и полноту проверки",
   "Официальные источники",

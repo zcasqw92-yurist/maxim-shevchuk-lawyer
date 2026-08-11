@@ -90,68 +90,97 @@
     margin-bottom: var(--editorial-flow-sm);
   }
 
-  /* C-139: единый компактный ритм внутри статьи. */
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+  /* Единый компактный ритм для отдельно утверждённых статей C-139 и C-170. */
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) {
     --editorial-c139-content-inset: 16px;
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-body > .article-section {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-body > .article-section {
     padding-inline: var(--editorial-c139-content-inset);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-body > .article-section,
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-body > .editorial-answer + .article-section {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-body > .article-section,
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-body > .editorial-answer + .article-section {
     margin-top: var(--editorial-c139-section-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-related + .editorial-related,
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-body > .editorial-author {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-related + .editorial-related,
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-body > .editorial-author {
     margin-top: var(--editorial-c139-section-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .article-section h2 {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .article-section h2 {
     margin-bottom: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .article-section p + p {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .article-section p + p {
     margin-top: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    :is(.editorial-options, .editorial-note) {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) :is(.editorial-options, .editorial-note) {
     margin-top: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-options {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-options {
     gap: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    :is(.editorial-answer, .editorial-options article, .editorial-note, .editorial-intake, .editorial-intake__questions, .editorial-author) {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) :is(.editorial-answer, .editorial-options article, .editorial-note, .editorial-intake, .editorial-intake__questions, .editorial-author) {
     padding: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    :is(.editorial-intake__grid, .editorial-author) {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) :is(.editorial-intake__grid, .editorial-author) {
     gap: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-intake__questions ul {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-intake__questions ul {
     margin-top: var(--editorial-c139-space);
     margin-bottom: var(--editorial-c139-space);
   }
 
-  .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"]
-    .editorial-related > p > a[href^="/uslugi/"] {
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .editorial-related > p > a[href^="/uslugi/"] {
     padding: var(--editorial-c139-space);
   }
 
@@ -194,7 +223,10 @@
       padding-bottom: 30px;
     }
 
-    .article-page .editorial-article[data-article-id="contractor-repair-quality-claim-response"] {
+    .article-page .editorial-article:is(
+      [data-article-id="contractor-repair-quality-claim-response"],
+      [data-article-id="theft-police-statement"]
+    ) {
       --editorial-c139-content-inset: 12px;
     }
 

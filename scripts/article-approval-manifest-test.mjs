@@ -1,8 +1,9 @@
 import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import { gunzipSync } from "node:zlib";
 import { fingerprintArticleEditorRows } from "./article-editor-fingerprint.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -16,6 +17,34 @@ const sourceModules = new Set(
   [...registry.matchAll(/from\s+"\.\/([^"\n]+\.mjs)"/g)]
     .map((match) => `src/${match[1]}`),
 );
+
+// Некоторые опубликованные статьи подключаются через data-wrapper, а фактический
+// утверждённый текст живёт в соседнем *-source.mjs. Такой источник также должен
+// быть защищён manifest gate, иначе body можно изменить в обход snapshot редактора.
+for (const wrapper of [...sourceModules]) {
+  try {
+    const wrapperText = await readFile(join(root, wrapper), "utf8");
+    for (const match of wrapperText.matchAll(/from\s+"(\.\/[^"\n]+\.mjs)"/g)) {
+      const nested = relative(root, resolve(dirname(join(root, wrapper)), match[1])).replaceAll("\\", "/");
+      if (nested.startsWith("src/") && nested.endsWith("-source.mjs")) sourceModules.add(nested);
+    }
+  } catch {
+    // Не каждый импорт registry обязан быть article-wrapper; остальные контракты
+    // проверят существование модулей. Здесь важна только дополнительная защита source.
+  }
+}
+
+const decodeManifestRows = (manifest) => {
+  if (Array.isArray(manifest.rows) && manifest.rows.length) return manifest.rows;
+  if (typeof manifest.rowsGzipBase64 !== "string" || !manifest.rowsGzipBase64.trim()) return null;
+  try {
+    const decoded = gunzipSync(Buffer.from(manifest.rowsGzipBase64, "base64")).toString("utf8");
+    const rows = JSON.parse(decoded);
+    return Array.isArray(rows) && rows.length ? rows : null;
+  } catch {
+    return null;
+  }
+};
 
 const manifestFiles = (await readdir(manifestsDir))
   .filter((name) => name.endsWith(".json") && name !== "template.json")
@@ -33,6 +62,7 @@ for (const name of manifestFiles) {
 
 const validManifestBySource = new Map();
 for (const { name, manifest } of manifests) {
+  const approvedRows = decodeManifestRows(manifest);
   if (manifest.schemaVersion !== 1) errors.push(`${name}: schemaVersion must be 1`);
   if (!manifest.articleId || !manifest.version) errors.push(`${name}: articleId and version are required`);
   if (manifest.editorTab !== config.editorTab) errors.push(`${name}: editorTab must be ${config.editorTab}`);
@@ -40,12 +70,12 @@ for (const { name, manifest } of manifests) {
   if (manifest.finalPreflight !== "passed-after-user-command") errors.push(`${name}: final preflight must be passed after the user command`);
   if (manifest.fingerprintAlgorithm !== "sha256") errors.push(`${name}: fingerprintAlgorithm must be sha256`);
   if (!/^[a-f0-9]{64}$/.test(String(manifest.approvedFingerprint || ""))) errors.push(`${name}: approvedFingerprint must be lowercase SHA-256 hex`);
-  if (!Array.isArray(manifest.rows) || manifest.rows.length === 0) errors.push(`${name}: approved editor rows[] must be embedded in the manifest`);
+  if (!approvedRows) errors.push(`${name}: full approved editor snapshot must be embedded as rows[] or rowsGzipBase64`);
   if (!manifest.sourceModule || !String(manifest.sourceModule).startsWith("src/")) errors.push(`${name}: sourceModule must be a src/ path`);
   if (manifest.status !== "approved-for-publish" && manifest.status !== "published") errors.push(`${name}: status must be approved-for-publish or published`);
-  if (Array.isArray(manifest.rows) && manifest.rows.length) {
-    const actual = fingerprintArticleEditorRows(manifest.rows);
-    if (actual !== manifest.approvedFingerprint) errors.push(`${name}: approvedFingerprint does not match embedded approved rows`);
+  if (approvedRows) {
+    const actual = fingerprintArticleEditorRows(approvedRows);
+    if (actual !== manifest.approvedFingerprint) errors.push(`${name}: approvedFingerprint does not match embedded approved snapshot`);
   }
   if (manifest.editorFingerprintRecheckedBeforeSourceChange !== true) errors.push(`${name}: live editor fingerprint must be rechecked before changing production source`);
   if (manifest.sourceModule) validManifestBySource.set(manifest.sourceModule, manifest);
@@ -83,6 +113,6 @@ if (errors.length) {
 }
 
 const enforcement = baseSha
-  ? "changed editorial source modules are approval-manifest gated with shallow-safe tree diff"
+  ? "changed editorial source modules (including nested *-source.mjs bodies) are approval-manifest gated with full embedded editor snapshots"
   : "manifest structure validated; changed-file enforcement awaits CONTENT_GOVERNANCE_BASE_SHA";
 console.log(`Article approval manifest contract passed: ${enforcement}`);

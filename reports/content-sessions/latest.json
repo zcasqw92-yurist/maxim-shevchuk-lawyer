@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
-  "sessionId": "20260810-c170-theft-publication",
-  "reviewedAt": "2026-08-10T16:44:00.000Z",
+  "sessionId": "20260811-c170-approved-structure-revision",
+  "reviewedAt": "2026-08-11T10:28:00.000Z",
   "spreadsheet": {
     "id": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
-    "modifiedTime": "2026-08-10T16:43:02.001Z",
+    "modifiedTime": "2026-08-11T10:23:00.000Z",
     "metadataTabCount": 48,
     "discoveredTabs": ["Команды","00_Старт","01_БПЮ","02_ЮрДоки","03_Оплаты","04_Дашборд_старый","04_Дашборд","04_Дашборд_архив","05_Контроль","06_Импорт","_Справочники","_Журнал","07_Диалоги_исследование","08_Банк_реплик","09_Паттерны_аудитории","10_Контентные_возможности","11_Кейсы_для_публикации","12_Эффективные_ответы","13_Статистика_контента","14_Контент_дашборд","15_Обращения_с_контента","_Реестр_диалогов","_Ситуации_и_связи","_События_воронки","_Версии_контента","16_Контроль_данных","_Импорт_ЮД_151_200","Статьи_HARANT","17_SEO_сборы","18_SEO_база_ключей","19_SEO_preflight","20_HARANT_регламент","21_HARANT_калибровка","22_HARANT_preflight","23_HARANT_SERP","24_HARANT_PAA","25_HARANT_право_условия","26_HARANT_черновик","27_HARANT_контроль","28_HARANT_промпт","29_Публикационный_шлюз","29_HARANT_доказательства","30_HARANT_метрики","31_HARANT_версии","32_HARANT_отклонено","33_HARANT_changelog","34_Редактор_статей_сайта","_35_Версии_статей_сайта"]
   },
   "reviewedTabs": [
     {"name":"Команды","range":"A1:Z1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
-    {"name":"00_Старт","range":"A1:Z1001","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","publication route"]},
+    {"name":"00_Старт","range":"A1:Z1001","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project rules","publication route","C-139/C-170 semantic list scope"]},
     {"name":"01_БПЮ","range":"A1:AC1006","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"02_ЮрДоки","range":"A1:AA1008","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["paid-work boundary"]},
     {"name":"03_Оплаты","range":"A1:Z2004","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
@@ -24,7 +24,7 @@
     {"name":"07_Диалоги_исследование","range":"A1:AK1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"08_Банк_реплик","range":"A1:V2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"09_Паттерны_аудитории","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
-    {"name":"10_Контентные_возможности","range":"A1:BO1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 brief","Information Gain","risk","CTA plan","legal gate"]},
+    {"name":"10_Контентные_возможности","range":"A1:BO1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 v0.4 brief","Information Gain","risk","CTA plan","legal gate","section-function map"]},
     {"name":"11_Кейсы_для_публикации","range":"A1:AF1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"12_Эффективные_ответы","range":"A1:X1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"13_Статистика_контента","range":"A1:AF2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
@@ -55,8 +55,8 @@
     {"name":"31_HARANT_версии","range":"A1:N1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"32_HARANT_отклонено","range":"A1:N1000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
     {"name":"33_HARANT_changelog","range":"A1:J500","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["project baseline"]},
-    {"name":"34_Редактор_статей_сайта","range":"A1:N2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 v0.3 live approved rows","SITE-R-001…013"]},
-    {"name":"_35_Версии_статей_сайта","range":"A1:L2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 approved snapshot","SHA-256 fingerprint"]}
+    {"name":"34_Редактор_статей_сайта","range":"A1:N2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 v0.4 canonical rows","SITE-R-001…013","CTA and semantic list review"]},
+    {"name":"_35_Версии_статей_сайта","range":"A1:L2000","reviewedNonEmptyCells":true,"notesReviewed":true,"usedFor":["C-170 v0.4 approved snapshot","SHA-256 fingerprint"]}
   ],
   "sourceTrace": {"dialogIds":[],"situationIds":["SIT-YD-20260530-197"],"workIds":[],"contentIds":["C-170"],"caseIds":[],"notes":"No personal data. Paid work confirms work activity only; no theft-case result is claimed."},
   "seoKnowledgeBaseReview": {
@@ -75,7 +75,7 @@
     "region": "Россия / Москва",
     "primaryIntent": "Потерпевший обнаружил пропажу имущества, считает возможной кражу и готовит первое заявление в полицию до процессуального решения.",
     "verifiedCluster": ["заявление в полицию о краже","как написать заявление в полицию о краже","заявление о краже имущества","заявление о краже телефона","что приложить к заявлению о краже"],
-    "intentMap": [{"intent":"первое заявление о предполагаемой краже","target":"H1, lead, short answer"},{"intent":"описание имущества","target":"describe-property"},{"intent":"стоимость без чека","target":"ownership-value"},{"intent":"камеры и цифровые следы","target":"cameras-witnesses-digital"},{"intent":"регистрация после подачи","target":"statement-and-registration"}],
+    "intentMap": [{"intent":"первое заявление о предполагаемой краже","target":"H1, lead, short answer"},{"intent":"описание имущества","target":"describe-property"},{"intent":"стоимость без чека","target":"ownership-value"},{"intent":"камеры и цифровые следы","target":"cameras-witnesses-digital"},{"intent":"ошибки до подачи","target":"mistakes-before-filing"},{"intent":"содержание заявления","target":"statement-content"},{"intent":"регистрация и контроль после подачи","target":"registration-control"}],
     "intentOwnership": [{
       "intent": "Потерпевший обнаружил пропажу имущества, считает возможной кражу и готовит первое заявление в полицию до процессуального решения.",
       "ownerUrl": "https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/",
@@ -108,7 +108,7 @@
       "competitorGap":"Типовая выдача в основном даёт бланк и реквизиты, но редко связывает факт с доказательством и сроком исчезновения источника.",
       "sourceBasis":"reserve SERP, verified legal sources and original editorial synthesis",
       "sourceIds":["SEO-20260810-SERP-WEB-C170","PF-20260810-C170-THEFT","УПК-141-144-145","УК-158"],
-      "placement":"urgent-actions, describe-property, ownership-value, cameras-witnesses-digital",
+      "placement":"urgent-actions, mistakes-before-filing, describe-property, ownership-value, cameras-witnesses-digital, statement-content, registration-control",
       "verifiedAgainstSerp":true
     }],
     "cannibalizationChecked": true,
@@ -116,9 +116,8 @@
   },
   "editorialChecks": {"factsSeparatedFromHypotheses":true,"paidWorkSeparatedFromPaymentDetails":true,"workProcedureAndCaseResultsSeparated":true,"legalSourcesVerified":true,"anonymizationVerified":true,"criticalSourceErrorsResolved":true},
   "contentChanges": [
-    {"path":"src/editorial-data.mjs","kind":"registry","contentId":"C-170","action":"register approved C-170 theft police statement article","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"},
-    {"path":"site.config.mjs","kind":"content-date","contentId":"C-170","action":"register truthful 2026-08-10 content date for C-170 and the articles index","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"}
+    {"path":"site.config.mjs","kind":"content-date","contentId":"C-170","action":"register truthful 2026-08-11 substantive revision date for C-170 and the articles index","expectedUrl":"https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"}
   ],
   "plannedChecks": ["npm run test:content-governance","npm run test:public-copy","npm run check","node scripts/live-all-publications-smoke.mjs","node scripts/live-public-copy-regression-test.mjs"],
-  "publication": {"expectedUrls":["https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"],"notes":"Publish only after full PR CI, final live-editor fingerprint recheck, production deployment and live public-copy verification. Direct engine positions and exact Wordstat frequency are not claimed."}
+  "publication": {"expectedUrls":["https://yuristshevchuk.com/razbory/zayavlenie-v-politsiyu-o-krazhe/"],"notes":"C-170 v0.4 is a structural correction of the already published article. Publish only after full PR CI, final live-editor fingerprint recheck, production deployment and live public-copy verification. Direct engine positions and exact Wordstat frequency are not claimed."}
 }

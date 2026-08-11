@@ -15,7 +15,7 @@ const summaryScriptPath = join(root, "scripts", "seo-feedback-summary.mjs");
 const summaryScript = await readFile(summaryScriptPath, "utf8");
 const workflow = await readFile(join(root, ".github", "workflows", "seo-data-pipeline.yml"), "utf8");
 
-assert.equal(config.schema_version, 2, "Конфигурация должна использовать схему полного feedback-снимка");
+assert.equal(config.schema_version, 3, "Конфигурация должна использовать схему полного feedback-снимка с расширенной диагностикой");
 assert.equal(config.cache_ttl_days, 30, "Wordstat-кеш должен действовать 30 дней");
 assert.equal(config.max_api_calls_per_cluster, 3, "На кластер допускается не более трёх API-вызовов");
 assert.equal(config.max_primary_calls, 1, "Основной Wordstat-запрос должен быть один");
@@ -26,6 +26,13 @@ assert.ok(config.hypotheses.every((item) => item.reason && item.content_id && it
 assert.ok(config.metrica.goal_events.includes("cta_click"), "Feedback должен учитывать клики CTA");
 assert.ok(config.metrica.goal_events.includes("messenger_dialog_open"), "Feedback должен учитывать открытие выбора мессенджера");
 assert.ok(config.metrica.goal_events.includes("button_action"), "Feedback должен учитывать общий контроль кнопочных действий");
+for (const event of [
+  "publication_scroll_25", "publication_scroll_75", "publication_scroll_100",
+  "publication_active_30s", "publication_active_120s", "publication_helpfulness",
+  "contact_phone", "contact_email", "contact_map",
+]) {
+  assert.ok(config.metrica.diagnostic_goal_events.includes(event), `Расширенный feedback должен учитывать ${event}`);
+}
 assert.ok(config.feedback_clusters.length >= 2, "Регулярный feedback должен охватывать не менее двух утверждённых кластеров");
 
 const refundCluster = config.feedback_clusters.find((cluster) => cluster.id === "refund-services");
@@ -78,7 +85,7 @@ assert.equal(summarySyntax.status, 0, `Скрипт многокластерно
 assert.match(workflow, /schedule:[\s\S]*cron:\s*'25 4 \* \* 1'/, "Должен быть еженедельный сбор обратной связи");
 assert.match(workflow, /push:[\s\S]*branches:[\s\S]*- main/, "После изменения конвейера должен выполняться контрольный feedback-запуск");
 assert.match(workflow, /PIPELINE_MODE:\s*\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.mode \|\| 'feedback' \}\}/, "Все автоматические события должны использовать безопасный режим feedback");
-assert.match(workflow, /feedback\)[\s\S]*node scripts\/seo-feedback-pipeline\.mjs/, "Режим feedback должен запускать новый сборщик");
+assert.match(workflow, /feedback\)[\s\S]*node scripts\/metrica-finalize\.mjs[\s\S]*node scripts\/seo-feedback-pipeline\.mjs/, "Перед feedback цели Метрики должны синхронизироваться с реестром");
 assert.match(workflow, /wordstat\)[\s\S]*node scripts\/seo-data-pipeline\.mjs/, "Режим wordstat должен оставаться отдельным");
 assert.match(workflow, /node scripts\/seo-feedback-summary\.mjs/, "После feedback-сбора должна формироваться сводка по всем кластерам");
 assert.match(workflow, /ref:\s*seo-data/, "История должна сохраняться в отдельной ветке seo-data");
@@ -113,4 +120,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("SEO feedback contract passed: refund and police clusters, multi-cluster summary, per-page Webmaster data, Metrica funnels, cache limits and safe reporting are enforced");
+console.log("SEO feedback contract passed: full event diagnostics, refund and police clusters, per-page Webmaster/Metrica data, cache limits and safe reporting are enforced");

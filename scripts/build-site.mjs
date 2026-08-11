@@ -31,6 +31,23 @@ const styleModules = [
 await import("./build.mjs");
 await applyPublicationLinkingToDist({ root, services, articles, practiceCases });
 
+/* Keep the source renderer stable while making the published homepage describe
+   the replaced portrait accurately and expose its real intrinsic dimensions. */
+const homePath = join(dist, "index.html");
+const homeHtml = await readFile(homePath, "utf8");
+const heroImagePattern = /<img src="\/assets\/images\/maxim-hero\.webp" width="1536" height="1024" alt="[^"]*" fetchpriority="high" decoding="async">/;
+if (!heroImagePattern.test(homeHtml)) {
+  throw new Error("Не найдено главное фото для обновления alt и intrinsic-размеров");
+}
+await writeFile(
+  homePath,
+  homeHtml.replace(
+    heroImagePattern,
+    '<img src="/assets/images/maxim-hero.webp" width="1024" height="1024" alt="Юрист Максим Юрьевич Шевчук" fetchpriority="high" decoding="async">',
+  ),
+  "utf8",
+);
+
 const buildInfo = JSON.parse(await readFile(join(dist, "build-info.json"), "utf8"));
 const markerName = /^[A-Fa-f0-9]{40}$/.test(String(buildInfo.sha || "")) ? buildInfo.sha : "local";
 const deploymentMarker = {

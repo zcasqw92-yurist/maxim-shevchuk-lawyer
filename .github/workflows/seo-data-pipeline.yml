@@ -15,13 +15,19 @@ on:
       - 'scripts/seo-feedback-enrichment.mjs'
       - 'scripts/seo-metrica-event-goals.mjs'
       - 'scripts/seo-feedback-summary.mjs'
+      - 'scripts/metrica-finalize.mjs'
+      - 'scripts/metrica-state-test.mjs'
+      - 'scripts/metrica-goal-contract-test.mjs'
       - 'scripts/seo-data-pipeline-test.mjs'
       - 'scripts/seo-feedback-enrichment-test.mjs'
       - 'scripts/seo-metrica-event-goals-test.mjs'
       - 'scripts/seo-workflow-runtime-test.mjs'
       - 'src/editorial-data.mjs'
       - 'src/metrica-goals.mjs'
+      - 'src/app.js'
+      - 'src/visual-trust.js'
       - 'public/assets/editorial-analytics.mjs'
+      - 'public/assets/web-vitals.js'
   workflow_dispatch:
     inputs:
       mode:
@@ -91,6 +97,7 @@ jobs:
           node scripts/seo-data-pipeline-test.mjs
           node scripts/seo-feedback-enrichment-test.mjs
           node scripts/seo-metrica-event-goals-test.mjs
+          node scripts/metrica-goal-contract-test.mjs
 
       - name: Collect full SEO feedback without Wordstat spending
         shell: bash
@@ -107,6 +114,8 @@ jobs:
 
           case "${PIPELINE_MODE}" in
             feedback)
+              node scripts/metrica-finalize.mjs
+              node scripts/metrica-state-test.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-enrichment.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-metrica-event-goals.mjs
@@ -115,6 +124,8 @@ jobs:
               SEO_STATE_DIR="${state_dir}" node scripts/seo-data-pipeline.mjs "${wordstat_args[@]}"
               ;;
             all)
+              node scripts/metrica-finalize.mjs
+              node scripts/metrica-state-test.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-enrichment.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-metrica-event-goals.mjs

@@ -8,7 +8,9 @@ const stateDir = resolve(String(process.env.SEO_STATE_DIR || join(root, "reports
 const reportPath = join(stateDir, "feedback-latest.json");
 const report = JSON.parse(await readFile(reportPath, "utf8"));
 const token = String(process.env.YANDEX_METRICA_OAUTH_TOKEN || "").trim();
-const goalEvents = Array.isArray(config?.metrica?.goal_events) ? config.metrica.goal_events : [];
+const coreGoalEvents = Array.isArray(config?.metrica?.goal_events) ? config.metrica.goal_events : [];
+const diagnosticGoalEvents = Array.isArray(config?.metrica?.diagnostic_goal_events) ? config.metrica.diagnostic_goal_events : [];
+const goalEvents = [...new Set([...coreGoalEvents, ...diagnosticGoalEvents])];
 const origin = `https://${config.webmaster.target_host}`;
 
 if (!token) {
@@ -102,6 +104,31 @@ for (const row of Array.isArray(payload.data) ? payload.data : []) {
   byPath.set(path, current);
 }
 
+const contactGoal = goals.find((goal) => goal.type === "action" && actionEvent(goal) === "contact_conversion");
+const organicByPath = new Map();
+let organicPayload = null;
+if (contactGoal?.id) {
+  const organicParams = new URLSearchParams({
+    ids: counterId,
+    date1: report?.period?.date1,
+    date2: report?.period?.date2,
+    dimensions: "ym:s:startURLPath",
+    metrics: `ym:s:visits,ym:s:goal${contactGoal.id}reaches`,
+    filters: "ym:s:trafficSource=='organic'",
+    limit: "10000",
+    accuracy: "full",
+  });
+  organicPayload = await yandexApi(`${reportingBase}/data?${organicParams}`, "Metrica organic landing conversions");
+  for (const row of Array.isArray(organicPayload.data) ? organicPayload.data : []) {
+    const path = normalizePath(dimensionValue(row?.dimensions?.[0]));
+    if (!trackedPaths.has(path)) continue;
+    organicByPath.set(path, {
+      visits: asNumber(row?.metrics?.[0]),
+      contact_reaches: asNumber(row?.metrics?.[1]),
+    });
+  }
+}
+
 const existingRows = Array.isArray(report?.metrica?.exact_attribution?.rows)
   ? report.metrica.exact_attribution.rows
   : (Array.isArray(report?.metrica?.rows) ? report.metrica.rows : []);
@@ -117,34 +144,76 @@ report.metrica.exact_attribution = {
   status: "ok",
   page_attribution: "viewed_page_url",
   goal_attribution: "event_url_action_goal",
+  organic_conversion_attribution: contactGoal?.id ? "organic_landing_page_session" : "unavailable",
+  organic_contact_goal_id: contactGoal?.id || null,
   goal_error: "",
+  core_goal_events: coreGoalEvents,
+  diagnostic_goal_events: diagnosticGoalEvents,
   missing_goals: goalEvents.filter((event) => !aliases.has(event)),
   sampled: Boolean(payload.sampled),
-  contains_sensitive_data: Boolean(payload.contains_sensitive_data),
+  organic_sampled: Boolean(organicPayload?.sampled),
+  contains_sensitive_data: Boolean(payload.contains_sensitive_data || organicPayload?.contains_sensitive_data),
   rows: exactRows,
 };
 report.metrica.rows = exactRows;
 
 for (const page of trackedPages) {
-  const behavior = exactByPath.get(normalizePath(page.url)) || {};
+  const path = normalizePath(page.url);
+  const behavior = exactByPath.get(path) || {};
+  const organic = organicByPath.get(path) || {};
   for (const event of goalEvents) page[event] = asNumber(behavior[event]);
   page.publication_view = asNumber(behavior.publication_view);
+  page.scroll_25 = asNumber(behavior.publication_scroll_25);
   page.scroll_50 = asNumber(behavior.publication_scroll_50);
+  page.scroll_75 = asNumber(behavior.publication_scroll_75);
   page.scroll_90 = asNumber(behavior.publication_scroll_90);
+  page.scroll_100 = asNumber(behavior.publication_scroll_100);
+  page.active_30s = asNumber(behavior.publication_active_30s);
   page.active_60s = asNumber(behavior.publication_active_60s);
+  page.active_120s = asNumber(behavior.publication_active_120s);
+  page.section_view = asNumber(behavior.publication_section_view);
+  page.toc_click = asNumber(behavior.publication_toc_click);
   page.faq_open = asNumber(behavior.publication_faq_open);
+  page.source_click = asNumber(behavior.publication_source_click);
   page.related_click = asNumber(behavior.publication_related_click);
+  page.case_click = asNumber(behavior.publication_case_click);
+  page.service_click = asNumber(behavior.publication_service_click);
+  page.article_click = asNumber(behavior.publication_article_click);
   page.messenger_intent = asNumber(behavior.publication_messenger_intent);
+  page.helpfulness = asNumber(behavior.publication_helpfulness);
   page.cta_view = asNumber(behavior.cta_view);
   page.cta_click = asNumber(behavior.cta_click);
   page.messenger_dialog_open = asNumber(behavior.messenger_dialog_open);
   page.button_action = asNumber(behavior.button_action);
+  page.contact_click = asNumber(behavior.contact_click);
+  page.contact_action = asNumber(behavior.contact_action);
   page.contact_conversion = asNumber(behavior.contact_conversion);
   page.telegram = asNumber(behavior.contact_telegram);
   page.whatsapp = asNumber(behavior.contact_whatsapp);
+  page.phone = asNumber(behavior.contact_phone);
+  page.email = asNumber(behavior.contact_email);
+  page.map = asNumber(behavior.contact_map);
+  page.chat_transitions = page.telegram + page.whatsapp;
+  page.organic_entrance_visits = asNumber(organic.visits);
+  page.organic_contact_reaches = asNumber(organic.contact_reaches);
+  page.organic_contact_conversion = page.organic_entrance_visits > 0
+    ? `${percent(page.organic_contact_reaches, page.organic_entrance_visits).toFixed(2)}%`
+    : "";
   page.metrica_goal_attribution = "event_url_action_goal";
+  page.metrica_organic_attribution = contactGoal?.id ? "organic_landing_page_session" : "unavailable";
   const observationBase = page.type === "Услуга" ? asNumber(page.pageviews) : asNumber(page.publication_view);
-  page.conversion_to_chat = observationBase > 0 ? `${percent(page.contact_conversion, observationBase).toFixed(2)}%` : "";
+  const searchBase = asNumber(page.combined_search_impressions || page.search_shows);
+  page.conversion_to_chat = observationBase > 0 ? `${percent(page.chat_transitions, observationBase).toFixed(2)}%` : "";
+  page.conversion_to_contact = observationBase > 0 ? `${percent(page.contact_conversion, observationBase).toFixed(2)}%` : "";
+  if (observationBase >= 30 && searchBase >= 30) {
+    page.decision = "Поведенческой и поисковой выборки достаточно для первичного сравнения; менять материал только после сопоставления с предыдущей версией, запросами и конверсией.";
+  } else if (observationBase >= 30) {
+    page.decision = "Поведенческий сигнал уже можно анализировать, но поисковой выборки недостаточно. UX наблюдать; SEO-текст и структуру по одному этому сигналу пока не менять.";
+  } else if (searchBase >= 30) {
+    page.decision = "Поисковая видимость уже набирает выборку, но данных по чтению недостаточно. Проверять CTR и интент; содержательную структуру пока не менять.";
+  } else {
+    page.decision = "Наблюдение: выборка недостаточна, страницу не менять.";
+  }
 }
 
 const publicationByPath = new Map(trackedPages.map((page) => [normalizePath(page.url), page]));
@@ -155,13 +224,23 @@ for (const cluster of Array.isArray(report.clusters) ? report.clusters : []) {
     ...(cluster.totals || {}),
     cta_clicks: pages.reduce((sum, page) => sum + asNumber(page.cta_click), 0),
     messenger_dialog_opens: pages.reduce((sum, page) => sum + asNumber(page.messenger_dialog_open), 0),
+    chat_transitions: pages.reduce((sum, page) => sum + asNumber(page.chat_transitions), 0),
     contact_conversions: pages.reduce((sum, page) => sum + asNumber(page.contact_conversion), 0),
+    organic_entrance_visits: pages.reduce((sum, page) => sum + asNumber(page.organic_entrance_visits), 0),
+    organic_contact_reaches: pages.reduce((sum, page) => sum + asNumber(page.organic_contact_reaches), 0),
   };
 }
 report.rules = {
   ...(report.rules || {}),
   metrica_goal_metrics_use_event_url: true,
   metrica_goal_count_uses_action_goal_events: true,
+  publication_scroll_scope_from_2026_08_11: "publication",
+  publication_scroll_measurement_version: 2,
+  related_clicks_split_by_destination: true,
+  chat_transition_definition: "contact_telegram + contact_whatsapp",
+  contact_conversion_definition: "all configured contact channels",
+  organic_conversion_definition: "contact_conversion goal reaches in sessions whose landing page is the tracked URL and trafficSource is organic",
+  decisions_require_behavior_and_search_context: true,
 };
 
 await writeJson(reportPath, report);
@@ -171,10 +250,15 @@ const headers = [
   "В поиске Яндекса", "Показы Яндекс", "Клики Яндекс", "CTR Яндекс", "Позиция Яндекс",
   "Показы Google", "Клики Google", "CTR Google", "Позиция Google",
   "Показы всего", "Клики всего", "CTR всего", "Средняя позиция",
+  "Органические входные визиты", "Органические переходы к контакту", "Органическая конверсия в контакт",
   "Входные визиты", "Просмотры страницы", "Пользователи", "Просмотры публикации",
-  "Скролл 50%", "Скролл 90%", "Активное чтение 60с", "Клики CTA",
-  "Открытия выбора мессенджера", "Telegram", "WhatsApp", "Переходы в чат",
-  "Атрибуция Метрики", "Решение",
+  "Скролл 25%", "Скролл 50%", "Скролл 75%", "Скролл 90%", "Дочитал публикацию 100%",
+  "Активное чтение 30с", "Активное чтение 60с", "Активное чтение 120с",
+  "Просмотры смысловых блоков", "Клики по оглавлению", "Открытия FAQ", "Клики по источникам", "Клики по связанным материалам",
+  "Клики по кейсам", "Клики по услугам", "Клики по статьям", "Намерение написать", "Оценки полезности",
+  "Просмотры CTA", "Клики CTA", "Открытия выбора мессенджера", "Все кнопочные действия",
+  "Telegram", "WhatsApp", "Переходы в чат", "Телефон", "Email", "Карта", "Все переходы к контакту",
+  "Конверсия в чат", "Конверсия в контакт", "Атрибуция Метрики", "Решение",
 ];
 const rows = trackedPages.map((page) => [
   `${report?.period?.date1 || ""}—${report?.period?.date2 || ""}`,
@@ -185,11 +269,17 @@ const rows = trackedPages.map((page) => [
   page.google_impressions ? `${asNumber(page.google_ctr).toFixed(2)}%` : "", page.google_avg_position || "",
   page.combined_search_impressions, page.combined_search_clicks,
   page.combined_search_impressions ? `${asNumber(page.combined_search_ctr).toFixed(2)}%` : "", page.combined_search_avg_position || "",
+  page.organic_entrance_visits, page.organic_contact_reaches, page.organic_contact_conversion,
   page.entrance_visits ?? page.visits, page.pageviews, page.users, page.publication_view,
-  page.scroll_50, page.scroll_90, page.active_60s, page.cta_click, page.messenger_dialog_open,
-  page.telegram, page.whatsapp, page.contact_conversion,
-  `${page.metrica_page_attribution}; цели: ${page.metrica_goal_attribution}`,
+  page.scroll_25, page.scroll_50, page.scroll_75, page.scroll_90, page.scroll_100,
+  page.active_30s, page.active_60s, page.active_120s,
+  page.section_view, page.toc_click, page.faq_open, page.source_click, page.related_click,
+  page.case_click, page.service_click, page.article_click, page.messenger_intent, page.helpfulness,
+  page.cta_view, page.cta_click, page.messenger_dialog_open, page.button_action,
+  page.telegram, page.whatsapp, page.chat_transitions, page.phone, page.email, page.map, page.contact_conversion,
+  page.conversion_to_chat, page.conversion_to_contact,
+  `${page.metrica_page_attribution}; цели: ${page.metrica_goal_attribution}; органика: ${page.metrica_organic_attribution}`,
   page.decision,
 ]);
 await writeCsv(join(stateDir, "sheet-unified-search-statistics.csv"), headers, rows);
-console.log(`Metrica event-goal attribution: paths=${byPath.size}, rows=${exactRows.length}, status=ok`);
+console.log(`Metrica event-goal attribution: paths=${byPath.size}, organic_paths=${organicByPath.size}, rows=${exactRows.length}, goals=${goalEvents.length}, status=ok`);

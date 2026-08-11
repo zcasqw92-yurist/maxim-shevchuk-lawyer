@@ -50,6 +50,7 @@ if (publication) {
     };
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event, ...payload });
+    if (typeof window.gtag === "function") window.gtag("event", event, payload);
     if (canSendToYandex()) {
       window.ym(Number(yandexMetricaId), "reachGoal", event, payload);
     } else if (/^\d+$/.test(yandexMetricaId)) {
@@ -76,11 +77,18 @@ if (publication) {
   });
 
   const measureScroll = () => {
-    const max = Math.max(document.documentElement.scrollHeight - innerHeight, 1);
-    const percent = Math.min(100, Math.round((scrollY / max) * 100));
+    const rect = publication.getBoundingClientRect();
+    const publicationTop = scrollY + rect.top;
+    const publicationHeight = Math.max(publication.scrollHeight || rect.height, 1);
+    const viewportBottom = scrollY + innerHeight;
+    const percent = Math.min(100, Math.max(0, Math.round(((viewportBottom - publicationTop) / publicationHeight) * 100)));
     for (const threshold of [25, 50, 75, 90, 100]) {
       if (percent >= threshold) {
-        trackOnce(`scroll-${threshold}`, `publication_scroll_${threshold}`, { scroll_percent: threshold });
+        trackOnce(`scroll-${threshold}`, `publication_scroll_${threshold}`, {
+          scroll_percent: threshold,
+          measurement_scope: "publication",
+          measurement_version: 2,
+        });
       }
     }
   };
@@ -133,7 +141,13 @@ if (publication) {
     link.addEventListener("click", () => track("publication_source_click", { source_host: new URL(link.href).hostname }));
   });
   document.querySelectorAll(".editorial-related a, .editorial-card a").forEach((link) => {
-    link.addEventListener("click", () => track("publication_related_click", { target_path: new URL(link.href, location.href).pathname }));
+    link.addEventListener("click", () => {
+      const targetPath = new URL(link.href, location.href).pathname;
+      track("publication_related_click", { target_path: targetPath });
+      if (targetPath.startsWith("/praktika/")) track("publication_case_click", { target_path: targetPath });
+      else if (targetPath.startsWith("/uslugi/")) track("publication_service_click", { target_path: targetPath });
+      else if (targetPath.startsWith("/razbory/")) track("publication_article_click", { target_path: targetPath });
+    });
   });
   document.querySelectorAll(".editorial-cta [data-dialog-open], .editorial-intake [data-dialog-open]").forEach((button) => {
     button.addEventListener("click", () => track("publication_messenger_intent", { topic: button.dataset.topic || "general" }));

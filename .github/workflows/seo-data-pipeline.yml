@@ -16,6 +16,7 @@ on:
       - 'scripts/seo-metrica-event-goals.mjs'
       - 'scripts/seo-feedback-summary.mjs'
       - 'scripts/metrica-finalize.mjs'
+      - 'scripts/metrica-state-test.mjs'
       - 'scripts/metrica-goal-contract-test.mjs'
       - 'scripts/seo-data-pipeline-test.mjs'
       - 'scripts/seo-feedback-enrichment-test.mjs'
@@ -114,6 +115,7 @@ jobs:
           case "${PIPELINE_MODE}" in
             feedback)
               node scripts/metrica-finalize.mjs
+              node scripts/metrica-state-test.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-enrichment.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-metrica-event-goals.mjs
@@ -123,6 +125,7 @@ jobs:
               ;;
             all)
               node scripts/metrica-finalize.mjs
+              node scripts/metrica-state-test.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-pipeline.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-feedback-enrichment.mjs
               SEO_STATE_DIR="${state_dir}" node scripts/seo-metrica-event-goals.mjs

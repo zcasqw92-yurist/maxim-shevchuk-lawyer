@@ -42,6 +42,10 @@ for (const marker of [
   "web_vital",
   'typeof window.gtag === "function"',
   'typeof window.ym === "function"',
+  "analyticsReady",
+  "startWebVitals",
+  'document.addEventListener("analytics:ready"',
+  "if (delivered) sentMetricValues.add(eventKey)",
 ]) {
   if (!wrapper.includes(marker)) errors.push(`web-vitals.js: missing ${marker}`);
 }
@@ -92,4 +96,4 @@ if (errors.length) {
   console.error([...new Set(errors)].join("\n"));
   process.exit(1);
 }
-console.log("Core Web Vitals checks passed: official web-vitals 6.0.0, zero values, bfcache and duplicate protection");
+console.log("Core Web Vitals checks passed: official web-vitals 6.0.0, analytics-ready consent gate, zero values, bfcache and duplicate protection");

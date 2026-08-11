@@ -59,13 +59,14 @@ for (const item of articles) {
     const finalId = item.finalSection?.id;
     const finalButtonLabel = item.finalSection?.buttonLabel || item.ctaButtonLabel || "Написать юристу";
     const softHref = item.sections?.find((section) => section.softCta)?.softCta?.href;
+    const hasCanonicalFinal = Boolean(item.finalSection);
     for (const marker of [
       finalId ? `id="${finalId}"` : null,
       softHref ? `href="${softHref}"` : null,
       item.finalSection?.title,
       item.finalSection?.groups?.[0]?.title,
       item.finalSection?.groups?.[1]?.title,
-      'class="editorial-inline-cta"',
+      hasCanonicalFinal ? 'class="article-section editorial-intake editorial-final-conversion"' : 'class="editorial-inline-cta"',
       'data-dialog-open',
       finalButtonLabel,
     ].filter(Boolean)) {
@@ -77,9 +78,20 @@ for (const item of articles) {
       "Перед сообщением юристу",
       "Проверить свою ситуацию",
       "Что написать юристу",
-      '<section class="editorial-cta"',
     ]) {
-      if (html.includes(forbidden)) errors.push(`${route}: legacy repeating CTA returned into inlineFinalCta article: ${forbidden}`);
+      if (html.includes(forbidden)) errors.push(`${route}: legacy repeating intake returned into inlineFinalCta article: ${forbidden}`);
+    }
+    if (hasCanonicalFinal) {
+      if (!html.includes('<section class="editorial-cta"')) errors.push(`${route}: canonical final article must retain the standard page-ending CTA`);
+      const finalIndex = html.indexOf('class="article-section editorial-intake editorial-final-conversion"');
+      const authorIndex = html.indexOf('class="editorial-author"');
+      const helpfulnessIndex = html.indexOf('data-editorial-helpfulness');
+      const pageCtaIndex = html.lastIndexOf('<section class="editorial-cta"');
+      if (!(finalIndex >= 0 && authorIndex > finalIndex && helpfulnessIndex > authorIndex && pageCtaIndex > helpfulnessIndex)) {
+        errors.push(`${route}: canonical endflow order must be themed intake -> author -> helpfulness -> final page CTA`);
+      }
+    } else if (html.includes('<section class="editorial-cta"')) {
+      errors.push(`${route}: legacy repeating CTA returned into legacy inlineFinalCta article`);
     }
   } else if (item.hideMessageGuide) {
     for (const marker of [

@@ -162,7 +162,17 @@ for (const page of trackedPages) {
   page.map = asNumber(behavior.contact_map);
   page.metrica_goal_attribution = "event_url_action_goal";
   const observationBase = page.type === "Услуга" ? asNumber(page.pageviews) : asNumber(page.publication_view);
+  const searchBase = asNumber(page.combined_search_impressions || page.search_shows);
   page.conversion_to_chat = observationBase > 0 ? `${percent(page.contact_conversion, observationBase).toFixed(2)}%` : "";
+  if (observationBase >= 30 && searchBase >= 30) {
+    page.decision = "Поведенческой и поисковой выборки достаточно для первичного сравнения; менять материал только после сопоставления с предыдущей версией, запросами и конверсией.";
+  } else if (observationBase >= 30) {
+    page.decision = "Поведенческий сигнал уже можно анализировать, но поисковой выборки недостаточно. UX наблюдать; SEO-текст и структуру по одному этому сигналу пока не менять.";
+  } else if (searchBase >= 30) {
+    page.decision = "Поисковая видимость уже набирает выборку, но данных по чтению недостаточно. Проверять CTR и интент; содержательную структуру пока не менять.";
+  } else {
+    page.decision = "Наблюдение: выборка недостаточна, страницу не менять.";
+  }
 }
 
 const publicationByPath = new Map(trackedPages.map((page) => [normalizePath(page.url), page]));
@@ -182,6 +192,7 @@ report.rules = {
   metrica_goal_count_uses_action_goal_events: true,
   publication_scroll_scope_from_2026_08_11: "publication",
   publication_scroll_measurement_version: 2,
+  decisions_require_behavior_and_search_context: true,
 };
 
 await writeJson(reportPath, report);

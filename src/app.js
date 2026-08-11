@@ -39,6 +39,7 @@ const startAnalytics = () => {
     });
     loadExternalScript("https://mc.yandex.ru/metrika/tag.js");
   }
+  document.dispatchEvent(new CustomEvent("analytics:ready"));
 };
 
 const consentBanner = $("[data-consent-banner]");
@@ -74,6 +75,7 @@ $("[data-consent-settings]")?.addEventListener("click", () => {
 const track = (event, params = {}) => {
   if (!analyticsStarted) return;
   window.dataLayer.push({ event, ...params });
+  if (typeof window.gtag === "function") window.gtag("event", event, params);
   if (analyticsEnabled && /^\d+$/.test(yandexMetricaId) && typeof window.ym === "function") {
     window.ym(Number(yandexMetricaId), "reachGoal", event, params);
   }

@@ -160,10 +160,12 @@ for (const page of trackedPages) {
   page.phone = asNumber(behavior.contact_phone);
   page.email = asNumber(behavior.contact_email);
   page.map = asNumber(behavior.contact_map);
+  page.chat_transitions = page.telegram + page.whatsapp;
   page.metrica_goal_attribution = "event_url_action_goal";
   const observationBase = page.type === "Услуга" ? asNumber(page.pageviews) : asNumber(page.publication_view);
   const searchBase = asNumber(page.combined_search_impressions || page.search_shows);
-  page.conversion_to_chat = observationBase > 0 ? `${percent(page.contact_conversion, observationBase).toFixed(2)}%` : "";
+  page.conversion_to_chat = observationBase > 0 ? `${percent(page.chat_transitions, observationBase).toFixed(2)}%` : "";
+  page.conversion_to_contact = observationBase > 0 ? `${percent(page.contact_conversion, observationBase).toFixed(2)}%` : "";
   if (observationBase >= 30 && searchBase >= 30) {
     page.decision = "Поведенческой и поисковой выборки достаточно для первичного сравнения; менять материал только после сопоставления с предыдущей версией, запросами и конверсией.";
   } else if (observationBase >= 30) {
@@ -183,6 +185,7 @@ for (const cluster of Array.isArray(report.clusters) ? report.clusters : []) {
     ...(cluster.totals || {}),
     cta_clicks: pages.reduce((sum, page) => sum + asNumber(page.cta_click), 0),
     messenger_dialog_opens: pages.reduce((sum, page) => sum + asNumber(page.messenger_dialog_open), 0),
+    chat_transitions: pages.reduce((sum, page) => sum + asNumber(page.chat_transitions), 0),
     contact_conversions: pages.reduce((sum, page) => sum + asNumber(page.contact_conversion), 0),
   };
 }
@@ -192,6 +195,8 @@ report.rules = {
   metrica_goal_count_uses_action_goal_events: true,
   publication_scroll_scope_from_2026_08_11: "publication",
   publication_scroll_measurement_version: 2,
+  chat_transition_definition: "contact_telegram + contact_whatsapp",
+  contact_conversion_definition: "all configured contact channels",
   decisions_require_behavior_and_search_context: true,
 };
 
@@ -207,8 +212,8 @@ const headers = [
   "Активное чтение 30с", "Активное чтение 60с", "Активное чтение 120с",
   "Просмотры смысловых блоков", "Клики по оглавлению", "Открытия FAQ", "Клики по источникам", "Клики по связанным материалам",
   "Намерение написать", "Оценки полезности", "Просмотры CTA", "Клики CTA", "Открытия выбора мессенджера", "Все кнопочные действия",
-  "Telegram", "WhatsApp", "Телефон", "Email", "Карта", "Переходы к контакту",
-  "Атрибуция Метрики", "Решение",
+  "Telegram", "WhatsApp", "Переходы в чат", "Телефон", "Email", "Карта", "Все переходы к контакту",
+  "Конверсия в чат", "Конверсия в контакт", "Атрибуция Метрики", "Решение",
 ];
 const rows = trackedPages.map((page) => [
   `${report?.period?.date1 || ""}—${report?.period?.date2 || ""}`,
@@ -224,7 +229,8 @@ const rows = trackedPages.map((page) => [
   page.active_30s, page.active_60s, page.active_120s,
   page.section_view, page.toc_click, page.faq_open, page.source_click, page.related_click,
   page.messenger_intent, page.helpfulness, page.cta_view, page.cta_click, page.messenger_dialog_open, page.button_action,
-  page.telegram, page.whatsapp, page.phone, page.email, page.map, page.contact_conversion,
+  page.telegram, page.whatsapp, page.chat_transitions, page.phone, page.email, page.map, page.contact_conversion,
+  page.conversion_to_chat, page.conversion_to_contact,
   `${page.metrica_page_attribution}; цели: ${page.metrica_goal_attribution}`,
   page.decision,
 ]);

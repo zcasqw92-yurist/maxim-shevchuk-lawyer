@@ -360,3 +360,16 @@
     font-size: .875rem;
   }
 }
+
+/* Final mobile portrait crop: keep the lawyer visually centered after real-device review. */
+@media (max-width: 680px) {
+  .home .hero .hero__image-wrap img {
+    object-position: 96% 24%;
+  }
+}
+
+@media (max-width: 430px) {
+  .home .hero .hero__image-wrap img {
+    object-position: 100% 24%;
+  }
+}

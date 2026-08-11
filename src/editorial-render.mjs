@@ -44,12 +44,18 @@ const insertBeforeSectionClose = (content, sectionId, html) => {
   return content.replace(pattern, `$1${html}$2`);
 };
 
+const finalListClass = (kind) => {
+  if (kind === "check") return "editorial-checklist";
+  if (["cross", "dot", "dash"].includes(kind)) return `editorial-list editorial-list--${kind}`;
+  return "editorial-list editorial-list--dot";
+};
+
 const renderFinalSection = (section) => {
   if (!section?.id || !section?.title) return "";
   const groups = (section.groups || []).map((group) => `
     <div class="editorial-final-group">
       <h3>${esc(group.title)}</h3>
-      <ul class="editorial-list editorial-list--dot">${(group.items || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
+      <ul class="${finalListClass(group.kind)}">${(group.items || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
     </div>`).join("");
   const paragraphs = (section.paragraphs || []).map((paragraph) => `<p>${esc(paragraph)}</p>`).join("");
   const benefit = section.benefit ? `<p>${esc(section.benefit)}</p>` : "";

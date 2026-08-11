@@ -262,3 +262,101 @@
     .engagement-nudge__dismiss { order: 2; }
   }
 }
+
+/* Home reference uses unlayered selectors because the visual override in
+   page-endings.css is intentionally unlayered as well. Keep the global CTA
+   contract while allowing the first screen to use the new geometry. */
+.home .header__actions .button--compact,
+.home .hero .hero__actions .button--primary,
+.home .hero .hero__actions .button--secondary {
+  font-size: var(--cta-font-size);
+  font-weight: var(--cta-font-weight);
+}
+
+.home .hero .hero__actions .button--secondary {
+  color: var(--cta-secondary-text);
+}
+
+.home .trust-strip__item > span {
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+@media (max-width: 680px) {
+  .home .hero .hero__actions .button--secondary {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 680px) and (max-height: 620px) {
+  .home .hero .hero__content {
+    padding: 24px 0 28px;
+  }
+
+  .home .hero .hero__content::before {
+    margin-bottom: 10px;
+    font-size: 9px;
+  }
+
+  .home .hero h1 {
+    font-size: 2.15rem;
+    line-height: 1.02;
+  }
+
+  .home .hero h1::after {
+    width: 52px;
+    margin-top: 14px;
+  }
+
+  .home .hero .hero__lead {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.42;
+  }
+
+  .home .hero .hero__actions {
+    order: 1;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .home .hero .hero__actions .button--primary {
+    min-height: 48px;
+  }
+
+  .home .hero .hero__actions .button--secondary {
+    min-height: 44px;
+  }
+
+  .home .hero .hero__assurance {
+    order: 2;
+    gap: 6px;
+    margin-top: 18px;
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .home .hero .hero__assurance svg {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+    padding: 3px;
+  }
+}
+
+/* Preserve browser/user text scaling on the redesigned first screen. */
+.home .hero .hero__lead {
+  font-size: 1.125rem;
+}
+
+@media (max-width: 680px) {
+  .home .hero .hero__lead {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 680px) and (max-height: 620px) {
+  .home .hero .hero__lead {
+    font-size: .875rem;
+  }
+}

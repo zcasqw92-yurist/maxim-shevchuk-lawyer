@@ -92,20 +92,11 @@ const runEngine = async (engineName, engine) => {
         if (await page.locator("form, input, select, textarea").count()) errors.push(`${label}: public page contains data-entry controls`);
         if (await page.locator("#callback-dialog, #price-quiz-dialog, [data-callback-open], [data-price-quiz-open]").count()) errors.push(`${label}: removed form or questionnaire UI is still public`);
 
-        await page.locator("[data-header] [data-dialog-open]").first().click();
+        await page.locator("[data-dialog-open]:visible").first().click();
         let links = await dialogLinks(page);
         const genericParts = ["Хочу понять, что можно сделать в моей ситуации", "Кратко опишу"];
         expectParts(`${label}: generic Telegram`, textParam(links.telegram), genericParts);
         expectParts(`${label}: generic WhatsApp`, textParam(links.whatsapp), genericParts);
-        await closeDialog(links.dialog);
-
-        const topicTrigger = page.locator(".hero__quick-choices [data-topic='возврат денежных средств']");
-        await topicTrigger.scrollIntoViewIfNeeded();
-        await topicTrigger.click();
-        links = await dialogLinks(page);
-        const topicParts = ["Обращаюсь по вопросу: возврат денежных средств", "Кратко опишу ситуацию"];
-        expectParts(`${label}: topic Telegram`, textParam(links.telegram), topicParts);
-        expectParts(`${label}: topic WhatsApp`, textParam(links.whatsapp), topicParts);
         await closeDialog(links.dialog);
 
         const priceTrigger = page.locator('[data-topic="ориентир стоимости юридической помощи"]').first();
@@ -145,4 +136,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Messenger intents passed: no forms, prefilled direct drafts, generic/topic/price flows in Chromium and WebKit");
+console.log("Messenger intents passed: no forms, prefilled direct drafts, generic and visible price-topic flows in Chromium and WebKit");

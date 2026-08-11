@@ -170,7 +170,7 @@ try {
         await auditLayout(page, `${profile.name} ${route}`, profile.isMobile);
 
         if (route === "/") {
-          await page.locator("[data-dialog-open]").first().click();
+          await page.locator("[data-dialog-open]:visible").first().click();
           await page.locator("#contact-dialog[open]").waitFor({ state: "visible" });
           await runAxe(page, `${profile.name} / contact-dialog`);
           await auditLayout(page, `${profile.name} / contact-dialog`, profile.isMobile);

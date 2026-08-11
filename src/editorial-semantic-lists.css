@@ -146,6 +146,21 @@
     font-size: .95rem;
   }
 
+  /* В тёмной колонке финального блока семантические списки наследуют светлую палитру панели. */
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .article-section .editorial-intake__questions :is(.editorial-checklist, .editorial-list) li {
+    color: var(--text-on-dark-strong);
+  }
+
+  .article-page .editorial-article:is(
+    [data-article-id="contractor-repair-quality-claim-response"],
+    [data-article-id="theft-police-statement"]
+  ) .article-section .editorial-intake__questions :is(.editorial-list--dot, .editorial-list--dash) li::before {
+    color: var(--text-on-dark-strong);
+  }
+
   .article-page .editorial-article:is(
     [data-article-id="contractor-repair-quality-claim-response"],
     [data-article-id="theft-police-statement"]

@@ -8,7 +8,9 @@ const stateDir = resolve(String(process.env.SEO_STATE_DIR || join(root, "reports
 const reportPath = join(stateDir, "feedback-latest.json");
 const report = JSON.parse(await readFile(reportPath, "utf8"));
 const token = String(process.env.YANDEX_METRICA_OAUTH_TOKEN || "").trim();
-const goalEvents = Array.isArray(config?.metrica?.goal_events) ? config.metrica.goal_events : [];
+const coreGoalEvents = Array.isArray(config?.metrica?.goal_events) ? config.metrica.goal_events : [];
+const diagnosticGoalEvents = Array.isArray(config?.metrica?.diagnostic_goal_events) ? config.metrica.diagnostic_goal_events : [];
+const goalEvents = [...new Set([...coreGoalEvents, ...diagnosticGoalEvents])];
 const origin = `https://${config.webmaster.target_host}`;
 
 if (!token) {
@@ -118,6 +120,8 @@ report.metrica.exact_attribution = {
   page_attribution: "viewed_page_url",
   goal_attribution: "event_url_action_goal",
   goal_error: "",
+  core_goal_events: coreGoalEvents,
+  diagnostic_goal_events: diagnosticGoalEvents,
   missing_goals: goalEvents.filter((event) => !aliases.has(event)),
   sampled: Boolean(payload.sampled),
   contains_sensitive_data: Boolean(payload.contains_sensitive_data),
@@ -129,19 +133,33 @@ for (const page of trackedPages) {
   const behavior = exactByPath.get(normalizePath(page.url)) || {};
   for (const event of goalEvents) page[event] = asNumber(behavior[event]);
   page.publication_view = asNumber(behavior.publication_view);
+  page.scroll_25 = asNumber(behavior.publication_scroll_25);
   page.scroll_50 = asNumber(behavior.publication_scroll_50);
+  page.scroll_75 = asNumber(behavior.publication_scroll_75);
   page.scroll_90 = asNumber(behavior.publication_scroll_90);
+  page.scroll_100 = asNumber(behavior.publication_scroll_100);
+  page.active_30s = asNumber(behavior.publication_active_30s);
   page.active_60s = asNumber(behavior.publication_active_60s);
+  page.active_120s = asNumber(behavior.publication_active_120s);
+  page.section_view = asNumber(behavior.publication_section_view);
+  page.toc_click = asNumber(behavior.publication_toc_click);
   page.faq_open = asNumber(behavior.publication_faq_open);
+  page.source_click = asNumber(behavior.publication_source_click);
   page.related_click = asNumber(behavior.publication_related_click);
   page.messenger_intent = asNumber(behavior.publication_messenger_intent);
+  page.helpfulness = asNumber(behavior.publication_helpfulness);
   page.cta_view = asNumber(behavior.cta_view);
   page.cta_click = asNumber(behavior.cta_click);
   page.messenger_dialog_open = asNumber(behavior.messenger_dialog_open);
   page.button_action = asNumber(behavior.button_action);
+  page.contact_click = asNumber(behavior.contact_click);
+  page.contact_action = asNumber(behavior.contact_action);
   page.contact_conversion = asNumber(behavior.contact_conversion);
   page.telegram = asNumber(behavior.contact_telegram);
   page.whatsapp = asNumber(behavior.contact_whatsapp);
+  page.phone = asNumber(behavior.contact_phone);
+  page.email = asNumber(behavior.contact_email);
+  page.map = asNumber(behavior.contact_map);
   page.metrica_goal_attribution = "event_url_action_goal";
   const observationBase = page.type === "Услуга" ? asNumber(page.pageviews) : asNumber(page.publication_view);
   page.conversion_to_chat = observationBase > 0 ? `${percent(page.contact_conversion, observationBase).toFixed(2)}%` : "";
@@ -162,6 +180,8 @@ report.rules = {
   ...(report.rules || {}),
   metrica_goal_metrics_use_event_url: true,
   metrica_goal_count_uses_action_goal_events: true,
+  publication_scroll_scope_from_2026_08_11: "publication",
+  publication_scroll_measurement_version: 2,
 };
 
 await writeJson(reportPath, report);
@@ -172,8 +192,11 @@ const headers = [
   "Показы Google", "Клики Google", "CTR Google", "Позиция Google",
   "Показы всего", "Клики всего", "CTR всего", "Средняя позиция",
   "Входные визиты", "Просмотры страницы", "Пользователи", "Просмотры публикации",
-  "Скролл 50%", "Скролл 90%", "Активное чтение 60с", "Клики CTA",
-  "Открытия выбора мессенджера", "Telegram", "WhatsApp", "Переходы в чат",
+  "Скролл 25%", "Скролл 50%", "Скролл 75%", "Скролл 90%", "Дочитал публикацию 100%",
+  "Активное чтение 30с", "Активное чтение 60с", "Активное чтение 120с",
+  "Просмотры смысловых блоков", "Клики по оглавлению", "Открытия FAQ", "Клики по источникам", "Клики по связанным материалам",
+  "Намерение написать", "Оценки полезности", "Просмотры CTA", "Клики CTA", "Открытия выбора мессенджера", "Все кнопочные действия",
+  "Telegram", "WhatsApp", "Телефон", "Email", "Карта", "Переходы к контакту",
   "Атрибуция Метрики", "Решение",
 ];
 const rows = trackedPages.map((page) => [
@@ -186,10 +209,13 @@ const rows = trackedPages.map((page) => [
   page.combined_search_impressions, page.combined_search_clicks,
   page.combined_search_impressions ? `${asNumber(page.combined_search_ctr).toFixed(2)}%` : "", page.combined_search_avg_position || "",
   page.entrance_visits ?? page.visits, page.pageviews, page.users, page.publication_view,
-  page.scroll_50, page.scroll_90, page.active_60s, page.cta_click, page.messenger_dialog_open,
-  page.telegram, page.whatsapp, page.contact_conversion,
+  page.scroll_25, page.scroll_50, page.scroll_75, page.scroll_90, page.scroll_100,
+  page.active_30s, page.active_60s, page.active_120s,
+  page.section_view, page.toc_click, page.faq_open, page.source_click, page.related_click,
+  page.messenger_intent, page.helpfulness, page.cta_view, page.cta_click, page.messenger_dialog_open, page.button_action,
+  page.telegram, page.whatsapp, page.phone, page.email, page.map, page.contact_conversion,
   `${page.metrica_page_attribution}; цели: ${page.metrica_goal_attribution}`,
   page.decision,
 ]);
 await writeCsv(join(stateDir, "sheet-unified-search-statistics.csv"), headers, rows);
-console.log(`Metrica event-goal attribution: paths=${byPath.size}, rows=${exactRows.length}, status=ok`);
+console.log(`Metrica event-goal attribution: paths=${byPath.size}, rows=${exactRows.length}, goals=${goalEvents.length}, status=ok`);

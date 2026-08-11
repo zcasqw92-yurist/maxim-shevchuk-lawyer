@@ -154,7 +154,6 @@ export const theftPoliceStatementArticles = [
         title: "Что написать в заявлении",
         paragraphs: [
           "Единого обязательного бланка для заявления о преступлении нет. Письменное заявление должно быть подписано. Смысл не в объёме текста, а в том, чтобы из него была понятна проверяемая картина события.",
-          "Не обязательно искать нужную часть статьи 158 УК РФ и спорить о квалификации в самом заявлении. Попросите принять и зарегистрировать сообщение, провести проверку и дать правовую оценку установленным обстоятельствам. Полиция обязана принимать и регистрировать заявления и сообщения; если вопрос относится к другому подразделению, материал может быть передан по компетенции.",
         ],
         checklist: [
           "Укажите свои данные для связи и обстоятельства, при которых обнаружили пропажу.",
@@ -163,6 +162,9 @@ export const theftPoliceStatementArticles = [
           "Укажите известную стоимость и чем подтверждаются принадлежность и цена.",
           "Перечислите приложения, камеры, свидетелей и цифровые данные, которые можно проверить.",
           "Если подозреваете конкретного человека, отдельно напишите, что известно точно, а что является предположением и на чём оно основано.",
+        ],
+        afterChecklistParagraphs: [
+          "Не обязательно искать нужную часть статьи 158 УК РФ и спорить о квалификации в самом заявлении. Попросите принять и зарегистрировать сообщение, провести проверку и дать правовую оценку установленным обстоятельствам. Полиция обязана принимать и регистрировать заявления и сообщения; если вопрос относится к другому подразделению, материал может быть передан по компетенции.",
         ],
       },
       {
@@ -173,7 +175,7 @@ export const theftPoliceStatementArticles = [
           "Контролируйте, какое процессуальное решение принято по сообщению.",
           "Учитывайте, что базовый срок проверки по статье 144 УПК РФ — до трёх суток; при предусмотренных законом основаниях он может быть продлён.",
         ],
-        paragraphs: [
+        afterChecklistParagraphs: [
           "По итогам проверки принимается решение о возбуждении уголовного дела, об отказе либо о передаче сообщения по подследственности. Если решения нет или проверка затягивается, это уже следующая стадия.",
         ],
         relatedLinks: [
@@ -264,6 +266,10 @@ export const validateTheftPoliceStatementData = () => {
     if (!mistakes?.avoid?.length || mistakes.avoid.length < 4) errors.push(`Статья ${article.slug}: нет явного блока ошибок с крестиками`);
     const property = article.sections?.find((section) => section.id === "describe-property");
     if (!property?.bullets?.length) errors.push(`Статья ${article.slug}: нейтральные примеры имущества не отделены от положительных действий`);
+    const statement = article.sections?.find((section) => section.id === "statement-content");
+    if (statement?.paragraphs?.length !== 1 || statement?.afterChecklistParagraphs?.length !== 1) errors.push(`Статья ${article.slug}: порядок блока «Что написать» не совпадает с редактором`);
+    const registration = article.sections?.find((section) => section.id === "registration-control");
+    if (registration?.paragraphs?.length || registration?.afterChecklistParagraphs?.length !== 1) errors.push(`Статья ${article.slug}: порядок блока контроля после подачи не совпадает с редактором`);
     const softCtas = article.sections?.flatMap((section) => section.microCta ? [section.microCta] : []) || [];
     if (!softCtas.length || softCtas.some((cta) => cta.href !== `#${article.finalSection.id}`)) errors.push(`Статья ${article.slug}: промежуточный CTA должен вести только к финальному блоку`);
     if (article.finalSection.groups.some((group) => group.kind !== "check")) errors.push(`Статья ${article.slug}: финальные списки должны быть положительными действиями`);

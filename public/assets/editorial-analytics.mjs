@@ -141,7 +141,13 @@ if (publication) {
     link.addEventListener("click", () => track("publication_source_click", { source_host: new URL(link.href).hostname }));
   });
   document.querySelectorAll(".editorial-related a, .editorial-card a").forEach((link) => {
-    link.addEventListener("click", () => track("publication_related_click", { target_path: new URL(link.href, location.href).pathname }));
+    link.addEventListener("click", () => {
+      const targetPath = new URL(link.href, location.href).pathname;
+      track("publication_related_click", { target_path: targetPath });
+      if (targetPath.startsWith("/praktika/")) track("publication_case_click", { target_path: targetPath });
+      else if (targetPath.startsWith("/uslugi/")) track("publication_service_click", { target_path: targetPath });
+      else if (targetPath.startsWith("/razbory/")) track("publication_article_click", { target_path: targetPath });
+    });
   });
   document.querySelectorAll(".editorial-cta [data-dialog-open], .editorial-intake [data-dialog-open]").forEach((button) => {
     button.addEventListener("click", () => track("publication_messenger_intent", { topic: button.dataset.topic || "general" }));

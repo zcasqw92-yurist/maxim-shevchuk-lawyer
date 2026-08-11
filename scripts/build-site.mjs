@@ -35,7 +35,7 @@ await applyPublicationLinkingToDist({ root, services, articles, practiceCases })
    the replaced portrait accurately and expose its real intrinsic dimensions. */
 const homePath = join(dist, "index.html");
 const homeHtml = await readFile(homePath, "utf8");
-const heroImagePattern = /<img src="\/assets\/images\/maxim-hero\.webp" width="1536" height="1024" alt="[^"]*" fetchpriority="high" decoding="async">/;
+const heroImagePattern = /<img\b(?=[^>]*\bsrc="\/assets\/images\/maxim-hero\.webp")(?=[^>]*\bfetchpriority="high")[^>]*>/i;
 if (!heroImagePattern.test(homeHtml)) {
   throw new Error("Не найдено главное фото для обновления alt и intrinsic-размеров");
 }

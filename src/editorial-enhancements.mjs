@@ -163,13 +163,16 @@ export const injectEditorialEnhancements = (html, pathname, context = {}) => {
   if (article) {
     if (result.includes("data-editorial-helpfulness")) throw new Error(`Редакционные блоки уже добавлены: ${pathname}`);
 
-    if (!article.inlineFinalCta) {
-      result = injectBefore(
-        result,
-        '<section class="article-section" id="sources">',
-        articleIntake(article),
-        `${pathname}: перед источниками`,
-      );
+    const hasCanonicalFinal = Boolean(article.finalSection);
+    if (!article.inlineFinalCta || hasCanonicalFinal) {
+      if (!hasCanonicalFinal) {
+        result = injectBefore(
+          result,
+          '<section class="article-section" id="sources">',
+          articleIntake(article),
+          `${pathname}: перед источниками`,
+        );
+      }
       result = injectBeforePattern(
         result,
         /<div class="wrap">\s*<section class="editorial-cta"/,

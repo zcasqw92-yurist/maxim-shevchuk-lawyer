@@ -52,23 +52,32 @@ const finalListClass = (kind) => {
 
 const renderFinalSection = (section) => {
   if (!section?.id || !section?.title) return "";
-  const groups = (section.groups || []).map((group) => `
-    <div class="editorial-final-group">
-      <h3>${esc(group.title)}</h3>
-      <ul class="${finalListClass(group.kind)}">${(group.items || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
-    </div>`).join("");
+  const [primaryGroup, ...sideGroups] = section.groups || [];
   const paragraphs = (section.paragraphs || []).map((paragraph) => `<p>${esc(paragraph)}</p>`).join("");
+  const primary = primaryGroup
+    ? `<h3>${esc(primaryGroup.title)}</h3><ul class="${finalListClass(primaryGroup.kind)}">${(primaryGroup.items || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`
+    : "";
   const benefit = section.benefit ? `<p>${esc(section.benefit)}</p>` : "";
+  const side = sideGroups.map((group) => `
+      <strong>${esc(group.title)}</strong>
+      <ul class="${finalListClass(group.kind)}">${(group.items || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`).join("");
   const button = section.buttonLabel && section.topic
-    ? `<div class="editorial-inline-cta"><button class="button button--gold" type="button" data-dialog-open data-topic="${esc(section.topic)}">${esc(section.buttonLabel)}</button></div>`
+    ? `<button class="button button--gold" type="button" data-dialog-open data-topic="${esc(section.topic)}">${esc(section.buttonLabel)}</button>`
     : "";
   return `
-  <section class="article-section editorial-final-conversion" id="${esc(section.id)}" data-article-section="${esc(section.id)}">
-    <h2 style="overflow-wrap:anywhere">${esc(section.title)}</h2>
-    ${paragraphs}
-    ${groups}
-    ${benefit}
-    ${button}
+  <section class="article-section editorial-intake editorial-final-conversion" id="${esc(section.id)}" data-article-section="${esc(section.id)}">
+    <div class="editorial-intake__grid">
+      <div>
+        <h2 style="overflow-wrap:anywhere">${esc(section.title)}</h2>
+        ${paragraphs}
+        ${primary}
+        ${benefit}
+      </div>
+      <aside class="editorial-intake__questions">
+        ${side}
+        ${button}
+      </aside>
+    </div>
   </section>`;
 };
 
@@ -99,7 +108,7 @@ const applyExtendedArticleBlocks = (page, article) => {
     );
   }
 
-  if (article.inlineFinalCta) {
+  if (article.inlineFinalCta && !article.finalSection) {
     content = content.replace(
       /\s*<div class="wrap">\s*<section class="editorial-cta"[\s\S]*?<\/section>\s*<\/div>\s*$/,
       "\n",

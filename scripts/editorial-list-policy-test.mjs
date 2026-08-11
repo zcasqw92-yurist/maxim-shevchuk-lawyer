@@ -5,6 +5,9 @@ import { articles } from "../src/editorial-data.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const renderer = await readFile(join(root, "src", "editorial-render-base.mjs"), "utf8");
+const extendedRenderer = await readFile(join(root, "src", "editorial-render.mjs"), "utf8");
+const enhancements = await readFile(join(root, "src", "editorial-enhancements.mjs"), "utf8");
+const linking = await readFile(join(root, "src", "publication-linking.mjs"), "utf8");
 const styles = await readFile(join(root, "src", "editorial-semantic-lists.css"), "utf8");
 const rhythm = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 const errors = [];
@@ -54,6 +57,20 @@ for (const articleId of policyIds) {
   }
 }
 
+const theftArticle = articles.find((item) => item.id === "theft-police-statement");
+if (theftArticle) {
+  const final = theftArticle.finalSection;
+  if (!final?.id || !final?.title) errors.push(`${theftArticle.slug}: отсутствует тематический якорный блок перед связанными материалами`);
+  if (!Array.isArray(final?.groups) || final.groups.length < 2) errors.push(`${theftArticle.slug}: финальный блок должен иметь две смысловые колонки`);
+  for (const [index, group] of (final?.groups || []).entries()) {
+    if (!group?.title || !Array.isArray(group.items) || !group.items.length) errors.push(`${theftArticle.slug}: колонка ${index + 1} финального блока не заполнена`);
+  }
+  if (!final?.buttonLabel || !final?.topic) errors.push(`${theftArticle.slug}: в тематическом блоке отсутствует рабочая кнопка связи`);
+  const target = final?.id ? `#${final.id}` : "";
+  const microCtas = (theftArticle.sections || []).flatMap((section) => section.microCta ? [section.microCta] : []);
+  if (!microCtas.length || microCtas.some((cta) => cta.href !== target)) errors.push(`${theftArticle.slug}: мягкие CTA должны вести в тематический двухколоночный блок`);
+}
+
 for (const marker of [
   'semanticList(section.avoid, "cross")',
   'semanticList(section.bullets, "dot")',
@@ -61,6 +78,28 @@ for (const marker of [
   'class="editorial-micro-cta"',
 ]) {
   if (!renderer.includes(marker)) errors.push(`renderer: отсутствует обязательный контракт ${marker}`);
+}
+
+for (const marker of [
+  'class="article-section editorial-intake editorial-final-conversion"',
+  'article.inlineFinalCta && !article.finalSection',
+]) {
+  if (!extendedRenderer.includes(marker)) errors.push(`editorial-render.mjs: отсутствует контракт канонического финального блока: ${marker}`);
+}
+
+for (const marker of [
+  'const hasCanonicalFinal = Boolean(article.finalSection);',
+  '!article.inlineFinalCta || hasCanonicalFinal',
+  '`${pathname}: перед итоговым CTA`',
+]) {
+  if (!enhancements.includes(marker)) errors.push(`editorial-enhancements.mjs: нарушен порядок финальных блоков: ${marker}`);
+}
+
+for (const marker of [
+  'Другие материалы по этому направлению',
+  "insertBefore(html, '<aside class=\"editorial-author\"'",
+]) {
+  if (!linking.includes(marker)) errors.push(`publication-linking.mjs: нарушен контракт связанных материалов перед карточкой автора: ${marker}`);
 }
 
 for (const marker of [
@@ -94,8 +133,8 @@ if (/^\s*\.article-page\s+\.editorial-body\s*>\s*\.article-section\s*\{[^}]*var\
 }
 
 if (errors.length) {
-  console.error(["Проверка смысловых маркеров и ритма C-139/C-170 не пройдена:", ...errors.map((item) => `- ${item}`)].join("\n"));
+  console.error(["Проверка смысловых маркеров, ритма и финальной сборки C-139/C-170 не пройдена:", ...errors.map((item) => `- ${item}`)].join("\n"));
   process.exit(1);
 }
 
-console.log("Editorial list policy passed: C-139 and C-170 use the approved semantic markers and compact rhythm; earlier articles keep their previous presentation");
+console.log("Editorial policy passed: C-139/C-170 keep semantic markers and canonical endflow: themed intake -> related materials -> author -> helpfulness -> final CTA");

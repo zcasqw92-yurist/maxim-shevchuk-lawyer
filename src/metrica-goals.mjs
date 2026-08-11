@@ -27,6 +27,9 @@ export const metricaActionGoals = Object.freeze([
   { event: "publication_faq_open", name: "Публикация: открыл FAQ", favorite: false, role: "content" },
   { event: "publication_source_click", name: "Публикация: открыл источник", favorite: false, role: "content_diagnostic" },
   { event: "publication_related_click", name: "Публикация: перешёл к связанному материалу", favorite: false, role: "content" },
+  { event: "publication_case_click", name: "Публикация: перешёл к кейсу", favorite: false, role: "content_diagnostic" },
+  { event: "publication_service_click", name: "Публикация: перешёл к услуге", favorite: false, role: "content_funnel" },
+  { event: "publication_article_click", name: "Публикация: перешёл к другой статье", favorite: false, role: "content_diagnostic" },
   { event: "publication_messenger_intent", name: "Публикация: намерение написать юристу", favorite: false, role: "content_funnel" },
   { event: "publication_helpfulness", name: "Публикация: оценка полезности", favorite: false, role: "content" },
 

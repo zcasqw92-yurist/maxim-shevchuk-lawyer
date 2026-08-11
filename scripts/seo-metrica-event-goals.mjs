@@ -146,6 +146,9 @@ for (const page of trackedPages) {
   page.faq_open = asNumber(behavior.publication_faq_open);
   page.source_click = asNumber(behavior.publication_source_click);
   page.related_click = asNumber(behavior.publication_related_click);
+  page.case_click = asNumber(behavior.publication_case_click);
+  page.service_click = asNumber(behavior.publication_service_click);
+  page.article_click = asNumber(behavior.publication_article_click);
   page.messenger_intent = asNumber(behavior.publication_messenger_intent);
   page.helpfulness = asNumber(behavior.publication_helpfulness);
   page.cta_view = asNumber(behavior.cta_view);
@@ -195,6 +198,7 @@ report.rules = {
   metrica_goal_count_uses_action_goal_events: true,
   publication_scroll_scope_from_2026_08_11: "publication",
   publication_scroll_measurement_version: 2,
+  related_clicks_split_by_destination: true,
   chat_transition_definition: "contact_telegram + contact_whatsapp",
   contact_conversion_definition: "all configured contact channels",
   decisions_require_behavior_and_search_context: true,
@@ -211,7 +215,8 @@ const headers = [
   "Скролл 25%", "Скролл 50%", "Скролл 75%", "Скролл 90%", "Дочитал публикацию 100%",
   "Активное чтение 30с", "Активное чтение 60с", "Активное чтение 120с",
   "Просмотры смысловых блоков", "Клики по оглавлению", "Открытия FAQ", "Клики по источникам", "Клики по связанным материалам",
-  "Намерение написать", "Оценки полезности", "Просмотры CTA", "Клики CTA", "Открытия выбора мессенджера", "Все кнопочные действия",
+  "Клики по кейсам", "Клики по услугам", "Клики по статьям", "Намерение написать", "Оценки полезности",
+  "Просмотры CTA", "Клики CTA", "Открытия выбора мессенджера", "Все кнопочные действия",
   "Telegram", "WhatsApp", "Переходы в чат", "Телефон", "Email", "Карта", "Все переходы к контакту",
   "Конверсия в чат", "Конверсия в контакт", "Атрибуция Метрики", "Решение",
 ];
@@ -228,7 +233,8 @@ const rows = trackedPages.map((page) => [
   page.scroll_25, page.scroll_50, page.scroll_75, page.scroll_90, page.scroll_100,
   page.active_30s, page.active_60s, page.active_120s,
   page.section_view, page.toc_click, page.faq_open, page.source_click, page.related_click,
-  page.messenger_intent, page.helpfulness, page.cta_view, page.cta_click, page.messenger_dialog_open, page.button_action,
+  page.case_click, page.service_click, page.article_click, page.messenger_intent, page.helpfulness,
+  page.cta_view, page.cta_click, page.messenger_dialog_open, page.button_action,
   page.telegram, page.whatsapp, page.chat_transitions, page.phone, page.email, page.map, page.contact_conversion,
   page.conversion_to_chat, page.conversion_to_contact,
   `${page.metrica_page_attribution}; цели: ${page.metrica_goal_attribution}`,

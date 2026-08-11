@@ -12,7 +12,7 @@ const workflow = await readFile(join(root, ".github", "workflows", "seo-data-pip
 
 assert.ok(script.includes('dimensions: "ym:ep:eventURLPath,ym:ep:actionGoal"'), "URL и цель должны группироваться в одном event-отчёте");
 assert.ok(script.includes('metrics: "ym:ep:eventsNumber"'), "Счётчик должен использовать совместимую event-метрику");
-assert.ok(!script.includes("ym:ev:goal"), "Нельзя смешивать event URL и visit goal metric");
+assert.ok(!script.includes("ym:ev:goal"), "Нельзя смешивать event URL и visit goal metric в точном событийном отчёте");
 assert.ok(script.includes("event_url_action_goal"), "Отчёт должен явно фиксировать точную атрибуцию цели");
 assert.ok(script.includes("diagnostic_goal_events"), "Расширенные диагностические события должны добавляться к базовой выборке");
 for (const marker of [
@@ -23,6 +23,12 @@ for (const marker of [
   "page.chat_transitions = page.telegram + page.whatsapp",
   "page.conversion_to_chat",
   "page.conversion_to_contact",
+  "page.organic_entrance_visits",
+  "page.organic_contact_reaches",
+  "page.organic_contact_conversion",
+  'dimensions: "ym:s:startURLPath"',
+  'filters: "ym:s:trafficSource==\'organic\'"',
+  'organic_conversion_attribution: contactGoal?.id ? "organic_landing_page_session" : "unavailable"',
   'related_clicks_split_by_destination: true',
   'chat_transition_definition: "contact_telegram + contact_whatsapp"',
   'publication_scroll_measurement_version: 2',
@@ -54,4 +60,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("Metrica event-goal attribution contract passed: full diagnostics, related destination split, exact page attribution and separate chat/contact conversions are enforced");
+console.log("Metrica event-goal attribution contract passed: full diagnostics, related destination split, organic landing attribution and separate chat/contact conversions are enforced");

@@ -80,19 +80,27 @@
   .home .identity-card {
     right: 10px;
     bottom: 10px;
-    width: min(210px, 50%);
-    padding: 13px 15px;
+    width: min(205px, 58%);
+    padding: 10px 12px;
   }
 
   .home .identity-card strong {
-    margin: 5px 0;
-    font-size: clamp(14px, 4vw, 16px);
+    margin: 4px 0;
+    font-size: .875rem;
     line-height: 1.08;
   }
 
   .home .identity-card span,
   .home .identity-card small {
-    font-size: 7px;
-    line-height: 1.3;
+    font-size: .75rem;
+    line-height: 1.25;
+  }
+
+  .home .identity-card span {
+    letter-spacing: .08em;
+  }
+
+  .home .identity-card small {
+    letter-spacing: 0;
   }
 }

@@ -54,7 +54,23 @@
       "contact_action",
       "contact_phone",
       "contact_email",
-      "contact_map"
+      "contact_map",
+      "web_vital",
+      "video_placeholder_open",
+      "video_ready",
+      "video_play",
+      "video_progress",
+      "video_complete",
+      "video_placeholder_unavailable",
+      "video_load_error",
+      "video_placeholder_close",
+      "video_placeholder_contact",
+      "document_sample_open",
+      "document_sample_close",
+      "document_sample_contact",
+      "case_details_open",
+      "education_proof_open",
+      "office_map_load"
     ]
   },
   "feedback_clusters": [

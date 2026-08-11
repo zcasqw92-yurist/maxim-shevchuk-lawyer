@@ -14,7 +14,17 @@ assert.ok(script.includes('dimensions: "ym:ep:eventURLPath,ym:ep:actionGoal"'), 
 assert.ok(script.includes('metrics: "ym:ep:eventsNumber"'), "Счётчик должен использовать совместимую event-метрику");
 assert.ok(!script.includes("ym:ev:goal"), "Нельзя смешивать event URL и visit goal metric");
 assert.ok(script.includes("event_url_action_goal"), "Отчёт должен явно фиксировать точную атрибуцию цели");
+assert.ok(script.includes("diagnostic_goal_events"), "Расширенные диагностические события должны добавляться к базовой выборке");
+for (const marker of [
+  "page.scroll_25", "page.scroll_75", "page.scroll_100",
+  "page.active_30s", "page.active_120s", "page.helpfulness",
+  "page.phone", "page.email", "page.map",
+  'publication_scroll_measurement_version: 2',
+]) {
+  assert.ok(script.includes(marker), `Расширенный отчёт должен содержать ${marker}`);
+}
 assert.match(workflow, /seo-feedback-enrichment\.mjs[\s\S]*seo-metrica-event-goals\.mjs/, "Точная атрибуция должна выполняться после базового обогащения");
+assert.match(workflow, /metrica-finalize\.mjs[\s\S]*seo-feedback-pipeline\.mjs/, "Цели Метрики должны быть синхронизированы до сбора feedback");
 
 const syntax = spawnSync(process.execPath, ["--check", scriptPath], { cwd: root, encoding: "utf8" });
 assert.equal(syntax.status, 0, `Скрипт должен быть синтаксически корректным: ${syntax.stderr}`);
@@ -38,4 +48,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("Metrica event-goal attribution contract passed: compatible event dimensions and metrics are enforced");
+console.log("Metrica event-goal attribution contract passed: complete diagnostic event set and exact page attribution are enforced");

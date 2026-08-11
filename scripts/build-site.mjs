@@ -36,15 +36,17 @@ await applyPublicationLinkingToDist({ root, services, articles, practiceCases })
 const homePath = join(dist, "index.html");
 const homeHtml = await readFile(homePath, "utf8");
 const heroImagePattern = /<img\b(?=[^>]*\bsrc="\/assets\/images\/maxim-hero\.webp")(?=[^>]*\bfetchpriority="high")[^>]*>/i;
-if (!heroImagePattern.test(homeHtml)) {
+const heroImageMatch = homeHtml.match(heroImagePattern);
+if (!heroImageMatch) {
   throw new Error("Не найдено главное фото для обновления alt и intrinsic-размеров");
 }
+const updatedHeroImage = heroImageMatch[0]
+  .replace(/\bwidth="\d+"/i, 'width="1024"')
+  .replace(/\bheight="\d+"/i, 'height="1024"')
+  .replace(/\balt="[^"]*"/i, 'alt="Юрист Максим Юрьевич Шевчук"');
 await writeFile(
   homePath,
-  homeHtml.replace(
-    heroImagePattern,
-    '<img src="/assets/images/maxim-hero.webp" width="1024" height="1024" alt="Юрист Максим Юрьевич Шевчук" fetchpriority="high" decoding="async">',
-  ),
+  homeHtml.replace(heroImagePattern, updatedHeroImage),
   "utf8",
 );
 

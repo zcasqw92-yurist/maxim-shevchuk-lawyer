@@ -18,10 +18,12 @@ assert.ok(script.includes("diagnostic_goal_events"), "Расширенные д�
 for (const marker of [
   "page.scroll_25", "page.scroll_75", "page.scroll_100",
   "page.active_30s", "page.active_120s", "page.helpfulness",
+  "page.case_click", "page.service_click", "page.article_click",
   "page.phone", "page.email", "page.map",
   "page.chat_transitions = page.telegram + page.whatsapp",
   "page.conversion_to_chat",
   "page.conversion_to_contact",
+  'related_clicks_split_by_destination: true',
   'chat_transition_definition: "contact_telegram + contact_whatsapp"',
   'publication_scroll_measurement_version: 2',
 ]) {
@@ -52,4 +54,4 @@ try {
   await rm(stateDir, { recursive: true, force: true });
 }
 
-console.log("Metrica event-goal attribution contract passed: complete diagnostic set, exact page attribution and separate chat/contact conversions are enforced");
+console.log("Metrica event-goal attribution contract passed: full diagnostics, related destination split, exact page attribution and separate chat/contact conversions are enforced");

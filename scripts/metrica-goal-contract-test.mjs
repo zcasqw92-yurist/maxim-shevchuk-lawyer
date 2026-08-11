@@ -16,6 +16,8 @@ const sources = {
   channel: await readFile(join(root, "public", "assets", "channel-analytics.mjs"), "utf8"),
   button: await readFile(join(root, "public", "assets", "button-analytics.mjs"), "utf8"),
   editorial: await readFile(join(root, "public", "assets", "editorial-analytics.mjs"), "utf8"),
+  visual: await readFile(join(root, "src", "visual-trust.js"), "utf8"),
+  webvitals: await readFile(join(root, "public", "assets", "web-vitals.js"), "utf8"),
 };
 
 const eventSources = new Map([
@@ -31,6 +33,7 @@ const eventSources = new Map([
   ["contact_phone", ["channel"]],
   ["contact_email", ["channel"]],
   ["contact_map", ["channel"]],
+  ["web_vital", ["webvitals"]],
 ]);
 
 const editorialEventImplemented = (event) => {
@@ -50,21 +53,21 @@ const editorialEventImplemented = (event) => {
   return false;
 };
 
+const visualEventImplemented = (event) => sources.visual.includes(`proofTrack("${event}"`);
+
 for (const goal of metricaActionGoals) {
   if (!goal.event || !goal.name || typeof goal.favorite !== "boolean" || !goal.role) {
     errors.push(`Некорректное описание action-цели: ${JSON.stringify(goal)}`);
     continue;
   }
   const expectedSources = eventSources.get(goal.event)
-    || (goal.event.startsWith("publication_") ? ["editorial"] : []);
-  if (!expectedSources.length) {
-    errors.push(`${goal.event}: не определён источник события`);
-    continue;
-  }
-  const implemented = goal.event.startsWith("publication_")
-    ? editorialEventImplemented(goal.event)
-    : expectedSources.some((source) => sources[source].includes(goal.event));
-  if (!implemented) errors.push(`${goal.event}: событие отсутствует в ожидаемом клиентском модуле ${expectedSources.join(", ")}`);
+    || (goal.event.startsWith("publication_") ? ["editorial"] : [])
+    || (visualEventImplemented(goal.event) ? ["visual"] : []);
+  let implemented = false;
+  if (goal.event.startsWith("publication_")) implemented = editorialEventImplemented(goal.event);
+  else if (visualEventImplemented(goal.event)) implemented = true;
+  else implemented = expectedSources.some((source) => sources[source]?.includes(goal.event));
+  if (!implemented) errors.push(`${goal.event}: событие отсутствует в ожидаемом клиентском модуле ${expectedSources.join(", ") || "не определён"}`);
 }
 
 const actionEvents = new Set(metricaActionGoals.map((goal) => goal.event));
@@ -72,6 +75,17 @@ if (actionEvents.size !== metricaActionGoals.length) errors.push("В модел�
 const primary = metricaActionGoals.filter((goal) => goal.favorite);
 if (primary.length !== 1 || primary[0].event !== "contact_conversion") {
   errors.push("Единственной избранной целью должна быть contact_conversion");
+}
+
+for (const emitted of [...sources.visual.matchAll(/proofTrack\("([a-z0-9_]+)"/g)].map((match) => match[1])) {
+  if (!actionEvents.has(emitted)) errors.push(`${emitted}: visual-trust отправляет событие, но оно не зарегистрировано в модели Метрики`);
+}
+for (const event of [
+  "publication_scroll_25", "publication_scroll_50", "publication_scroll_75", "publication_scroll_90", "publication_scroll_100",
+  "publication_active_30s", "publication_active_60s", "publication_active_120s",
+  "web_vital",
+]) {
+  if (!actionEvents.has(event)) errors.push(`${event}: обязательное диагностическое событие отсутствует в модели Метрики`);
 }
 
 for (const funnel of metricaCompositeGoals) {
@@ -96,4 +110,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Metrica goal contract passed: ${metricaActionGoals.length} action goals, ${metricaCompositeGoals.length} funnels, ${metricaObsoleteGoals.length} controlled obsolete goals`);
+console.log(`Metrica goal contract passed: ${metricaActionGoals.length} action goals, ${metricaCompositeGoals.length} funnels, all emitted trust/content/performance events are registered`);

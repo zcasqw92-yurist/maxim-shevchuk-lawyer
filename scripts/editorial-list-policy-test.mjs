@@ -114,6 +114,8 @@ for (const marker of [
   'content: "×"',
   'content: "•"',
   'content: "—"',
+  '.editorial-intake__questions :is(.editorial-checklist, .editorial-list) li',
+  'color: var(--text-on-dark-strong)',
 ]) {
   if (!styles.includes(marker)) errors.push(`editorial-semantic-lists.css: отсутствует обязательный контракт ${marker}`);
 }
@@ -137,4 +139,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial policy passed: C-139/C-170 keep semantic markers and canonical endflow: themed intake -> related materials -> author -> helpfulness -> final CTA");
+console.log("Editorial policy passed: C-139/C-170 keep semantic markers, readable dark-panel contrast and canonical endflow: themed intake -> related materials -> author -> helpfulness -> final CTA");

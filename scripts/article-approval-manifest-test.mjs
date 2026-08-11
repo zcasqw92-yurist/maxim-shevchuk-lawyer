@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { fingerprintArticleEditorRows } from "./article-editor-fingerprint.mjs";
@@ -16,6 +16,22 @@ const sourceModules = new Set(
   [...registry.matchAll(/from\s+"\.\/([^"\n]+\.mjs)"/g)]
     .map((match) => `src/${match[1]}`),
 );
+
+// Некоторые опубликованные статьи подключаются через data-wrapper, а фактический
+// утверждённый текст живёт в соседнем *-source.mjs. Такой источник также должен
+// быть защищён manifest gate, иначе body можно изменить в обход snapshot редактора.
+for (const wrapper of [...sourceModules]) {
+  try {
+    const wrapperText = await readFile(join(root, wrapper), "utf8");
+    for (const match of wrapperText.matchAll(/from\s+"(\.\/[^"\n]+\.mjs)"/g)) {
+      const nested = relative(root, resolve(dirname(join(root, wrapper)), match[1])).replaceAll("\\", "/");
+      if (nested.startsWith("src/") && nested.endsWith("-source.mjs")) sourceModules.add(nested);
+    }
+  } catch {
+    // Не каждый импорт registry обязан быть article-wrapper; остальные контракты
+    // проверят существование модулей. Здесь важна только дополнительная защита source.
+  }
+}
 
 const manifestFiles = (await readdir(manifestsDir))
   .filter((name) => name.endsWith(".json") && name !== "template.json")
@@ -83,6 +99,6 @@ if (errors.length) {
 }
 
 const enforcement = baseSha
-  ? "changed editorial source modules are approval-manifest gated with shallow-safe tree diff"
+  ? "changed editorial source modules (including nested *-source.mjs bodies) are approval-manifest gated with shallow-safe tree diff"
   : "manifest structure validated; changed-file enforcement awaits CONTENT_GOVERNANCE_BASE_SHA";
 console.log(`Article approval manifest contract passed: ${enforcement}`);

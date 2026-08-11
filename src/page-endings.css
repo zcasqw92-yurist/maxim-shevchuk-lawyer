@@ -64,11 +64,35 @@
     padding-block: 40px;
   }
 
+  /* Keep almost the full square portrait visible on phones instead of
+     cropping the torso into a short landscape frame. */
   .home .hero__image-wrap {
-    height: clamp(330px, 105vw, 410px);
+    height: auto;
+    aspect-ratio: 1 / 1.04;
   }
 
   .home .hero__image-wrap img {
-    object-position: center 43%;
+    height: 100%;
+    object-position: center center;
+  }
+
+  /* The identity plate must support the portrait, not cover it. */
+  .home .identity-card {
+    right: 10px;
+    bottom: 10px;
+    width: min(210px, 50%);
+    padding: 13px 15px;
+  }
+
+  .home .identity-card strong {
+    margin: 5px 0;
+    font-size: clamp(14px, 4vw, 16px);
+    line-height: 1.08;
+  }
+
+  .home .identity-card span,
+  .home .identity-card small {
+    font-size: 7px;
+    line-height: 1.3;
   }
 }

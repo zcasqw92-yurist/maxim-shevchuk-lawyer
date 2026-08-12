@@ -117,3 +117,5 @@ if (!exception && !statisticsReuse) {
     await unlink(runtimePath).catch(() => {});
   }
 }
+
+await import("./search-quality-ai-gate-test.mjs");

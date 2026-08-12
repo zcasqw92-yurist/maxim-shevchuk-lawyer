@@ -15,7 +15,10 @@ const exists = async (path) => {
   }
 };
 const nonEmpty = (value) => typeof value === "string" && value.trim().length > 0;
+const nonEmptyArray = (value) => Array.isArray(value) && value.length > 0;
 const unique = (values) => [...new Set(values)];
+const placeholderPattern = /\b(?:replace|todo|tbd|placeholder)\b|заменить|заполнить|пример/iu;
+const hasPlaceholder = (value) => nonEmpty(value) && placeholderPattern.test(value);
 const globToRegExp = (pattern) => {
   const token = "__DOUBLE_STAR__";
   const escaped = pattern
@@ -27,6 +30,17 @@ const globToRegExp = (pattern) => {
 };
 const matchesAny = (path, patterns) => patterns.some((pattern) => globToRegExp(pattern).test(path));
 const git = (args) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+const requireString = (value, label) => {
+  if (!nonEmpty(value)) errors.push(`${label} is empty`);
+  else if (hasPlaceholder(value)) errors.push(`${label} contains a placeholder`);
+};
+const requireStringArray = (value, label, minimum = 1) => {
+  if (!Array.isArray(value) || value.length < minimum) {
+    errors.push(`${label} must contain at least ${minimum} item(s)`);
+    return;
+  }
+  value.forEach((item, index) => requireString(item, `${label}[${index}]`));
+};
 
 const [gateText, governanceText, docText, reviewTemplateText] = await Promise.all([
   read("config/search-quality-ai-gate.json"),
@@ -136,22 +150,40 @@ const validateReview = (review, label) => {
     if (review[key] !== true) errors.push(`${label}: ${key} must be true`);
   }
 
+  requireString(review.ownerIntentEvidence?.preflightId, `${label}: ownerIntentEvidence.preflightId`);
+  requireString(review.ownerIntentEvidence?.ownerUrl, `${label}: ownerIntentEvidence.ownerUrl`);
+  requireString(review.ownerIntentEvidence?.rootQuery, `${label}: ownerIntentEvidence.rootQuery`);
+  requireString(review.directAnswerEvidence?.title, `${label}: directAnswerEvidence.title`);
+  requireString(review.directAnswerEvidence?.h1, `${label}: directAnswerEvidence.h1`);
+  requireString(review.directAnswerEvidence?.shortAnswer, `${label}: directAnswerEvidence.shortAnswer`);
+
   const questions = review.supportingQuestions;
   if (!Array.isArray(questions) || questions.length < 2) {
     errors.push(`${label}: at least two supportingQuestions are required`);
   } else {
     questions.forEach((item, index) => {
-      if (!nonEmpty(item?.question)) errors.push(`${label}: supportingQuestions[${index}].question is empty`);
-      if (!nonEmpty(item?.target)) errors.push(`${label}: supportingQuestions[${index}].target is empty`);
+      requireString(item?.question, `${label}: supportingQuestions[${index}].question`);
+      requireString(item?.target, `${label}: supportingQuestions[${index}].target`);
       if (item?.inOwnerIntent !== true) errors.push(`${label}: supportingQuestions[${index}] leaves the owner intent`);
       if (item?.directAnswerPlanned !== true) errors.push(`${label}: supportingQuestions[${index}] has no direct answer plan`);
     });
   }
 
+  requireStringArray(review.materialH2Evidence, `${label}: materialH2Evidence`);
+  requireStringArray(review.legalSourceIds, `${label}: legalSourceIds`);
+  if (review.practiceClaimsUsed === true) requireStringArray(review.practiceSourceIds, `${label}: practiceSourceIds`);
+  if (review.practiceClaimsUsed !== true && review.practiceClaimsUsed !== false) errors.push(`${label}: practiceClaimsUsed must be a boolean`);
+
+  requireString(review.clusterEvidence?.clusterCenterUrl, `${label}: clusterEvidence.clusterCenterUrl`);
+  requireStringArray(review.clusterEvidence?.excludedQueries, `${label}: clusterEvidence.excludedQueries`);
+  if (!Array.isArray(review.clusterEvidence?.relatedOwnerUrls)) errors.push(`${label}: clusterEvidence.relatedOwnerUrls must be an array`);
+  else review.clusterEvidence.relatedOwnerUrls.forEach((item, index) => requireString(item, `${label}: clusterEvidence.relatedOwnerUrls[${index}]`));
+
   const eligibility = review.searchEligibility || {};
   for (const key of ["indexable", "canonical", "mobileParity", "normalSnippetEligible"]) {
     if (eligibility[key] !== true) errors.push(`${label}: searchEligibility.${key} must be true`);
   }
+  requireString(eligibility.canonicalUrl, `${label}: searchEligibility.canonicalUrl`);
   if (eligibility.structuredDataTreatedAsRankingBoost !== false) errors.push(`${label}: structured data cannot be treated as a ranking boost`);
   if (eligibility.specialAiSchemaOrLlmsTxtRequired !== false) errors.push(`${label}: special AI schema/llms.txt cannot be required`);
 
@@ -179,7 +211,36 @@ const validateReview = (review, label) => {
   if (plan?.majorRewriteRequiresMeaningfulEvidence !== true) errors.push(`${label}: major rewrites must require meaningful evidence`);
 };
 
-if (reviewTemplate) validateReview(reviewTemplate, "Search/AI review template");
+const validateSafeTemplate = (template) => {
+  const label = "Search/AI review template";
+  if (!template || typeof template !== "object") {
+    errors.push(`${label}: template is missing`);
+    return;
+  }
+  if (template.status !== "blocked" || template.passed !== false) errors.push(`${label}: template must be blocked by default`);
+  for (const key of [
+    "ownerIntentAligned",
+    "titleH1LeadDirectAnswerAligned",
+    "allMaterialH2HaveDirectExtractableAnswer",
+    "materialLegalClaimsPrimaryOrOfficialSourcesChecked",
+    "practiceClaimsTraceable",
+    "workProcedureAndOutcomeSeparated",
+    "siteClusterFitAndCannibalizationChecked",
+  ]) {
+    if (template[key] !== false) errors.push(`${label}: ${key} must default to false`);
+  }
+  if (!Array.isArray(template.supportingQuestions) || template.supportingQuestions.length !== 0) errors.push(`${label}: supportingQuestions must start empty`);
+  if (!Array.isArray(template.materialH2Evidence) || template.materialH2Evidence.length !== 0) errors.push(`${label}: materialH2Evidence must start empty`);
+  if (!Array.isArray(template.legalSourceIds) || template.legalSourceIds.length !== 0) errors.push(`${label}: legalSourceIds must start empty`);
+  for (const key of ["indexable", "canonical", "mobileParity", "normalSnippetEligible"]) {
+    if (template.searchEligibility?.[key] !== false) errors.push(`${label}: searchEligibility.${key} must default to false`);
+  }
+  if (nonEmpty(template.ownerIntentEvidence?.preflightId) || nonEmpty(template.ownerIntentEvidence?.ownerUrl) || nonEmpty(template.ownerIntentEvidence?.rootQuery)) errors.push(`${label}: owner intent evidence must start empty`);
+  if (nonEmpty(template.searchEligibility?.canonicalUrl)) errors.push(`${label}: canonicalUrl must start empty`);
+  if (!Array.isArray(template.postPublishMeasurementPlan?.signals) || template.postPublishMeasurementPlan.signals.length !== 0) errors.push(`${label}: post-publish signals must start empty`);
+};
+
+if (reviewTemplate) validateSafeTemplate(reviewTemplate);
 
 let changedFiles = [];
 try {
@@ -217,8 +278,8 @@ if (governance && gate) {
 }
 
 if (errors.length) {
-  console.error("Search/AI quality gate failed:\n- " + errors.join("\n- "));
+  console.error("Search/AI quality gate failed:\n- " + [...new Set(errors)].join("\n- "));
   process.exit(1);
 }
 
-console.log("Search/AI quality gate passed.");
+console.log("Search/AI quality gate passed: template is blocked by default and governed article changes require evidence-backed review.");

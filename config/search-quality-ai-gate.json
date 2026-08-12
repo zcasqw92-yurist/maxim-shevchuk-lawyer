@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "ruleId": "search-quality-ai-gate-2026-08-12",
+  "scope": "new-or-materially-updated-articles",
+  "basis": {
+    "officialGoogleResearch": "authoritative-public-guidance",
+    "contentWarehouseLeak": "directional-evidence-only-no-known-weights",
+    "dojAndJudicialDisclosures": "system-behavior-evidence-no-ranking-recipe",
+    "rule": "Never convert leaked field names, internal system names or court disclosures into invented weights, formulas or manipulation recipes."
+  },
+  "requiredReview": {
+    "ownerIntentAligned": true,
+    "titleH1LeadDirectAnswerAligned": true,
+    "minimumBoundedSupportingQuestions": 2,
+    "allSupportingQuestionsInsideOwnerIntent": true,
+    "allMaterialH2HaveDirectExtractableAnswer": true,
+    "materialLegalClaimsCheckedAgainstPrimaryOrOfficialSources": true,
+    "practiceClaimsTraceableToInternalEvidence": true,
+    "workProcedureAndOutcomeSeparated": true,
+    "siteClusterFitAndCannibalizationChecked": true,
+    "normalSearchEligibilityChecked": true,
+    "materialFreshnessOnly": true,
+    "postPublishMeasurementPlanRequired": true
+  },
+  "searchEligibility": {
+    "requireIndexable": true,
+    "requireCanonical": true,
+    "requireMobileParity": true,
+    "requireNormalSnippetEligibility": true,
+    "structuredDataIsEligibilityNotRankingGuarantee": true,
+    "specialAiSchemaRequired": false,
+    "llmsTxtRequiredForGoogleAi": false
+  },
+  "prohibitions": {
+    "fixedKeywordDensityTarget": true,
+    "keywordStuffing": true,
+    "arbitraryFixedWordCountTarget": true,
+    "ctrOrClickManipulation": true,
+    "botsOrSyntheticUserBehavior": true,
+    "linkSchemes": true,
+    "fakeFreshnessOrDecorativeDateModified": true,
+    "genericScaledCommodityContent": true,
+    "schemaAsRankingBoostClaim": true,
+    "llmsTxtOrGeoTrickAsAiGuarantee": true,
+    "rawCtrAsSoleSuccessMetric": true,
+    "majorRewriteFromTinySample": true,
+    "inventedRankingWeightsFromLeak": true
+  },
+  "postPublishSignals": [
+    "queries",
+    "impressions",
+    "organicClicks",
+    "activeReading",
+    "helpfulness",
+    "contactIntent",
+    "contactConversion",
+    "qualifiedContactsOrPaidWork"
+  ],
+  "hardBlockers": [
+    "owner-intent-drift",
+    "title-h1-lead-direct-answer-drift",
+    "fan-out-outside-owner-intent",
+    "material-h2-without-direct-answer",
+    "material-legal-claim-without-primary-or-official-evidence",
+    "untraceable-practice-or-outcome-claim",
+    "cannibalization-unresolved",
+    "normal-search-eligibility-not-proven",
+    "keyword-density-or-stuffing-target",
+    "arbitrary-word-count-target",
+    "click-or-user-behavior-manipulation",
+    "link-scheme",
+    "fake-freshness",
+    "ai-ranking-guarantee-or-magic-schema-claim",
+    "invented-leak-weight-or-ranking-formula",
+    "major-rewrite-based-only-on-raw-ctr-or-tiny-sample"
+  ]
+}

@@ -168,6 +168,8 @@
     "site.config.mjs",
     "src/data.mjs",
     "src/service-content.mjs",
+    "src/*-data.mjs",
+    "src/*-source.mjs",
     "src/debt-cluster-data.mjs",
     "src/debt-cluster-data-legacy.mjs",
     "src/refund-services-cluster-data.mjs",

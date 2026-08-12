@@ -11,9 +11,23 @@ const origin = `http://127.0.0.1:${port}`;
 const requireBrowsers = process.env.CROSS_BROWSER_REQUIRED === "true";
 const errors = [];
 const skipped = [];
+
+// Every article is a publication-layout gate target. A future article enters this
+// matrix automatically as soon as it is added to the editorial registry.
 const routes = [
-  { kind: "article", path: `/razbory/${articles[0].slug}/`, container: ".editorial-body" },
-  { kind: "case", path: `/praktika/${practiceCases[0].slug}/`, container: ".editorial-case-main" },
+  ...articles.map((article) => ({
+    kind: "article",
+    id: article.id,
+    path: `/razbory/${article.slug}/`,
+    container: ".editorial-body",
+  })),
+  // Keep one case route as a regression sentinel for the shared editorial rhythm.
+  ...(practiceCases[0] ? [{
+    kind: "case",
+    id: practiceCases[0].id,
+    path: `/praktika/${practiceCases[0].slug}/`,
+    container: ".editorial-case-main",
+  }] : []),
 ];
 const viewports = [
   { width: 320, height: 844 },
@@ -21,6 +35,8 @@ const viewports = [
   { width: 768, height: 1024 },
   { width: 1440, height: 1000 },
 ];
+
+if (!articles.length) errors.push("Editorial rhythm contract: в реестре нет статей для layout gate");
 
 const rhythmCss = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 for (const token of ["--editorial-flow-xs", "--editorial-flow-sm", "--editorial-flow-md", "--editorial-flow-lg", "--editorial-flow-xl"]) {
@@ -59,8 +75,9 @@ const waitForLayout = (page) => page.evaluate(async () => {
 });
 
 const inspectRhythm = ({ containerSelector, kind }) => {
-  const resolveToken = (name) => {
-    const raw = getComputedStyle(document.body).getPropertyValue(name).trim();
+  const resolveCssLength = (element, name) => {
+    if (!element) return Number.NaN;
+    const raw = getComputedStyle(element).getPropertyValue(name).trim();
     const clamp = raw.match(/^clamp\(\s*([\d.]+)px\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)px\s*\)$/);
     if (clamp) {
       const minimum = Number(clamp[1]);
@@ -71,20 +88,29 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     const pixels = raw.match(/^([\d.]+)px$/);
     return pixels ? Number(pixels[1]) : Number.NaN;
   };
+
+  const pageRoot = document.querySelector(kind === "article" ? ".article-page" : ".case-page") || document.body;
+  const articleRoot = document.querySelector(".editorial-article");
   const flow = {
-    xs: resolveToken("--editorial-flow-xs"),
-    sm: resolveToken("--editorial-flow-sm"),
-    md: resolveToken("--editorial-flow-md"),
-    lg: resolveToken("--editorial-flow-lg"),
-    xl: resolveToken("--editorial-flow-xl"),
+    xs: resolveCssLength(pageRoot, "--editorial-flow-xs"),
+    sm: resolveCssLength(pageRoot, "--editorial-flow-sm"),
+    md: resolveCssLength(pageRoot, "--editorial-flow-md"),
+    lg: resolveCssLength(pageRoot, "--editorial-flow-lg"),
+    xl: resolveCssLength(pageRoot, "--editorial-flow-xl"),
+  };
+  const compact = {
+    space: resolveCssLength(articleRoot, "--editorial-c139-space"),
+    section: resolveCssLength(articleRoot, "--editorial-c139-section-space"),
   };
 
   const container = document.querySelector(containerSelector);
-  const children = [...container.children].filter((element) => {
+  if (!container) return { missingContainer: true, flow, compact };
+
+  const visible = (element) => {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
-    return rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
-  });
+    return rect.height > 0 && rect.width > 0 && style.display !== "none" && style.visibility !== "hidden";
+  };
   const label = (element) => {
     if (element.classList.contains("editorial-answer")) return "answer";
     if (element.classList.contains("editorial-author")) return "author";
@@ -94,12 +120,15 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     if (element.classList.contains("article-section")) return `section:${element.id || element.querySelector("h2")?.textContent.trim() || "none"}`;
     return element.className || element.tagName.toLowerCase();
   };
+
+  const children = [...container.children].filter(visible);
   const topLevel = children.map((element, index) => {
     const rect = element.getBoundingClientRect();
     const previous = children[index - 1];
     const previousRect = previous?.getBoundingClientRect();
     return {
       label: label(element),
+      isSection: element.classList.contains("article-section"),
       className: element.className,
       top: rect.top,
       bottom: rect.bottom,
@@ -107,7 +136,8 @@ const inspectRhythm = ({ containerSelector, kind }) => {
       previousLabel: previous ? label(previous) : null,
     };
   });
-  const headings = [...container.querySelectorAll(".article-section > h2")].map((heading) => {
+
+  const headings = [...container.querySelectorAll(".article-section > h2")].filter(visible).map((heading) => {
     const next = heading.nextElementSibling;
     const headingRect = heading.getBoundingClientRect();
     const nextRect = next?.getBoundingClientRect();
@@ -116,10 +146,69 @@ const inspectRhythm = ({ containerSelector, kind }) => {
       gapAfter: nextRect ? nextRect.top - headingRect.bottom : null,
     };
   });
-  const paragraphs = [...container.querySelectorAll(".article-section > p + p")].map((paragraph) => {
+
+  const paragraphs = [...container.querySelectorAll(".article-section > p + p")].filter(visible).map((paragraph) => {
     const previousRect = paragraph.previousElementSibling.getBoundingClientRect();
     const rect = paragraph.getBoundingClientRect();
     return { text: paragraph.textContent.trim().slice(0, 60), gapBefore: rect.top - previousRect.bottom };
+  });
+
+  const embeddedBlocks = [...container.querySelectorAll(
+    ".article-section > .editorial-options, .article-section > .editorial-note, .article-section > .editorial-micro-cta",
+  )].filter(visible).map((block) => {
+    const rect = block.getBoundingClientRect();
+    const previous = block.previousElementSibling;
+    const previousRect = previous?.getBoundingClientRect();
+    return {
+      className: block.className,
+      gapBefore: previousRect ? rect.top - previousRect.bottom : null,
+      left: rect.left,
+      right: rect.right,
+      width: rect.width,
+      clientWidth: block.clientWidth,
+      scrollWidth: block.scrollWidth,
+    };
+  });
+
+  const faqItems = [...container.querySelectorAll(".faq-list .faq-item")].filter(visible).map((item) => {
+    const rect = item.getBoundingClientRect();
+    return {
+      top: rect.top,
+      bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
+      width: rect.width,
+      clientWidth: item.clientWidth,
+      scrollWidth: item.scrollWidth,
+    };
+  });
+
+  const relatedBlocks = [...container.querySelectorAll(".editorial-related")].filter(visible).map((item) => {
+    const rect = item.getBoundingClientRect();
+    return {
+      top: rect.top,
+      bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
+      width: rect.width,
+      clientWidth: item.clientWidth,
+      scrollWidth: item.scrollWidth,
+    };
+  });
+
+  const directChildOverlaps = [...container.querySelectorAll(".article-section")].filter(visible).flatMap((section) => {
+    const blockChildren = [...section.children].filter(visible);
+    return blockChildren.slice(1).map((current, index) => {
+      const previous = blockChildren[index];
+      const previousRect = previous.getBoundingClientRect();
+      const currentRect = current.getBoundingClientRect();
+      return {
+        section: section.id || section.querySelector("h2")?.textContent.trim() || "none",
+        previous: previous.className || previous.tagName.toLowerCase(),
+        current: current.className || current.tagName.toLowerCase(),
+        gap: currentRect.top - previousRect.bottom,
+      };
+    });
   });
 
   const tailCandidates = kind === "case"
@@ -127,28 +216,43 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     : [children.at(-1)];
   const visibleTailBottoms = tailCandidates
     .filter(Boolean)
-    .map((element) => element.getBoundingClientRect())
-    .filter((rect) => rect.height > 0)
-    .map((rect) => rect.bottom);
+    .filter(visible)
+    .map((element) => element.getBoundingClientRect().bottom);
   const tailBottom = visibleTailBottoms.length ? Math.max(...visibleTailBottoms) : null;
   const helpfulness = document.querySelector("[data-editorial-helpfulness]");
   const cta = document.querySelector(".editorial-cta");
   const helpfulnessRect = helpfulness?.getBoundingClientRect();
   const ctaRect = cta?.getBoundingClientRect();
+
   return {
+    missingContainer: false,
     flow,
+    compact,
     topLevel,
     headings,
     paragraphs,
+    embeddedBlocks,
+    faqItems,
+    relatedBlocks,
+    directChildOverlaps,
     tailGap: tailBottom !== null && helpfulnessRect ? helpfulnessRect.top - tailBottom : null,
     ctaGap: helpfulnessRect && ctaRect ? ctaRect.top - helpfulnessRect.bottom : null,
-    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    overflow: Math.max(
+      document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      document.body.scrollWidth - innerWidth,
+    ),
+    viewportWidth: innerWidth,
+    containerBounds: (() => {
+      const rect = container.getBoundingClientRect();
+      return { left: rect.left, right: rect.right };
+    })(),
   };
 };
 
 const closeTo = (actual, expected, tolerance = 3) => Number.isFinite(actual)
   && Number.isFinite(expected)
   && Math.abs(actual - expected) <= tolerance;
+const finiteOr = (candidate, fallback) => Number.isFinite(candidate) ? candidate : fallback;
 
 try {
   for (const [engineName, engine] of [["Chromium", chromium], ["WebKit", webkit]]) {
@@ -179,36 +283,80 @@ try {
           await waitForLayout(page);
 
           const state = await page.evaluate(inspectRhythm, { containerSelector: route.container, kind: route.kind });
-          if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route.path}: ${state.overflow}px horizontal overflow`);
-          if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
+          const prefix = `${engineName} ${viewport.width}px ${route.path}`;
+          if (state.missingContainer) {
+            errors.push(`${prefix}: missing ${route.container}`);
+            await context.close();
+            continue;
           }
+          if (state.overflow > 1) errors.push(`${prefix}: ${state.overflow}px horizontal overflow`);
+          if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
+            errors.push(`${prefix}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
+          }
+
+          const compactSection = finiteOr(state.compact.section, Number.NaN);
+          const compactSpace = finiteOr(state.compact.space, Number.NaN);
+          const sectionGap = finiteOr(compactSection, state.flow.lg);
+          const headingGap = finiteOr(compactSpace, state.flow.sm);
+          const paragraphGap = finiteOr(compactSpace, state.flow.xs);
+          const embeddedGap = finiteOr(compactSpace, state.flow.sm);
+          const authorGap = finiteOr(compactSection, state.flow.xl);
+          const relatedPairGap = finiteOr(compactSection, state.flow.md);
 
           for (const item of state.topLevel.slice(1)) {
             let expected = state.flow.lg;
-            if (item.label === "author") expected = state.flow.xl;
+            if (item.isSection) expected = sectionGap;
+            if (item.label === "author") expected = authorGap;
             else if (item.previousLabel === "intake" && item.label === "message-guide") expected = state.flow.md;
-            else if (item.previousLabel?.startsWith("related:") && item.label.startsWith("related:")) expected = state.flow.md;
+            else if (item.previousLabel?.startsWith("related:") && item.label.startsWith("related:")) expected = relatedPairGap;
             if (!closeTo(item.gapBefore, expected)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong top-level gap ${JSON.stringify({ item, expected, flow: state.flow })}`);
+              errors.push(`${prefix}: wrong top-level gap ${JSON.stringify({ item, expected, flow: state.flow, compact: state.compact })}`);
             }
           }
 
           for (const heading of state.headings) {
-            if (!closeTo(heading.gapAfter, state.flow.sm)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong heading gap ${JSON.stringify({ heading, expected: state.flow.sm })}`);
+            if (!closeTo(heading.gapAfter, headingGap)) {
+              errors.push(`${prefix}: wrong heading gap ${JSON.stringify({ heading, expected: headingGap })}`);
             }
           }
           for (const paragraph of state.paragraphs) {
-            if (!closeTo(paragraph.gapBefore, state.flow.xs)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong paragraph gap ${JSON.stringify({ paragraph, expected: state.flow.xs })}`);
+            if (!closeTo(paragraph.gapBefore, paragraphGap)) {
+              errors.push(`${prefix}: wrong paragraph gap ${JSON.stringify({ paragraph, expected: paragraphGap })}`);
             }
           }
+
+          for (const block of state.embeddedBlocks) {
+            if (!Number.isFinite(block.gapBefore) || block.gapBefore < -1) {
+              errors.push(`${prefix}: embedded block overlaps previous content ${JSON.stringify(block)}`);
+            }
+            if (!closeTo(block.gapBefore, embeddedGap, 4)) {
+              errors.push(`${prefix}: wrong NOTE/options/micro-CTA gap ${JSON.stringify({ block, expected: embeddedGap })}`);
+            }
+            if (block.scrollWidth - block.clientWidth > 1) {
+              errors.push(`${prefix}: embedded block has internal horizontal overflow ${JSON.stringify(block)}`);
+            }
+          }
+
+          for (const overlap of state.directChildOverlaps) {
+            if (overlap.gap < -1) errors.push(`${prefix}: article block overlap ${JSON.stringify(overlap)}`);
+          }
+
+          for (const [kind, blocks] of [["FAQ", state.faqItems], ["RELATED", state.relatedBlocks]]) {
+            for (const block of blocks) {
+              if (block.scrollWidth - block.clientWidth > 1) {
+                errors.push(`${prefix}: ${kind} block has internal horizontal overflow ${JSON.stringify(block)}`);
+              }
+              if (block.left < state.containerBounds.left - 1 || block.right > state.containerBounds.right + 1) {
+                errors.push(`${prefix}: ${kind} block escapes editorial column ${JSON.stringify({ block, bounds: state.containerBounds })}`);
+              }
+            }
+          }
+
           if (!closeTo(state.tailGap, state.flow.xl, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
+            errors.push(`${prefix}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
           }
           if (!closeTo(state.ctaGap, state.flow.md, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);
+            errors.push(`${prefix}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);
           }
 
           await context.close();
@@ -228,4 +376,6 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial rhythm passed: consistent section, heading, paragraph, author, feedback and CTA spacing in articles and cases across Chromium and WebKit");
+console.log(
+  `Editorial publication layout gate passed: ${articles.length} articles checked for section/block rhythm, NOTE/options/micro-CTA, FAQ, RELATED, page ending and overflow across Chromium and WebKit at ${viewports.map(({ width }) => width).join("/")}px`,
+);

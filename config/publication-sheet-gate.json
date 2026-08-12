@@ -15,6 +15,13 @@
   "resolvedUnknownFailureValue": "Да — закрыт regression",
   "releaseLogHeaderRow": 54,
   "releaseLogFirstDataRow": 55,
+  "sessionBinding": {
+    "configPath": "config/publication-session-binding.json",
+    "documentationPath": "docs/publication-session-binding.md",
+    "mustResetPassedStatusesOnIdentityChange": true,
+    "mustForbidEvidenceReuseAcrossSessions": true,
+    "mustArchiveClosedSessionBeforeOpeningNext": true
+  },
   "articleEditor": {
     "configPath": "config/article-editor-gate.json",
     "editorTab": "34_Редактор_статей_сайта",
@@ -41,7 +48,8 @@
     "mustRecordProductionHttpAndPublicCopy": true,
     "mustRecordIndexNowOutcome": true,
     "mustAppendReleaseLog": true,
-    "mustEnforceArticleEditorApprovalGate": true
+    "mustEnforceArticleEditorApprovalGate": true,
+    "mustBindEvidenceToCurrentPublicationSession": true
   },
   "unknownFailurePolicy": {
     "nextIdStartsAt": "PF-016",
@@ -56,6 +64,8 @@
     "requiring post-deploy evidence as a precondition of merge",
     "treating pre-merge approval as proof of publication",
     "treating merge as proof of publication",
+    "reusing publication evidence from another session, object, PR, branch or SHA",
+    "keeping passed statuses after publication-session identity changes",
     "technical retry commits",
     "alternate Pages writers",
     "browser-heavy post-deploy checks",

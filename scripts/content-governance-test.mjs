@@ -119,3 +119,4 @@ if (!exception && !statisticsReuse) {
 }
 
 await import("./search-quality-ai-gate-test.mjs");
+await import("./search-quality-ai-scope-contract-test.mjs");

@@ -28,19 +28,19 @@ const globToRegExp = (pattern) => {
 const matchesAny = (path, patterns) => patterns.some((pattern) => globToRegExp(pattern).test(path));
 const git = (args) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
 
-const [gateText, governanceText, docText, templateText] = await Promise.all([
+const [gateText, governanceText, docText, reviewTemplateText] = await Promise.all([
   read("config/search-quality-ai-gate.json"),
   read("config/content-governance.json"),
   read("docs/search-quality-ai-gate.md"),
-  read("reports/content-sessions/template.json"),
+  read("reports/content-sessions/search-quality-ai-review-template.json"),
 ]);
 
 let gate;
 let governance;
-let template;
+let reviewTemplate;
 try { gate = JSON.parse(gateText); } catch (error) { errors.push(`config/search-quality-ai-gate.json: invalid JSON: ${error.message}`); }
 try { governance = JSON.parse(governanceText); } catch (error) { errors.push(`config/content-governance.json: invalid JSON: ${error.message}`); }
-try { template = JSON.parse(templateText); } catch (error) { errors.push(`reports/content-sessions/template.json: invalid JSON: ${error.message}`); }
+try { reviewTemplate = JSON.parse(reviewTemplateText); } catch (error) { errors.push(`reports/content-sessions/search-quality-ai-review-template.json: invalid JSON: ${error.message}`); }
 
 if (gate) {
   if (gate.schemaVersion !== 1) errors.push("Search/AI gate: schemaVersion must be 1");
@@ -170,7 +170,7 @@ const validateReview = (review, label) => {
   if (plan?.majorRewriteRequiresMeaningfulEvidence !== true) errors.push(`${label}: major rewrites must require meaningful evidence`);
 };
 
-if (template) validateReview(template.searchQualityAiReview, "content session template");
+if (reviewTemplate) validateReview(reviewTemplate, "Search/AI review template");
 
 let changedFiles = [];
 try {

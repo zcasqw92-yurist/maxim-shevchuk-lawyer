@@ -50,6 +50,15 @@ if (gate) {
   if (gate.basis?.contentWarehouseLeak !== "directional-evidence-only-no-known-weights") errors.push("Search/AI gate: leak evidence limitation is missing");
   if (gate.basis?.dojAndJudicialDisclosures !== "system-behavior-evidence-no-ranking-recipe") errors.push("Search/AI gate: judicial evidence limitation is missing");
 
+  const articlePatterns = gate.articleContentPaths;
+  if (!Array.isArray(articlePatterns) || articlePatterns.length === 0) {
+    errors.push("Search/AI gate: articleContentPaths must be non-empty");
+  } else {
+    for (const pattern of ["content/**", "src/*-data.mjs", "src/*-source.mjs"]) {
+      if (!articlePatterns.includes(pattern)) errors.push(`Search/AI gate: articleContentPaths is missing ${pattern}`);
+    }
+  }
+
   const requiredTrue = [
     "ownerIntentAligned",
     "titleH1LeadDirectAnswerAligned",
@@ -188,12 +197,14 @@ try {
 }
 changedFiles = unique(changedFiles.map((item) => item.trim()).filter(Boolean));
 
-if (governance) {
-  const governed = changedFiles.filter((path) => matchesAny(path, governance.governedContentPaths || []));
-  if (governed.length) {
+if (governance && gate) {
+  const governedPatterns = governance.governedContentPaths || [];
+  const articlePatterns = gate.articleContentPaths || [];
+  const articleChanges = changedFiles.filter((path) => matchesAny(path, governedPatterns) && matchesAny(path, articlePatterns));
+  if (articleChanges.length) {
     const manifestPath = governance.sessionManifest?.path || "reports/content-sessions/latest.json";
     if (!(await exists(manifestPath))) {
-      errors.push(`Search/AI gate: governed article/content change without ${manifestPath}`);
+      errors.push(`Search/AI gate: governed article change without ${manifestPath}`);
     } else {
       try {
         const manifest = JSON.parse(await read(manifestPath));

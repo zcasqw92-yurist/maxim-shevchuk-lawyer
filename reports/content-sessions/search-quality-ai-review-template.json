@@ -1,0 +1,54 @@
+{
+  "status": "blocked",
+  "ownerIntentAligned": false,
+  "ownerIntentEvidence": {
+    "preflightId": "",
+    "ownerUrl": "",
+    "rootQuery": ""
+  },
+  "titleH1LeadDirectAnswerAligned": false,
+  "directAnswerEvidence": {
+    "title": "",
+    "h1": "",
+    "shortAnswer": ""
+  },
+  "supportingQuestions": [],
+  "allMaterialH2HaveDirectExtractableAnswer": false,
+  "materialH2Evidence": [],
+  "materialLegalClaimsPrimaryOrOfficialSourcesChecked": false,
+  "legalSourceIds": [],
+  "practiceClaimsUsed": false,
+  "practiceClaimsTraceable": false,
+  "practiceSourceIds": [],
+  "workProcedureAndOutcomeSeparated": false,
+  "siteClusterFitAndCannibalizationChecked": false,
+  "clusterEvidence": {
+    "clusterCenterUrl": "",
+    "relatedOwnerUrls": [],
+    "excludedQueries": []
+  },
+  "searchEligibility": {
+    "indexable": false,
+    "canonical": false,
+    "canonicalUrl": "",
+    "mobileParity": false,
+    "normalSnippetEligible": false,
+    "structuredDataTreatedAsRankingBoost": false,
+    "specialAiSchemaOrLlmsTxtRequired": false
+  },
+  "prohibitions": {
+    "fixedKeywordDensityTargetUsed": false,
+    "keywordStuffingUsed": false,
+    "arbitraryFixedWordCountTargetUsed": false,
+    "clickManipulationUsed": false,
+    "linkSchemeUsed": false,
+    "fakeFreshnessUsed": false,
+    "inventedLeakWeightsUsed": false
+  },
+  "rawCtrUsedAsSoleSuccessMetric": false,
+  "postPublishMeasurementPlan": {
+    "signals": [],
+    "majorRewriteRequiresMeaningfulEvidence": true
+  },
+  "passed": false
+}

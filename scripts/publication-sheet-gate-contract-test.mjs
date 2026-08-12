@@ -15,9 +15,22 @@ const requiredEditorGid = "340000340";
 const requiredHistoryTab = "_35_Версии_статей_сайта";
 const requiredHistoryGid = "350000350";
 const requiredArticleGateIds = ["PUB-025", "PUB-026", "PUB-027", "PUB-028", "PUB-029"];
+const requiredSessionIdentity = ["sessionId", "changeType", "objectKey", "branch", "prNumber", "headSha"];
 
-const [gateText, contentGovernanceText, failureRegistryText, agents, publishing, prTemplate, releaseGate] = await Promise.all([
+const [
+  gateText,
+  sessionBindingText,
+  sessionBindingDoc,
+  contentGovernanceText,
+  failureRegistryText,
+  agents,
+  publishing,
+  prTemplate,
+  releaseGate,
+] = await Promise.all([
   read("config/publication-sheet-gate.json"),
+  read("config/publication-session-binding.json"),
+  read("docs/publication-session-binding.md"),
   read("config/content-governance.json"),
   read("config/publication-failure-regressions.json"),
   read("AGENTS.md"),
@@ -27,9 +40,11 @@ const [gateText, contentGovernanceText, failureRegistryText, agents, publishing,
 ]);
 
 let gate;
+let sessionBinding;
 let contentGovernance;
 let failureRegistry;
 try { gate = JSON.parse(gateText); } catch (error) { errors.push(`publication sheet gate config is invalid JSON: ${error.message}`); }
+try { sessionBinding = JSON.parse(sessionBindingText); } catch (error) { errors.push(`publication session binding config is invalid JSON: ${error.message}`); }
 try { contentGovernance = JSON.parse(contentGovernanceText); } catch (error) { errors.push(`content governance config is invalid JSON: ${error.message}`); }
 try { failureRegistry = JSON.parse(failureRegistryText); } catch (error) { errors.push(`publication failure registry is invalid JSON: ${error.message}`); }
 
@@ -52,6 +67,11 @@ if (gate) {
   if (gate.unknownFailureCell !== "J2" || gate.unresolvedUnknownFailureValue !== "Да — не закрыт") errors.push("unknown failure blocker must remain tied to J2");
   if (gate.resolvedUnknownFailureValue !== "Да — закрыт regression") errors.push("unknown failure may be resolved only after regression control exists");
   if (!sameMembers(gate.appliesTo || [], ["article", "site-change", "seo", "infrastructure"])) errors.push("publication gate must apply to articles, site changes, SEO and infrastructure");
+  if (gate.sessionBinding?.configPath !== "config/publication-session-binding.json") errors.push("publication gate must point to the session-binding machine contract");
+  if (gate.sessionBinding?.documentationPath !== "docs/publication-session-binding.md") errors.push("publication gate must point to session-binding documentation");
+  for (const field of ["mustResetPassedStatusesOnIdentityChange", "mustForbidEvidenceReuseAcrossSessions", "mustArchiveClosedSessionBeforeOpeningNext"]) {
+    if (gate.sessionBinding?.[field] !== true) errors.push(`publication session binding must remain enabled: ${field}`);
+  }
   if (gate.articleEditor?.configPath !== "config/article-editor-gate.json") errors.push("publication gate must point to the article editor machine contract");
   if (gate.articleEditor?.editorTab !== requiredEditorTab || gate.articleEditor?.editorGid !== requiredEditorGid) errors.push("publication gate must preserve the canonical article editor tab/gid");
   if (gate.articleEditor?.historyTab !== requiredHistoryTab || gate.articleEditor?.historyGid !== requiredHistoryGid) errors.push("publication gate must preserve the immutable article snapshot history tab/gid");
@@ -69,6 +89,7 @@ if (gate) {
     "mustRecordIndexNowOutcome",
     "mustAppendReleaseLog",
     "mustEnforceArticleEditorApprovalGate",
+    "mustBindEvidenceToCurrentPublicationSession",
   ]) {
     if (gate.requirements?.[field] !== true) errors.push(`publication gate requirement must remain enabled: ${field}`);
   }
@@ -82,6 +103,49 @@ if (gate) {
     if (gate.unknownFailurePolicy?.[field] !== true) errors.push(`unknown failure policy must remain enabled: ${field}`);
   }
   if (gate.unknownFailurePolicy?.nextIdStartsAt !== "PF-016") errors.push("new unknown failures must start at PF-016 because PF-014 and PF-015 are already registered");
+  for (const marker of [
+    "reusing publication evidence from another session, object, PR, branch or SHA",
+    "keeping passed statuses after publication-session identity changes",
+  ]) {
+    if (!(gate.prohibitions || []).includes(marker)) errors.push(`publication gate session-binding prohibition is missing: ${marker}`);
+  }
+}
+
+if (sessionBinding) {
+  if (sessionBinding.schemaVersion !== 1) errors.push("publication session binding schemaVersion must be 1");
+  if (sessionBinding.ruleId !== "publication-session-evidence-binding") errors.push("publication session binding ruleId changed");
+  if (sessionBinding.spreadsheetId !== requiredSheetId || sessionBinding.gateTab !== requiredGateTab) errors.push("publication session binding points to the wrong sheet/tab");
+  if (!sameMembers(sessionBinding.identity?.requiredPremergeFields || [], requiredSessionIdentity)) errors.push("publication session binding must require session/object/branch/PR/head identity");
+  if (!sameMembers(sessionBinding.identity?.requiredPostmergeFields || [], ["mergeSha", "productionSha"])) errors.push("publication session binding must require merge and production SHA post-merge");
+  if (sessionBinding.identity?.shaPattern !== "^[0-9a-f]{40}$") errors.push("publication session binding must require full 40-char SHA values");
+  for (const field of [
+    "evidenceMustReferenceCurrentSession",
+    "premergeEvidenceMustMatchCurrentHeadSha",
+    "postdeployEvidenceMustMatchCurrentMergeOrProductionSha",
+    "identityChangeInvalidatesPassedStatuses",
+    "forbidEvidenceReuseAcrossSessions",
+    "forbidEvidenceFromDifferentObject",
+    "forbidEvidenceFromDifferentBranchOrPr",
+    "archiveClosedSessionBeforeOpeningNext",
+    "newSessionStartsBlocked",
+    "finalCompletionRequiresExactProductionEvidence",
+  ]) {
+    if (sessionBinding.rules?.[field] !== true) errors.push(`publication session evidence rule must remain enabled: ${field}`);
+  }
+  if (!sameMembers(sessionBinding.evidenceScope?.premerge || [], ["sessionId", "objectKey", "branch", "prNumber", "headSha", "runId", "checkId"])) errors.push("premerge evidence scope must remain session-bound");
+  if (!sameMembers(sessionBinding.evidenceScope?.postdeploy || [], ["sessionId", "objectKey", "mergeSha", "productionSha", "runId", "checkId"])) errors.push("postdeploy evidence scope must remain production-session-bound");
+  if (sessionBinding.defaultStates?.merge !== "MERGE ЗАБЛОКИРОВАН" || sessionBinding.defaultStates?.publication !== "НЕ ЗАВЕРШЕНА") errors.push("new publication sessions must default to blocked/not-finished");
+}
+
+for (const marker of [
+  "publication session",
+  "sessionId",
+  "другой публикационной сессии",
+  "MERGE ЗАБЛОКИРОВАН",
+  "НЕ ЗАВЕРШЕНА",
+  "ЖУРНАЛ РЕЛИЗОВ",
+]) {
+  if (!sessionBindingDoc.includes(marker)) errors.push(`docs/publication-session-binding.md: missing marker ${marker}`);
 }
 
 if (contentGovernance) {
@@ -131,4 +195,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Publication sheet gate contract passed: staged B2/L2 and PUB-025…PUB-029 article approval controls are protected; PF-014/PF-015 remain registered and the next unknown class starts at PF-016");
+console.log("Publication sheet gate contract passed: staged B2/L2, session-bound PUB evidence and PUB-025…PUB-029 article approval controls are protected; PF-014/PF-015 remain registered and the next unknown class starts at PF-016");

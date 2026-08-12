@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "ruleId": "publication-session-evidence-binding",
+  "spreadsheetId": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
+  "gateTab": "29_Публикационный_шлюз",
+  "identity": {
+    "requiredPremergeFields": [
+      "sessionId",
+      "changeType",
+      "objectKey",
+      "branch",
+      "prNumber",
+      "headSha"
+    ],
+    "requiredPostmergeFields": [
+      "mergeSha",
+      "productionSha"
+    ],
+    "shaPattern": "^[0-9a-f]{40}$"
+  },
+  "rules": {
+    "evidenceMustReferenceCurrentSession": true,
+    "premergeEvidenceMustMatchCurrentHeadSha": true,
+    "postdeployEvidenceMustMatchCurrentMergeOrProductionSha": true,
+    "identityChangeInvalidatesPassedStatuses": true,
+    "forbidEvidenceReuseAcrossSessions": true,
+    "forbidEvidenceFromDifferentObject": true,
+    "forbidEvidenceFromDifferentBranchOrPr": true,
+    "archiveClosedSessionBeforeOpeningNext": true,
+    "newSessionStartsBlocked": true,
+    "finalCompletionRequiresExactProductionEvidence": true
+  },
+  "evidenceScope": {
+    "premerge": [
+      "sessionId",
+      "objectKey",
+      "branch",
+      "prNumber",
+      "headSha",
+      "runId",
+      "checkId"
+    ],
+    "postdeploy": [
+      "sessionId",
+      "objectKey",
+      "mergeSha",
+      "productionSha",
+      "runId",
+      "checkId"
+    ]
+  },
+  "defaultStates": {
+    "merge": "MERGE ЗАБЛОКИРОВАН",
+    "publication": "НЕ ЗАВЕРШЕНА"
+  },
+  "prohibitions": [
+    "reusing a passed PUB row from another publication session",
+    "reusing evidence from another object, PR, branch or head SHA",
+    "keeping passed statuses after publication-session identity changes",
+    "treating a historical release-log row as current-session evidence",
+    "closing a session without exact production SHA, HTTP/public-copy and IndexNow evidence"
+  ]
+}

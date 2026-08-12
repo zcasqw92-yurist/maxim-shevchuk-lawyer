@@ -168,6 +168,10 @@
     "site.config.mjs",
     "src/data.mjs",
     "src/service-content.mjs",
+    "src/*-data.mjs",
+    "src/*-source.mjs",
+    "src/editorial-data-base.mjs",
+    "src/refund-imposed-service.mjs",
     "src/debt-cluster-data.mjs",
     "src/debt-cluster-data-legacy.mjs",
     "src/refund-services-cluster-data.mjs",
@@ -197,12 +201,14 @@
   "sessionManifest": {
     "path": "reports/content-sessions/latest.json",
     "template": "reports/content-sessions/template.json",
+    "searchQualityAiReviewTemplate": "reports/content-sessions/search-quality-ai-review-template.json",
     "requiredWhenGovernedContentChanges": true,
     "mustChangeWithGovernedContent": true,
     "mustListEveryDiscoveredTab": true,
     "mustNotContainPersonalData": true,
     "mustPassAllClusterGates": true,
-    "mustPassSeoPreflight": true
+    "mustPassSeoPreflight": true,
+    "mustPassSearchQualityAiReview": true
   },
   "publication": {
     "localFullSiteCheck": "npm run check",

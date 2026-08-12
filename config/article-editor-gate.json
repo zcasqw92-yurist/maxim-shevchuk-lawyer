@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "ruleId": "canonical-article-editor-approval-gate",
   "spreadsheetId": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
   "editorTab": "34_Редактор_статей_сайта",

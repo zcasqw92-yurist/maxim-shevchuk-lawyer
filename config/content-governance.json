@@ -201,12 +201,14 @@
   "sessionManifest": {
     "path": "reports/content-sessions/latest.json",
     "template": "reports/content-sessions/template.json",
+    "searchQualityAiReviewTemplate": "reports/content-sessions/search-quality-ai-review-template.json",
     "requiredWhenGovernedContentChanges": true,
     "mustChangeWithGovernedContent": true,
     "mustListEveryDiscoveredTab": true,
     "mustNotContainPersonalData": true,
     "mustPassAllClusterGates": true,
-    "mustPassSeoPreflight": true
+    "mustPassSeoPreflight": true,
+    "mustPassSearchQualityAiReview": true
   },
   "publication": {
     "localFullSiteCheck": "npm run check",

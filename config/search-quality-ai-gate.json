@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "ruleId": "search-quality-ai-gate-2026-08-12",
   "scope": "new-or-materially-updated-articles",
+  "articleContentPaths": [
+    "content/**",
+    "src/*-data.mjs",
+    "src/*-source.mjs",
+    "src/editorial-data.mjs",
+    "src/editorial-data-base.mjs",
+    "src/refund-imposed-service.mjs",
+    "src/refund-voluntary-service-cancellation.mjs"
+  ],
   "basis": {
     "officialGoogleResearch": "authoritative-public-guidance",
     "contentWarehouseLeak": "directional-evidence-only-no-known-weights",

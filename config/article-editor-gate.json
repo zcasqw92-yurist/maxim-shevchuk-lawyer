@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "ruleId": "canonical-article-editor-approval-gate",
   "spreadsheetId": "1W4014FzdUJWYDja7VUh5XXUsSuxtQIrcS5fWRX1rm24",
   "editorTab": "34_Редактор_статей_сайта",
@@ -63,6 +63,27 @@
     "AUTHOR"
   ],
   "approvalManifestDir": "reports/article-approvals",
+  "layoutGate": {
+    "command": "npm run test:editorial-rhythm",
+    "script": "scripts/editorial-rhythm-test.mjs",
+    "scope": "all registered site articles",
+    "browsers": ["chromium", "webkit"],
+    "viewportWidths": [320, 390, 768, 1440],
+    "requiredChecks": [
+      "section spacing",
+      "H2 spacing",
+      "paragraph spacing",
+      "NOTE/options/micro-CTA spacing",
+      "FAQ bounds and overflow",
+      "RELATED bounds and overflow",
+      "article block overlap",
+      "content-to-feedback spacing",
+      "feedback-to-final-CTA spacing",
+      "horizontal overflow"
+    ],
+    "futureArticlesAutoIncludedFromRegistry": true,
+    "mustPassBeforeMerge": true
+  },
   "requirements": {
     "prepareFullSiteStructureInEditorBeforeApproval": true,
     "editorIsOnlyPrepublicationCopySource": true,
@@ -70,8 +91,10 @@
     "sheetStatusAloneNeverCountsAsApproval": true,
     "rereadLiveEditorAfterApprovalCommand": true,
     "runFinalEditorialPreflightAfterCommand": true,
+    "runAllArticleLayoutGateBeforeMerge": true,
     "reportEveryFoundIssueInChat": true,
     "stopPublicationWhenIssueFound": true,
+    "stopMergeWhenLayoutGateFails": true,
     "forbidSilentCorrectionsAfterApprovalCommand": true,
     "requireUserAgreementBeforeApplyingFoundCorrections": true,
     "snapshotOnlyAfterCleanAgreedPreflight": true,
@@ -91,6 +114,7 @@
     "silently correcting issues found during final preflight",
     "publishing after editor drift without a new explicit user approval",
     "overwriting the approved snapshot after drift",
-    "merging article changes without an approval manifest and matching fingerprint"
+    "merging article changes without an approval manifest and matching fingerprint",
+    "merging an article when the all-article layout gate has not passed on the current head SHA"
   ]
 }

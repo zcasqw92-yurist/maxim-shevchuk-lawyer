@@ -1,31 +1,38 @@
 {
-  "status": "passed",
-  "ownerIntentAligned": true,
-  "titleH1LeadDirectAnswerAligned": true,
-  "supportingQuestions": [
-    {
-      "question": "replace with supporting question 1",
-      "target": "H2",
-      "inOwnerIntent": true,
-      "directAnswerPlanned": true
-    },
-    {
-      "question": "replace with supporting question 2",
-      "target": "H2 or FAQ",
-      "inOwnerIntent": true,
-      "directAnswerPlanned": true
-    }
-  ],
-  "allMaterialH2HaveDirectExtractableAnswer": true,
-  "materialLegalClaimsPrimaryOrOfficialSourcesChecked": true,
-  "practiceClaimsTraceable": true,
-  "workProcedureAndOutcomeSeparated": true,
-  "siteClusterFitAndCannibalizationChecked": true,
+  "status": "blocked",
+  "ownerIntentAligned": false,
+  "ownerIntentEvidence": {
+    "preflightId": "",
+    "ownerUrl": "",
+    "rootQuery": ""
+  },
+  "titleH1LeadDirectAnswerAligned": false,
+  "directAnswerEvidence": {
+    "title": "",
+    "h1": "",
+    "shortAnswer": ""
+  },
+  "supportingQuestions": [],
+  "allMaterialH2HaveDirectExtractableAnswer": false,
+  "materialH2Evidence": [],
+  "materialLegalClaimsPrimaryOrOfficialSourcesChecked": false,
+  "legalSourceIds": [],
+  "practiceClaimsUsed": false,
+  "practiceClaimsTraceable": false,
+  "practiceSourceIds": [],
+  "workProcedureAndOutcomeSeparated": false,
+  "siteClusterFitAndCannibalizationChecked": false,
+  "clusterEvidence": {
+    "clusterCenterUrl": "",
+    "relatedOwnerUrls": [],
+    "excludedQueries": []
+  },
   "searchEligibility": {
-    "indexable": true,
-    "canonical": true,
-    "mobileParity": true,
-    "normalSnippetEligible": true,
+    "indexable": false,
+    "canonical": false,
+    "canonicalUrl": "",
+    "mobileParity": false,
+    "normalSnippetEligible": false,
     "structuredDataTreatedAsRankingBoost": false,
     "specialAiSchemaOrLlmsTxtRequired": false
   },
@@ -40,17 +47,8 @@
   },
   "rawCtrUsedAsSoleSuccessMetric": false,
   "postPublishMeasurementPlan": {
-    "signals": [
-      "queries",
-      "impressions",
-      "organicClicks",
-      "activeReading",
-      "helpfulness",
-      "contactIntent",
-      "contactConversion",
-      "qualifiedContactsOrPaidWork"
-    ],
+    "signals": [],
     "majorRewriteRequiresMeaningfulEvidence": true
   },
-  "passed": true
+  "passed": false
 }

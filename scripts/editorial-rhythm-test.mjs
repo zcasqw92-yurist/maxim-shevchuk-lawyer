@@ -17,7 +17,7 @@ const routes = [
     id: item.id,
     path: `/razbory/${item.slug}/`,
     container: ".editorial-body",
-    expectedSections: item.sections.length,
+    expectedSectionIds: item.sections.map((section) => section.id),
     expectedFaq: item.faq?.length || 0,
   })),
   ...(practiceCases[0] ? [{
@@ -25,7 +25,7 @@ const routes = [
     id: practiceCases[0].id,
     path: `/praktika/${practiceCases[0].slug}/`,
     container: ".editorial-case-main",
-    expectedSections: null,
+    expectedSectionIds: [],
     expectedFaq: 0,
   }] : []),
 ];
@@ -35,6 +35,13 @@ const viewports = [
   { width: 768, height: 1024 },
   { width: 1440, height: 1000 },
 ];
+
+for (const route of routes.filter((item) => item.kind === "article")) {
+  const uniqueIds = new Set(route.expectedSectionIds);
+  if (uniqueIds.size !== route.expectedSectionIds.length) {
+    errors.push(`${route.path}: source article has duplicate section IDs`);
+  }
+}
 
 const rhythmCss = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 for (const token of ["--editorial-flow-xs", "--editorial-flow-sm", "--editorial-flow-md", "--editorial-flow-lg", "--editorial-flow-xl"]) {
@@ -112,6 +119,7 @@ const inspectRhythm = ({ containerSelector, kind }) => {
   });
   const label = (element) => {
     if (element.classList.contains("editorial-answer")) return "answer";
+    if (element.classList.contains("editorial-risk")) return "risk";
     if (element.classList.contains("editorial-author")) return "author";
     if (element.classList.contains("editorial-intake")) return "intake";
     if (element.classList.contains("editorial-message-guide")) return "message-guide";
@@ -173,8 +181,10 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     helpfulness: Boolean(document.querySelector("[data-editorial-helpfulness]")),
     cta: Boolean(document.querySelector(".editorial-cta")),
   };
-  const structuralCounts = {
-    sections: container.querySelectorAll("[data-article-section]").length,
+  const structural = {
+    sectionIds: [...container.querySelectorAll("[data-article-section]")]
+      .map((element) => element.getAttribute("data-article-section"))
+      .filter(Boolean),
     faq: document.querySelectorAll("#faq .faq-item").length,
     related: container.querySelectorAll(".editorial-related").length,
     notes: container.querySelectorAll(".editorial-note").length,
@@ -230,6 +240,7 @@ const inspectRhythm = ({ containerSelector, kind }) => {
   return {
     flow,
     compact: Number.isFinite(compactSpace),
+    compactSpace,
     sectionGap,
     headingGap,
     paragraphGap,
@@ -239,7 +250,7 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     paragraphs,
     insetBlocks,
     required,
-    structuralCounts,
+    structural,
     visibleLayoutBlocks,
     tailGap: tailBottom !== null && helpfulnessRect ? helpfulnessRect.top - tailBottom : null,
     ctaGap: helpfulnessRect && ctaRect ? ctaRect.top - helpfulnessRect.bottom : null,
@@ -272,84 +283,91 @@ try {
     });
     try {
       for (const viewport of viewports) {
-        for (const route of routes) {
-          const context = await browser.newContext({ viewport, locale: "ru-RU", reducedMotion: "reduce" });
-          await context.addInitScript(() => {
-            localStorage.setItem("analytics_consent", "denied");
-            sessionStorage.setItem("site_engagement_nudge_shown", "true");
-          });
-          const page = await context.newPage();
-          const response = await page.goto(`${origin}${route.path}`, { waitUntil: "networkidle" });
-          if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route.path}: status ${response?.status()}`);
-          await waitForLayout(page);
+        const context = await browser.newContext({ viewport, locale: "ru-RU", reducedMotion: "reduce" });
+        await context.addInitScript(() => {
+          localStorage.setItem("analytics_consent", "denied");
+          sessionStorage.setItem("site_engagement_nudge_shown", "true");
+        });
+        const page = await context.newPage();
+        try {
+          for (const route of routes) {
+            const response = await page.goto(`${origin}${route.path}`, { waitUntil: "networkidle" });
+            if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route.path}: status ${response?.status()}`);
+            await waitForLayout(page);
 
-          const state = await page.evaluate(inspectRhythm, { containerSelector: route.container, kind: route.kind });
-          if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route.path}: ${state.overflow}px horizontal overflow`);
-          if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
-          }
-
-          for (const [name, present] of Object.entries(state.required)) {
-            if (!present) errors.push(`${engineName} ${viewport.width}px ${route.path}: required layout block is missing: ${name}`);
-          }
-          if (route.kind === "article" && state.structuralCounts.sections !== route.expectedSections) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: rendered sections ${state.structuralCounts.sections}, expected ${route.expectedSections}`);
-          }
-          if (route.kind === "article" && state.structuralCounts.faq !== route.expectedFaq) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: rendered FAQ items ${state.structuralCounts.faq}, expected ${route.expectedFaq}`);
-          }
-
-          for (const item of state.topLevel.slice(1)) {
-            let expected = state.sectionGap;
-            if (item.label === "author") expected = state.compact ? state.sectionGap : state.flow.xl;
-            else if (item.previousLabel === "intake" && item.label === "message-guide") expected = state.flow.md;
-            else if (item.previousLabel?.startsWith("related:") && item.label.startsWith("related:")) expected = state.compact ? state.sectionGap : state.flow.md;
-            if (!closeTo(item.gapBefore, expected)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong top-level gap ${JSON.stringify({ item, expected, flow: state.flow, compact: state.compact })}`);
+            const state = await page.evaluate(inspectRhythm, { containerSelector: route.container, kind: route.kind });
+            if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route.path}: ${state.overflow}px horizontal overflow`);
+            if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
             }
-          }
 
-          for (const heading of state.headings) {
-            if (!closeTo(heading.gapAfter, state.headingGap)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong heading gap ${JSON.stringify({ heading, expected: state.headingGap })}`);
+            for (const [name, present] of Object.entries(state.required)) {
+              if (!present) errors.push(`${engineName} ${viewport.width}px ${route.path}: required layout block is missing: ${name}`);
             }
-          }
-          for (const paragraph of state.paragraphs) {
-            if (!closeTo(paragraph.gapBefore, state.paragraphGap)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong paragraph gap ${JSON.stringify({ paragraph, expected: state.paragraphGap })}`);
+            if (route.kind === "article") {
+              for (const expectedId of route.expectedSectionIds) {
+                const count = state.structural.sectionIds.filter((id) => id === expectedId).length;
+                if (count !== 1) {
+                  errors.push(`${engineName} ${viewport.width}px ${route.path}: source section ${expectedId} rendered ${count} times instead of once`);
+                }
+              }
+              if (state.structural.faq !== route.expectedFaq) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: rendered FAQ items ${state.structural.faq}, expected ${route.expectedFaq}`);
+              }
             }
-          }
-          for (const block of state.insetBlocks) {
-            if (block.type.includes("editorial-options") || block.type.includes("editorial-note") || block.type.includes("editorial-micro-cta")) {
+
+            for (const item of state.topLevel.slice(1)) {
+              let expected = state.sectionGap;
+              if (item.label === "risk") expected = state.compact ? state.compactSpace : state.flow.sm;
+              else if (item.label === "author") expected = state.compact ? state.sectionGap : state.flow.xl;
+              else if (item.previousLabel === "intake" && item.label === "message-guide") expected = state.flow.md;
+              else if (item.previousLabel?.startsWith("related:") && item.label.startsWith("related:")) expected = state.compact ? state.sectionGap : state.flow.md;
+              if (!closeTo(item.gapBefore, expected)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong top-level gap ${JSON.stringify({ item, expected, flow: state.flow, compact: state.compact })}`);
+              }
+            }
+
+            for (const heading of state.headings) {
+              if (!closeTo(heading.gapAfter, state.headingGap)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong heading gap ${JSON.stringify({ heading, expected: state.headingGap })}`);
+              }
+            }
+            for (const paragraph of state.paragraphs) {
+              if (!closeTo(paragraph.gapBefore, state.paragraphGap)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong paragraph gap ${JSON.stringify({ paragraph, expected: state.paragraphGap })}`);
+              }
+            }
+            for (const block of state.insetBlocks) {
               if (!closeTo(block.gapBefore, state.insetBlockGap, 4)) {
                 errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong inset block gap ${JSON.stringify({ block, expected: state.insetBlockGap })}`);
               }
             }
-          }
 
-          if (!closeTo(state.tailGap, state.flow.xl, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
-          }
-          if (!closeTo(state.ctaGap, state.flow.md, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);
-          }
-          if (Number.isFinite(state.ctaFooterGap) && state.ctaFooterGap < -1) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: CTA overlaps footer by ${Math.abs(state.ctaFooterGap)}px`);
-          }
+            if (!closeTo(state.tailGap, state.flow.xl, 4)) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
+            }
+            if (!closeTo(state.ctaGap, state.flow.md, 4)) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);
+            }
+            if (Number.isFinite(state.ctaFooterGap) && state.ctaFooterGap < -1) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: CTA overlaps footer by ${Math.abs(state.ctaFooterGap)}px`);
+            }
 
-          for (const block of state.visibleLayoutBlocks) {
-            if (block.left < -1 || block.right > viewport.width + 1) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: layout block escapes viewport ${JSON.stringify(block)}`);
+            for (const block of state.visibleLayoutBlocks) {
+              if (block.left < -1 || block.right > viewport.width + 1) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: layout block escapes viewport ${JSON.stringify(block)}`);
+              }
+            }
+            for (let index = 1; index < state.topLevel.length; index += 1) {
+              const previous = state.topLevel[index - 1];
+              const current = state.topLevel[index];
+              if (current.top < previous.bottom - 1) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: top-level blocks overlap ${JSON.stringify({ previous, current })}`);
+              }
             }
           }
-          for (let index = 1; index < state.topLevel.length; index += 1) {
-            const previous = state.topLevel[index - 1];
-            const current = state.topLevel[index];
-            if (current.top < previous.bottom - 1) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: top-level blocks overlap ${JSON.stringify({ previous, current })}`);
-            }
-          }
-
+        } finally {
+          await page.close();
           await context.close();
         }
       }
@@ -367,4 +385,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Editorial rhythm passed for every article: ${articles.length} articles across ${viewports.length} viewports in Chromium and WebKit, with section/block spacing, FAQ, CTA, related/note/micro-CTA containment and page-ending geometry checked`);
+console.log(`Editorial rhythm passed for every article: ${articles.length} articles across ${viewports.length} viewports in Chromium and WebKit, with source-section presence, FAQ, block spacing, containment and page-ending geometry checked`);

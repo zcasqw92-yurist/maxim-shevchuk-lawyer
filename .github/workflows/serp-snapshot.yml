@@ -1,0 +1,137 @@
+name: SERP-шлюз — только сохранённый кеш
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Проверить Яндекс без новых API-запросов
+        id: yandex
+        continue-on-error: true
+        env:
+          SERP_ENGINE: yandex
+          SERP_ALLOW_PAID_REQUESTS: '0'
+          SERP_FORCE_REFRESH: '0'
+          SERP_QUERY_IDS: ''
+        run: node scripts/run-serp-budgeted.mjs
+
+      - name: Проверить Google без новых API-запросов
+        id: google
+        continue-on-error: true
+        env:
+          SERP_ENGINE: google
+          SERP_ALLOW_PAID_REQUESTS: '0'
+          SERP_FORCE_REFRESH: '0'
+          SERP_QUERY_IDS: ''
+        run: node scripts/run-serp-budgeted.mjs
+
+      - name: Сохранить отчёты
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: refund-services-serp-cache-snapshot
+          path: reports/serp-snapshots/refund-services/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Записать результат в pull request
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const readJson = (path) => {
+              try { return JSON.parse(fs.readFileSync(path, 'utf8')); }
+              catch (error) { core.warning(`${path} unavailable: ${error.message}`); return null; }
+            };
+            const yandexReport = readJson('reports/serp-snapshots/refund-services/yandex-api.json');
+            const googleReport = readJson('reports/serp-snapshots/refund-services/google-api.json');
+            const yandexById = new Map((yandexReport?.queries || []).map((item) => [item.id, item]));
+            const googleById = new Map((googleReport?.queries || []).map((item) => [item.id, item]));
+            const queryIds = [...new Set([
+              ...(yandexReport?.queries || []).map((item) => item.id),
+              ...(googleReport?.queries || []).map((item) => item.id),
+            ])];
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:${context.ref.replace('refs/heads/', '')}`;
+            const { data: pulls } = await github.rest.pulls.list({ owner, repo, head, state: 'open' });
+            if (!pulls.length) {
+              core.warning(`No open pull request found for ${head}`);
+              return;
+            }
+
+            const combinedGate = Boolean(queryIds.length && queryIds.every((id) =>
+              yandexById.get(id)?.minimumMet && googleById.get(id)?.minimumMet
+            ));
+            const lines = [
+              '## SERP-шлюз по сохранённому кешу',
+              '',
+              `Объединённый шлюз пройден: **${combinedGate ? 'да' : 'нет'}**`,
+              '',
+              `Новых запросов Яндекса: **${yandexReport?.cachePolicy?.paidRequestsThisRun ?? 0}**`,
+              `Новых запросов SerpApi: **${googleReport?.cachePolicy?.paidRequestsThisRun ?? 0}**`,
+              `Учтённый лимит SerpApi: **${googleReport?.budget?.knownUsed ?? '?'} / ${googleReport?.budget?.limit ?? 250}**`,
+              '',
+              '| Гипотеза | Яндекс | Google |',
+              '|---|---:|---:|',
+            ];
+
+            for (const id of queryIds) {
+              const yandex = yandexById.get(id) || {};
+              const google = googleById.get(id) || {};
+              const query = yandex.query || google.query || id;
+              lines.push(`| ${query} | ${yandex.organicResultsReviewed ?? 0} (${yandex.cache?.status || yandex.status || 'нет'}) | ${google.organicResultsReviewed ?? 0} (${google.cache?.status || google.status || 'нет'}) |`);
+            }
+
+            const errors = [];
+            for (const id of queryIds) {
+              const yandex = yandexById.get(id) || {};
+              const google = googleById.get(id) || {};
+              const query = yandex.query || google.query || id;
+              if (!yandex.minimumMet) errors.push(`Яндекс — ${query}: ${yandex.diagnostics?.reason || 'нет свежего кеша'}`);
+              if (!google.minimumMet) errors.push(`Google — ${query}: ${google.diagnostics?.reason || 'нет свежего кеша'}`);
+            }
+            if (errors.length) lines.push('', '### Диагностика', ...errors.slice(0, 12).map((value) => `- ${value}`));
+
+            lines.push('', '> Этот объединённый workflow никогда не обращается к платным SERP API. Новые запросы разрешаются только в отдельных ручных workflow.', '', `Workflow commit: \`${context.sha}\``);
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pulls[0].number,
+              body: lines.join('\n'),
+            });
+
+      - name: Проверить объединённый шлюз
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const yandex = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/yandex-api.json', 'utf8'));
+          const google = JSON.parse(fs.readFileSync('reports/serp-snapshots/refund-services/google-api.json', 'utf8'));
+          const yandexById = new Map((yandex.queries || []).map((item) => [item.id, item]));
+          const passed = Boolean(google.queries?.length && google.queries.every((item) => item.minimumMet && yandexById.get(item.id)?.minimumMet));
+          console.log(`Combined cached SERP gate passed: ${passed}`);
+          console.log(`Paid Yandex requests: ${yandex.cachePolicy?.paidRequestsThisRun ?? 0}`);
+          console.log(`Paid Google requests: ${google.cachePolicy?.paidRequestsThisRun ?? 0}`);
+          if (!passed) process.exit(1);
+          NODE

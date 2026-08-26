@@ -12,8 +12,22 @@ const requireBrowsers = process.env.CROSS_BROWSER_REQUIRED === "true";
 const errors = [];
 const skipped = [];
 const routes = [
-  { kind: "article", path: `/razbory/${articles[0].slug}/`, container: ".editorial-body" },
-  { kind: "case", path: `/praktika/${practiceCases[0].slug}/`, container: ".editorial-case-main" },
+  ...articles.map((item) => ({
+    kind: "article",
+    id: item.id,
+    path: `/razbory/${item.slug}/`,
+    container: ".editorial-body",
+    expectedSectionIds: item.sections.map((section) => section.id),
+    expectedFaq: item.faq?.length || 0,
+  })),
+  ...(practiceCases[0] ? [{
+    kind: "case",
+    id: practiceCases[0].id,
+    path: `/praktika/${practiceCases[0].slug}/`,
+    container: ".editorial-case-main",
+    expectedSectionIds: [],
+    expectedFaq: 0,
+  }] : []),
 ];
 const viewports = [
   { width: 320, height: 844 },
@@ -21,6 +35,13 @@ const viewports = [
   { width: 768, height: 1024 },
   { width: 1440, height: 1000 },
 ];
+
+for (const route of routes.filter((item) => item.kind === "article")) {
+  const uniqueIds = new Set(route.expectedSectionIds);
+  if (uniqueIds.size !== route.expectedSectionIds.length) {
+    errors.push(`${route.path}: source article has duplicate section IDs`);
+  }
+}
 
 const rhythmCss = await readFile(join(root, "src", "editorial-rhythm.css"), "utf8");
 for (const token of ["--editorial-flow-xs", "--editorial-flow-sm", "--editorial-flow-md", "--editorial-flow-lg", "--editorial-flow-xl"]) {
@@ -59,18 +80,23 @@ const waitForLayout = (page) => page.evaluate(async () => {
 });
 
 const inspectRhythm = ({ containerSelector, kind }) => {
-  const resolveToken = (name) => {
-    const raw = getComputedStyle(document.body).getPropertyValue(name).trim();
-    const clamp = raw.match(/^clamp\(\s*([\d.]+)px\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)px\s*\)$/);
+  const parseLength = (raw) => {
+    const value = String(raw || "").trim();
+    const clamp = value.match(/^clamp\(\s*([\d.]+)px\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)px\s*\)$/);
     if (clamp) {
       const minimum = Number(clamp[1]);
       const preferred = innerWidth * Number(clamp[2]) / 100;
       const maximum = Number(clamp[3]);
       return Math.min(maximum, Math.max(minimum, preferred));
     }
-    const pixels = raw.match(/^([\d.]+)px$/);
+    const pixels = value.match(/^([\d.]+)px$/);
     return pixels ? Number(pixels[1]) : Number.NaN;
   };
+  const root = kind === "article"
+    ? document.querySelector(".editorial-article")
+    : document.body;
+  const rootStyle = getComputedStyle(root || document.body);
+  const resolveToken = (name) => parseLength(rootStyle.getPropertyValue(name));
   const flow = {
     xs: resolveToken("--editorial-flow-xs"),
     sm: resolveToken("--editorial-flow-sm"),
@@ -78,6 +104,12 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     lg: resolveToken("--editorial-flow-lg"),
     xl: resolveToken("--editorial-flow-xl"),
   };
+  const compactSpace = parseLength(rootStyle.getPropertyValue("--editorial-c139-space"));
+  const compactSectionSpace = parseLength(rootStyle.getPropertyValue("--editorial-c139-section-space"));
+  const sectionGap = Number.isFinite(compactSectionSpace) ? compactSectionSpace : flow.lg;
+  const headingGap = Number.isFinite(compactSpace) ? compactSpace : flow.sm;
+  const paragraphGap = Number.isFinite(compactSpace) ? compactSpace : flow.xs;
+  const insetBlockGap = Number.isFinite(compactSpace) ? compactSpace : flow.sm;
 
   const container = document.querySelector(containerSelector);
   const children = [...container.children].filter((element) => {
@@ -87,6 +119,7 @@ const inspectRhythm = ({ containerSelector, kind }) => {
   });
   const label = (element) => {
     if (element.classList.contains("editorial-answer")) return "answer";
+    if (element.classList.contains("editorial-risk")) return "risk";
     if (element.classList.contains("editorial-author")) return "author";
     if (element.classList.contains("editorial-intake")) return "intake";
     if (element.classList.contains("editorial-message-guide")) return "message-guide";
@@ -103,6 +136,8 @@ const inspectRhythm = ({ containerSelector, kind }) => {
       className: element.className,
       top: rect.top,
       bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
       gapBefore: previousRect ? rect.top - previousRect.bottom : null,
       previousLabel: previous ? label(previous) : null,
     };
@@ -121,6 +156,71 @@ const inspectRhythm = ({ containerSelector, kind }) => {
     const rect = paragraph.getBoundingClientRect();
     return { text: paragraph.textContent.trim().slice(0, 60), gapBefore: rect.top - previousRect.bottom };
   });
+  const insetBlocks = [...container.querySelectorAll(".article-section :is(.editorial-options, .editorial-note, .editorial-micro-cta)")]
+    .filter((element) => {
+      const style = getComputedStyle(element);
+      return element.getBoundingClientRect().height > 0 && style.display !== "none" && style.visibility !== "hidden";
+    })
+    .map((element) => {
+      const rect = element.getBoundingClientRect();
+      const previous = element.previousElementSibling;
+      const previousRect = previous?.getBoundingClientRect();
+      return {
+        type: element.className,
+        gapBefore: previousRect ? rect.top - previousRect.bottom : null,
+        left: rect.left,
+        right: rect.right,
+      };
+    });
+
+  const required = {
+    header: Boolean(document.querySelector(".editorial-article__header")),
+    toc: kind !== "article" || Boolean(document.querySelector(".editorial-toc")),
+    answer: kind !== "article" || Boolean(container.querySelector(".editorial-answer")),
+    author: Boolean(container.querySelector(".editorial-author")),
+    helpfulness: Boolean(document.querySelector("[data-editorial-helpfulness]")),
+    cta: Boolean(document.querySelector(".editorial-cta")),
+  };
+  const structural = {
+    sectionIds: [...container.querySelectorAll("[data-article-section]")]
+      .map((element) => element.getAttribute("data-article-section"))
+      .filter(Boolean),
+    faq: document.querySelectorAll("#faq .faq-item").length,
+    related: container.querySelectorAll(".editorial-related").length,
+    notes: container.querySelectorAll(".editorial-note").length,
+    options: container.querySelectorAll(".editorial-options").length,
+    microCta: container.querySelectorAll(".editorial-micro-cta").length,
+  };
+
+  const visibleLayoutBlocks = [...document.querySelectorAll([
+    ".editorial-article__header",
+    containerSelector,
+    ".editorial-answer",
+    ".article-section",
+    ".editorial-options",
+    ".editorial-note",
+    ".editorial-micro-cta",
+    ".editorial-related",
+    ".editorial-intake",
+    ".editorial-message-guide",
+    ".editorial-author",
+    "#faq .faq-item",
+    "[data-editorial-helpfulness]",
+    ".editorial-cta",
+  ].join(","))].filter((element) => {
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+  }).map((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      selector: element.id ? `${element.tagName.toLowerCase()}#${element.id}` : `${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 3).join(".")}`,
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      bottom: rect.bottom,
+    };
+  });
 
   const tailCandidates = kind === "case"
     ? [container.lastElementChild, document.querySelector(".editorial-case-aside")]
@@ -133,16 +233,32 @@ const inspectRhythm = ({ containerSelector, kind }) => {
   const tailBottom = visibleTailBottoms.length ? Math.max(...visibleTailBottoms) : null;
   const helpfulness = document.querySelector("[data-editorial-helpfulness]");
   const cta = document.querySelector(".editorial-cta");
+  const footer = document.querySelector("footer");
   const helpfulnessRect = helpfulness?.getBoundingClientRect();
   const ctaRect = cta?.getBoundingClientRect();
+  const footerRect = footer?.getBoundingClientRect();
   return {
     flow,
+    compact: Number.isFinite(compactSpace),
+    compactSpace,
+    sectionGap,
+    headingGap,
+    paragraphGap,
+    insetBlockGap,
     topLevel,
     headings,
     paragraphs,
+    insetBlocks,
+    required,
+    structural,
+    visibleLayoutBlocks,
     tailGap: tailBottom !== null && helpfulnessRect ? helpfulnessRect.top - tailBottom : null,
     ctaGap: helpfulnessRect && ctaRect ? ctaRect.top - helpfulnessRect.bottom : null,
-    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ctaFooterGap: ctaRect && footerRect ? footerRect.top - ctaRect.bottom : null,
+    overflow: Math.max(
+      document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      document.body.scrollWidth - innerWidth,
+    ),
   };
 };
 
@@ -167,50 +283,91 @@ try {
     });
     try {
       for (const viewport of viewports) {
-        for (const route of routes) {
-          const context = await browser.newContext({ viewport, locale: "ru-RU", reducedMotion: "reduce" });
-          await context.addInitScript(() => {
-            localStorage.setItem("analytics_consent", "denied");
-            sessionStorage.setItem("site_engagement_nudge_shown", "true");
-          });
-          const page = await context.newPage();
-          const response = await page.goto(`${origin}${route.path}`, { waitUntil: "networkidle" });
-          if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route.path}: status ${response?.status()}`);
-          await waitForLayout(page);
+        const context = await browser.newContext({ viewport, locale: "ru-RU", reducedMotion: "reduce" });
+        await context.addInitScript(() => {
+          localStorage.setItem("analytics_consent", "denied");
+          sessionStorage.setItem("site_engagement_nudge_shown", "true");
+        });
+        const page = await context.newPage();
+        try {
+          for (const route of routes) {
+            const response = await page.goto(`${origin}${route.path}`, { waitUntil: "networkidle" });
+            if (!response?.ok()) errors.push(`${engineName} ${viewport.width}px ${route.path}: status ${response?.status()}`);
+            await waitForLayout(page);
 
-          const state = await page.evaluate(inspectRhythm, { containerSelector: route.container, kind: route.kind });
-          if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route.path}: ${state.overflow}px horizontal overflow`);
-          if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
-          }
+            const state = await page.evaluate(inspectRhythm, { containerSelector: route.container, kind: route.kind });
+            if (state.overflow > 1) errors.push(`${engineName} ${viewport.width}px ${route.path}: ${state.overflow}px horizontal overflow`);
+            if (Object.values(state.flow).some((value) => !Number.isFinite(value) || value <= 0)) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: rhythm tokens are invalid ${JSON.stringify(state.flow)}`);
+            }
 
-          for (const item of state.topLevel.slice(1)) {
-            let expected = state.flow.lg;
-            if (item.label === "author") expected = state.flow.xl;
-            else if (item.previousLabel === "intake" && item.label === "message-guide") expected = state.flow.md;
-            else if (item.previousLabel?.startsWith("related:") && item.label.startsWith("related:")) expected = state.flow.md;
-            if (!closeTo(item.gapBefore, expected)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong top-level gap ${JSON.stringify({ item, expected, flow: state.flow })}`);
+            for (const [name, present] of Object.entries(state.required)) {
+              if (!present) errors.push(`${engineName} ${viewport.width}px ${route.path}: required layout block is missing: ${name}`);
+            }
+            if (route.kind === "article") {
+              for (const expectedId of route.expectedSectionIds) {
+                const count = state.structural.sectionIds.filter((id) => id === expectedId).length;
+                if (count !== 1) {
+                  errors.push(`${engineName} ${viewport.width}px ${route.path}: source section ${expectedId} rendered ${count} times instead of once`);
+                }
+              }
+              if (state.structural.faq !== route.expectedFaq) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: rendered FAQ items ${state.structural.faq}, expected ${route.expectedFaq}`);
+              }
+            }
+
+            for (const item of state.topLevel.slice(1)) {
+              let expected = state.sectionGap;
+              if (item.label === "risk") expected = state.compact ? state.compactSpace : state.flow.sm;
+              else if (item.label === "author") expected = state.compact ? state.sectionGap : state.flow.xl;
+              else if (item.previousLabel === "intake" && item.label === "message-guide") expected = state.flow.md;
+              else if (item.previousLabel?.startsWith("related:") && item.label.startsWith("related:")) expected = state.compact ? state.sectionGap : state.flow.md;
+              if (!closeTo(item.gapBefore, expected)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong top-level gap ${JSON.stringify({ item, expected, flow: state.flow, compact: state.compact })}`);
+              }
+            }
+
+            for (const heading of state.headings) {
+              if (!closeTo(heading.gapAfter, state.headingGap)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong heading gap ${JSON.stringify({ heading, expected: state.headingGap })}`);
+              }
+            }
+            for (const paragraph of state.paragraphs) {
+              if (!closeTo(paragraph.gapBefore, state.paragraphGap)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong paragraph gap ${JSON.stringify({ paragraph, expected: state.paragraphGap })}`);
+              }
+            }
+            for (const block of state.insetBlocks) {
+              if (!closeTo(block.gapBefore, state.insetBlockGap, 4)) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong inset block gap ${JSON.stringify({ block, expected: state.insetBlockGap })}`);
+              }
+            }
+
+            if (!closeTo(state.tailGap, state.flow.xl, 4)) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
+            }
+            if (!closeTo(state.ctaGap, state.flow.md, 4)) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);
+            }
+            if (Number.isFinite(state.ctaFooterGap) && state.ctaFooterGap < -1) {
+              errors.push(`${engineName} ${viewport.width}px ${route.path}: CTA overlaps footer by ${Math.abs(state.ctaFooterGap)}px`);
+            }
+
+            for (const block of state.visibleLayoutBlocks) {
+              if (block.left < -1 || block.right > viewport.width + 1) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: layout block escapes viewport ${JSON.stringify(block)}`);
+              }
+            }
+            for (let index = 1; index < state.topLevel.length; index += 1) {
+              const previous = state.topLevel[index - 1];
+              const current = state.topLevel[index];
+              if (current.top < previous.bottom - 1) {
+                errors.push(`${engineName} ${viewport.width}px ${route.path}: top-level blocks overlap ${JSON.stringify({ previous, current })}`);
+              }
             }
           }
-
-          for (const heading of state.headings) {
-            if (!closeTo(heading.gapAfter, state.flow.sm)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong heading gap ${JSON.stringify({ heading, expected: state.flow.sm })}`);
-            }
-          }
-          for (const paragraph of state.paragraphs) {
-            if (!closeTo(paragraph.gapBefore, state.flow.xs)) {
-              errors.push(`${engineName} ${viewport.width}px ${route.path}: wrong paragraph gap ${JSON.stringify({ paragraph, expected: state.flow.xs })}`);
-            }
-          }
-          if (!closeTo(state.tailGap, state.flow.xl, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: content-to-feedback gap is inconsistent ${JSON.stringify({ actual: state.tailGap, expected: state.flow.xl })}`);
-          }
-          if (!closeTo(state.ctaGap, state.flow.md, 4)) {
-            errors.push(`${engineName} ${viewport.width}px ${route.path}: feedback-to-CTA gap is inconsistent ${JSON.stringify({ actual: state.ctaGap, expected: state.flow.md })}`);
-          }
-
+        } finally {
+          await page.close();
           await context.close();
         }
       }
@@ -228,4 +385,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Editorial rhythm passed: consistent section, heading, paragraph, author, feedback and CTA spacing in articles and cases across Chromium and WebKit");
+console.log(`Editorial rhythm passed for every article: ${articles.length} articles across ${viewports.length} viewports in Chromium and WebKit, with source-section presence, FAQ, block spacing, containment and page-ending geometry checked`);
